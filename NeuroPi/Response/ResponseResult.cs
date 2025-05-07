@@ -1,46 +1,21 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Text.Json.Serialization;
-
-namespace NeuroPi.Response
+﻿namespace NeuroPi.Response
 {
-    public class ResponseResult<T> : IActionResult
+    public class ResponseResult<T>
     {
-        [JsonPropertyName("status")]
-        public int Status { get; set; }
-
-        [JsonPropertyName("message")]
+        // Properties to hold the response data
+        public bool Success { get; set; }
         public string Message { get; set; }
-
-        [JsonPropertyName("data")]
         public T Data { get; set; }
 
-        public ResponseResult(int status = 200, string message = "Success", T data = default)
+        // Success response method - used for successful operations
+        public static ResponseResult<T> SuccessResponse(T data, string message = null)
         {
-            Status = status;
-            Message = message;
-            Data = data;
+            return new ResponseResult<T> { Success = true, Message = message, Data = data };
         }
 
-        public async Task ExecuteResultAsync(ActionContext context)
+        public static ResponseResult<T> FailResponse(string message)
         {
-            var result = new JsonResult(new
-            {
-                status = Status,
-                message = Message,
-                data = Data
-            })
-            {
-                StatusCode = Status
-            };
-
-            await result.ExecuteResultAsync(context);
+            return new ResponseResult<T> { Success = false, Message = message, Data = default(T) };
         }
-
-        // ✅ Static Helpers for cleaner usage
-        public static ResponseResult<T> Success(T data, string message = "Success")
-            => new ResponseResult<T>(200, message, data);
-
-        public static ResponseResult<T> Error(string message, int statusCode = 500)
-            => new ResponseResult<T>(statusCode, message, default);
     }
 }
