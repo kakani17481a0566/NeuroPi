@@ -1,10 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NeuroPi.Models
 {
     [Table("role_permissions")]
     public class MRolePermission : MBaseModel
     {
+        [Key]
+        [Column("role_permission_id")]
+        public int RolePermissionId { get; set; }
+
         [Column("role_id")]
         [ForeignKey("Role")]
         public int RoleId { get; set; }

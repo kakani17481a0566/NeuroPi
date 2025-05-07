@@ -6,6 +6,10 @@ namespace NeuroPi.Models
     [Table("config")]
     public class MConfig : MBaseModel
     {
+        [Key]
+        [Column("config_id")]
+        public int ConfigId { get; set; }
+
         [Column("tenant_id")]
         [ForeignKey("Tenant")]
         public int TenantId { get; set; }

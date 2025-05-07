@@ -7,6 +7,10 @@ namespace NeuroPi.Models
     [Table("audit_logs")]
     public class MAuditLog : MBaseModel
     {
+        [Key]
+        [Column("audit_id")]
+        public int AuditId { get; set; }
+
         [Column("user_id")]
         [ForeignKey("User")]
         public int? UserId { get; set; }

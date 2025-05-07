@@ -5,10 +5,6 @@ namespace NeuroPi.Models
 {
     public abstract class MBaseModel
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        [Column("id")]
-        public int Id { get; set; }
 
         [Column("created_on")]
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using NeuroPi.Model;
 
 namespace NeuroPi.Models
@@ -6,6 +7,11 @@ namespace NeuroPi.Models
     [Table("user_departments")]
     public class MUserDepartment : MBaseModel
     {
+        [Key]  // Indicates that this column will be the primary key
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // Auto-increment
+        [Column("user_dept_id")]
+        public int UserDeptId { get; set; }
+
         [Column("user_id")]
         [ForeignKey("User")]
         public int UserId { get; set; }

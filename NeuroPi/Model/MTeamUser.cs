@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using NeuroPi.Model;
 
 namespace NeuroPi.Models
@@ -6,6 +7,10 @@ namespace NeuroPi.Models
     [Table("team_users")]
     public class MTeamUser : MBaseModel
     {
+        [Key]
+        [Column("team_user_id")]
+        public int TeamUserId { get; set; }
+
         [Column("team_id")]
         [ForeignKey("Team")]
         public int TeamId { get; set; }

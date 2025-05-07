@@ -6,6 +6,10 @@ namespace NeuroPi.Models
     [Table("organizations")]
     public class MOrganization : MBaseModel
     {
+        [Key]
+        [Column("organization_id")]
+        public int OrganizationId { get; set; }
+
         [Required]
         [MaxLength(100)]
         [Column("name")]
@@ -22,6 +26,6 @@ namespace NeuroPi.Models
         // Navigation properties
         public virtual MOrganization ParentOrganization { get; set; }
         public virtual MTenant Tenant { get; set; }
-        public virtual ICollection<MDepartment> Departments { get; set; }
+        public virtual ICollection<MDepartment> Departments { get; set; } = new List<MDepartment>();
     }
 }

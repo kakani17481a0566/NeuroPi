@@ -6,6 +6,10 @@ namespace NeuroPi.Models
     [Table("permissions")]
     public class MPermission : MBaseModel
     {
+        [Key]
+        [Column("permission_id")]
+        public int PermissionId { get; set; }
+
         [Required]
         [MaxLength(50)]
         [Column("name")]
@@ -20,6 +24,6 @@ namespace NeuroPi.Models
 
         // Navigation properties
         public virtual MTenant Tenant { get; set; }
-        public virtual ICollection<MRolePermission> RolePermissions { get; set; }
+        public virtual ICollection<MRolePermission> RolePermissions { get; set; } = new List<MRolePermission>();
     }
 }

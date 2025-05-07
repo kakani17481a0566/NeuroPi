@@ -4,8 +4,13 @@ using System.ComponentModel.DataAnnotations;
 
 namespace NeuroPi.Model
 {
+    [Table("users")]
     public class MUser : MBaseModel
     {
+        [Key]
+        [Column("user_id")]
+        public int UserId { get; set; }
+
         [Required]
         [MaxLength(50)]
         [Column("username")]
@@ -55,9 +60,10 @@ namespace NeuroPi.Model
 
         // Navigation properties
         public virtual MTenant Tenant { get; set; }
-        public virtual ICollection<MUserRole> UserRoles { get; set; }
-        public virtual ICollection<MTeamUser> TeamUsers { get; set; }
-        public virtual ICollection<MGroupUser> GroupUsers { get; set; }
-        public virtual ICollection<MUserDepartment> UserDepartments { get; set; }
+
+        public virtual ICollection<MUserRole> UserRoles { get; set; } = new List<MUserRole>();
+        public virtual ICollection<MTeamUser> TeamUsers { get; set; } = new List<MTeamUser>();
+        public virtual ICollection<MGroupUser> GroupUsers { get; set; } = new List<MGroupUser>();
+        public virtual ICollection<MUserDepartment> UserDepartments { get; set; } = new List<MUserDepartment>();
     }
 }

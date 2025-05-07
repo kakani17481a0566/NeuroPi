@@ -7,6 +7,10 @@ namespace NeuroPi.Models
     [Table("departments")]
     public class MDepartment : MBaseModel
     {
+        [Key]
+        [Column("department_id")]
+        public int DepartmentId { get; set; }
+
         [Required]
         [MaxLength(100)]
         [Column("name")]
@@ -28,6 +32,6 @@ namespace NeuroPi.Models
         public virtual MUser HeadUser { get; set; }
         public virtual MOrganization Organization { get; set; }
         public virtual MTenant Tenant { get; set; }
-        public virtual ICollection<MUserDepartment> UserDepartments { get; set; }
+        public virtual ICollection<MUserDepartment> UserDepartments { get; set; } = new List<MUserDepartment>();
     }
 }

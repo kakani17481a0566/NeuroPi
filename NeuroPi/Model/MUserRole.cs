@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using NeuroPi.Model;
 
 namespace NeuroPi.Models
@@ -6,6 +7,12 @@ namespace NeuroPi.Models
     [Table("user_roles")]
     public class MUserRole : MBaseModel
     {
+        // Primary key for the user_role record
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // Auto-incremented primary key
+        [Column("user_role_id")] // Maps to 'user_role_id' column in the database
+        public int UserRoleId { get; set; }
+
         [Column("user_id")]
         [ForeignKey("User")]
         public int UserId { get; set; }

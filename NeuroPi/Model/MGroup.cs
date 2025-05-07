@@ -6,6 +6,10 @@ namespace NeuroPi.Models
     [Table("groups")]
     public class MGroup : MBaseModel
     {
+        [Key]
+        [Column("group_id")]
+        public int GroupId { get; set; }
+
         [Required]
         [MaxLength(100)]
         [Column("name")]
@@ -17,6 +21,6 @@ namespace NeuroPi.Models
 
         // Navigation properties
         public virtual MTenant Tenant { get; set; }
-        public virtual ICollection<MGroupUser> GroupUsers { get; set; }
+        public virtual ICollection<MGroupUser> GroupUsers { get; set; } = new List<MGroupUser>();
     }
 }
