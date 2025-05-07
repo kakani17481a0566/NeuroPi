@@ -16,9 +16,11 @@ namespace NeuroPi.Services.Implementation
             _context = context;
         }
 
-        public async Task<IEnumerable<MTenant>> GetAllTenantsAsync()
+        public async Task<List<MTenant>> GetAllTenantsAsync()
         {
             return await _context.Tenants.ToListAsync();
         }
+
+        
     }
 }

@@ -6,6 +6,6 @@ namespace NeuroPi.Services.Interface
 {
     public interface ITenantService
     {
-        Task<IEnumerable<MTenant>> GetAllTenantsAsync();
+        Task<List<MTenant>> GetAllTenantsAsync();
     }
 }
