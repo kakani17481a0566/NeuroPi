@@ -1,24 +1,26 @@
 using Microsoft.EntityFrameworkCore;
 using NeuroPi.Data;
-using NeuroPi.Services.Implementation;
 using NeuroPi.Services.Interface;
+using NeuroPi.Services.Implementation;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Register services
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<ITenantService, TenantService>();
+// Register application services
+builder.Services.AddScoped<ITenantService, TenantServiceImpl>();
 
-// Register PostgreSQL DbContext
+// Register DbContext for PostgreSQL
 builder.Services.AddDbContext<NeuroPiDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+);
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -28,4 +30,5 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
+
 app.Run();
