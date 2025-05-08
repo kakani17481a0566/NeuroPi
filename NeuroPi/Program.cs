@@ -12,6 +12,7 @@ builder.Services.AddSwaggerGen();
 
 // Register application services
 builder.Services.AddScoped<ITenantService, TenantServiceImpl>();
+builder.Services.AddTransient<IDepartmentService, DepartmentServiceImpl>();
 
 // Register DbContext for PostgreSQL
 builder.Services.AddDbContext<NeuroPiDbContext>(options =>
