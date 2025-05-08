@@ -2,9 +2,8 @@
 using NeuroPi.Response;
 using NeuroPi.Services.Interface;
 using NeuroPi.ViewModel.Tenent;
-using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Net;
 
 namespace NeuroPi.Controllers
 {
@@ -21,92 +20,69 @@ namespace NeuroPi.Controllers
 
         // GET: api/tenants
         [HttpGet]
-        public async Task<ResponseResult<List<TenantViewModel>>> GetAll()
+        public ResponseResult<List<TenantViewModel>> GetAll()
         {
-            try
+            var tenants = _tenantService.GetAllTenants();
+            if (tenants == null || tenants.Count == 0)
             {
-                var tenants = await _tenantService.GetAllTenantsAsync();
-                return tenants == null || tenants.Count == 0
-                    ? ResponseResult<List<TenantViewModel>>.FailResponse("No tenants found")
-                    : ResponseResult<List<TenantViewModel>>.SuccessResponse(tenants, "Tenants retrieved successfully");
+                return ResponseResult<List<TenantViewModel>>.FailResponse(HttpStatusCode.NotFound, "No tenants found");
             }
-            catch (Exception ex)
-            {
-                return ResponseResult<List<TenantViewModel>>.FailResponse($"Error retrieving tenants: {ex.Message}");
-            }
+            return ResponseResult<List<TenantViewModel>>.SuccessResponse(HttpStatusCode.OK, tenants, "Tenants retrieved successfully");
         }
 
-        // GET: api/tenants/5
+        // GET: api/tenants/{id}
         [HttpGet("{id}")]
-        public async Task<ResponseResult<TenantViewModel>> GetById(int id)
+        public ResponseResult<TenantViewModel> GetById(int id)
         {
-            try
+            var tenant = _tenantService.GetTenantById(id);
+            if (tenant == null)
             {
-                var tenant = await _tenantService.GetTenantByIdAsync(id);
-                return tenant == null
-                    ? ResponseResult<TenantViewModel>.FailResponse("Tenant not found")
-                    : ResponseResult<TenantViewModel>.SuccessResponse(tenant, "Tenant retrieved successfully");
+                return ResponseResult<TenantViewModel>.FailResponse(HttpStatusCode.NotFound, "Tenant not found");
             }
-            catch (Exception ex)
-            {
-                return ResponseResult<TenantViewModel>.FailResponse($"Error retrieving tenant: {ex.Message}");
-            }
+            return ResponseResult<TenantViewModel>.SuccessResponse(HttpStatusCode.OK, tenant, "Tenant retrieved successfully");
         }
 
         // POST: api/tenants
         [HttpPost]
-        public async Task<ResponseResult<TenantViewModel>> Create([FromBody] TenantInputModel tenantInput)
+        public ResponseResult<TenantViewModel> Create([FromBody] TenantInputModel tenantInput)
         {
-            try
+            if (!ModelState.IsValid)
             {
-                if (!ModelState.IsValid)
-                    return ResponseResult<TenantViewModel>.FailResponse("Invalid tenant data");
+                return ResponseResult<TenantViewModel>.FailResponse(HttpStatusCode.BadRequest, "Invalid tenant data");
+            }
 
-                var createdTenant = await _tenantService.CreateTenantAsync(tenantInput);
-                return ResponseResult<TenantViewModel>.SuccessResponse(createdTenant, "Tenant created successfully");
-            }
-            catch (Exception ex)
-            {
-                return ResponseResult<TenantViewModel>.FailResponse($"Error creating tenant: {ex.Message}");
-            }
+            var createdTenant = _tenantService.CreateTenant(tenantInput);
+            return ResponseResult<TenantViewModel>.SuccessResponse(HttpStatusCode.Created, createdTenant, "Tenant created successfully");
         }
 
-        // PUT: api/tenants/5
+        // PUT: api/tenants/{id}
         [HttpPut("{id}")]
-        public async Task<ResponseResult<TenantViewModel>> Update(int id, [FromBody] TenantUpdateInputModel tenantUpdateInput)
+        public ResponseResult<TenantViewModel> Update(int id, [FromBody] TenantUpdateInputModel tenantUpdateInput)
         {
-            try
+            if (!ModelState.IsValid)
             {
-                if (!ModelState.IsValid)
-                    return ResponseResult<TenantViewModel>.FailResponse("Invalid tenant data");
-
-                var updatedTenant = await _tenantService.UpdateTenantAsync(id, tenantUpdateInput);
-                if (updatedTenant == null)
-                    return ResponseResult<TenantViewModel>.FailResponse("Tenant not found");
-
-                return ResponseResult<TenantViewModel>.SuccessResponse(updatedTenant, "Tenant updated successfully");
+                return ResponseResult<TenantViewModel>.FailResponse(HttpStatusCode.BadRequest, "Invalid tenant data");
             }
-            catch (Exception ex)
+
+            var updatedTenant = _tenantService.UpdateTenant(id, tenantUpdateInput);
+            if (updatedTenant == null)
             {
-                return ResponseResult<TenantViewModel>.FailResponse($"Error updating tenant: {ex.Message}");
+                return ResponseResult<TenantViewModel>.FailResponse(HttpStatusCode.NotFound, "Tenant not found");
             }
+
+            return ResponseResult<TenantViewModel>.SuccessResponse(HttpStatusCode.OK, updatedTenant, "Tenant updated successfully");
         }
 
-        // DELETE: api/tenants/5
+        // DELETE: api/tenants/{id}
         [HttpDelete("{id}")]
-        public async Task<ResponseResult<bool>> Delete(int id)
+        public ResponseResult<bool> Delete(int id)
         {
-            try
+            var result = _tenantService.DeleteTenant(id);
+            if (!result)
             {
-                var result = await _tenantService.DeleteTenantAsync(id);
-                return result
-                    ? ResponseResult<bool>.SuccessResponse(true, "Tenant deleted successfully")
-                    : ResponseResult<bool>.FailResponse("Tenant not found or could not be deleted");
+                return ResponseResult<bool>.FailResponse(HttpStatusCode.NotFound, "Tenant not found or could not be deleted");
             }
-            catch (Exception ex)
-            {
-                return ResponseResult<bool>.FailResponse($"Error deleting tenant: {ex.Message}");
-            }
+            return ResponseResult<bool>.SuccessResponse(HttpStatusCode.OK, true, "Tenant deleted successfully");
         }
     }
 }
