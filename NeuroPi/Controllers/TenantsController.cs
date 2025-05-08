@@ -5,7 +5,18 @@ using NeuroPi.ViewModel.Tenent;
 using System.Collections.Generic;
 using System.Net;
 
+namespace NeuroPi.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class TenantsController : ControllerBase
+    {
+        private readonly ITenantService _tenantService;
 
+        public TenantsController(ITenantService tenantService)
+        {
+            _tenantService = tenantService;
+        }
 
         // GET: api/tenants
         [HttpGet]
