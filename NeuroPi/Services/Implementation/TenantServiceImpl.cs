@@ -1,12 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
-using NeuroPi.Data;
+﻿using NeuroPi.Data;
 using NeuroPi.Models;
 using NeuroPi.Services.Interface;
 using NeuroPi.ViewModel.Tenent;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace NeuroPi.Services.Implementation
 {
@@ -19,152 +17,87 @@ namespace NeuroPi.Services.Implementation
             _context = context;
         }
 
-        // Get all tenants and map them to TenantViewModel
-        public async Task<List<TenantViewModel>> GetAllTenantsAsync()
+        public List<TenantViewModel> GetAllTenants()
         {
-            try
-            {
-                return await _context.Tenants
-                    .Select(t => new TenantViewModel
-                    {
-                        TenantId = t.TenantId,
-                        Name = t.Name,
-                        CreatedOn = t.CreatedOn,
-                        UpdatedOn = t.UpdatedOn
-                    })
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("An error occurred while fetching the tenants.", ex);
-            }
+            return _context.Tenants
+                .Select(t => new TenantViewModel
+                {
+                    TenantId = t.TenantId,
+                    Name = t.Name,
+                    CreatedOn = t.CreatedOn,
+                    UpdatedOn = t.UpdatedOn
+                })
+                .ToList();
         }
 
-        // Get a tenant by its ID and map it to TenantViewModel
-        public async Task<TenantViewModel> GetTenantByIdAsync(int id)
+        public TenantViewModel GetTenantById(int id)
         {
-            try
-            {
-                var tenant = await _context.Tenants
-                    .Where(t => t.TenantId == id)
-                    .Select(t => new TenantViewModel
-                    {
-                        TenantId = t.TenantId,
-                        Name = t.Name,
-                        CreatedOn = t.CreatedOn,
-                        UpdatedOn = t.UpdatedOn
-                    })
-                    .FirstOrDefaultAsync();
-
-                if (tenant == null)
+            var tenant = _context.Tenants
+                .Where(t => t.TenantId == id)
+                .Select(t => new TenantViewModel
                 {
-                    throw new KeyNotFoundException($"Tenant with ID {id} not found.");
-                }
+                    TenantId = t.TenantId,
+                    Name = t.Name,
+                    CreatedOn = t.CreatedOn,
+                    UpdatedOn = t.UpdatedOn
+                })
+                .FirstOrDefault();
 
-                return tenant;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("An error occurred while fetching the tenant.", ex);
-            }
+            return tenant;
         }
 
-        // Create a new tenant and map it to TenantViewModel
-        public async Task<TenantViewModel> CreateTenantAsync(TenantInputModel input)
+        public TenantViewModel CreateTenant(TenantInputModel input)
         {
-            try
+            var tenant = new MTenant
             {
-                // Validate that the 'CreatedBy' user exists
-                bool userExists = await _context.Users.AnyAsync(u => u.UserId == input.CreatedBy);
-                if (!userExists)
-                {
-                    throw new InvalidOperationException("User does not exist.");
-                }
+                Name = input.Name,
+                CreatedBy = input.CreatedBy,
+                CreatedOn = DateTime.UtcNow
+            };
 
-                var tenant = new MTenant
-                {
-                    Name = input.Name,
-                    CreatedBy = input.CreatedBy,
-                    CreatedOn = DateTime.UtcNow
-                };
+            _context.Tenants.Add(tenant);
+            _context.SaveChanges();
 
-                _context.Tenants.Add(tenant);
-                await _context.SaveChangesAsync();
-
-                return new TenantViewModel
-                {
-                    TenantId = tenant.TenantId,
-                    Name = tenant.Name,
-                    CreatedOn = tenant.CreatedOn
-                };
-            }
-            catch (Exception ex)
+            return new TenantViewModel
             {
-                throw new Exception("An error occurred while creating the tenant.", ex);
-            }
+                TenantId = tenant.TenantId,
+                Name = tenant.Name,
+                CreatedOn = tenant.CreatedOn
+            };
         }
 
-        // Update an existing tenant and map it to TenantViewModel
-        public async Task<TenantViewModel> UpdateTenantAsync(int id, TenantUpdateInputModel input)
+        public TenantViewModel UpdateTenant(int id, TenantUpdateInputModel input)
         {
-            try
+            var existingTenant = _context.Tenants.Find(id);
+            if (existingTenant == null)
+                return null;
+
+            existingTenant.Name = input.Name;
+            existingTenant.UpdatedBy = input.UpdatedBy;
+            existingTenant.UpdatedOn = DateTime.UtcNow;
+
+            _context.Tenants.Update(existingTenant);
+            _context.SaveChanges();
+
+            return new TenantViewModel
             {
-                // Validate if the 'UpdatedBy' user exists
-                bool userExists = await _context.Users.AnyAsync(u => u.UserId == input.UpdatedBy);
-                if (!userExists)
-                {
-                    throw new InvalidOperationException($"User with ID {input.UpdatedBy} does not exist.");
-                }
-
-                var existingTenant = await _context.Tenants.FindAsync(id);
-                if (existingTenant == null)
-                {
-                    throw new KeyNotFoundException($"Tenant with ID {id} not found.");
-                }
-
-                // Update the tenant's properties
-                existingTenant.Name = input.Name;
-                existingTenant.UpdatedBy = input.UpdatedBy;
-                existingTenant.UpdatedOn = DateTime.UtcNow;
-
-                // Apply the changes and save to the database
-                _context.Tenants.Update(existingTenant);
-                await _context.SaveChangesAsync();
-
-                return new TenantViewModel
-                {
-                    TenantId = existingTenant.TenantId,
-                    Name = existingTenant.Name,
-                    CreatedOn = existingTenant.CreatedOn,
-                    UpdatedOn = existingTenant.UpdatedOn
-                };
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error updating tenant: {ex.Message}", ex);
-            }
+                TenantId = existingTenant.TenantId,
+                Name = existingTenant.Name,
+                CreatedOn = existingTenant.CreatedOn,
+                UpdatedOn = existingTenant.UpdatedOn
+            };
         }
 
-        // Delete a tenant and return true if successful
-        public async Task<bool> DeleteTenantAsync(int id)
+        public bool DeleteTenant(int id)
         {
-            try
-            {
-                var tenant = await _context.Tenants.FindAsync(id);
-                if (tenant == null)
-                {
-                    throw new KeyNotFoundException($"Tenant with ID {id} not found.");
-                }
+            var tenant = _context.Tenants.Find(id);
+            if (tenant == null)
+                return false;
 
-                _context.Tenants.Remove(tenant);
-                await _context.SaveChangesAsync();
+            _context.Tenants.Remove(tenant);
+            _context.SaveChanges();
 
-                return true;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("An error occurred while deleting the tenant.", ex);
-            }
+            return true;
         }
     }
 }
