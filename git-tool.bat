@@ -211,43 +211,49 @@ echo Exiting Git Tool...
 exit /b
 
 
-
 :progress_bar
 @echo off
 setlocal enabledelayedexpansion
 
 :: Settings
-set "total=20"          :: Number of steps
-set "bar_width=40"      :: Width of progress bar
-set "delay=100"         :: Delay in milliseconds
+set "steps=30"              :: Total animation steps
+set "bar_width=40"          :: Width of the progress bar
+set "delay=50"              :: Milliseconds between steps
 
 :: ANSI colors
 for /f %%A in ('echo prompt $E ^| cmd') do set "ESC=%%A"
-set "BLUE=%ESC%[34m"
+set "BLUE=%ESC%[94m"
+set "GREEN=%ESC%[92m"
 set "RESET=%ESC%[0m"
 
-:: Main loop
-for /L %%i in (1,1,%total%) do (
-    set /a "percent=%%i*100/%total%"
-    set /a "filled=%%i*%bar_width%/%total%"
-    set /a "empty=%bar_width%-!filled!"
+:: Clear line function
+set "clear_line=%ESC%[2K%ESC%[1G"
+
+:: Animation loop
+for /L %%i in (1,1,%steps%) do (
+    set /a "percent=(%%i*100/%steps%)"
+    set /a "filled=(%%i*%bar_width%/%steps%)"
+    set /a "remaining=%bar_width%-!filled!"
     
-    :: Build the bar
-    set "bar="
-    for /L %%j in (1,1,!filled!) do set "bar=!bar!█"
-    for /L %%j in (1,1,!empty!) do set "bar=!bar!─"
+    :: Build progress bar
+    set "progress_bar="
+    if !filled! gtr 0 (
+        for /L %%j in (1,1,!filled!) do set "progress_bar=!progress_bar!▓"
+    )
+    if !remaining! gtr 0 (
+        for /L %%j in (1,1,!remaining!) do set "progress_bar=!progress_bar!░"
+    )
     
     :: Display
-    <nul set /p="%BLUE%[!bar!] %percent%%% %RESET%"
+    <nul set /p="!clear_line!!BLUE!║!GREEN!!progress_bar!!BLUE!║ !percent!%%"
     
-    :: Clear line and return cursor
-    <nul set /p="%ESC%[1G"
-    
-    :: Delay
-    ping -n 2 127.0.0.1 >nul
+    :: Smooth delay
+    ping -n 1 -w %delay% 127.0.0.1 >nul
 )
 
-:: Complete
-echo [████████████████████████████████████████] 100%%
+:: Final 100% state
+set "progress_bar="
+for /L %%i in (1,1,%bar_width%) do set "progress_bar=!progress_bar!▓"
+echo !clear_line!!BLUE!║!GREEN!!progress_bar!!BLUE!║ 100%%
 endlocal
 goto :eof
