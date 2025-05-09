@@ -1,5 +1,1 @@
-
-NeuroPi/Program.cs
-NeuroPi/Program.cs
-
 tmp_status.txt
