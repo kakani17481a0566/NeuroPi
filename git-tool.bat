@@ -209,7 +209,6 @@ goto menu
 echo.
 echo Exiting Git Tool...
 exit /b
-
 :progress_bar
 @echo off
 setlocal enabledelayedexpansion
@@ -218,17 +217,29 @@ setlocal enabledelayedexpansion
 set "total=100"
 set "percent=0"
 set "bar="
+set "width=50"  :: Total width of the progress bar
+set "symbol=#"  :: The symbol to use in the progress bar
+set "delay=50"  :: Delay in ms for smooth progress updates
+
+:: Set initial color (Green for progress)
+for /f %%A in ('echo prompt $E ^| cmd') do set "ESC=%%A"
+:: ANSI codes for green and default text color
+set "GREEN=%ESC%[32m"
+set "RESET=%ESC%[0m"
 
 :: Loop to create the progress bar
 for /L %%i in (1,1,%total%) do (
     set /a "percent=(%%i*100)/%total%"
-    set "bar=!bar!#"
-
-    :: Print the progress bar on the same line (using carriage return to overwrite)
-    <nul set /p="Progress: [!bar!--------------------------------------------------] !percent!%%"
-
-    :: Optional: Adjust the delay time for faster progress
-    ping 127.0.0.1 -n 1 -w 50 > nul  :: 50ms delay for faster updates
+    
+    :: Update the bar with symbols
+    set "bar="
+    for /L %%j in (1,1,%%i) do set "bar=!bar!!symbol!"
+    
+    :: Update the progress bar line (this will overwrite the previous line)
+    <nul set /p="Progress: [!GREEN!!bar!%RESET%--------------------------------------------------] !percent!%%"
+    
+    :: Optional: Adjust the delay time for smoother updates
+    ping 127.0.0.1 -n 1 -w !delay! > nul  :: Delay for smoother animation
 )
 
 :: Finish with a newline after the progress bar
