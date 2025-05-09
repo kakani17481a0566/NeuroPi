@@ -1,6 +1,14 @@
 @echo off
 setlocal EnableDelayedExpansion
 
+:: Initialize ANSI color codes
+for /f %%A in ('echo prompt $E ^| cmd') do set "ESC=%%A"
+set "BLUE=%ESC%[94m"
+set "GREEN=%ESC%[92m"
+set "YELLOW=%ESC%[93m"
+set "RED=%ESC%[91m"
+set "RESET=%ESC%[0m"
+
 :menu
 cls
 echo ================================================
@@ -17,11 +25,11 @@ echo  8.  Delete a local branch
 echo  9.  Delete a remote branch
 echo 10.  Merge a branch into current
 echo 11.  Pull latest from origin
-echo 12.  Pull from selected remote branch into current local branch
+echo 12.  Pull from selected remote branch
 echo 13.  Push current branch to origin
-echo 14.  Push current branch to selected remote branch
-echo 15.  Push current branch to all remote branches
-echo 16.  Commit and push local changes to current branch
+echo 14.  Push to selected remote branch
+echo 15.  Push to all remote branches
+echo 16.  Commit and push changes
 echo 17.  Stash changes
 echo 18.  Exit
 echo ================================================
@@ -54,7 +62,7 @@ goto pause_return
 
 :log
 echo.
-git log --oneline --graph --decorate --all
+git log --oneline --graph --decorate --all -n 20
 goto pause_return
 
 :list_local
@@ -74,39 +82,41 @@ goto pause_return
 
 :checkout
 echo.
-set /p branch="Enter the branch name to checkout: "
+set /p branch="Enter branch name to checkout: "
 git checkout %branch% || goto error
 goto pause_return
 
 :create_branch
 echo.
-set /p newBranch="Enter the name of the new branch: "
+set /p newBranch="Enter name for new branch: "
 git checkout -b %newBranch% || goto error
 echo Switched to new branch %newBranch%
 goto pause_return
 
 :delete_local_branch
 echo.
-set /p deleteBranch="Enter the name of the local branch to delete: "
+set /p deleteBranch="Enter local branch to delete: "
 git branch -d %deleteBranch% || goto error
 echo Local branch %deleteBranch% deleted.
 goto pause_return
 
 :delete_remote_branch
 echo.
-set /p deleteRemoteBranch="Enter the name of the remote branch to delete: "
+set /p deleteRemoteBranch="Enter remote branch to delete: "
 git push origin --delete %deleteRemoteBranch% || goto error
 echo Remote branch %deleteRemoteBranch% deleted.
 goto pause_return
 
 :merge
 echo.
-set /p mergeBranch="Enter the branch to merge into current: "
+set /p mergeBranch="Enter branch to merge into current: "
+call :progress_line "Merging %mergeBranch%"
 git merge %mergeBranch% || goto error
 goto pause_return
 
 :pull_origin
 echo.
+call :progress_line "Pulling from origin"
 git pull || goto error
 goto pause_return
 
@@ -115,17 +125,14 @@ echo.
 echo === Remote Branches ===
 git branch -r
 echo.
-set /p remoteBranch="Enter the remote branch name to pull from (e.g. origin/feature-xyz): "
-echo Pulling from remote branch...
-call :progress_bar
+set /p remoteBranch="Enter remote branch to pull from (e.g. origin/main): "
+call :progress_line "Pulling %remoteBranch%"
 git pull origin %remoteBranch% || goto error
 goto pause_return
 
 :push
-echo.
 for /f %%b in ('git branch --show-current') do set currentBranch=%%b
-echo Pushing current branch %currentBranch% to origin...
-call :progress_bar
+call :progress_line "Pushing %currentBranch% to origin"
 git push origin %currentBranch% || goto error
 goto pause_return
 
@@ -134,43 +141,31 @@ echo.
 echo === Remote Branches ===
 git branch -r
 echo.
-set /p selectedBranch="Enter the remote branch name to push the current branch to: "
+set /p selectedBranch="Enter remote branch to push to: "
 for /f %%b in ('git branch --show-current') do set currentBranch=%%b
-echo Pushing to remote branch %selectedBranch%...
-call :progress_bar
+call :progress_line "Pushing to %selectedBranch%"
 git push origin %currentBranch%:%selectedBranch% || goto error
 goto pause_return
 
 :push_all_branches
-echo.
 for /f %%b in ('git branch --show-current') do set currentBranch=%%b
-echo Pushing current branch to all remote branches...
 echo === Remote Branches ===
 git branch -r
 echo.
-call :progress_bar
-:: Loop over remote branches and push
+call :progress_line "Pushing to all remotes"
 for /f "tokens=*" %%a in ('git branch -r') do (
     set "remoteBranch=%%a"
     if not "!remoteBranch!"=="origin/HEAD" (
-        call :push_to_remote !remoteBranch!
+        set "remoteBranch=!remoteBranch:origin/=!"
+        git push origin %currentBranch%:!remoteBranch! || echo !RED!Failed to push to !remoteBranch!!RESET!
     )
 )
 goto pause_return
 
-:push_to_remote
-setlocal EnableDelayedExpansion
-set "branchName=%~1"
-set "branchName=!branchName:origin/=!"
-echo Pushing to !branchName!...
-git push origin %currentBranch%:!branchName! || echo Failed to push to !branchName!
-endlocal
-exit /b
-
 :commit_push
 echo.
 git diff --name-only > tmp_status.txt
-set msg=Updated:
+set msg=Changes:
 setlocal EnableDelayedExpansion
 for /f "usebackq delims=" %%f in ("tmp_status.txt") do (
     set "file=%%~nxf"
@@ -183,21 +178,26 @@ if not exist tmp_status.txt (
     goto pause_return
 )
 
+call :progress_line "Committing changes"
 git add . || goto error
 git commit -m "%msg%" || goto error
 del tmp_status.txt
 
-goto push
+for /f %%b in ('git branch --show-current') do set currentBranch=%%b
+call :progress_line "Pushing %currentBranch%"
+git push origin %currentBranch% || goto error
+goto pause_return
 
 :stash
 echo.
+call :progress_line "Stashing changes"
 git stash push || goto error
 echo Changes have been stashed.
 goto pause_return
 
 :error
 echo.
-echo === ERROR: Operation failed. Please check the above output. ===
+echo !RED!=== ERROR: Operation failed. Please check the above output. ===!RESET!
 goto pause_return
 
 :pause_return
@@ -215,42 +215,50 @@ exit /b
 setlocal enabledelayedexpansion
 
 :: Settings
-set "width=50"            :: Width of the progress area
-set "delay=50"            :: Milliseconds between updates
-set "steps=100"           :: Total animation steps
+set "width=40"
+set "delay=20"
+set "steps=30"
 
-:: ANSI colors
-for /f %%A in ('echo prompt $E ^| cmd') do set "ESC=%%A"
-set "CYAN=%ESC%[36m"
-set "RESET=%ESC%[0m"
+:: Get operation description
+set "operation=%~1"
+if not defined operation set "operation=Processing"
+
+:: Clear line sequence
 set "clear_line=%ESC%[2K%ESC%[1G"
 
-:: Animation characters (can be customized)
-set "chars=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>="
-
-:: Main animation loop
+:: Animation loop
 for /L %%i in (1,1,%steps%) do (
-    set /a "percent=%%i*100/%steps%"
-    set /a "pos=%%i*%width%/%steps%"
+    set /a "percent=(%%i*100/%steps%)"
+    set /a "pos=(%%i*%width%/%steps%)"
     
-    :: Build the line
+    :: Build progress line
     set "line="
     for /L %%j in (1,1,%width%) do (
-        if %%j == !pos! (
-            set "line=!line!!CYAN!■!RESET!"
+        if %%j lss !pos! (
+            if !percent! geq 80 (
+                set "line=!line!!GREEN!▓!RESET!"
+            ) else if !percent! geq 50 (
+                set "line=!line!!YELLOW!▒!RESET!"
+            ) else (
+                set "line=!line!!BLUE!░!RESET!"
+            )
+        ) else if %%j == !pos! (
+            set "line=!line!!BLUE!►!RESET!"
         ) else (
-            set "line=!line!-"
+            set "line=!line! "
         )
     )
     
-    :: Display
-    <nul set /p="!clear_line![ !line! ] !percent!%%"
+    :: Display progress
+    <nul set /p="!clear_line!!BLUE!!operation! !RESET![!line!] !percent!%%"
     
     :: Smooth delay
-    ping -n 1 -w %delay% 127.0.0.1 >nul
+    >nul ping -n 1 -w %delay% 127.0.0.1
 )
 
-:: Completion
-echo !clear_line![ !CYAN!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%!RESET! ] 100%%
+:: Completion state
+set "line="
+for /L %%j in (1,1,%width%) do set "line=!line!!GREEN!▓!RESET!"
+echo !clear_line!!BLUE!!operation! !RESET![!line!] 100%% !GREEN!✓!RESET!
 endlocal
 goto :eof
