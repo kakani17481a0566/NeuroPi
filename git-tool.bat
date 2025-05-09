@@ -210,50 +210,47 @@ echo.
 echo Exiting Git Tool...
 exit /b
 
-
-:progress_bar
+:progress_line
 @echo off
 setlocal enabledelayedexpansion
 
 :: Settings
-set "steps=30"              :: Total animation steps
-set "bar_width=40"          :: Width of the progress bar
-set "delay=50"              :: Milliseconds between steps
+set "width=50"            :: Width of the progress area
+set "delay=50"            :: Milliseconds between updates
+set "steps=100"           :: Total animation steps
 
 :: ANSI colors
 for /f %%A in ('echo prompt $E ^| cmd') do set "ESC=%%A"
-set "BLUE=%ESC%[94m"
-set "GREEN=%ESC%[92m"
+set "CYAN=%ESC%[36m"
 set "RESET=%ESC%[0m"
-
-:: Clear line function
 set "clear_line=%ESC%[2K%ESC%[1G"
 
-:: Animation loop
+:: Animation characters (can be customized)
+set "chars=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>="
+
+:: Main animation loop
 for /L %%i in (1,1,%steps%) do (
-    set /a "percent=(%%i*100/%steps%)"
-    set /a "filled=(%%i*%bar_width%/%steps%)"
-    set /a "remaining=%bar_width%-!filled!"
+    set /a "percent=%%i*100/%steps%"
+    set /a "pos=%%i*%width%/%steps%"
     
-    :: Build progress bar
-    set "progress_bar="
-    if !filled! gtr 0 (
-        for /L %%j in (1,1,!filled!) do set "progress_bar=!progress_bar!▓"
-    )
-    if !remaining! gtr 0 (
-        for /L %%j in (1,1,!remaining!) do set "progress_bar=!progress_bar!░"
+    :: Build the line
+    set "line="
+    for /L %%j in (1,1,%width%) do (
+        if %%j == !pos! (
+            set "line=!line!!CYAN!■!RESET!"
+        ) else (
+            set "line=!line!-"
+        )
     )
     
     :: Display
-    <nul set /p="!clear_line!!BLUE!║!GREEN!!progress_bar!!BLUE!║ !percent!%%"
+    <nul set /p="!clear_line![ !line! ] !percent!%%"
     
     :: Smooth delay
     ping -n 1 -w %delay% 127.0.0.1 >nul
 )
 
-:: Final 100% state
-set "progress_bar="
-for /L %%i in (1,1,%bar_width%) do set "progress_bar=!progress_bar!▓"
-echo !clear_line!!BLUE!║!GREEN!!progress_bar!!BLUE!║ 100%%
+:: Completion
+echo !clear_line![ !CYAN!%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%!RESET! ] 100%%
 endlocal
 goto :eof
