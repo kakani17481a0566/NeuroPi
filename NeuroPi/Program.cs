@@ -17,7 +17,8 @@ builder.Services.AddTransient<IDepartmentService, DepartmentServiceImpl>();
 builder.Services.AddScoped<IGroupService, GroupServiceImpl>();
 builder.Services.AddScoped<IOrganizationService, OrganizationImpl>();
 builder.Services.AddTransient<IGroupUserService, GroupUserServiceImpl>();
-builder.Services.AddScoped<ITeamService, TeamService>();
+builder.Services.AddScoped<ITeamService, TeamService>(); 
+builder.Services.AddTransient<ITeamUserService, TeamUserServiceImpl>();
 
 
 
