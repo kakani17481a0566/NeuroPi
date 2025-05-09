@@ -17,7 +17,9 @@ builder.Services.AddTransient<IDepartmentService, DepartmentServiceImpl>();
 builder.Services.AddScoped<IGroupService, GroupServiceImpl>();
 builder.Services.AddScoped<IOrganizationService, OrganizationImpl>();
 builder.Services.AddTransient<IGroupUserService, GroupUserServiceImpl>();
+
 builder.Services.AddTransient<IRolePermisisionService, RolePermissionServiceImpl>();
+builder.Services.AddScoped<ITeamService, TeamService>();
 
 
 // Register DbContext for PostgreSQL

@@ -1,9 +1,3 @@
- M NeuroPi/Controllers/TenantsController.cs
- M NeuroPi/NeuroPi.csproj
- M NeuroPi/Program.cs
- M NeuroPi/Response/ResponseResult.cs
- D NeuroPi/Services/Implementation/TenantService.cs
- M NeuroPi/Services/Interface/ITenantService.cs
- M tmp_status.txt
-?? NeuroPi/Services/Implementation/TenantServiceImpl.cs
-?? NeuroPi/ViewModel/
+NeuroPi/Program.cs
+NeuroPi/Program.cs
+tmp_status.txt
