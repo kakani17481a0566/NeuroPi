@@ -212,7 +212,7 @@ setlocal
 set "total=50"  :: Total number of steps in the progress bar (50 steps for a 50% bar fill)
 set "bar="
 set "percent=0"
-set "delay=200" :: Delay for smoother progress (milliseconds)
+set "delay=100" :: Delay for smoother progress (milliseconds)
 
 :: Initial progress bar
 <nul set /p="Progress: [--------------------------------------------------] 0%%"
@@ -222,7 +222,7 @@ for /L %%i in (1,1,%total%) do (
     set "bar=!bar!#"
     set /a "percent=(%%i*100)/%total%"
     
-    :: Clear the previous progress bar and update it
+    :: Clear the previous progress bar and update it on the same line
     <nul set /p="Progress: [!bar!--------------------------------------------------] !percent!%%"
 
     :: Wait for the specified delay to simulate the operation progress
