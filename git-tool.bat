@@ -207,33 +207,27 @@ echo.
 echo Exiting Git Tool...
 exit /b
 
-:: ------------------- PROFESSIONAL PROGRESS BAR ----------------------
-
 :progress_bar
 setlocal
 set "total=50"  :: Total number of steps in the progress bar (50 steps for a 50% bar fill)
 set "bar="
 set "percent=0"
-set "empty=-"
-set "full=="
-set "width=50"  :: Width of the progress bar
+set "delay=100" :: Delay for smoother progress (milliseconds)
 
-:: Initial blank bar display
-echo Progress: [%-50s] 0%%
+:: Print the initial progress bar
+<nul set /p="Progress: [--------------------------------------------------] 0%%"
 
-:: Progress Bar Loop
+:: Loop through and update progress on the same line
 for /L %%i in (1,1,%total%) do (
-    set /a "percent=%%i*100/%total%"
-    set "bar="
+    set "bar=!bar!#"
+    set /a "percent=(%%i*100)/%total%"
     
-    :: Build the progress bar
-    for /L %%j in (1,1,%%i) do set "bar=!bar!!full!"
-    for /L %%k in (%%i,1,%total%) do set "bar=!bar!!empty!"
-    
-    :: Display the progress bar and percentage
-    <nul set /p="Progress: [!bar!] !percent!%%"
-    ping 127.0.0.1 -n 1 -w 100 > nul  :: Simulate delay
+    :: Clear the line and redraw the progress bar in place
+    <nul set /p="Progress: [!bar!--------------------------------------------------] !percent!%%"
+
+    :: Wait for the specified delay
+    ping 127.0.0.1 -n 1 -w !delay! > nul
 )
 
-echo.  :: To ensure the last line is fully printed
+echo.  :: Ensure a newline after the progress bar
 endlocal
