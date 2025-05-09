@@ -1,23 +1,52 @@
-﻿using System.Net;
+
+﻿using Microsoft.AspNetCore.Mvc;
+using System.Net;
+
+using System.Threading.Tasks;
 
 namespace NeuroPi.Response
 {
-    public class ResponseResult<T>
+    public class ResponseResult<T> : IActionResult
     {
-        // Properties to hold the response data
-        public HttpStatusCode Success { get; set; }
+
+        public HttpStatusCode StatusCode { get; set; }
+
+        // Message to accompany the response
         public string Message { get; set; }
+
+        // Data to return in the response
         public T Data { get; set; }
 
-        // Success response method - used for successful operations
-        public static ResponseResult<T> SuccessResponse( HttpStatusCode code,T data, string message )
+
+        public static ResponseResult<T> SuccessResponse(HttpStatusCode statusCode, T data, string message = null)
         {
-            return new ResponseResult<T> { Success = code, Message = message, Data = data };
+            return new ResponseResult<T>
+            {
+                StatusCode = statusCode,
+                Message = message ?? "Request succeeded",
+                Data = data
+            };
         }
 
-        public static ResponseResult<T> FailResponse(HttpStatusCode code,string message)
+        public static ResponseResult<T> FailResponse(HttpStatusCode statusCode, string message)
         {
-            return new ResponseResult<T> { Success =code, Message = message, Data = default(T) };
+            return new ResponseResult<T>
+            {
+                StatusCode = statusCode,
+                Message = message,
+                Data = default(T)
+            };
+        }
+
+        public async Task ExecuteResultAsync(ActionContext context)
+        {
+            var result = new ObjectResult(this)
+            {
+                StatusCode = (int)this.StatusCode
+
+            };
+
+            await result.ExecuteResultAsync(context);
         }
     }
 }
