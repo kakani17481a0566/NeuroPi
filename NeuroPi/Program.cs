@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using NeuroPi.Data;
 using NeuroPi.Services.Interface;
 using NeuroPi.Services.Implementation;
+using NeuroPi.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,9 @@ builder.Services.AddTransient<IDepartmentService, DepartmentServiceImpl>();
 builder.Services.AddScoped<IGroupService, GroupServiceImpl>();
 builder.Services.AddScoped<IOrganizationService, OrganizationImpl>();
 builder.Services.AddTransient<IGroupUserService, GroupUserServiceImpl>();
+builder.Services.AddScoped<ITeamService, TeamService>();
+
+
 
 
 // Register DbContext for PostgreSQL
