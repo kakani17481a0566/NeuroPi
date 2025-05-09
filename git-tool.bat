@@ -210,6 +210,7 @@ echo.
 echo Exiting Git Tool...
 exit /b
 
+
 :progress_bar
 @echo off
 setlocal enabledelayedexpansion
@@ -228,7 +229,7 @@ set "CYAN=%ESC%[36m"
 set "YELLOW=%ESC%[33m"
 set "RESET=%ESC%[0m"
 
-:: Characters for the progress bar
+:: Characters for the spinner animation
 set "chars=⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
 
 :: Loop to create the animated progress bar
@@ -258,9 +259,8 @@ for /L %%i in (1,1,%total%) do (
     :: Add slight delay for animation
     ping 127.0.0.1 -n 1 -w !delay! > nul
     
-    :: Clear the line for next update
-    <nul set /p="%ESC%[K"
-    <nul set /p="%ESC%[1000D"
+    :: Clear the line for next update (using proper ANSI escape codes)
+    <nul set /p="%ESC%[2K%ESC%[1G"
 )
 
 :: Finish with a newline
