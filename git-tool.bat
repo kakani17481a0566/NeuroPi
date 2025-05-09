@@ -209,14 +209,19 @@ exit /b
 
 :progress_bar
 setlocal
-set "percent=0"
+set "total=50"  :: Total number of steps in the progress bar (50 steps for a 50% bar fill)
 set "bar="
-for /L %%i in (1,1,100) do (
+set "percent=0"
+
+echo Progress: [                    ] 0%%
+
+for /L %%i in (1,1,%total%) do (
     set "bar=!bar!#"
-    set /a "percent+=1"
-    set /a "delay=1000"
-    ping 127.0.0.1 -n 1 -w !delay! > nul
-    set /p="Progress: [!bar!%] !percent!%%" < nul
-    echo.
+    set /a "percent=(%%i*100)/%total%"
+    <nul set /p="Progress: [!bar!                    ] !percent!%%"  :: Fill bar with # symbols
+    set /p=" " <nul  :: Move the cursor back to the same line
+    ping 127.0.0.1 -n 1 -w 100 > nul  :: Wait for 100ms to simulate progress
 )
+
+echo.  :: To ensure the last line is fully printed
 endlocal
