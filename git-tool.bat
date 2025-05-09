@@ -112,7 +112,10 @@ goto pause_return
 
 :pull_remote_branch
 echo.
-set /p remoteBranch="Enter the remote branch name to pull from (e.g. feature-xyz): "
+echo === Remote Branches ===
+git branch -r
+echo.
+set /p remoteBranch="Enter the remote branch name to pull from (e.g. origin/feature-xyz): "
 git pull origin %remoteBranch% || goto error
 goto pause_return
 
@@ -124,7 +127,9 @@ goto pause_return
 
 :push_selected_branch
 echo.
+echo === Remote Branches ===
 git branch -r
+echo.
 set /p selectedBranch="Enter the remote branch name to push the current branch to: "
 for /f %%b in ('git branch --show-current') do set currentBranch=%%b
 git push origin %currentBranch%:%selectedBranch% || goto error
@@ -133,6 +138,13 @@ goto pause_return
 :push_all_branches
 echo.
 for /f %%b in ('git branch --show-current') do set currentBranch=%%b
+echo Current branch is: %currentBranch%
+echo Pushing current branch to all remote branches...
+echo.
+echo === Remote Branches ===
+git branch -r
+echo.
+
 for /f "tokens=*" %%a in ('git branch -r') do (
     set "remoteBranch=%%a"
     call :push_to_remote !remoteBranch!
