@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using NeuroPi.Data;
 using NeuroPi.Services.Interface;
 using NeuroPi.Services.Implementation;
-using NeuroPi.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 

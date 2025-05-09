@@ -71,9 +71,7 @@ goto pause_return
 
 :push
 echo.
-git branch --show-current > tmp_branch.txt
-set /p currentBranch=<tmp_branch.txt
-del tmp_branch.txt
+for /f %%b in ('git branch --show-current') do set currentBranch=%%b
 echo Pushing current branch (%currentBranch%) to origin...
 git push origin %currentBranch% || goto error
 goto pause_return
@@ -84,33 +82,34 @@ echo === Remote Branches ===
 git branch -r
 echo.
 set /p selectedBranch="Enter the remote branch name to push the current branch to (or press Enter to select a branch from the list): "
-
 if "%selectedBranch%"=="" (
     echo No remote branch selected. Please type the name of the remote branch.
     goto pause_return
 )
-
-git branch --show-current > tmp_branch.txt
-set /p currentBranch=<tmp_branch.txt
-del tmp_branch.txt
-
+for /f %%b in ('git branch --show-current') do set currentBranch=%%b
 echo Pushing current branch (%currentBranch%) to remote branch %selectedBranch%...
 git push origin %currentBranch%:%selectedBranch% || goto error
 goto pause_return
 
 :push_all_branches
 echo.
-git branch --show-current > tmp_branch.txt
-set /p currentBranch=<tmp_branch.txt
-del tmp_branch.txt
+for /f %%b in ('git branch --show-current') do set currentBranch=%%b
 echo Pushing current branch (%currentBranch%) to all remote branches...
+
 for /f "tokens=*" %%a in ('git branch -r') do (
-    set remoteBranch=%%a
-    set remoteBranch=!remoteBranch:origin/=!
-    echo Pushing to !remoteBranch!
-    git push origin %currentBranch%:!remoteBranch! || echo Failed to push to !remoteBranch!
+    set "remoteBranch=%%a"
+    call :push_to_remote !remoteBranch!
 )
 goto pause_return
+
+:push_to_remote
+setlocal EnableDelayedExpansion
+set "branchName=%~1"
+set "branchName=!branchName:origin/=!"
+echo Pushing to !branchName!...
+git push origin %currentBranch%:!branchName! || echo Failed to push to !branchName!
+endlocal
+exit /b
 
 :pull
 echo.
@@ -124,22 +123,27 @@ goto pause_return
 
 :commit_push
 echo.
-git status --porcelain > tmp_status.txt
-setlocal EnableDelayedExpansion
+git diff --name-only > tmp_status.txt
 set msg=Updated:
-for /f "tokens=2 delims= " %%f in (tmp_status.txt) do (
-    set msg=!msg! %%~nxf
+setlocal EnableDelayedExpansion
+for /f "usebackq delims=" %%f in ("tmp_status.txt") do (
+    set "file=%%~nxf"
+    set "msg=!msg! !file!"
 )
-if not defined msg (
+endlocal
+
+if not exist tmp_status.txt (
     echo No changes to commit.
-    del tmp_status.txt
     goto pause_return
 )
+
 echo Adding all changes...
 git add . || goto error
-echo Committing with message: "!msg!"
-git commit -m "!msg!" || goto error
+
+echo Committing with message: "%msg%"
+git commit -m "%msg%" || goto error
 del tmp_status.txt
+
 goto push
 
 :create_branch

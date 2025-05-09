@@ -2,8 +2,8 @@
 using System.Net;
 using NeuroPi.Models;
 using NeuroPi.Response;
-using NeuroPi.Services.Interfaces;
 using NeuroPi.ViewModel.Team;
+using NeuroPi.Services.Interface;
 
 namespace NeuroPi.Controllers
 {

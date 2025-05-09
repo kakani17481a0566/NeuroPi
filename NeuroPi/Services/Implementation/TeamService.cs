@@ -1,6 +1,6 @@
 ﻿using NeuroPi.Data;
 using NeuroPi.Models;
-using NeuroPi.Services.Interfaces;
+using NeuroPi.Services.Interface;
 
 namespace NeuroPi.Services.Implementation
 {
