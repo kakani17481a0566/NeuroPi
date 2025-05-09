@@ -211,59 +211,43 @@ echo Exiting Git Tool...
 exit /b
 
 
+
 :progress_bar
 @echo off
 setlocal enabledelayedexpansion
 
-:: Total steps for progress bar
-set "total=50"
-set "percent=0"
-set "bar="
-set "width=50"
-set "delay=50"
+:: Settings
+set "total=20"          :: Number of steps
+set "bar_width=40"      :: Width of progress bar
+set "delay=100"         :: Delay in milliseconds
 
-:: ANSI color codes
+:: ANSI colors
 for /f %%A in ('echo prompt $E ^| cmd') do set "ESC=%%A"
-set "GREEN=%ESC%[32m"
-set "CYAN=%ESC%[36m"
-set "YELLOW=%ESC%[33m"
+set "BLUE=%ESC%[34m"
 set "RESET=%ESC%[0m"
 
-:: Characters for the spinner animation
-set "chars=⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
-
-:: Loop to create the animated progress bar
+:: Main loop
 for /L %%i in (1,1,%total%) do (
-    set /a "percent=(%%i*100)/%total%"
+    set /a "percent=%%i*100/%total%"
+    set /a "filled=%%i*%bar_width%/%total%"
+    set /a "empty=%bar_width%-!filled!"
     
-    :: Calculate spinner position
-    set /a "spinner_pos=%%i %% 10"
-    call set "spinner=%%chars:~!spinner_pos!,1%%"
-    
-    :: Build the progress bar with different colors
+    :: Build the bar
     set "bar="
-    for /L %%j in (1,1,%%i) do (
-        set /a "color_zone=%%j*100/%width%"
-        if !color_zone! lss 30 (
-            set "bar=!bar!%GREEN%▓%RESET%"
-        ) else if !color_zone! lss 70 (
-            set "bar=!bar!%YELLOW%▓%RESET%"
-        ) else (
-            set "bar=!bar!%CYAN%▓%RESET%"
-        )
-    )
+    for /L %%j in (1,1,!filled!) do set "bar=!bar!█"
+    for /L %%j in (1,1,!empty!) do set "bar=!bar!─"
     
-    :: Display the progress bar with spinner
-    <nul set /p="%CYAN%!spinner!%RESET% [%GREEN%!bar!%RESET%] %percent%%% %CYAN%Working...%RESET%"
+    :: Display
+    <nul set /p="%BLUE%[!bar!] %percent%%% %RESET%"
     
-    :: Add slight delay for animation
-    ping 127.0.0.1 -n 1 -w !delay! > nul
+    :: Clear line and return cursor
+    <nul set /p="%ESC%[1G"
     
-    :: Clear the line for next update (using proper ANSI escape codes)
-    <nul set /p="%ESC%[2K%ESC%[1G"
+    :: Delay
+    ping -n 2 127.0.0.1 >nul
 )
 
-:: Finish with a newline
-echo.
+:: Complete
+echo [████████████████████████████████████████] 100%%
 endlocal
 goto :eof
