@@ -214,21 +214,21 @@ set "bar="
 set "percent=0"
 set "delay=100" :: Delay for smoother progress (milliseconds)
 
-:: Print the initial progress bar on the same line
+:: Initial progress bar
 <nul set /p="Progress: [--------------------------------------------------] 0%%"
 
-:: Loop through and update progress on the same line
+:: Loop to update the progress bar
 for /L %%i in (1,1,%total%) do (
     set "bar=!bar!#"
     set /a "percent=(%%i*100)/%total%"
     
-    :: Clear the line and redraw the progress bar in place on the same line
+    :: Update progress bar on the same line (overwrite the line)
     <nul set /p="Progress: [!bar!--------------------------------------------------] !percent!%%"
 
-    :: Wait for the specified delay
+    :: Wait for the specified delay to simulate the operation progress
     ping 127.0.0.1 -n 1 -w !delay! > nul
 )
 
-:: Ensure a newline after the progress bar is completed
+:: Newline after the progress bar
 echo.
 endlocal
