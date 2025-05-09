@@ -116,12 +116,16 @@ echo === Remote Branches ===
 git branch -r
 echo.
 set /p remoteBranch="Enter the remote branch name to pull from (e.g. origin/feature-xyz): "
+echo Pulling from remote branch...
+call :progress_bar
 git pull origin %remoteBranch% || goto error
 goto pause_return
 
 :push
 echo.
 for /f %%b in ('git branch --show-current') do set currentBranch=%%b
+echo Pushing current branch %currentBranch% to origin...
+call :progress_bar
 git push origin %currentBranch% || goto error
 goto pause_return
 
@@ -132,19 +136,19 @@ git branch -r
 echo.
 set /p selectedBranch="Enter the remote branch name to push the current branch to: "
 for /f %%b in ('git branch --show-current') do set currentBranch=%%b
+echo Pushing to remote branch %selectedBranch%...
+call :progress_bar
 git push origin %currentBranch%:%selectedBranch% || goto error
 goto pause_return
 
 :push_all_branches
 echo.
 for /f %%b in ('git branch --show-current') do set currentBranch=%%b
-echo Current branch is: %currentBranch%
 echo Pushing current branch to all remote branches...
-echo.
 echo === Remote Branches ===
 git branch -r
 echo.
-
+call :progress_bar
 for /f "tokens=*" %%a in ('git branch -r') do (
     set "remoteBranch=%%a"
     call :push_to_remote !remoteBranch!
@@ -202,3 +206,17 @@ goto menu
 echo.
 echo Exiting Git Tool...
 exit /b
+
+:progress_bar
+setlocal
+set "percent=0"
+set "bar="
+for /L %%i in (1,1,100) do (
+    set "bar=!bar!#"
+    set /a "percent+=1"
+    set /a "delay=1000"
+    ping 127.0.0.1 -n 1 -w !delay! > nul
+    set /p="Progress: [!bar!%] !percent!%%" < nul
+    echo.
+)
+endlocal
