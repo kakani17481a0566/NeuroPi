@@ -149,9 +149,12 @@ echo === Remote Branches ===
 git branch -r
 echo.
 call :progress_bar
+:: Loop over remote branches and push
 for /f "tokens=*" %%a in ('git branch -r') do (
     set "remoteBranch=%%a"
-    call :push_to_remote !remoteBranch!
+    if not "!remoteBranch!"=="origin/HEAD" (
+        call :push_to_remote !remoteBranch!
+    )
 )
 goto pause_return
 
