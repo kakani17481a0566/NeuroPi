@@ -214,7 +214,7 @@ set "bar="
 set "percent=0"
 set "delay=100" :: Delay for smoother progress (milliseconds)
 
-:: Print the initial progress bar
+:: Print the initial progress bar on the same line
 <nul set /p="Progress: [--------------------------------------------------] 0%%"
 
 :: Loop through and update progress on the same line
@@ -222,12 +222,13 @@ for /L %%i in (1,1,%total%) do (
     set "bar=!bar!#"
     set /a "percent=(%%i*100)/%total%"
     
-    :: Clear the line and redraw the progress bar in place
+    :: Clear the line and redraw the progress bar in place on the same line
     <nul set /p="Progress: [!bar!--------------------------------------------------] !percent!%%"
 
     :: Wait for the specified delay
     ping 127.0.0.1 -n 1 -w !delay! > nul
 )
 
-echo.  :: Ensure a newline after the progress bar
+:: Ensure a newline after the progress bar is completed
+echo.
 endlocal
