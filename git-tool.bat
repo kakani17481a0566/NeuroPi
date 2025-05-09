@@ -208,28 +208,26 @@ echo Exiting Git Tool...
 exit /b
 
 :progress_bar
-setlocal
-set "total=50"  :: Total number of steps in the progress bar (50 steps for a 50% bar fill)
-set "bar="
+@echo off
+setlocal enabledelayedexpansion
+
+:: Total steps for progress bar
+set "total=50"
 set "percent=0"
-set "delay=100" :: Delay for smoother progress (milliseconds)
+set "bar="
 
-:: Clear the line first
-<nul set /p="Progress: [--------------------------------------------------] 0%%"
-
-:: Loop to update the progress bar
+:: Loop to create the progress bar
 for /L %%i in (1,1,%total%) do (
-    set "bar=!bar!#"
     set /a "percent=(%%i*100)/%total%"
+    set "bar=!bar!#"
 
-    :: Use carriage return to overwrite the same line for progress updates
+    :: Print the progress bar on the same line (using carriage return to overwrite)
     <nul set /p="Progress: [!bar!--------------------------------------------------] !percent!%%"
 
-    :: Wait for the specified delay to simulate the operation progress
-    ping 127.0.0.1 -n 1 -w !delay! > nul
+    :: Add a slight delay to simulate work being done
+    ping 127.0.0.1 -n 1 -w 100 > nul
 )
 
-:: Newline after the progress bar to move to the next line
+:: Finish with a newline after the progress bar
 echo.
 endlocal
-
