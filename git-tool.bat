@@ -209,39 +209,61 @@ goto menu
 echo.
 echo Exiting Git Tool...
 exit /b
+
 :progress_bar
 @echo off
 setlocal enabledelayedexpansion
 
-:: Total steps for progress bar (100 for more granularity)
-set "total=100"
+:: Total steps for progress bar
+set "total=50"
 set "percent=0"
 set "bar="
-set "width=50"  :: Total width of the progress bar
-set "symbol=#"  :: The symbol to use in the progress bar
-set "delay=50"  :: Delay in ms for smooth progress updates
+set "width=50"
+set "delay=50"
 
-:: Set initial color (Green for progress)
+:: ANSI color codes
 for /f %%A in ('echo prompt $E ^| cmd') do set "ESC=%%A"
-:: ANSI codes for green and default text color
 set "GREEN=%ESC%[32m"
+set "CYAN=%ESC%[36m"
+set "YELLOW=%ESC%[33m"
 set "RESET=%ESC%[0m"
 
-:: Loop to create the progress bar
+:: Characters for the progress bar
+set "chars=⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
+
+:: Loop to create the animated progress bar
 for /L %%i in (1,1,%total%) do (
     set /a "percent=(%%i*100)/%total%"
     
-    :: Update the bar with symbols
+    :: Calculate spinner position
+    set /a "spinner_pos=%%i %% 10"
+    call set "spinner=%%chars:~!spinner_pos!,1%%"
+    
+    :: Build the progress bar with different colors
     set "bar="
-    for /L %%j in (1,1,%%i) do set "bar=!bar!!symbol!"
+    for /L %%j in (1,1,%%i) do (
+        set /a "color_zone=%%j*100/%width%"
+        if !color_zone! lss 30 (
+            set "bar=!bar!%GREEN%▓%RESET%"
+        ) else if !color_zone! lss 70 (
+            set "bar=!bar!%YELLOW%▓%RESET%"
+        ) else (
+            set "bar=!bar!%CYAN%▓%RESET%"
+        )
+    )
     
-    :: Update the progress bar line (this will overwrite the previous line)
-    <nul set /p="Progress: [!GREEN!!bar!%RESET%--------------------------------------------------] !percent!%%"
+    :: Display the progress bar with spinner
+    <nul set /p="%CYAN%!spinner!%RESET% [%GREEN%!bar!%RESET%] %percent%%% %CYAN%Working...%RESET%"
     
-    :: Optional: Adjust the delay time for smoother updates
-    ping 127.0.0.1 -n 1 -w !delay! > nul  :: Delay for smoother animation
+    :: Add slight delay for animation
+    ping 127.0.0.1 -n 1 -w !delay! > nul
+    
+    :: Clear the line for next update
+    <nul set /p="%ESC%[K"
+    <nul set /p="%ESC%[1000D"
 )
 
-:: Finish with a newline after the progress bar
+:: Finish with a newline
 echo.
 endlocal
+goto :eof
