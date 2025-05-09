@@ -211,8 +211,8 @@ exit /b
 @echo off
 setlocal enabledelayedexpansion
 
-:: Total steps for progress bar
-set "total=50"
+:: Total steps for progress bar (100 for more granularity)
+set "total=100"
 set "percent=0"
 set "bar="
 
@@ -224,8 +224,8 @@ for /L %%i in (1,1,%total%) do (
     :: Print the progress bar on the same line (using carriage return to overwrite)
     <nul set /p="Progress: [!bar!--------------------------------------------------] !percent!%%"
 
-    :: Add a slight delay to simulate work being done
-    ping 127.0.0.1 -n 1 -w 100 > nul
+    :: Optional: Adjust the delay time for faster progress
+    ping 127.0.0.1 -n 1 -w 50 > nul  :: 50ms delay for faster updates
 )
 
 :: Finish with a newline after the progress bar
