@@ -1,16 +1,18 @@
-﻿using NeuroPi.Models;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+using NeuroPi.Models;
 
 namespace NeuroPi.Model
 {
     [Table("users")]
     public class MUser : MBaseModel
     {
+        // Primary Key
         [Key]
         [Column("user_id")]
         public int UserId { get; set; }
 
+        // Basic Information
         [Required]
         [MaxLength(50)]
         [Column("username")]
@@ -48,19 +50,21 @@ namespace NeuroPi.Model
         [Column("alternate_number")]
         public string? AlternateNumber { get; set; }
 
+        // Personal Information
         [Column("dob")]
         public DateTime? DateOfBirth { get; set; }
 
-        [Column("address")]
+        [Column("address", TypeName = "text")]
         public string? Address { get; set; }
 
+        // Tenant Information
         [Column("tenant_id")]
-        [ForeignKey("Tenant")]
         public int TenantId { get; set; }
 
-        // Navigation properties
+        [ForeignKey("TenantId")]
         public virtual MTenant Tenant { get; set; }
 
+        // Related Entities
         public virtual ICollection<MUserRole> UserRoles { get; set; } = new List<MUserRole>();
         public virtual ICollection<MTeamUser> TeamUsers { get; set; } = new List<MTeamUser>();
         public virtual ICollection<MGroupUser> GroupUsers { get; set; } = new List<MGroupUser>();

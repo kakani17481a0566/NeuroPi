@@ -20,6 +20,9 @@ builder.Services.AddTransient<IGroupUserService, GroupUserServiceImpl>();
 builder.Services.AddScoped<ITeamService, TeamService>();
 
 
+builder.Services.AddScoped<IUserService, UserServiceImpl>();
+
+
 
 
 // Register DbContext for PostgreSQL

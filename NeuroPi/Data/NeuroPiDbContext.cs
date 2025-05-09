@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Reflection.Emit;
 using Microsoft.EntityFrameworkCore;
 using NeuroPi.Model;
 using NeuroPi.Models;
@@ -28,12 +27,12 @@ namespace NeuroPi.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // User-Tenant relationship
+            // User-Tenant relationship (MTenant to MUser, which is the reverse relationship)
             modelBuilder.Entity<MUser>()
                 .HasOne(user => user.Tenant)
-                .WithMany() // or .WithMany(t => t.Users) if you add a Users collection in MTenant
+                .WithMany(tenant => tenant.Users) // Ensuring MTenant has a collection of MUser
                 .HasForeignKey(user => user.TenantId)
-                .OnDelete(DeleteBehavior.Restrict); // optional, prevents cascade delete issues
+                .OnDelete(DeleteBehavior.Restrict); // Optionally prevent cascading deletes
 
             // Composite indexes
             modelBuilder.Entity<MRolePermission>()
@@ -56,6 +55,5 @@ namespace NeuroPi.Data
                 .HasIndex(ud => new { ud.UserId, ud.DepartmentId })
                 .IsUnique();
         }
-
     }
 }

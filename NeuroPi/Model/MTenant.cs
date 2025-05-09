@@ -1,11 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using NeuroPi.Model;
 
-namespace NeuroPi.Models
+namespace NeuroPi.Models  // Ensure this is the only namespace with MTenant definition
 {
     [Table("tenants")]
-    public class MTenant : MBaseModel  // Inherit from MBaseModel to include audit fields
+    public class MTenant : MBaseModel  // Inheriting audit fields from MBaseModel
     {
         // Primary key for the tenant
         [Key]
@@ -20,15 +21,15 @@ namespace NeuroPi.Models
         public string Name { get; set; }
 
         // Navigation property to the creator user (foreign key to MUser)
-        [ForeignKey("CreatedBy")]
+        [ForeignKey("CreatedBy")]  // Explicitly mapping to the 'CreatedBy' column in the MUser table
         public virtual MUser Creator { get; set; }
 
         // Navigation property to the updater user (foreign key to MUser)
-        [ForeignKey("UpdatedBy")]
+        [ForeignKey("UpdatedBy")]  // Explicitly mapping to the 'UpdatedBy' column in the MUser table
         public virtual MUser Updater { get; set; }
 
-        // Collection of users associated with the tenant
-        public virtual ICollection<MUser> Users { get; set; }
+        // Collection of users associated with the tenant (one-to-many relationship)
+        public virtual ICollection<MUser> Users { get; set; } = new List<MUser>();  // Initialize to prevent null reference
 
         // If needed, other navigation properties or additional business logic can be added here
     }
