@@ -1,3 +1,1 @@
-NeuroPi/Data/NeuroPiDbContext.cs
-git-tool.bat
 tmp_status.txt
