@@ -29,11 +29,12 @@ echo 12.  Pull from selected remote branch
 echo 13.  Push current branch to origin
 echo 14.  Push to selected remote branch
 echo 15.  Push to all remote branches
-echo 16.  Commit and push changes
+echo 16.  Commit and push changes (with filenames)
 echo 17.  Stash changes
-echo 18.  Exit
+echo 18.  Create Pull Request
+echo 19.  Exit
 echo ================================================
-set /p choice="Select an option (1-18): "
+set /p choice="Select an option (1-19): "
 
 if "%choice%"=="1" goto status
 if "%choice%"=="2" goto log
@@ -52,7 +53,8 @@ if "%choice%"=="14" goto push_selected_branch
 if "%choice%"=="15" goto push_all_branches
 if "%choice%"=="16" goto commit_push
 if "%choice%"=="17" goto stash
-if "%choice%"=="18" goto end
+if "%choice%"=="18" goto create_pull_request
+if "%choice%"=="19" goto end
 goto menu
 
 :status
@@ -164,24 +166,67 @@ goto pause_return
 
 :commit_push
 echo.
-git diff --name-only > tmp_status.txt
-set msg=Changes:
-setlocal EnableDelayedExpansion
-for /f "usebackq delims=" %%f in ("tmp_status.txt") do (
-    set "file=%%~nxf"
-    set "msg=!msg! !file!"
-)
-endlocal
+:: Get list of changed/added files (combined staged and unstaged changes)
+git diff --name-only --cached > tmp_status.txt
+git diff --name-only >> tmp_status.txt
+git ls-files --others --exclude-standard >> tmp_status.txt
 
-if not exist tmp_status.txt (
+:: Windows-friendly alternative to 'sort | uniq'
+:: First sort the file
+sort tmp_status.txt > tmp_status_sorted.txt
+
+:: Then remove duplicates (Windows version)
+set "prevLine="
+(
+    for /f "delims=" %%f in (tmp_status_sorted.txt) do (
+        if "%%f" neq "!prevLine!" (
+            echo %%f
+            set "prevLine=%%f"
+        )
+    )
+) > tmp_status_filtered.txt
+
+:: Check if there are any changes
+set "hasChanges="
+for /f "usebackq delims=" %%f in ("tmp_status_filtered.txt") do (
+    set "hasChanges=1"
+    goto :has_changes
+)
+
+:has_changes
+if not defined hasChanges (
     echo No changes to commit.
+    del tmp_status.txt 2>nul
+    del tmp_status_sorted.txt 2>nul
+    del tmp_status_filtered.txt 2>nul
     goto pause_return
 )
+
+:: Build commit message from file names (limited to 5 files for brevity)
+set msg=Updated:
+setlocal EnableDelayedExpansion
+set fileCount=0
+for /f "usebackq delims=" %%f in ("tmp_status_filtered.txt") do (
+    set /a fileCount+=1
+    if !fileCount! leq 5 (
+        set "file=%%~nxf"
+        set "msg=!msg! !file!"
+    )
+)
+if !fileCount! gtr 5 (
+    set /a remaining=fileCount - 5
+    set "msg=!msg! and !remaining! more"
+)
+endlocal & set msg=%msg%
 
 call :progress_line "Committing changes"
 git add . || goto error
 git commit -m "%msg%" || goto error
-del tmp_status.txt
+
+:: Cleanup temporary files
+del tmp_status.txt 2>nul
+del tmp_status_sorted.txt 2>nul
+del tmp_status_filtered.txt 2>nul
 
 for /f %%b in ('git branch --show-current') do set currentBranch=%%b
 call :progress_line "Pushing %currentBranch%"
@@ -193,6 +238,47 @@ echo.
 call :progress_line "Stashing changes"
 git stash push || goto error
 echo Changes have been stashed.
+goto pause_return
+
+:create_pull_request
+echo.
+:: Get current branch
+for /f %%b in ('git branch --show-current') do set currentBranch=%%b
+
+:: Get default branch (usually main or master)
+for /f %%d in ('git symbolic-ref refs/remotes/origin/HEAD') do set defaultBranch=%%d
+set defaultBranch=!defaultBranch:refs/remotes/origin/=!
+
+echo Creating Pull Request from !currentBranch! to !defaultBranch!
+echo.
+set /p prTitle="Enter Pull Request title: "
+set /p prDescription="Enter Pull Request description: "
+
+call :progress_line "Creating Pull Request"
+git push origin %currentBranch% || goto error
+
+:: Try different methods to open PR URL based on git remote
+for /f "delims=" %%r in ('git remote get-url origin') do set repoUrl=%%r
+set repoUrl=!repoUrl:git@github.com:=https://github.com/!
+set repoUrl=!repoUrl:.git=!
+set repoUrl=!repoUrl:https://github.com/=https://github.com/!
+
+:: Create PR URL
+set prUrl=!repoUrl!/compare/!defaultBranch!...!currentBranch!?expand=1&title=!prTitle!&body=!prDescription!
+
+echo.
+echo !GREEN!Pull Request ready:!RESET!
+echo !prUrl!
+echo.
+echo You can also create it manually:
+echo 1. Go to: !repoUrl!/pulls
+echo 2. Click "New pull request"
+echo 3. Set base: !defaultBranch! and compare: !currentBranch!
+echo 4. Enter title and description
+echo 5. Click "Create pull request"
+
+:: Try to open browser (works on most Windows systems)
+start "" "!prUrl!" 2>nul
 goto pause_return
 
 :error
