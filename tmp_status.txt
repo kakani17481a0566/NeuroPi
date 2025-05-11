@@ -1,7 +1,1 @@
-NeuroPi/ViewModel/Group/GroupUpdateInputVM.cs
-NeuroPi/ViewModel/Group/GroupVM.cs
-NeuroPi/ViewModel/Organization/OrganizationInputVM.cs
-NeuroPi/ViewModel/Organization/OrganizationUpdateInputVM.cs
-NeuroPi/ViewModel/Organization/OrganizationVM.cs
-NeuroPi/ViewModel/Tenent/TenantInputVM.cs
 tmp_status.txt
