@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace NeuroPi.ViewModel.Organization
 {
-    public class OrganizationViewModel
+    public class OrganizationVM
     {
         public int OrganizationId { get; set; }
         public string Name { get; set; }

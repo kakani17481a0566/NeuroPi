@@ -1,6 +1,6 @@
 ﻿namespace NeuroPi.ViewModel.Group
 {
-    public class GroupUpdateInputModel
+    public class GroupUpdateInputVM
     {
         public string Name { get; set; }
     }

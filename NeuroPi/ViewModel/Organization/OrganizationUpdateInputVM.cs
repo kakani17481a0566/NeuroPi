@@ -1,6 +1,6 @@
 ﻿namespace NeuroPi.ViewModel.Organization
 {
-    public class OrganizationUpdateInputModel
+    public class OrganizationUpdateInputVM
     {
         public string Name { get; set; }
         public int? ParentId { get; set; }
