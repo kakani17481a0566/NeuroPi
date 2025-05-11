@@ -58,7 +58,7 @@ namespace NeuroPi.Controllers
             if (string.IsNullOrWhiteSpace(name) || tenantId <= 0)
                 return ResponseResult<object>.FailResponse(HttpStatusCode.BadRequest, "Invalid input");
 
-            var input = new OrganizationInputModel
+            var input = new OrganizationInputVM
             {
                 Name = name,
                 TenantId = tenantId,
@@ -82,7 +82,7 @@ namespace NeuroPi.Controllers
             if (string.IsNullOrWhiteSpace(name))
                 return ResponseResult<object>.FailResponse(HttpStatusCode.BadRequest, "Invalid input");
 
-            var input = new OrganizationUpdateInputModel
+            var input = new OrganizationUpdateInputVM
             {
                 Name = name,
                 ParentId = parentId

@@ -60,7 +60,7 @@ namespace NeuroPi.Controllers
 
         // Create a new group
         [HttpPost]
-        public IActionResult Create([FromBody] GroupInputModel input)
+        public IActionResult Create([FromBody] GroupInputVM input)
         {
             if (input == null || string.IsNullOrEmpty(input.Name) || input.TenantId <= 0)
             {
@@ -80,7 +80,7 @@ namespace NeuroPi.Controllers
 
         // Update an existing group
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] GroupUpdateInputModel input)
+        public IActionResult Update(int id, [FromBody] GroupUpdateInputVM input)
         {
             if (input == null || string.IsNullOrEmpty(input.Name))
             {

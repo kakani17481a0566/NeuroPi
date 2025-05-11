@@ -20,57 +20,57 @@ namespace NeuroPi.Controllers
 
         // GET: api/tenants
         [HttpGet]
-        public ResponseResult<List<TenantViewModel>> GetAll()
+        public ResponseResult<List<TenantVM>> GetAll()
         {
             var tenants = _tenantService.GetAllTenants();
             if (tenants == null || tenants.Count == 0)
             {
-                return ResponseResult<List<TenantViewModel>>.FailResponse(HttpStatusCode.NotFound, "No tenants found");
+                return ResponseResult<List<TenantVM>>.FailResponse(HttpStatusCode.NotFound, "No tenants found");
             }
-            return ResponseResult<List<TenantViewModel>>.SuccessResponse(HttpStatusCode.OK, tenants, "Tenants retrieved successfully");
+            return ResponseResult<List<TenantVM>>.SuccessResponse(HttpStatusCode.OK, tenants, "Tenants retrieved successfully");
         }
 
         // GET: api/tenants/{id}
         [HttpGet("{id}")]
-        public ResponseResult<TenantViewModel> GetById(int id)
+        public ResponseResult<TenantVM> GetById(int id)
         {
             var tenant = _tenantService.GetTenantById(id);
             if (tenant == null)
             {
-                return ResponseResult<TenantViewModel>.FailResponse(HttpStatusCode.NotFound, "Tenant not found");
+                return ResponseResult<TenantVM>.FailResponse(HttpStatusCode.NotFound, "Tenant not found");
             }
-            return ResponseResult<TenantViewModel>.SuccessResponse(HttpStatusCode.OK, tenant, "Tenant retrieved successfully");
+            return ResponseResult<TenantVM>.SuccessResponse(HttpStatusCode.OK, tenant, "Tenant retrieved successfully");
         }
 
         // POST: api/tenants
         [HttpPost]
-        public ResponseResult<TenantViewModel> Create([FromBody] TenantInputModel tenantInput)
+        public ResponseResult<TenantVM> Create([FromBody] TenantInputVM tenantInput)
         {
             if (!ModelState.IsValid)
             {
-                return ResponseResult<TenantViewModel>.FailResponse(HttpStatusCode.BadRequest, "Invalid tenant data");
+                return ResponseResult<TenantVM>.FailResponse(HttpStatusCode.BadRequest, "Invalid tenant data");
             }
 
             var createdTenant = _tenantService.CreateTenant(tenantInput);
-            return ResponseResult<TenantViewModel>.SuccessResponse(HttpStatusCode.Created, createdTenant, "Tenant created successfully");
+            return ResponseResult<TenantVM>.SuccessResponse(HttpStatusCode.Created, createdTenant, "Tenant created successfully");
         }
 
         // PUT: api/tenants/{id}
         [HttpPut("{id}")]
-        public ResponseResult<TenantViewModel> Update(int id, [FromBody] TenantUpdateInputModel tenantUpdateInput)
+        public ResponseResult<TenantVM> Update(int id, [FromBody] TenantUpdateInputVM tenantUpdateInput)
         {
             if (!ModelState.IsValid)
             {
-                return ResponseResult<TenantViewModel>.FailResponse(HttpStatusCode.BadRequest, "Invalid tenant data");
+                return ResponseResult<TenantVM>.FailResponse(HttpStatusCode.BadRequest, "Invalid tenant data");
             }
 
             var updatedTenant = _tenantService.UpdateTenant(id, tenantUpdateInput);
             if (updatedTenant == null)
             {
-                return ResponseResult<TenantViewModel>.FailResponse(HttpStatusCode.NotFound, "Tenant not found");
+                return ResponseResult<TenantVM>.FailResponse(HttpStatusCode.NotFound, "Tenant not found");
             }
 
-            return ResponseResult<TenantViewModel>.SuccessResponse(HttpStatusCode.OK, updatedTenant, "Tenant updated successfully");
+            return ResponseResult<TenantVM>.SuccessResponse(HttpStatusCode.OK, updatedTenant, "Tenant updated successfully");
         }
 
         // DELETE: api/tenants/{id}

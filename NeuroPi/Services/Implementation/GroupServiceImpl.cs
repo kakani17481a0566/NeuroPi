@@ -17,9 +17,9 @@ namespace NeuroPi.Services.Implementation
         }
 
         // Get all groups
-        public List<GroupViewModel> GetAll()
+        public List<GroupVM> GetAll()
         {
-            return _context.Groups.Select(g => new GroupViewModel
+            return _context.Groups.Select(g => new GroupVM
             {
                 GroupId = g.GroupId,
                 Name = g.Name,
@@ -28,12 +28,12 @@ namespace NeuroPi.Services.Implementation
         }
 
         // Get group by ID
-        public GroupViewModel GetById(int id)
+        public GroupVM GetById(int id)
         {
             var group = _context.Groups.FirstOrDefault(g => g.GroupId == id);
             if (group == null) return null;
 
-            return new GroupViewModel
+            return new GroupVM
             {
                 GroupId = group.GroupId,
                 Name = group.Name,
@@ -42,7 +42,7 @@ namespace NeuroPi.Services.Implementation
         }
 
         // Create a new group
-        public GroupViewModel Create(GroupInputModel input)
+        public GroupVM Create(GroupInputVM input)
         {
             var group = new MGroup
             {
@@ -53,7 +53,7 @@ namespace NeuroPi.Services.Implementation
             _context.Groups.Add(group);
             _context.SaveChanges();
 
-            return new GroupViewModel
+            return new GroupVM
             {
                 GroupId = group.GroupId,
                 Name = group.Name,
@@ -62,7 +62,7 @@ namespace NeuroPi.Services.Implementation
         }
 
         // Update an existing group
-        public GroupViewModel Update(int id, GroupUpdateInputModel input)
+        public GroupVM Update(int id, GroupUpdateInputVM input)
         {
             var group = _context.Groups.FirstOrDefault(g => g.GroupId == id);
             if (group == null) return null;
@@ -70,7 +70,7 @@ namespace NeuroPi.Services.Implementation
             group.Name = input.Name;
             _context.SaveChanges();
 
-            return new GroupViewModel
+            return new GroupVM
             {
                 GroupId = group.GroupId,
                 Name = group.Name,

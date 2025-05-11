@@ -17,10 +17,10 @@ namespace NeuroPi.Services.Implementation
             _context = context;
         }
 
-        public List<TenantViewModel> GetAllTenants()
+        public List<TenantVM> GetAllTenants()
         {
             return _context.Tenants
-                .Select(t => new TenantViewModel
+                .Select(t => new TenantVM
                 {
                     TenantId = t.TenantId,
                     Name = t.Name,
@@ -30,11 +30,11 @@ namespace NeuroPi.Services.Implementation
                 .ToList();
         }
 
-        public TenantViewModel GetTenantById(int id)
+        public TenantVM GetTenantById(int id)
         {
             var tenant = _context.Tenants
                 .Where(t => t.TenantId == id)
-                .Select(t => new TenantViewModel
+                .Select(t => new TenantVM
                 {
                     TenantId = t.TenantId,
                     Name = t.Name,
@@ -46,7 +46,7 @@ namespace NeuroPi.Services.Implementation
             return tenant;
         }
 
-        public TenantViewModel CreateTenant(TenantInputModel input)
+        public TenantVM CreateTenant(TenantInputVM input)
         {
             var tenant = new MTenant
             {
@@ -58,7 +58,7 @@ namespace NeuroPi.Services.Implementation
             _context.Tenants.Add(tenant);
             _context.SaveChanges();
 
-            return new TenantViewModel
+            return new TenantVM
             {
                 TenantId = tenant.TenantId,
                 Name = tenant.Name,
@@ -66,7 +66,7 @@ namespace NeuroPi.Services.Implementation
             };
         }
 
-        public TenantViewModel UpdateTenant(int id, TenantUpdateInputModel input)
+        public TenantVM UpdateTenant(int id, TenantUpdateInputVM input)
         {
             var existingTenant = _context.Tenants.Find(id);
             if (existingTenant == null)
@@ -79,7 +79,7 @@ namespace NeuroPi.Services.Implementation
             _context.Tenants.Update(existingTenant);
             _context.SaveChanges();
 
-            return new TenantViewModel
+            return new TenantVM
             {
                 TenantId = existingTenant.TenantId,
                 Name = existingTenant.Name,

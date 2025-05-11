@@ -5,10 +5,10 @@ namespace NeuroPi.Services.Interface
 {
     public interface IGroupService
     {
-        List<GroupViewModel> GetAll(); 
-        GroupViewModel GetById(int id); 
-        GroupViewModel Create(GroupInputModel input); 
-        GroupViewModel Update(int id, GroupUpdateInputModel input); 
+        List<GroupVM> GetAll(); 
+        GroupVM GetById(int id); 
+        GroupVM Create(GroupInputVM input); 
+        GroupVM Update(int id, GroupUpdateInputVM input); 
         bool Delete(int id);
     }
 }

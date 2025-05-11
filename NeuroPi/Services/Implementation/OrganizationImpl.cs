@@ -16,9 +16,9 @@ namespace NeuroPi.Services.Implementation
             _context = context;
         }
 
-        public List<OrganizationViewModel> GetAll()
+        public List<OrganizationVM> GetAll()
         {
-            return _context.Organizations.Select(o => new OrganizationViewModel
+            return _context.Organizations.Select(o => new OrganizationVM
             {
                 OrganizationId = o.OrganizationId,
                 Name = o.Name,
@@ -27,12 +27,12 @@ namespace NeuroPi.Services.Implementation
             }).ToList();
         }
 
-        public OrganizationViewModel GetById(int id)
+        public OrganizationVM GetById(int id)
         {
             var org = _context.Organizations.FirstOrDefault(o => o.OrganizationId == id);
             if (org == null) return null;
 
-            return new OrganizationViewModel
+            return new OrganizationVM
             {
                 OrganizationId = org.OrganizationId,
                 Name = org.Name,
@@ -41,7 +41,7 @@ namespace NeuroPi.Services.Implementation
             };
         }
 
-        public OrganizationViewModel Create(OrganizationInputModel input)
+        public OrganizationVM Create(OrganizationInputVM input)
         {
             var entity = new MOrganization
             {
@@ -53,7 +53,7 @@ namespace NeuroPi.Services.Implementation
             _context.Organizations.Add(entity);
             _context.SaveChanges();
 
-            return new OrganizationViewModel
+            return new OrganizationVM
             {
                 OrganizationId = entity.OrganizationId,
                 Name = entity.Name,
@@ -62,7 +62,7 @@ namespace NeuroPi.Services.Implementation
             };
         }
 
-        public OrganizationViewModel Update(int id, OrganizationUpdateInputModel input)
+        public OrganizationVM Update(int id, OrganizationUpdateInputVM input)
         {
             var org = _context.Organizations.FirstOrDefault(o => o.OrganizationId == id);
             if (org == null)
@@ -78,7 +78,7 @@ namespace NeuroPi.Services.Implementation
 
             _context.SaveChanges();
 
-            return new OrganizationViewModel
+            return new OrganizationVM
             {
                 OrganizationId = org.OrganizationId,
                 Name = org.Name,

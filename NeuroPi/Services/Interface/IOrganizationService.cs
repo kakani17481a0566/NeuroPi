@@ -5,10 +5,10 @@ namespace NeuroPi.Services.Interface
 {
     public interface IOrganizationService
     {
-        List<OrganizationViewModel> GetAll();
-        OrganizationViewModel GetById(int id);
-        OrganizationViewModel Create(OrganizationInputModel input);
-        OrganizationViewModel Update(int id, OrganizationUpdateInputModel input);
+        List<OrganizationVM> GetAll();
+        OrganizationVM GetById(int id);
+        OrganizationVM Create(OrganizationInputVM input);
+        OrganizationVM Update(int id, OrganizationUpdateInputVM input);
         bool Delete(int id);
     }
 }

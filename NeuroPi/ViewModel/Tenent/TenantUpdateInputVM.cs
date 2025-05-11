@@ -2,7 +2,7 @@
 
 namespace NeuroPi.ViewModel.Tenent
 {
-    public class TenantUpdateInputModel
+    public class TenantUpdateInputVM
     {
         [Required(ErrorMessage = "Name is required")]
         [MaxLength(100, ErrorMessage = "Name cannot exceed 100 characters")]

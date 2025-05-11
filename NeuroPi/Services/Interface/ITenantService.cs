@@ -5,10 +5,10 @@ namespace NeuroPi.Services.Interface
 {
     public interface ITenantService
     {
-        List<TenantViewModel> GetAllTenants();
-        TenantViewModel GetTenantById(int id);
-        TenantViewModel CreateTenant(TenantInputModel input);
-        TenantViewModel UpdateTenant(int id, TenantUpdateInputModel input);
+        List<TenantVM> GetAllTenants();
+        TenantVM GetTenantById(int id);
+        TenantVM CreateTenant(TenantInputVM input);
+        TenantVM UpdateTenant(int id, TenantUpdateInputVM input);
         bool DeleteTenant(int id);
     }
 }

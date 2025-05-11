@@ -1,6 +1,6 @@
 ﻿namespace NeuroPi.ViewModel.Tenent
 {
-    public class TenantViewModel
+    public class TenantVM
     {
         public int TenantId { get; set; }
         public string Name { get; set; }
