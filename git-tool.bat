@@ -32,11 +32,12 @@ echo 14.  Push to selected remote branch
 echo 15.  Push to all remote branches
 echo 16.  Commit and push changes (with filenames)
 echo 17.  Stash changes
-echo 18.  Create Pull Request
-echo 19.  Backup master/main branch
-echo 20.  Exit
+echo 18.  Delete local changes (reset working directory)
+echo 19.  Create Pull Request
+echo 20.  Backup master/main branch
+echo 21.  Exit
 echo ================================================
-set /p choice="%YELLOW%Select an option (1-20): %RESET%"
+set /p choice="%YELLOW%Select an option (1-21): %RESET%"
 
 if "%choice%"=="1" goto status
 if "%choice%"=="2" goto log
@@ -55,42 +56,50 @@ if "%choice%"=="14" goto push_selected_branch
 if "%choice%"=="15" goto push_all_branches
 if "%choice%"=="16" goto commit_push
 if "%choice%"=="17" goto stash
-if "%choice%"=="18" goto create_pull_request
-if "%choice%"=="19" goto backup_master
-if "%choice%"=="20" goto end
+if "%choice%"=="18" goto delete_local_changes
+if "%choice%"=="19" goto create_pull_request
+if "%choice%"=="20" goto backup_master
+if "%choice%"=="21" goto end
 goto menu
 
+:: Show git status
 :status
 echo.
 git status
 goto pause_return
 
+:: Show git log
 :log
 echo.
 git log --oneline --graph --decorate --all -n 20
 goto pause_return
 
+:: List all local branches
 :list_local
 echo.
 git branch
 goto pause_return
 
+:: List all remote branches
 :list_remote
 echo.
 git branch -r
 goto pause_return
 
+:: Switch to the last branch
 :last_branch
 echo.
 git checkout - || goto error
 goto pause_return
 
+:: Checkout a branch
 :checkout
 echo.
 set /p branch="Enter branch name to checkout: "
 git checkout %branch% || goto error
 goto pause_return
 
+:: Create a new branch
 :create_branch
 echo.
 set /p newBranch="Enter name for new branch: "
@@ -98,6 +107,7 @@ git checkout -b %newBranch% || goto error
 echo Switched to new branch %newBranch%
 goto pause_return
 
+:: Delete a local branch
 :delete_local_branch
 echo.
 set /p deleteBranch="Enter local branch to delete: "
@@ -105,6 +115,7 @@ git branch -d %deleteBranch% || goto error
 echo Local branch %deleteBranch% deleted.
 goto pause_return
 
+:: Delete a remote branch
 :delete_remote_branch
 echo.
 set /p deleteRemoteBranch="Enter remote branch to delete: "
@@ -112,6 +123,7 @@ git push origin --delete %deleteRemoteBranch% || goto error
 echo Remote branch %deleteRemoteBranch% deleted.
 goto pause_return
 
+:: Merge a branch into current
 :merge
 echo.
 set /p mergeBranch="Enter branch to merge into current: "
@@ -119,12 +131,14 @@ call :progress_line "Merging %mergeBranch%"
 git merge %mergeBranch% || goto error
 goto pause_return
 
+:: Pull latest from origin
 :pull_origin
 echo.
 call :progress_line "Pulling from origin"
 git pull || goto error
 goto pause_return
 
+:: Pull from selected remote branch
 :pull_remote_branch
 echo.
 echo === Remote Branches ===
@@ -135,12 +149,14 @@ call :progress_line "Pulling %remoteBranch%"
 git pull origin %remoteBranch% || goto error
 goto pause_return
 
+:: Push current branch to origin
 :push
 for /f %%b in ('git branch --show-current') do set currentBranch=%%b
 call :progress_line "Pushing %currentBranch% to origin"
 git push origin %currentBranch% || goto error
 goto pause_return
 
+:: Push to selected remote branch
 :push_selected_branch
 echo.
 echo === Remote Branches ===
@@ -152,6 +168,7 @@ call :progress_line "Pushing to %selectedBranch%"
 git push origin %currentBranch%:%selectedBranch% || goto error
 goto pause_return
 
+:: Push to all remote branches
 :push_all_branches
 for /f %%b in ('git branch --show-current') do set currentBranch=%%b
 echo === Remote Branches ===
@@ -167,17 +184,15 @@ for /f "tokens=*" %%a in ('git branch -r') do (
 )
 goto pause_return
 
+:: Commit and push changes
 :commit_push
 echo.
-:: Get list of changed/added files (combined staged and unstaged changes)
 git diff --name-only --cached > tmp_status.txt
 git diff --name-only >> tmp_status.txt
 git ls-files --others --exclude-standard >> tmp_status.txt
 
-:: Windows-friendly alternative to 'sort | uniq'
 sort tmp_status.txt > tmp_status_sorted.txt
 
-:: Remove duplicates
 set "prevLine="
 (
     for /f "delims=" %%f in (tmp_status_sorted.txt) do (
@@ -188,7 +203,6 @@ set "prevLine="
     )
 ) > tmp_status_filtered.txt
 
-:: Check if there are any changes
 set "hasChanges="
 for /f "usebackq delims=" %%f in ("tmp_status_filtered.txt") do (
     set "hasChanges=1"
@@ -204,7 +218,6 @@ if not defined hasChanges (
     goto pause_return
 )
 
-:: Build commit message from file names (limited to 5 files for brevity)
 set msg=Updated:
 setlocal EnableDelayedExpansion
 set fileCount=0
@@ -225,7 +238,6 @@ call :progress_line "Committing changes"
 git add . || goto error
 git commit -m "%msg%" || goto error
 
-:: Cleanup temporary files
 del tmp_status.txt 2>nul
 del tmp_status_sorted.txt 2>nul
 del tmp_status_filtered.txt 2>nul
@@ -235,6 +247,7 @@ call :progress_line "Pushing %currentBranch%"
 git push origin %currentBranch% || goto error
 goto pause_return
 
+:: Stash changes
 :stash
 echo.
 call :progress_line "Stashing changes"
@@ -242,133 +255,55 @@ git stash push || goto error
 echo Changes have been stashed.
 goto pause_return
 
+:: Delete local changes
+:delete_local_changes
+echo.
+echo Are you sure you want to delete all local changes? This action cannot be undone.
+set /p confirm="Type 'yes' to confirm, or anything else to cancel: "
+if /i not "%confirm%"=="yes" goto pause_return
+
+echo.
+call :progress_line "Resetting working directory"
+git reset --hard || goto error
+echo Local changes have been deleted.
+goto pause_return
+
+:: Create Pull Request
 :create_pull_request
 echo.
-:: Get current branch
 for /f %%b in ('git branch --show-current') do set currentBranch=%%b
-
-:: Get default branch (usually main or master)
 for /f %%d in ('git symbolic-ref refs/remotes/origin/HEAD') do set defaultBranch=%%d
 set defaultBranch=!defaultBranch:refs/remotes/origin/=!
 
 echo Creating Pull Request from !currentBranch! to !defaultBranch!
-echo.
-set /p prTitle="Enter Pull Request title: "
-set /p prDescription="Enter Pull Request description: "
-
-call :progress_line "Creating Pull Request"
-git push origin %currentBranch% || goto error
-
-:: Try different methods to open PR URL based on git remote
-for /f "delims=" %%r in ('git remote get-url origin') do set repoUrl=%%r
-set repoUrl=!repoUrl:git@github.com:=https://github.com/!
-set repoUrl=!repoUrl:.git=!
-set repoUrl=!repoUrl:https://github.com/=https://github.com/!
-
-:: Create PR URL
-set prUrl=!repoUrl!/compare/!defaultBranch!...!currentBranch!?expand=1&title=!prTitle!&body=!prDescription!
-
-echo.
-echo !GREEN!Pull Request ready:!RESET!
-echo !prUrl!
-echo.
-echo You can also create it manually:
-echo 1. Go to: !repoUrl!/pulls
-echo 2. Click "New pull request"
-echo 3. Set base: !defaultBranch! and compare: !currentBranch!
-echo 4. Enter title and description
-echo 5. Click "Create pull request"
-
-:: Try to open browser (works on most Windows systems)
-start "" "!prUrl!" 2>nul
+echo Please visit the following link to create the Pull Request:
+echo https://github.com/<your-username>/<repo-name>/compare/!currentBranch!...!defaultBranch!
 goto pause_return
 
+:: Backup master/main branch
 :backup_master
 echo.
-:: Determine if the default branch is called master or main
-git show-ref --verify --quiet refs/heads/master && set "defaultBranch=master" || set "defaultBranch=main"
-
-:: Get current date in YYYY-MM-DD_HH-MM-SS format
-for /f "tokens=2 delims==" %%a in ('wmic OS Get localdatetime /value') do set "datetime=%%a"
-set "dateStamp=%datetime:~0,4%-%datetime:~4,2%-%datetime:~6,2%_%datetime:~8,2%-%datetime:~10,2%-%datetime:~12,2%"
-
-:: Create backup branch name
-set "backupBranch=Backup_%defaultBranch%_%dateStamp%"
-
-call :progress_line "Creating backup branch %backupBranch%"
-git checkout %defaultBranch% || goto error
-git pull origin %defaultBranch% || goto error
-git checkout -b %backupBranch% || goto error
-git push origin %backupBranch% || goto error
-
-echo.
-echo !GREEN!Backup created successfully: %backupBranch%!RESET!
+call :progress_line "Backing up master/main branch"
+git checkout master || git checkout main || goto error
+git pull origin master || git pull origin main || goto error
+set backupBranch=backup_!date:/=-!
+git checkout -b !backupBranch! || goto error
+git push origin !backupBranch! || goto error
+echo Backup branch !backupBranch! created and pushed to origin.
 goto pause_return
 
+:: Error handling
 :error
 echo.
-echo !RED!=== ERROR: Operation failed. Please check the above output. ===!RESET!
+echo %RED%Error occurred!%RESET%
 goto pause_return
 
+:: Pause and return to menu
 :pause_return
-echo.
 pause
 goto menu
 
-:end
-echo.
-echo Exiting Git Tool...
-exit /b
-
+:: Progress line (to show action being taken)
 :progress_line
-@echo off
-setlocal enabledelayedexpansion
-
-:: Settings
-set "width=40"
-set "delay=20"
-set "steps=30"
-
-:: Get operation description
-set "operation=%~1"
-if not defined operation set "operation=Processing"
-
-:: Clear line sequence
-set "clear_line=%ESC%[2K%ESC%[1G"
-
-:: Animation loop
-for /L %%i in (1,1,%steps%) do (
-    set /a "percent=(%%i*100/%steps%)"
-    set /a "pos=(%%i*%width%/%steps%)"
-    
-    :: Build progress line
-    set "line="
-    for /L %%j in (1,1,%width%) do (
-        if %%j lss !pos! (
-            if !percent! geq 80 (
-                set "line=!line!!GREEN!▓!RESET!"
-            ) else if !percent! geq 50 (
-                set "line=!line!!YELLOW!▒!RESET!"
-            ) else (
-                set "line=!line!!BLUE!░!RESET!"
-            )
-        ) else if %%j == !pos! (
-            set "line=!line!!BLUE!►!RESET!"
-        ) else (
-            set "line=!line! "
-        )
-    )
-    
-    :: Display progress
-    <nul set /p="!clear_line!!BLUE!!operation! !RESET![!line!] !percent!%%"
-    
-    :: Smooth delay
-    >nul ping -n 1 -w %delay% 127.0.0.1
-)
-
-:: Completion state
-set "line="
-for /L %%j in (1,1,%width%) do set "line=!line!!GREEN!▓!RESET!"
-echo !clear_line!!BLUE!!operation! !RESET![!line!] 100%% !GREEN!✓!RESET!
-endlocal
+echo %CYAN%[INFO]%RESET% %1
 goto :eof
