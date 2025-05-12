@@ -7,15 +7,16 @@ set "BLUE=%ESC%[94m"
 set "GREEN=%ESC%[92m"
 set "YELLOW=%ESC%[93m"
 set "RED=%ESC%[91m"
+set "CYAN=%ESC%[96m"
 set "RESET=%ESC%[0m"
 
 :menu
 cls
 echo ================================================
-echo              GIT TOOL - INTERACTIVE MENU
+echo           %CYAN%GIT TOOL - INTERACTIVE MENU%RESET%
 echo ================================================
 echo  1.  Show git status
-echo  2.  Show git log
+echo  2.  Show git log (last 20 commits)
 echo  3.  List all local branches
 echo  4.  List all remote branches
 echo  5.  Switch to the last branch
@@ -32,9 +33,10 @@ echo 15.  Push to all remote branches
 echo 16.  Commit and push changes (with filenames)
 echo 17.  Stash changes
 echo 18.  Create Pull Request
-echo 19.  Exit
+echo 19.  Backup master/main branch
+echo 20.  Exit
 echo ================================================
-set /p choice="Select an option (1-19): "
+set /p choice="%YELLOW%Select an option (1-20): %RESET%"
 
 if "%choice%"=="1" goto status
 if "%choice%"=="2" goto log
@@ -54,7 +56,8 @@ if "%choice%"=="15" goto push_all_branches
 if "%choice%"=="16" goto commit_push
 if "%choice%"=="17" goto stash
 if "%choice%"=="18" goto create_pull_request
-if "%choice%"=="19" goto end
+if "%choice%"=="19" goto backup_master
+if "%choice%"=="20" goto end
 goto menu
 
 :status
@@ -172,10 +175,9 @@ git diff --name-only >> tmp_status.txt
 git ls-files --others --exclude-standard >> tmp_status.txt
 
 :: Windows-friendly alternative to 'sort | uniq'
-:: First sort the file
 sort tmp_status.txt > tmp_status_sorted.txt
 
-:: Then remove duplicates (Windows version)
+:: Remove duplicates
 set "prevLine="
 (
     for /f "delims=" %%f in (tmp_status_sorted.txt) do (
@@ -279,6 +281,28 @@ echo 5. Click "Create pull request"
 
 :: Try to open browser (works on most Windows systems)
 start "" "!prUrl!" 2>nul
+goto pause_return
+
+:backup_master
+echo.
+:: Determine if the default branch is called master or main
+git show-ref --verify --quiet refs/heads/master && set "defaultBranch=master" || set "defaultBranch=main"
+
+:: Get current date in YYYY-MM-DD_HH-MM-SS format
+for /f "tokens=2 delims==" %%a in ('wmic OS Get localdatetime /value') do set "datetime=%%a"
+set "dateStamp=%datetime:~0,4%-%datetime:~4,2%-%datetime:~6,2%_%datetime:~8,2%-%datetime:~10,2%-%datetime:~12,2%"
+
+:: Create backup branch name
+set "backupBranch=Backup_%defaultBranch%_%dateStamp%"
+
+call :progress_line "Creating backup branch %backupBranch%"
+git checkout %defaultBranch% || goto error
+git pull origin %defaultBranch% || goto error
+git checkout -b %backupBranch% || goto error
+git push origin %backupBranch% || goto error
+
+echo.
+echo !GREEN!Backup created successfully: %backupBranch%!RESET!
 goto pause_return
 
 :error
