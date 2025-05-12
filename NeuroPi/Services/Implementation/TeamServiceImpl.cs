@@ -4,11 +4,11 @@ using NeuroPi.Services.Interface;
 
 namespace NeuroPi.Services.Implementation
 {
-    public class TeamService : ITeamService
+    public class TeamServiceImpl : ITeamService
     {
         private readonly NeuroPiDbContext _context;
 
-        public TeamService(NeuroPiDbContext context)
+        public TeamServiceImpl(NeuroPiDbContext context)
         {
             _context = context;
         }
