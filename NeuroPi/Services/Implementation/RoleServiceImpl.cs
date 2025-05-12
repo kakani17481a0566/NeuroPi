@@ -1,82 +1,73 @@
-﻿using Microsoft.EntityFrameworkCore;
-using NeuroPi.Data;
+﻿using System.Linq;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 using NeuroPi.Models;
-using NeuroPi.Services.Interface;
 using NeuroPi.ViewModel.Role;
+using NeuroPi.Data;
+using NeuroPi.Services.Interface;
 
 namespace NeuroPi.Services.Implementation
 {
     public class RoleServiceImpl : IRoleService
-
     {
         private readonly NeuroPiDbContext _context;
+
         public RoleServiceImpl(NeuroPiDbContext context)
         {
             _context = context;
         }
 
-        public RoleResponseVM AddRole(RoleRequestVM role)
+        public RoleResponseVM AddRole(RoleRequestVM roleRequestVM)
         {
-            MRole roleModel = RoleRequestVM.ToModel(role);
+            var roleModel = RoleRequestVM.ToModel(roleRequestVM);
             _context.Roles.Add(roleModel);
-             var result=_context.SaveChanges();
+            var result = _context.SaveChanges();
+
             if (result > 0)
             {
-                RoleResponseVM response = new RoleResponseVM
-                {
-                    Id = roleModel.RoleId, // Assuming 'Id' is the primary key property in your MRole entity
-                    Name = roleModel.Name,
-                    TenantId = roleModel.TenantId
-                };
-                return response;
-
+                return RoleResponseVM.ToViewModel(roleModel);
             }
-            return null;
-
+            return null; // Or throw an exception depending on how you want to handle this.
         }
 
-        public void DeleteRoleById(int id)
+        public bool DeleteRoleById(int id)
         {
-            var roleModel = _context.Roles.FirstOrDefault(r=>r.RoleId== id);
-            if (roleModel != null)
+            var role = _context.Roles.SingleOrDefault(r => r.RoleId == id);
+            if (role == null)
             {
-                _context.Roles.Remove(roleModel);
-                _context.SaveChanges();
+                return false; // Role not found
             }
+
+            _context.Roles.Remove(role);
+            var result = _context.SaveChanges();
+            return result > 0; // Return true if the deletion was successful
         }
 
         public List<RoleResponseVM> GetAllRoles()
-        { 
-            return RoleResponseVM.ToViewModelList(_context.Roles.Include(r=>r.Tenant).ToList());
-
+        {
+            var roles = _context.Roles.Include(r => r.Tenant).ToList();
+            return RoleResponseVM.ToViewModelList(roles);
         }
 
         public RoleResponseVM GetRoleById(int id)
         {
-            return RoleResponseVM.ToViewModel(_context.Roles.FirstOrDefault(r=>r.RoleId == id));
+            var role = _context.Roles.FirstOrDefault(r => r.RoleId == id);
+            return role == null ? null : RoleResponseVM.ToViewModel(role); // Return null if not found
         }
 
-        public RoleResponseVM UpdateRole(int id,RoleRequestVM role)
+        public RoleResponseVM UpdateRole(int id, RoleRequestVM roleRequestVM)
         {
-            MRole existedRole = _context.Roles.FirstOrDefault(r => r.RoleId == id);
-            if (existedRole != null)
+            var existingRole = _context.Roles.FirstOrDefault(r => r.RoleId == id);
+            if (existingRole == null)
             {
-                existedRole.Name = role.Name;
-                existedRole.TenantId=role.TenantId;
-                _context.SaveChanges();
-
-                MRole roleModel = new MRole()
-                {
-                    RoleId = existedRole.RoleId,
-                    Name = role.Name,
-                    TenantId = role.TenantId
-                };
-                return RoleResponseVM.ToViewModel(roleModel);
+                return null; // Role not found
             }
-            return null;
-        
+
+            existingRole.Name = roleRequestVM.Name;
+            existingRole.TenantId = roleRequestVM.TenantId;
+
+            var result = _context.SaveChanges();
+            return result > 0 ? RoleResponseVM.ToViewModel(existingRole) : null;
         }
-
     }
-
 }

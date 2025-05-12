@@ -1,6 +1,6 @@
-﻿using System.Net;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.Net;
+using System.Collections.Generic;
 using NeuroPi.Response;
 using NeuroPi.Services.Interface;
 using NeuroPi.ViewModel.TeamUser;
@@ -11,65 +11,99 @@ namespace NeuroPi.Controllers
     [ApiController]
     public class TeamUserController : ControllerBase
     {
-        private readonly ITeamUserService teamUserService;
-        public TeamUserController(ITeamUserService userService)
+        private readonly ITeamUserService _teamUserService;
+
+        public TeamUserController(ITeamUserService teamUserService)
         {
-            teamUserService= userService;
-            
+            _teamUserService = teamUserService;
         }
+
+        // GET: api/TeamUser
         [HttpGet]
-        public ResponseResult<List<TeamUserResponseVM>> GetAllTeamUsers()
+        public IActionResult GetAllTeamUsers()
         {
-            var result = teamUserService.GetTeamUsers();
-            if (result == null)
+            var result = _teamUserService.GetTeamUsers();
+            if (result == null || result.Count == 0)
             {
-                return ResponseResult<List<TeamUserResponseVM>>.FailResponse(HttpStatusCode.NotFound, "No data for team users");
+                return new ResponseResult<List<TeamUserResponseVM>>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    "No data for team users");
             }
-            return ResponseResult<List<TeamUserResponseVM>>.SuccessResponse(HttpStatusCode.OK, result, "Team users fetched successfully");
-        }
-        [HttpGet("id")]
-        public ResponseResult<TeamUserResponseVM> GetById(int id)
-        {
-            var result = teamUserService.GetTeamUserById(id);
-            if (result == null)
-            {
-                return ResponseResult<TeamUserResponseVM>.FailResponse(HttpStatusCode.NotFound, "No data for team users");
-            }
-            return ResponseResult<TeamUserResponseVM>.SuccessResponse(HttpStatusCode.OK, result, "Team users fetched successfully");
+
+            return new ResponseResult<List<TeamUserResponseVM>>(
+                HttpStatusCode.OK,
+                result,
+                "Team users fetched successfully");
         }
 
+        // GET: api/TeamUser/{id}
+        [HttpGet("{id}")]
+        public IActionResult GetById(int id)
+        {
+            var result = _teamUserService.GetTeamUserById(id);
+            if (result == null)
+            {
+                return new ResponseResult<TeamUserResponseVM>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    "No data for team user");
+            }
+
+            return new ResponseResult<TeamUserResponseVM>(
+                HttpStatusCode.OK,
+                result,
+                "Team user fetched successfully");
+        }
+
+        // POST: api/TeamUser
         [HttpPost]
-        public ResponseResult<TeamUserResponseVM> AddTeamUser(TeamUserRequestVM teamuser)
+        public IActionResult AddTeamUser([FromBody] TeamUserRequestVM teamUser)
         {
-            var result = teamUserService.AddTeamUser(teamuser);
+            var result = _teamUserService.AddTeamUser(teamUser);
             if (result == null)
             {
-                return ResponseResult<TeamUserResponseVM>.FailResponse(HttpStatusCode.NotAcceptable, "No data created for  team users");
+                return new ResponseResult<TeamUserResponseVM>(
+                    HttpStatusCode.NotAcceptable,
+                    null,
+                    "Failed to create team user");
             }
-            return ResponseResult<TeamUserResponseVM>.SuccessResponse(HttpStatusCode.Created, result, "Team users fetched successfully");
-        }
-        [HttpPut("id")]
 
-        public ResponseResult<TeamUserResponseVM> UpdtaeTeamUserById(int id,TeamUserRequestVM teamUser)
+            return new ResponseResult<TeamUserResponseVM>(
+                HttpStatusCode.Created,
+                result,
+                "Team user created successfully");
+        }
+
+        // PUT: api/TeamUser/{id}
+        [HttpPut("{id}")]
+        public IActionResult UpdateTeamUserById(int id, [FromBody] TeamUserRequestVM teamUser)
         {
-            var result = teamUserService.UpdateTeamUser(id, teamUser);
+            var result = _teamUserService.UpdateTeamUser(id, teamUser);
             if (result == null)
             {
-                return ResponseResult<TeamUserResponseVM>.FailResponse(HttpStatusCode.NotFound, "No data for team users");
+                return new ResponseResult<TeamUserResponseVM>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    "Team user not found");
             }
-            return ResponseResult<TeamUserResponseVM>.SuccessResponse(HttpStatusCode.OK, result, "Team users Updated  successfully");
+
+            return new ResponseResult<TeamUserResponseVM>(
+                HttpStatusCode.OK,
+                result,
+                "Team user updated successfully");
         }
 
-        [HttpDelete("id")]
-        public ResponseResult<Object> DeleteById(int id)
+        // DELETE: api/TeamUser/{id}
+        [HttpDelete("{id}")]
+        public IActionResult DeleteById(int id)
         {
-             teamUserService.DeleteTeamUser(id);
-            
-            return ResponseResult<Object>.SuccessResponse(HttpStatusCode.OK, null, "Team users Deleted successfully");
+            _teamUserService.DeleteTeamUser(id);
+
+            return new ResponseResult<object>(
+                HttpStatusCode.OK,
+                null,
+                "Team user deleted successfully");
         }
-
-
-
-
     }
-    }
+}

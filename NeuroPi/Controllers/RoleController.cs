@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using NeuroPi.Response;
 using NeuroPi.Services.Interface;
 using NeuroPi.ViewModel.Role;
+using System.Collections.Generic;
 using System.Net;
 
 namespace NeuroPi.Controllers
@@ -12,63 +12,66 @@ namespace NeuroPi.Controllers
     public class RoleController : ControllerBase
     {
         private readonly IRoleService _roleService;
+
         public RoleController(IRoleService roleService)
         {
             _roleService = roleService;
         }
 
         [HttpGet]
-
         public ResponseResult<List<RoleResponseVM>> GetRoles()
         {
             var result = _roleService.GetAllRoles();
             if (result != null)
             {
-                return ResponseResult<List<RoleResponseVM>>.SuccessResponse(System.Net.HttpStatusCode.OK, result, "Roles fetched successfully");
+                return new ResponseResult<List<RoleResponseVM>>(HttpStatusCode.OK, result, "Roles fetched successfully");
             }
-            return ResponseResult<List<RoleResponseVM>>.FailResponse(System.Net.HttpStatusCode.NoContent, "Roles Not found");
+            return new ResponseResult<List<RoleResponseVM>>(HttpStatusCode.NoContent, null, "Roles not found");
         }
+
         [HttpGet("id")]
         public ResponseResult<RoleResponseVM> GetRoleById(int id)
         {
             var result = _roleService.GetRoleById(id);
             if (result != null)
             {
-                return ResponseResult<RoleResponseVM>.SuccessResponse(HttpStatusCode.OK, result, "Role fetched successfully");
+                return new ResponseResult<RoleResponseVM>(HttpStatusCode.OK, result, "Role fetched successfully");
             }
-            return ResponseResult<RoleResponseVM>.FailResponse(HttpStatusCode.NotFound, "Role Not found");
+            return new ResponseResult<RoleResponseVM>(HttpStatusCode.NotFound, null, "Role not found");
         }
-        [HttpPost]
 
-        public ResponseResult<RoleResponseVM> AddRole(RoleRequestVM roleRequest)
+        [HttpPost]
+        public ResponseResult<RoleResponseVM> AddRole([FromBody] RoleRequestVM roleRequest)
         {
             var result = _roleService.AddRole(roleRequest);
             if (result != null)
             {
-                return ResponseResult<RoleResponseVM>.SuccessResponse(HttpStatusCode.OK, result, "Role Created successfully");
+                return new ResponseResult<RoleResponseVM>(HttpStatusCode.OK, result, "Role created successfully");
             }
-            return ResponseResult<RoleResponseVM>.FailResponse(HttpStatusCode.NotFound, "Role Not Created ");
-
+            return new ResponseResult<RoleResponseVM>(HttpStatusCode.NotFound, null, "Role not created");
         }
+
         [HttpPut("id")]
-        public ResponseResult<RoleResponseVM> UpdateRole(int id, RoleRequestVM roleRequest)
+        public ResponseResult<RoleResponseVM> UpdateRole(int id, [FromBody] RoleRequestVM roleRequest)
         {
             var result = _roleService.UpdateRole(id, roleRequest);
             if (result != null)
             {
-                return ResponseResult<RoleResponseVM>.SuccessResponse(HttpStatusCode.OK, result, "updated role successfully");
+                return new ResponseResult<RoleResponseVM>(HttpStatusCode.OK, result, "Role updated successfully");
             }
-            return ResponseResult<RoleResponseVM>.FailResponse(HttpStatusCode.NotModified, "Not updated role");
-
+            return new ResponseResult<RoleResponseVM>(HttpStatusCode.NotModified, null, "Role not updated");
         }
+
         [HttpDelete("id")]
         public ResponseResult<object> DeleteRoleById(int id)
         {
-            _roleService.DeleteRoleById(id);
-             return ResponseResult<object>.SuccessResponse(HttpStatusCode.OK, null, "Deleted  role successfully");
-            
-
+            var result = _roleService.DeleteRoleById(id);
+            if (result)
+            {
+                return new ResponseResult<object>(HttpStatusCode.OK, null, "Role deleted successfully");
+            }
+            return new ResponseResult<object>(HttpStatusCode.BadRequest, null, $"Role not found with id {id}");
         }
+
     }
-    
 }

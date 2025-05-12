@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using NeuroPi.Response;
 using NeuroPi.Services.Interface;
 using NeuroPi.ViewModel.Organization;
+using System;
 
 namespace NeuroPi.Controllers
 {
@@ -18,44 +19,44 @@ namespace NeuroPi.Controllers
         }
 
         [HttpGet]
-        public async Task<ResponseResult<object>> GetAll()
+        public ResponseResult<object> GetAll()
         {
             try
             {
                 var result = _organizationService.GetAll();
-                if (result.Count == 0)
-                    return ResponseResult<object>.FailResponse(HttpStatusCode.NotFound, "No organizations found");
+                if (result == null || result.Count == 0)
+                    return new ResponseResult<object>(HttpStatusCode.NotFound, null, "No organizations found");
 
-                return ResponseResult<object>.SuccessResponse(HttpStatusCode.OK, result);
+                return new ResponseResult<object>(HttpStatusCode.OK, result, "Organizations fetched successfully");
             }
             catch (Exception ex)
             {
-                return ResponseResult<object>.FailResponse(HttpStatusCode.InternalServerError, ex.Message);
+                return new ResponseResult<object>(HttpStatusCode.InternalServerError, null, ex.Message);
             }
         }
 
         [HttpGet("{id}")]
-        public async Task<ResponseResult<object>> GetById(int id)
+        public ResponseResult<object> GetById(int id)
         {
             try
             {
                 var org = _organizationService.GetById(id);
                 if (org == null)
-                    return ResponseResult<object>.FailResponse(HttpStatusCode.NotFound, "Organization not found");
+                    return new ResponseResult<object>(HttpStatusCode.NotFound, null, "Organization not found");
 
-                return ResponseResult<object>.SuccessResponse(HttpStatusCode.OK, org);
+                return new ResponseResult<object>(HttpStatusCode.OK, org, "Organization found successfully");
             }
             catch (Exception ex)
             {
-                return ResponseResult<object>.FailResponse(HttpStatusCode.InternalServerError, ex.Message);
+                return new ResponseResult<object>(HttpStatusCode.InternalServerError, null, ex.Message);
             }
         }
 
         [HttpPost]
-        public async Task<ResponseResult<object>> Create([FromQuery] string name, [FromQuery] int tenantId, [FromQuery] int? parentId)
+        public ResponseResult<object> Create([FromQuery] string name, [FromQuery] int tenantId, [FromQuery] int? parentId)
         {
             if (string.IsNullOrWhiteSpace(name) || tenantId <= 0)
-                return ResponseResult<object>.FailResponse(HttpStatusCode.BadRequest, "Invalid input");
+                return new ResponseResult<object>(HttpStatusCode.BadRequest, null, "Invalid input");
 
             var input = new OrganizationInputVM
             {
@@ -67,19 +68,19 @@ namespace NeuroPi.Controllers
             try
             {
                 var created = _organizationService.Create(input);
-                return ResponseResult<object>.SuccessResponse(HttpStatusCode.Created, created, "Organization created");
+                return new ResponseResult<object>(HttpStatusCode.Created, created, "Organization created successfully");
             }
             catch (Exception ex)
             {
-                return ResponseResult<object>.FailResponse(HttpStatusCode.InternalServerError, ex.Message);
+                return new ResponseResult<object>(HttpStatusCode.InternalServerError, null, ex.Message);
             }
         }
 
         [HttpPut("{id}")]
-        public async Task<ResponseResult<object>> Update(int id, [FromQuery] string name, [FromQuery] int? parentId)
+        public ResponseResult<object> Update(int id, [FromQuery] string name, [FromQuery] int? parentId)
         {
             if (string.IsNullOrWhiteSpace(name))
-                return ResponseResult<object>.FailResponse(HttpStatusCode.BadRequest, "Invalid input");
+                return new ResponseResult<object>(HttpStatusCode.BadRequest, null, "Invalid input");
 
             var input = new OrganizationUpdateInputVM
             {
@@ -91,30 +92,30 @@ namespace NeuroPi.Controllers
             {
                 var updated = _organizationService.Update(id, input);
                 if (updated == null)
-                    return ResponseResult<object>.FailResponse(HttpStatusCode.NotFound, "Organization not found");
+                    return new ResponseResult<object>(HttpStatusCode.NotFound, null, "Organization not found");
 
-                return ResponseResult<object>.SuccessResponse(HttpStatusCode.OK, updated, "Organization updated");
+                return new ResponseResult<object>(HttpStatusCode.OK, updated, "Organization updated successfully");
             }
             catch (Exception ex)
             {
-                return ResponseResult<object>.FailResponse(HttpStatusCode.InternalServerError, ex.Message);
+                return new ResponseResult<object>(HttpStatusCode.InternalServerError, null, ex.Message);
             }
         }
 
         [HttpDelete("{id}")]
-        public async Task<ResponseResult<object>> Delete(int id)
+        public ResponseResult<object> Delete(int id)
         {
             try
             {
                 var success = _organizationService.Delete(id);
                 if (!success)
-                    return ResponseResult<object>.FailResponse(HttpStatusCode.NotFound, "Organization not found");
+                    return new ResponseResult<object>(HttpStatusCode.NotFound, null, "Organization not found");
 
-                return ResponseResult<object>.SuccessResponse(HttpStatusCode.NoContent, null, "Organization deleted");
+                return new ResponseResult<object>(HttpStatusCode.OK, null, "Organization deleted successfully");
             }
             catch (Exception ex)
             {
-                return ResponseResult<object>.FailResponse(HttpStatusCode.InternalServerError, ex.Message);
+                return new ResponseResult<object>(HttpStatusCode.InternalServerError, null, ex.Message);
             }
         }
     }

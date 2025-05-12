@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Net;
 using NeuroPi.Response;
 using NeuroPi.Services.Interface;
 using NeuroPi.ViewModel.Tenent;
-using System.Collections.Generic;
-using System.Net;
 
 namespace NeuroPi.Controllers
 {
@@ -20,69 +20,110 @@ namespace NeuroPi.Controllers
 
         // GET: api/tenants
         [HttpGet]
-        public ResponseResult<List<TenantVM>> GetAll()
+        public IActionResult GetAll()
         {
             var tenants = _tenantService.GetAllTenants();
+
             if (tenants == null || tenants.Count == 0)
             {
-                return ResponseResult<List<TenantVM>>.FailResponse(HttpStatusCode.NotFound, "No tenants found");
+                return new ResponseResult<List<TenantVM>>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    "No tenants found");
             }
-            return ResponseResult<List<TenantVM>>.SuccessResponse(HttpStatusCode.OK, tenants, "Tenants retrieved successfully");
+
+            return new ResponseResult<List<TenantVM>>(
+                HttpStatusCode.OK,
+                tenants,
+                "Tenants retrieved successfully");
         }
 
         // GET: api/tenants/{id}
         [HttpGet("{id}")]
-        public ResponseResult<TenantVM> GetById(int id)
+        public IActionResult GetById(int id)
         {
             var tenant = _tenantService.GetTenantById(id);
+
             if (tenant == null)
             {
-                return ResponseResult<TenantVM>.FailResponse(HttpStatusCode.NotFound, "Tenant not found");
+                return new ResponseResult<TenantVM>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    "Tenant not found");
             }
-            return ResponseResult<TenantVM>.SuccessResponse(HttpStatusCode.OK, tenant, "Tenant retrieved successfully");
+
+            return new ResponseResult<TenantVM>(
+                HttpStatusCode.OK,
+                tenant,
+                "Tenant retrieved successfully");
         }
 
         // POST: api/tenants
         [HttpPost]
-        public ResponseResult<TenantVM> Create([FromBody] TenantInputVM tenantInput)
+        public IActionResult Create([FromBody] TenantInputVM tenantInput)
         {
             if (!ModelState.IsValid)
             {
-                return ResponseResult<TenantVM>.FailResponse(HttpStatusCode.BadRequest, "Invalid tenant data");
+                return new ResponseResult<TenantVM>(
+                    HttpStatusCode.BadRequest,
+                    null,
+                    "Invalid tenant data");
             }
 
             var createdTenant = _tenantService.CreateTenant(tenantInput);
-            return ResponseResult<TenantVM>.SuccessResponse(HttpStatusCode.Created, createdTenant, "Tenant created successfully");
+
+            return new ResponseResult<TenantVM>(
+                HttpStatusCode.Created,
+                createdTenant,
+                "Tenant created successfully");
         }
 
         // PUT: api/tenants/{id}
         [HttpPut("{id}")]
-        public ResponseResult<TenantVM> Update(int id, [FromBody] TenantUpdateInputVM tenantUpdateInput)
+        public IActionResult Update(int id, [FromBody] TenantUpdateInputVM tenantUpdateInput)
         {
             if (!ModelState.IsValid)
             {
-                return ResponseResult<TenantVM>.FailResponse(HttpStatusCode.BadRequest, "Invalid tenant data");
+                return new ResponseResult<TenantVM>(
+                    HttpStatusCode.BadRequest,
+                    null,
+                    "Invalid tenant data");
             }
 
             var updatedTenant = _tenantService.UpdateTenant(id, tenantUpdateInput);
+
             if (updatedTenant == null)
             {
-                return ResponseResult<TenantVM>.FailResponse(HttpStatusCode.NotFound, "Tenant not found");
+                return new ResponseResult<TenantVM>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    "Tenant not found");
             }
 
-            return ResponseResult<TenantVM>.SuccessResponse(HttpStatusCode.OK, updatedTenant, "Tenant updated successfully");
+            return new ResponseResult<TenantVM>(
+                HttpStatusCode.OK,
+                updatedTenant,
+                "Tenant updated successfully");
         }
 
         // DELETE: api/tenants/{id}
         [HttpDelete("{id}")]
-        public ResponseResult<bool> Delete(int id)
+        public IActionResult Delete(int id)
         {
             var result = _tenantService.DeleteTenant(id);
+
             if (!result)
             {
-                return ResponseResult<bool>.FailResponse(HttpStatusCode.NotFound, "Tenant not found or could not be deleted");
+                return new ResponseResult<bool>(
+                    HttpStatusCode.NotFound,
+                    false,
+                    "Tenant not found or could not be deleted");
             }
-            return ResponseResult<bool>.SuccessResponse(HttpStatusCode.OK, true, "Tenant deleted successfully");
+
+            return new ResponseResult<bool>(
+                HttpStatusCode.OK,
+                true,
+                "Tenant deleted successfully");
         }
     }
 }

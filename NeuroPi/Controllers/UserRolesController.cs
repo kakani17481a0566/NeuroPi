@@ -20,8 +20,9 @@ namespace NeuroPi.Controllers
             _service = service;
         }
 
+        // GET: api/userroles
         [HttpGet]
-        public ResponseResult<List<UserRoleVM>> GetAll()
+        public IActionResult GetAll()
         {
             var roles = _service.GetAll()
                 .Select(r => new UserRoleVM
@@ -32,15 +33,22 @@ namespace NeuroPi.Controllers
                     TenantId = r.TenantId
                 }).ToList();
 
-            return ResponseResult<List<UserRoleVM>>.SuccessResponse(HttpStatusCode.OK, roles, "User roles fetched");
+            return new ResponseResult<List<UserRoleVM>>(
+                HttpStatusCode.OK,
+                roles,
+                "User roles fetched");
         }
 
+        // GET: api/userroles/{id}
         [HttpGet("{id}")]
-        public ResponseResult<UserRoleVM> GetById(int id)
+        public IActionResult GetById(int id)
         {
             var role = _service.GetById(id);
             if (role == null)
-                return ResponseResult<UserRoleVM>.FailResponse(HttpStatusCode.NotFound, "User role not found");
+                return new ResponseResult<UserRoleVM>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    "User role not found");
 
             var result = new UserRoleVM
             {
@@ -50,11 +58,15 @@ namespace NeuroPi.Controllers
                 TenantId = role.TenantId
             };
 
-            return ResponseResult<UserRoleVM>.SuccessResponse(HttpStatusCode.OK, result, "User role found");
+            return new ResponseResult<UserRoleVM>(
+                HttpStatusCode.OK,
+                result,
+                "User role found");
         }
 
+        // POST: api/userroles
         [HttpPost]
-        public ResponseResult<UserRoleVM> Create([FromBody] UserRoleCreateVM input)
+        public IActionResult Create([FromBody] UserRoleCreateVM input)
         {
             var entity = new MUserRole
             {
@@ -75,11 +87,15 @@ namespace NeuroPi.Controllers
                 TenantId = created.TenantId
             };
 
-            return ResponseResult<UserRoleVM>.SuccessResponse(HttpStatusCode.Created, result, "User role created");
+            return new ResponseResult<UserRoleVM>(
+                HttpStatusCode.Created,
+                result,
+                "User role created");
         }
 
+        // PUT: api/userroles/{id}
         [HttpPut("{id}")]
-        public ResponseResult<UserRoleVM> Update(int id, [FromBody] UserRoleUpdateVM input)
+        public IActionResult Update(int id, [FromBody] UserRoleUpdateVM input)
         {
             var entity = new MUserRole
             {
@@ -91,7 +107,10 @@ namespace NeuroPi.Controllers
 
             var updated = _service.Update(id, entity);
             if (updated == null)
-                return ResponseResult<UserRoleVM>.FailResponse(HttpStatusCode.NotFound, "User role not found");
+                return new ResponseResult<UserRoleVM>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    "User role not found");
 
             var result = new UserRoleVM
             {
@@ -101,17 +120,27 @@ namespace NeuroPi.Controllers
                 TenantId = updated.TenantId
             };
 
-            return ResponseResult<UserRoleVM>.SuccessResponse(HttpStatusCode.OK, result, "User role updated");
+            return new ResponseResult<UserRoleVM>(
+                HttpStatusCode.OK,
+                result,
+                "User role updated");
         }
 
+        // DELETE: api/userroles/{id}
         [HttpDelete("{id}")]
-        public ResponseResult<object> Delete(int id)
+        public IActionResult Delete(int id)
         {
             var success = _service.Delete(id);
             if (!success)
-                return ResponseResult<object>.FailResponse(HttpStatusCode.NotFound, "User role not found");
+                return new ResponseResult<object>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    "User role not found");
 
-            return ResponseResult<object>.SuccessResponse(HttpStatusCode.OK, null, "User role deleted");
+            return new ResponseResult<object>(
+                HttpStatusCode.OK,
+                null,
+                "User role deleted");
         }
     }
 }

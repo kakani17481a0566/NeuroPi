@@ -1,8 +1,6 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
 using System.Net;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using NeuroPi.Models;
 using NeuroPi.Response;
 using NeuroPi.Services.Interface;
 using NeuroPi.ViewModel.GroupUser;
@@ -21,58 +19,58 @@ namespace NeuroPi.Controllers
         }
 
         [HttpPost]
-        public ResponseResult<GroupUserVM> create([FromBody] GroupUserInputVM groupUserInput)
+        public ResponseResult<GroupUserVM> Create([FromBody] GroupUserInputVM groupUserInput)
         {
-            var createGroupUser = _groupUserService.createGroupUser(groupUserInput);
-            return ResponseResult<GroupUserVM>.SuccessResponse(HttpStatusCode.OK, createGroupUser, "Group User Created Successfully");
+            var createdGroupUser = _groupUserService.createGroupUser(groupUserInput);
+            if (createdGroupUser != null)
+            {
+                return new ResponseResult<GroupUserVM>(HttpStatusCode.OK, createdGroupUser, "Group User created successfully");
+            }
+            return new ResponseResult<GroupUserVM>(HttpStatusCode.BadRequest, null, "Failed to create Group User");
         }
 
         [HttpPut("update-by-id/{id}")]
-
-        public ResponseResult<GroupUserUpdateVM> updateByid(int id, [FromBody] GroupUserUpdateVM input)
+        public ResponseResult<GroupUserUpdateVM> UpdateById(int id, [FromBody] GroupUserUpdateVM input)
         {
-            var groupUser = _groupUserService.updateGroupUserById(id, input);
-            if (groupUser == null)
+            var updatedGroupUser = _groupUserService.updateGroupUserById(id, input);
+            if (updatedGroupUser != null)
             {
-                return ResponseResult<GroupUserUpdateVM>.FailResponse(HttpStatusCode.NotFound, "Group User Not Found");
-
+                return new ResponseResult<GroupUserUpdateVM>(HttpStatusCode.OK, updatedGroupUser, "Group User updated successfully");
             }
-            return ResponseResult<GroupUserUpdateVM>.SuccessResponse(HttpStatusCode.OK, groupUser, "Group User Updated Succefully");
+            return new ResponseResult<GroupUserUpdateVM>(HttpStatusCode.NotFound, null, "Group User not found");
         }
 
         [HttpGet]
-        public ResponseResult<List<GroupUserVM>> getAllGroupUsers()
+        public ResponseResult<List<GroupUserVM>> GetAllGroupUsers()
         {
             var groupUsers = _groupUserService.getAllGroupUsers();
-            if (groupUsers == null || groupUsers.Count == 0)
+            if (groupUsers != null && groupUsers.Count > 0)
             {
-                return ResponseResult<List<GroupUserVM>>.FailResponse(HttpStatusCode.NotFound, "Group Users Not Found");
+                return new ResponseResult<List<GroupUserVM>>(HttpStatusCode.OK, groupUsers, "Group Users retrieved successfully");
             }
-            return ResponseResult<List<GroupUserVM>>.SuccessResponse(HttpStatusCode.OK, groupUsers, "Group Users retrived Successfully");
+            return new ResponseResult<List<GroupUserVM>>(HttpStatusCode.NotFound, null, "No Group Users found");
         }
 
         [HttpGet("get-by-id/{GroupId}")]
-        public ResponseResult<GroupUserVM> getGroupUserById(int GroupId)
+        public ResponseResult<GroupUserVM> GetGroupUserById(int GroupId)
         {
             var groupUser = _groupUserService.getGroupUserById(GroupId);
-            if (groupUser == null)
+            if (groupUser != null)
             {
-                return ResponseResult<GroupUserVM>.FailResponse(HttpStatusCode.NotFound, "Group User Not Found");
+                return new ResponseResult<GroupUserVM>(HttpStatusCode.OK, groupUser, "Group User retrieved successfully");
             }
-            return ResponseResult<GroupUserVM>.SuccessResponse(HttpStatusCode.OK, groupUser, "Group User retrived Successfully");
+            return new ResponseResult<GroupUserVM>(HttpStatusCode.NotFound, null, "Group User not found");
         }
 
         [HttpDelete("{GroupId}")]
-        public ResponseResult<bool> deleteGroupUserById(int GroupId)
+        public ResponseResult<bool> DeleteGroupUserById(int GroupId)
         {
-            var result = _groupUserService.deleteGroupUserById(GroupId);
-            if (!result)
+            var success = _groupUserService.deleteGroupUserById(GroupId);
+            if (success)
             {
-                return ResponseResult<bool>.FailResponse(HttpStatusCode.NotFound,"Group User Not Found");
+                return new ResponseResult<bool>(HttpStatusCode.OK, true, "Group User deleted successfully");
             }
-            return ResponseResult<bool>.SuccessResponse(HttpStatusCode.OK,true, "Group User Deleted Successfully");
+            return new ResponseResult<bool>(HttpStatusCode.NotFound, false, "Group User not found");
         }
-
-
     }
 }

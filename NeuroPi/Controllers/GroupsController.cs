@@ -27,14 +27,14 @@ namespace NeuroPi.Controllers
                 var groups = _groupService.GetAll();
                 if (groups == null || groups.Count == 0)
                 {
-                    return ResponseResult<object>.FailResponse(System.Net.HttpStatusCode.NotFound, "No groups found");
+                    return new ResponseResult<object>(System.Net.HttpStatusCode.NotFound, null, "No groups found");
                 }
 
-                return ResponseResult<object>.SuccessResponse(System.Net.HttpStatusCode.OK, groups);
+                return new ResponseResult<object>(System.Net.HttpStatusCode.OK, groups, "Groups fetched successfully");
             }
             catch (Exception ex)
             {
-                return ResponseResult<object>.FailResponse(System.Net.HttpStatusCode.InternalServerError, ex.Message);
+                return new ResponseResult<object>(System.Net.HttpStatusCode.InternalServerError, null, ex.Message);
             }
         }
 
@@ -47,14 +47,14 @@ namespace NeuroPi.Controllers
                 var group = _groupService.GetById(id);
                 if (group == null)
                 {
-                    return ResponseResult<object>.FailResponse(System.Net.HttpStatusCode.NotFound, "Group not found");
+                    return new ResponseResult<object>(System.Net.HttpStatusCode.NotFound, null, "Group not found");
                 }
 
-                return ResponseResult<object>.SuccessResponse(System.Net.HttpStatusCode.OK, group);
+                return new ResponseResult<object>(System.Net.HttpStatusCode.OK, group, "Group fetched successfully");
             }
             catch (Exception ex)
             {
-                return ResponseResult<object>.FailResponse(System.Net.HttpStatusCode.InternalServerError, ex.Message);
+                return new ResponseResult<object>(System.Net.HttpStatusCode.InternalServerError, null, ex.Message);
             }
         }
 
@@ -64,17 +64,17 @@ namespace NeuroPi.Controllers
         {
             if (input == null || string.IsNullOrEmpty(input.Name) || input.TenantId <= 0)
             {
-                return ResponseResult<object>.FailResponse(System.Net.HttpStatusCode.BadRequest, "Invalid group data");
+                return new ResponseResult<object>(System.Net.HttpStatusCode.BadRequest, null, "Invalid group data");
             }
 
             try
             {
                 var group = _groupService.Create(input);
-                return ResponseResult<object>.SuccessResponse(System.Net.HttpStatusCode.Created, group, "Group created successfully");
+                return new ResponseResult<object>(System.Net.HttpStatusCode.Created, group, "Group created successfully");
             }
             catch (Exception ex)
             {
-                return ResponseResult<object>.FailResponse(System.Net.HttpStatusCode.InternalServerError, ex.Message);
+                return new ResponseResult<object>(System.Net.HttpStatusCode.InternalServerError, null, ex.Message);
             }
         }
 
@@ -84,7 +84,7 @@ namespace NeuroPi.Controllers
         {
             if (input == null || string.IsNullOrEmpty(input.Name))
             {
-                return ResponseResult<object>.FailResponse(System.Net.HttpStatusCode.BadRequest, "Invalid group data");
+                return new ResponseResult<object>(System.Net.HttpStatusCode.BadRequest, null, "Invalid group data");
             }
 
             try
@@ -92,14 +92,14 @@ namespace NeuroPi.Controllers
                 var group = _groupService.Update(id, input);
                 if (group == null)
                 {
-                    return ResponseResult<object>.FailResponse(System.Net.HttpStatusCode.NotFound, "Group not found");
+                    return new ResponseResult<object>(System.Net.HttpStatusCode.NotFound, null, "Group not found");
                 }
 
-                return ResponseResult<object>.SuccessResponse(System.Net.HttpStatusCode.OK, group, "Group updated successfully");
+                return new ResponseResult<object>(System.Net.HttpStatusCode.OK, group, "Group updated successfully");
             }
             catch (Exception ex)
             {
-                return ResponseResult<object>.FailResponse(System.Net.HttpStatusCode.InternalServerError, ex.Message);
+                return new ResponseResult<object>(System.Net.HttpStatusCode.InternalServerError, null, ex.Message);
             }
         }
 
@@ -112,14 +112,14 @@ namespace NeuroPi.Controllers
                 var success = _groupService.Delete(id);
                 if (!success)
                 {
-                    return ResponseResult<object>.FailResponse(System.Net.HttpStatusCode.NotFound, "Group not found");
+                    return new ResponseResult<object>(System.Net.HttpStatusCode.NotFound, null, "Group not found");
                 }
 
-                return ResponseResult<object>.SuccessResponse(System.Net.HttpStatusCode.NoContent, null, "Group deleted successfully");
+                return new ResponseResult<object>(System.Net.HttpStatusCode.NoContent, null, "Group deleted successfully");
             }
             catch (Exception ex)
             {
-                return ResponseResult<object>.FailResponse(System.Net.HttpStatusCode.InternalServerError, ex.Message);
+                return new ResponseResult<object>(System.Net.HttpStatusCode.InternalServerError, null, ex.Message);
             }
         }
     }

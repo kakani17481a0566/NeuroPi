@@ -1,9 +1,9 @@
-﻿using System.Net;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using NeuroPi.Response;
 using NeuroPi.Services.Interface;
 using NeuroPi.ViewModel.RolePermission;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace NeuroPi.Controllers
 {
@@ -11,66 +11,99 @@ namespace NeuroPi.Controllers
     [ApiController]
     public class RolePermissionController : ControllerBase
     {
-        private readonly IRolePermisisionService _rolePermissionService;
-        public RolePermissionController(IRolePermisisionService rolePermissionService)
+        private readonly IRolePermissionService _rolePermissionService;
+
+        public RolePermissionController(IRolePermissionService rolePermissionService)
         {
             _rolePermissionService = rolePermissionService;
         }
 
         [HttpPost]
-        public ResponseResult<RolePermissionResponseVM> AddRolePermission([FromBody] RolePermissionRequestVM rolePermission)
+        public async Task<ResponseResult<RolePermissionResponseVM>> AddRolePermission([FromBody] RolePermissionRequestVM rolePermission)
         {
             if (!ModelState.IsValid)
             {
-                return ResponseResult<RolePermissionResponseVM>.FailResponse(HttpStatusCode.BadRequest, "Invalid role permission data");
+                return new ResponseResult<RolePermissionResponseVM>(HttpStatusCode.BadRequest, null, "Invalid role permission data");
             }
-            var createdRolePermission = _rolePermissionService.AddRolePermission(rolePermission);
-            return ResponseResult<RolePermissionResponseVM>.SuccessResponse(HttpStatusCode.Created, createdRolePermission, "Role permission created successfully");
-        }
-        [HttpPut("{id}")]
-        public ResponseResult<RolePermissionResponseVM> UpdateRolePermissionById(int id, [FromBody] RolePermissionVM rolePermission)
-        { 
-            var updatedRolePermission = _rolePermissionService.UpdateRolePermissionById(id, rolePermission);
-            if (updatedRolePermission == null)
+
+            try
             {
-                return ResponseResult<RolePermissionResponseVM>.FailResponse(HttpStatusCode.NotFound, "Role permission not found");
+                var createdRolePermission = await _rolePermissionService.AddRolePermissionAsync(rolePermission);
+                return new ResponseResult<RolePermissionResponseVM>(HttpStatusCode.Created, createdRolePermission, "Role permission created successfully");
             }
-            return ResponseResult<RolePermissionResponseVM>.SuccessResponse(HttpStatusCode.OK, updatedRolePermission, "Role permission updated successfully");
+            catch (Exception ex)
+            {
+                return new ResponseResult<RolePermissionResponseVM>(HttpStatusCode.InternalServerError, null, $"Error creating role permission: {ex.Message}");
+            }
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ResponseResult<RolePermissionResponseVM>> UpdateRolePermission(int id, [FromBody] RolePermissionVM rolePermission)
+        {
+            if (!ModelState.IsValid)
+            {
+                return new ResponseResult<RolePermissionResponseVM>(HttpStatusCode.BadRequest, null, "Invalid data for update");
+            }
+
+            try
+            {
+                var updatedRolePermission = await _rolePermissionService.UpdateRolePermissionByIdAsync(id, rolePermission);
+                return updatedRolePermission == null
+                    ? new ResponseResult<RolePermissionResponseVM>(HttpStatusCode.NotFound, null, "Role permission not found")
+                    : new ResponseResult<RolePermissionResponseVM>(HttpStatusCode.OK, updatedRolePermission, "Role permission updated successfully");
+            }
+            catch (Exception ex)
+            {
+                return new ResponseResult<RolePermissionResponseVM>(HttpStatusCode.InternalServerError, null, $"Error updating role permission: {ex.Message}");
+            }
         }
 
         [HttpGet]
-        public ResponseResult<List<RolePermissionResponseVM>> GetAllRolePermissions()
+        public async Task<ResponseResult<List<RolePermissionResponseVM>>> GetAll()
         {
-            var result = _rolePermissionService.GetAllRolePermissions();
-            if (result != null)
+            try
             {
-                return ResponseResult<List<RolePermissionResponseVM>>.SuccessResponse(HttpStatusCode.OK, result, "Role Permissions retrived Successfully");
+                var result = await _rolePermissionService.GetAllRolePermissionsAsync();
+                return result.Count > 0
+                    ? new ResponseResult<List<RolePermissionResponseVM>>(HttpStatusCode.OK, result, "Role Permissions retrieved successfully")
+                    : new ResponseResult<List<RolePermissionResponseVM>>(HttpStatusCode.NoContent, result, "No role permissions found");
             }
-            return ResponseResult<List<RolePermissionResponseVM>>.FailResponse(HttpStatusCode.NoContent, "No data found");
+            catch (Exception ex)
+            {
+                return new ResponseResult<List<RolePermissionResponseVM>>(HttpStatusCode.InternalServerError, null, $"Error retrieving role permissions: {ex.Message}");
+            }
         }
-        
 
         [HttpGet("{id}")]
-        public ResponseResult<RolePermissionResponseVM> GetRolePermissionById(int id)
+        public async Task<ResponseResult<RolePermissionResponseVM>> GetById(int id)
         {
-            var result = _rolePermissionService.GetRolePermissionById(id);
-            if (result != null)
+            try
             {
-                return ResponseResult<RolePermissionResponseVM>.SuccessResponse(HttpStatusCode.OK, result, "Role Permission found");
+                var result = await _rolePermissionService.GetRolePermissionByIdAsync(id);
+                return result != null
+                    ? new ResponseResult<RolePermissionResponseVM>(HttpStatusCode.OK, result, "Role permission found")
+                    : new ResponseResult<RolePermissionResponseVM>(HttpStatusCode.NotFound, null, $"No role permission found with id {id}");
             }
-            return ResponseResult<RolePermissionResponseVM>.FailResponse(HttpStatusCode.NotFound, $"No data found with id {id}");
+            catch (Exception ex)
+            {
+                return new ResponseResult<RolePermissionResponseVM>(HttpStatusCode.InternalServerError, null, $"Error retrieving role permission: {ex.Message}");
+            }
         }
 
-
         [HttpDelete("{id}")]
-        public ResponseResult<bool> DeleteById(int id)
+        public async Task<ResponseResult<bool>> Delete(int id)
         {
-            var response = _rolePermissionService.DeleteById(id);
-            if (response)
+            try
             {
-                return ResponseResult<bool>.SuccessResponse(HttpStatusCode.OK, response, "Role Permission Deleted Successfully");
+                var response = await _rolePermissionService.DeleteByIdAsync(id);
+                return response
+                    ? new ResponseResult<bool>(HttpStatusCode.OK, true, "Role permission deleted successfully")
+                    : new ResponseResult<bool>(HttpStatusCode.NotFound, false, "Role permission not found");
             }
-            return ResponseResult<bool>.FailResponse(HttpStatusCode.NotFound, "No Content has deleted");
+            catch (Exception ex)
+            {
+                return new ResponseResult<bool>(HttpStatusCode.InternalServerError, false, $"Error deleting role permission: {ex.Message}");
+            }
         }
     }
 }

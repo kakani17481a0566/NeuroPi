@@ -12,6 +12,8 @@ namespace NeuroPi.Services.Interface
 
         RoleResponseVM UpdateRole( int id,RoleRequestVM role);
 
-        void DeleteRoleById(int id);
+        bool DeleteRoleById(int id);
+
+
     }
 }
