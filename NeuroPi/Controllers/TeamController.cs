@@ -4,6 +4,7 @@ using NeuroPi.Models;
 using NeuroPi.Response;
 using NeuroPi.ViewModel.Team;
 using NeuroPi.Services.Interface;
+using System.Threading.Tasks;
 
 namespace NeuroPi.Controllers
 {
@@ -19,7 +20,7 @@ namespace NeuroPi.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<ResponseResult<List<MTeamVM>>> GetAll()
         {
             var teams = _teamService.GetAllTeams();
 
@@ -30,15 +31,15 @@ namespace NeuroPi.Controllers
                 TenantId = t.TenantId
             }).ToList();
 
-            return Ok(ResponseResult<List<MTeamVM>>.SuccessResponse(HttpStatusCode.OK, result, "Teams fetched"));
+            return ResponseResult<List<MTeamVM>>.SuccessResponse(HttpStatusCode.OK, result, "Teams fetched");
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public async Task<ResponseResult<MTeamVM>> GetById(int id)
         {
             var team = _teamService.GetTeamById(id);
             if (team == null)
-                return NotFound(ResponseResult<MTeamVM>.FailResponse(HttpStatusCode.NotFound, "Team not found"));
+                return ResponseResult<MTeamVM>.FailResponse(HttpStatusCode.NotFound, "Team not found");
 
             var result = new MTeamVM
             {
@@ -47,11 +48,11 @@ namespace NeuroPi.Controllers
                 TenantId = team.TenantId
             };
 
-            return Ok(ResponseResult<MTeamVM>.SuccessResponse(HttpStatusCode.OK, result, "Team found"));
+            return ResponseResult<MTeamVM>.SuccessResponse(HttpStatusCode.OK, result, "Team found");
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] MTeamInsertVM vm)
+        public async Task<ResponseResult<object>> Create([FromBody] MTeamInsertVM vm)
         {
             var team = new MTeam
             {
@@ -62,14 +63,13 @@ namespace NeuroPi.Controllers
             };
 
             var created = _teamService.CreateTeam(team);
-
             var result = new { created.TeamId };
 
-            return Ok(ResponseResult<object>.SuccessResponse(HttpStatusCode.Created, result, "Team created"));
+            return ResponseResult<object>.SuccessResponse(HttpStatusCode.Created, result, "Team created");
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] MTeamUpdateVM vm)
+        public async Task<ResponseResult<MTeamVM>> Update(int id, [FromBody] MTeamUpdateVM vm)
         {
             var update = new MTeam
             {
@@ -80,7 +80,7 @@ namespace NeuroPi.Controllers
 
             var updated = _teamService.UpdateTeam(id, update);
             if (updated == null)
-                return NotFound(ResponseResult<MTeamVM>.FailResponse(HttpStatusCode.NotFound, "Team not found"));
+                return ResponseResult<MTeamVM>.FailResponse(HttpStatusCode.NotFound, "Team not found");
 
             var result = new MTeamVM
             {
@@ -89,17 +89,17 @@ namespace NeuroPi.Controllers
                 TenantId = updated.TenantId
             };
 
-            return Ok(ResponseResult<MTeamVM>.SuccessResponse(HttpStatusCode.OK, result, "Team updated"));
+            return ResponseResult<MTeamVM>.SuccessResponse(HttpStatusCode.OK, result, "Team updated");
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<ResponseResult<string>> Delete(int id)
         {
             bool success = _teamService.SoftDeleteTeam(id);
             if (!success)
-                return NotFound(ResponseResult<string>.FailResponse(HttpStatusCode.NotFound, "Team not found"));
+                return ResponseResult<string>.FailResponse(HttpStatusCode.NotFound, "Team not found");
 
-            return Ok(ResponseResult<string>.SuccessResponse(HttpStatusCode.OK, null, "Team deleted"));
+            return ResponseResult<string>.SuccessResponse(HttpStatusCode.OK, null, "Team deleted");
         }
     }
 }

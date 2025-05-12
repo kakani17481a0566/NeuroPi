@@ -1,3 +1,10 @@
+NeuroPi/Controllers/OrganizationControllers.cs
+NeuroPi/Controllers/TeamController.cs
+NeuroPi/Controllers/UserRolesController.cs
+NeuroPi/Program.cs
+NeuroPi/Services/Implementation/UserRolesServiceImpl.cs
+NeuroPi/Services/Interface/IUserRolesService.cs
+NeuroPi/ViewModel/UserRoles/UserRoleCreateVM.cs
+NeuroPi/ViewModel/UserRoles/UserRoleUpdateVM.cs
+NeuroPi/ViewModel/UserRoles/UserRoleVM.cs
 tmp_status.txt
-tmp_status_filtered.txt
-tmp_status_sorted.txt

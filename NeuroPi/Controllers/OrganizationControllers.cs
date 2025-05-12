@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Net;
+﻿using System.Net;
+using Microsoft.AspNetCore.Mvc;
 using NeuroPi.Response;
 using NeuroPi.Services.Interface;
 using NeuroPi.ViewModel.Organization;
-using System;
 
 namespace NeuroPi.Controllers
 {
@@ -19,7 +18,7 @@ namespace NeuroPi.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<ResponseResult<object>> GetAll()
         {
             try
             {
@@ -36,7 +35,7 @@ namespace NeuroPi.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public async Task<ResponseResult<object>> GetById(int id)
         {
             try
             {
@@ -53,7 +52,7 @@ namespace NeuroPi.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create([FromQuery] string name, [FromQuery] int tenantId, [FromQuery] int? parentId)
+        public async Task<ResponseResult<object>> Create([FromQuery] string name, [FromQuery] int tenantId, [FromQuery] int? parentId)
         {
             if (string.IsNullOrWhiteSpace(name) || tenantId <= 0)
                 return ResponseResult<object>.FailResponse(HttpStatusCode.BadRequest, "Invalid input");
@@ -77,7 +76,7 @@ namespace NeuroPi.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromQuery] string name, [FromQuery] int? parentId)
+        public async Task<ResponseResult<object>> Update(int id, [FromQuery] string name, [FromQuery] int? parentId)
         {
             if (string.IsNullOrWhiteSpace(name))
                 return ResponseResult<object>.FailResponse(HttpStatusCode.BadRequest, "Invalid input");
@@ -103,7 +102,7 @@ namespace NeuroPi.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<ResponseResult<object>> Delete(int id)
         {
             try
             {

@@ -26,6 +26,8 @@ builder.Services.AddTransient<ITeamUserService, TeamUserServiceImpl>();
 
 
 builder.Services.AddScoped<IUserService, UserServiceImpl>();
+builder.Services.AddScoped<IUserRolesService, UserRolesServiceImpl>();
+
 
 
 
