@@ -1,6 +1,6 @@
-﻿using NeuroPi.Models;
+﻿using NeuroPi.UserManagment.Model;
 
-namespace NeuroPi.ViewModel.RolePermission
+namespace NeuroPi.UserManagment.ViewModel.RolePermission
 {
     public class RolePermissionResponseVM
     {

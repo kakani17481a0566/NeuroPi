@@ -1,7 +1,6 @@
-﻿using NeuroPi.ViewModel.Tenent;
-using System.Collections.Generic;
+﻿using NeuroPi.UserManagment.ViewModel.Tenent;
 
-namespace NeuroPi.Services.Interface
+namespace NeuroPi.UserManagment.Services.Interface
 {
     public interface ITenantService
     {

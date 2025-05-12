@@ -1,7 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace NeuroPi.Models
+namespace NeuroPi.UserManagment.Model
 {
     public abstract class MBaseModel
     {
@@ -17,7 +16,7 @@ namespace NeuroPi.Models
         [Column("updated_by")]
         public int? UpdatedBy { get; set; }
 
-       
+
 
         [Column("is_deleted")]
         public bool IsDeleted { get; set; } = false; // Changed from DeletedAt to IsDeleted

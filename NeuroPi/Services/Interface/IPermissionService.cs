@@ -1,7 +1,7 @@
-﻿using NeuroPi.Models;
-using NeuroPi.ViewModel.Permissions;
+﻿using NeuroPi.UserManagment.Model;
+using NeuroPi.UserManagment.ViewModel.Permissions;
 
-namespace NeuroPi.Services.Interface
+namespace NeuroPi.UserManagment.Services.Interface
 {
     public interface IPermissionService
     {
@@ -14,6 +14,6 @@ namespace NeuroPi.Services.Interface
 
         MPermission DeletePermission(int id);
 
-        PermissionResponseVM UpdatePermission(int id,PermissionRequestVM requestVM);
+        PermissionResponseVM UpdatePermission(int id, PermissionRequestVM requestVM);
     }
 }

@@ -1,10 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using NeuroPi.Data;
-using NeuroPi.Models;
-using NeuroPi.Services.Interface;
-using NeuroPi.ViewModel.RolePermission;
+using NeuroPi.UserManagment.Data;
+using NeuroPi.UserManagment.Services.Interface;
+using NeuroPi.UserManagment.ViewModel.RolePermission;
 
-namespace NeuroPi.Services.Implementation
+namespace NeuroPi.UserManagment.Services.Implementation
 {
     public class RolePermissionServiceImpl : IRolePermissionService
     {

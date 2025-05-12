@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace NeuroPi.ViewModel.Tenent
+namespace NeuroPi.UserManagment.ViewModel.Tenent
 {
     public class TenantUpdateInputVM
     {

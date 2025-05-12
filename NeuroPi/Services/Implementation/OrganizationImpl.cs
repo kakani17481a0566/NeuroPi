@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using NeuroPi.Data;
-using NeuroPi.Models;
-using NeuroPi.Services.Interface;
-using NeuroPi.ViewModel.Organization;
+﻿using NeuroPi.UserManagment.Data;
+using NeuroPi.UserManagment.Model;
+using NeuroPi.UserManagment.Services.Interface;
+using NeuroPi.UserManagment.ViewModel.Organization;
 
-namespace NeuroPi.Services.Implementation
+namespace NeuroPi.UserManagment.Services.Implementation
 {
     public class OrganizationImpl : IOrganizationService
     {
@@ -67,13 +65,13 @@ namespace NeuroPi.Services.Implementation
             var org = _context.Organizations.FirstOrDefault(o => o.OrganizationId == id);
             if (org == null)
             {
-                return null; 
+                return null;
             }
 
             org.Name = input.Name;
             org.ParentId = input.ParentId;
 
-            org.UpdatedBy = input.UpdatedBy;          
+            org.UpdatedBy = input.UpdatedBy;
             org.UpdatedOn = DateTime.UtcNow;
 
             _context.SaveChanges();

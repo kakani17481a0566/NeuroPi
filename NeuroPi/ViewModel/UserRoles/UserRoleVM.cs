@@ -1,4 +1,4 @@
-﻿namespace NeuroPi.ViewModel.UserRoles
+﻿namespace NeuroPi.UserManagment.ViewModel.UserRoles
 {
     public class UserRoleVM
     {

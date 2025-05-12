@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using NeuroPi.Data;
-using NeuroPi.Services.Interface;
-using NeuroPi.Services.Implementation;
+using NeuroPi.UserManagment.Data;
+using NeuroPi.UserManagment.Services.Implementation;
+using NeuroPi.UserManagment.Services.Interface;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +19,7 @@ builder.Services.AddScoped<IOrganizationService, OrganizationImpl>();
 builder.Services.AddTransient<IGroupUserService, GroupUserServiceImpl>();
 builder.Services.AddTransient<IRolePermissionService, RolePermissionServiceImpl>();
 builder.Services.AddScoped<ITeamService, TeamServiceImpl>();
-builder.Services.AddScoped<ITeamService, TeamServiceImpl>(); 
+builder.Services.AddScoped<ITeamService, TeamServiceImpl>();
 builder.Services.AddTransient<ITeamUserService, TeamUserServiceImpl>();
 builder.Services.AddTransient<IPermissionService, PermissionServiceImpl>();
 

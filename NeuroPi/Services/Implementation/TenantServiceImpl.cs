@@ -1,12 +1,9 @@
-﻿using NeuroPi.Data;
-using NeuroPi.Models;
-using NeuroPi.Services.Interface;
-using NeuroPi.ViewModel.Tenent;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using NeuroPi.UserManagment.Data;
+using NeuroPi.UserManagment.Model;
+using NeuroPi.UserManagment.Services.Interface;
+using NeuroPi.UserManagment.ViewModel.Tenent;
 
-namespace NeuroPi.Services.Implementation
+namespace NeuroPi.UserManagment.Services.Implementation
 {
     public class TenantServiceImpl : ITenantService
     {

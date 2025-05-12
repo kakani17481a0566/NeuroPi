@@ -1,7 +1,6 @@
-﻿using NeuroPi.ViewModel.Group;
-using NeuroPi.ViewModel.Organization;
+﻿using NeuroPi.UserManagment.ViewModel.Organization;
 
-namespace NeuroPi.Services.Interface
+namespace NeuroPi.UserManagment.Services.Interface
 {
     public interface IOrganizationService
     {

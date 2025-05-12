@@ -1,13 +1,12 @@
-﻿using NeuroPi.Model;
-using NeuroPi.Models;
+﻿using NeuroPi.UserManagment.Model;
 
-namespace NeuroPi.ViewModel.TeamUser
+namespace NeuroPi.UserManagment.ViewModel.TeamUser
 {
     public class TeamUserResponseVM
     {
         public int Id { get; set; }
 
-        public int TenantId {  get; set; }
+        public int TenantId { get; set; }
 
         public MTenant Tenant { get; set; }
 
@@ -36,7 +35,7 @@ namespace NeuroPi.ViewModel.TeamUser
             List<TeamUserResponseVM> teamUserResponseVMs = new List<TeamUserResponseVM>();
             foreach (MTeamUser user in users)
             {
-                teamUserResponseVMs.Add(TeamUserResponseVM.ToViewModel(user));
+                teamUserResponseVMs.Add(ToViewModel(user));
             }
             return teamUserResponseVMs;
         }

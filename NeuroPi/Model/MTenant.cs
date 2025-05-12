@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using NeuroPi.Model;
 
-namespace NeuroPi.Models  // Ensure this is the only namespace with MTenant definition
+namespace NeuroPi.UserManagment.Model  // Ensure this is the only namespace with MTenant definition
 {
     [Table("tenants")]
     public class MTenant : MBaseModel  // Inheriting audit fields from MBaseModel

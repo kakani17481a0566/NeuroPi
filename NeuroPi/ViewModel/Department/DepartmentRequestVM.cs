@@ -1,6 +1,6 @@
-﻿using NeuroPi.Models;
+﻿using NeuroPi.UserManagment.Model;
 
-namespace NeuroPi.ViewModel.Department
+namespace NeuroPi.UserManagment.ViewModel.Department
 {
     public class DepartmentRequestVM
     {

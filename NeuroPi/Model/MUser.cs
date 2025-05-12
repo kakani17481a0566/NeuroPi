@@ -1,8 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using NeuroPi.Models;
 
-namespace NeuroPi.Model
+namespace NeuroPi.UserManagment.Model
 {
     [Table("users")]
     public class MUser : MBaseModel

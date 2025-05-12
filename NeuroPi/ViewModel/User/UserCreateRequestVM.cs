@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace NeuroPi.ViewModel.User
+namespace NeuroPi.UserManagment.ViewModel.User
 {
     public class UserCreateRequestVM
     {

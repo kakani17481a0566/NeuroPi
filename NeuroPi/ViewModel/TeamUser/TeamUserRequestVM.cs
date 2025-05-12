@@ -1,6 +1,6 @@
-﻿using NeuroPi.Models;
+﻿using NeuroPi.UserManagment.Model;
 
-namespace NeuroPi.ViewModel.TeamUser
+namespace NeuroPi.UserManagment.ViewModel.TeamUser
 {
     public class TeamUserRequestVM
     {

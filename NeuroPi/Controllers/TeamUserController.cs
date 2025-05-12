@@ -1,11 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Net;
-using System.Collections.Generic;
-using NeuroPi.Response;
-using NeuroPi.Services.Interface;
-using NeuroPi.ViewModel.TeamUser;
+﻿using System.Net;
+using Microsoft.AspNetCore.Mvc;
+using NeuroPi.UserManagment.Response;
+using NeuroPi.UserManagment.Services.Interface;
+using NeuroPi.UserManagment.ViewModel.TeamUser;
 
-namespace NeuroPi.Controllers
+namespace NeuroPi.UserManagment.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

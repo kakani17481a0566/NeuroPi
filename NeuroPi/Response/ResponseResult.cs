@@ -1,8 +1,7 @@
-using Microsoft.AspNetCore.Mvc;
 using System.Net;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 
-namespace NeuroPi.Response
+namespace NeuroPi.UserManagment.Response
 {
     public class ResponseResult<T> : IActionResult
     {
@@ -28,7 +27,7 @@ namespace NeuroPi.Response
         {
             var result = new ObjectResult(this)
             {
-                StatusCode = (int)this.StatusCode
+                StatusCode = (int)StatusCode
             };
 
             // Asynchronously execute the result

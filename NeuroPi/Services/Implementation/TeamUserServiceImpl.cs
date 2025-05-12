@@ -1,24 +1,23 @@
-﻿using Microsoft.EntityFrameworkCore;
-using NeuroPi.Data;
-using NeuroPi.Services.Interface;
-using NeuroPi.ViewModel.TeamUser;
+﻿using NeuroPi.UserManagment.Data;
+using NeuroPi.UserManagment.Services.Interface;
+using NeuroPi.UserManagment.ViewModel.TeamUser;
 
-namespace NeuroPi.Services.Implementation
+namespace NeuroPi.UserManagment.Services.Implementation
 {
-    public class TeamUserServiceImpl:ITeamUserService
+    public class TeamUserServiceImpl : ITeamUserService
     {
         private readonly NeuroPiDbContext _context;
         public TeamUserServiceImpl(NeuroPiDbContext context)
         {
             _context = context;
-            
+
         }
 
         public TeamUserResponseVM AddTeamUser(TeamUserRequestVM teamUser)
         {
-            var teamUserModel=TeamUserRequestVM.ToModel(teamUser);
+            var teamUserModel = TeamUserRequestVM.ToModel(teamUser);
             _context.TeamUsers.Add(teamUserModel);
-           int result= _context.SaveChanges();
+            int result = _context.SaveChanges();
             if (result > 0)
             {
                 TeamUserResponseVM response = new TeamUserResponseVM()
@@ -31,13 +30,13 @@ namespace NeuroPi.Services.Implementation
                 return response;
             }
             return null;
-            
+
 
         }
 
         public void DeleteTeamUser(int id)
         {
-            var teamuser= _context.TeamUsers.FirstOrDefault(t=>t.TeamUserId== id);
+            var teamuser = _context.TeamUsers.FirstOrDefault(t => t.TeamUserId == id);
             if (teamuser != null)
             {
                 _context.TeamUsers.Remove(teamuser);
@@ -67,7 +66,7 @@ namespace NeuroPi.Services.Implementation
 
         }
 
-        public TeamUserResponseVM UpdateTeamUser(int id,TeamUserRequestVM teamUser)
+        public TeamUserResponseVM UpdateTeamUser(int id, TeamUserRequestVM teamUser)
         {
             var teamUserModel = _context.TeamUsers.FirstOrDefault(t => t.TeamUserId == id);
             if (teamUserModel != null)

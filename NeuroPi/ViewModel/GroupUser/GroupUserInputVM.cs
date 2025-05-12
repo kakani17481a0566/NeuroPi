@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace NeuroPi.ViewModel.GroupUser
+namespace NeuroPi.UserManagment.ViewModel.GroupUser
 {
     public class GroupUserInputVM
     {

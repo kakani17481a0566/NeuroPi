@@ -1,12 +1,9 @@
-﻿using System.Linq;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
-using NeuroPi.Models;
-using NeuroPi.ViewModel.Role;
-using NeuroPi.Data;
-using NeuroPi.Services.Interface;
+﻿using Microsoft.EntityFrameworkCore;
+using NeuroPi.UserManagment.Data;
+using NeuroPi.UserManagment.Services.Interface;
+using NeuroPi.UserManagment.ViewModel.Role;
 
-namespace NeuroPi.Services.Implementation
+namespace NeuroPi.UserManagment.Services.Implementation
 {
     public class RoleServiceImpl : IRoleService
     {

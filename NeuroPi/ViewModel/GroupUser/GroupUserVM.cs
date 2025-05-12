@@ -1,8 +1,6 @@
-﻿
-using System.ComponentModel.DataAnnotations;
-using NeuroPi.Models;
+﻿using NeuroPi.UserManagment.Model;
 
-namespace NeuroPi.ViewModel.GroupUser
+namespace NeuroPi.UserManagment.ViewModel.GroupUser
 {
     public class GroupUserVM
     {
@@ -15,7 +13,7 @@ namespace NeuroPi.ViewModel.GroupUser
 
         //[Required]
         //public int? CreatedBy { get; set; }
-       
+
         //public DateTime CreatedOn { get; set; }
 
         //public DateTime UpdatedOn { get; set; }

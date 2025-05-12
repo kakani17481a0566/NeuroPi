@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.13.35931.197
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeuroPi", "NeuroPi\NeuroPi.csproj", "{B37C3B33-A9C0-4726-A315-FD8866C95ED2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeuroPi.UserManagment", "NeuroPi\NeuroPi.UserManagment.csproj", "{B37C3B33-A9C0-4726-A315-FD8866C95ED2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

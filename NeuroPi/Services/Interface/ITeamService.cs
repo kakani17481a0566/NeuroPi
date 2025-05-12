@@ -1,7 +1,6 @@
-﻿using NeuroPi.Models;
-using System.Collections.Generic;
+﻿using NeuroPi.UserManagment.Model;
 
-namespace NeuroPi.Services.Interface
+namespace NeuroPi.UserManagment.Services.Interface
 {
     public interface ITeamService
     {

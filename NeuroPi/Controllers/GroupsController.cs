@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NeuroPi.Response;
-using NeuroPi.Services.Interface;
-using NeuroPi.ViewModel.Group;
-using System;
+using NeuroPi.UserManagment.Services.Interface;
+using NeuroPi.UserManagment.ViewModel.Group;
+using NeuroPi.UserManagment.Response;
 
-namespace NeuroPi.Controllers
+namespace NeuroPi.UserManagment.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

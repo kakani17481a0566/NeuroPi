@@ -1,11 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using NeuroPi.Data;
-using NeuroPi.Models;
-using NeuroPi.Services.Interface;
-using NeuroPi.ViewModel.Department;
-using System.Linq;
+using NeuroPi.UserManagment.Data;
+using NeuroPi.UserManagment.Services.Interface;
+using NeuroPi.UserManagment.ViewModel.Department;
 
-namespace NeuroPi.Services.Implementation
+namespace NeuroPi.UserManagment.Services.Implementation
 {
     public class DepartmentServiceImpl : IDepartmentService
     {

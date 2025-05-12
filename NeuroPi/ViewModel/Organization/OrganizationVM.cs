@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
-
-namespace NeuroPi.ViewModel.Organization
+﻿namespace NeuroPi.UserManagment.ViewModel.Organization
 {
     public class OrganizationVM
     {

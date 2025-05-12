@@ -1,8 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using NeuroPi.Model;
-using NeuroPi.Models;
+using NeuroPi.UserManagment.Model;
 
-namespace NeuroPi.Data
+namespace NeuroPi.UserManagment.Data
 {
     public class NeuroPiDbContext : DbContext
     {

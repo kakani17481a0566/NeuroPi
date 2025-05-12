@@ -1,6 +1,6 @@
-﻿using NeuroPi.ViewModel.RolePermission;
+﻿using NeuroPi.UserManagment.ViewModel.RolePermission;
 
-namespace NeuroPi.Services.Interface
+namespace NeuroPi.UserManagment.Services.Interface
 {
     public interface IRolePermissionService
     {

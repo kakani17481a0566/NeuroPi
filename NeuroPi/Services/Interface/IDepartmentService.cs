@@ -1,6 +1,6 @@
-﻿using NeuroPi.ViewModel.Department;
+﻿using NeuroPi.UserManagment.ViewModel.Department;
 
-namespace NeuroPi.Services.Interface
+namespace NeuroPi.UserManagment.Services.Interface
 {
     public interface IDepartmentService
     {
@@ -13,8 +13,8 @@ namespace NeuroPi.Services.Interface
 
         DepartmentResponseVM AddDepartment(DepartmentRequestVM department);
 
-        DepartmentResponseVM UpdateDepartment(int id,DepartmentRequestVM department);
+        DepartmentResponseVM UpdateDepartment(int id, DepartmentRequestVM department);
 
-        
+
     }
 }

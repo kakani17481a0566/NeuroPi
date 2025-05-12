@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace NeuroPi.ViewModel.User
+namespace NeuroPi.UserManagment.ViewModel.User
 {
     // UserRequestVM.cs
     public class UserRequestVM
@@ -35,7 +35,7 @@ namespace NeuroPi.ViewModel.User
         public int? CreatedBy { get; set; }
         public int? UpdatedBy { get; set; }
 
-  
+
 
     }
 }

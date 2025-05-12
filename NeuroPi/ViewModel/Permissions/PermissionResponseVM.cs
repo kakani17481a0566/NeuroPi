@@ -1,6 +1,6 @@
-﻿using NeuroPi.Models;
+﻿using NeuroPi.UserManagment.Model;
 
-namespace NeuroPi.ViewModel.Permissions
+namespace NeuroPi.UserManagment.ViewModel.Permissions
 {
     public class PermissionResponseVM
     {
@@ -26,8 +26,9 @@ namespace NeuroPi.ViewModel.Permissions
 
         public static List<PermissionResponseVM> ToViewModelList(List<MPermission> permissionList)
         {
-            List<PermissionResponseVM> response= new List<PermissionResponseVM>();
-            foreach (MPermission permission in permissionList) {
+            List<PermissionResponseVM> response = new List<PermissionResponseVM>();
+            foreach (MPermission permission in permissionList)
+            {
                 response.Add(ToViewModel(permission));
             }
             return response;

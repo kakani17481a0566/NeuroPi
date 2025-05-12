@@ -1,11 +1,9 @@
-﻿using NeuroPi.Data;
-using NeuroPi.Models;
-using NeuroPi.Services.Interface;
-using NeuroPi.ViewModel.Group;
-using System.Collections.Generic;
-using System.Linq;
+﻿using NeuroPi.UserManagment.Data;
+using NeuroPi.UserManagment.Model;
+using NeuroPi.UserManagment.Services.Interface;
+using NeuroPi.UserManagment.ViewModel.Group;
 
-namespace NeuroPi.Services.Implementation
+namespace NeuroPi.UserManagment.Services.Implementation
 {
     public class GroupServiceImpl : IGroupService
     {

@@ -1,4 +1,4 @@
-﻿namespace NeuroPi.ViewModel.Group
+﻿namespace NeuroPi.UserManagment.ViewModel.Group
 {
     public class GroupVM
     {

@@ -1,6 +1,6 @@
-﻿using NeuroPi.ViewModel.TeamUser;
+﻿using NeuroPi.UserManagment.ViewModel.TeamUser;
 
-namespace NeuroPi.Services.Interface
+namespace NeuroPi.UserManagment.Services.Interface
 {
     public interface ITeamUserService
     {
@@ -10,7 +10,7 @@ namespace NeuroPi.Services.Interface
 
         TeamUserResponseVM AddTeamUser(TeamUserRequestVM teamUser);
 
-        TeamUserResponseVM UpdateTeamUser( int id,TeamUserRequestVM teamUser);
+        TeamUserResponseVM UpdateTeamUser(int id, TeamUserRequestVM teamUser);
 
         void DeleteTeamUser(int id);
     }

@@ -1,7 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace NeuroPi.Models
+namespace NeuroPi.UserManagment.Model
 {
     [Table("organizations")]
     public class MOrganization : MBaseModel

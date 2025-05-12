@@ -1,4 +1,4 @@
-﻿namespace NeuroPi.ViewModel.Organization
+﻿namespace NeuroPi.UserManagment.ViewModel.Organization
 {
     public class OrganizationInputVM
     {

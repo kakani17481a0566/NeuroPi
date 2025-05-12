@@ -1,6 +1,6 @@
-﻿using NeuroPi.Models;
+﻿using NeuroPi.UserManagment.Model;
 
-namespace NeuroPi.ViewModel.Department
+namespace NeuroPi.UserManagment.ViewModel.Department
 {
     public class DepartmentResponseVM
     {
@@ -17,7 +17,7 @@ namespace NeuroPi.ViewModel.Department
         public int TenantId { get; set; }
         public string TenantName { get; set; }
 
-        
+
 
         public static DepartmentResponseVM ToViewModel(MDepartment department)
         {
@@ -28,15 +28,15 @@ namespace NeuroPi.ViewModel.Department
                 HeadUserId = department.HeadUserId,
                 OrganizationId = department.OrganizationId,
                 OrganizationName = department.Organization.Name,
-                TenantName=department.Tenant.Name,
+                TenantName = department.Tenant.Name,
                 TenantId = department.TenantId,
             };
         }
 
         public static List<DepartmentResponseVM> ToViewModelList(List<MDepartment> departments)
         {
-            List<DepartmentResponseVM> result= new List<DepartmentResponseVM>();
-            foreach(MDepartment department in departments)
+            List<DepartmentResponseVM> result = new List<DepartmentResponseVM>();
+            foreach (MDepartment department in departments)
             {
                 result.Add(ToViewModel(department));
             }

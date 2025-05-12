@@ -1,6 +1,6 @@
-﻿using NeuroPi.ViewModel.Role;
+﻿using NeuroPi.UserManagment.ViewModel.Role;
 
-namespace NeuroPi.Services.Interface
+namespace NeuroPi.UserManagment.Services.Interface
 {
     public interface IRoleService
     {
@@ -10,7 +10,7 @@ namespace NeuroPi.Services.Interface
 
         RoleResponseVM AddRole(RoleRequestVM role);
 
-        RoleResponseVM UpdateRole( int id,RoleRequestVM role);
+        RoleResponseVM UpdateRole(int id, RoleRequestVM role);
 
         bool DeleteRoleById(int id);
 

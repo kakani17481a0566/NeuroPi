@@ -1,12 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
-using NeuroPi.Models;
-using NeuroPi.Response;
-using NeuroPi.Services.Interface;
-using NeuroPi.ViewModel.Permissions;
-using System.Net;
+using NeuroPi.UserManagment.Response;
+using NeuroPi.UserManagment.Services.Interface;
+using NeuroPi.UserManagment.ViewModel.Permissions;
 
-namespace NeuroPi.Controllers
+namespace NeuroPi.UserManagment.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -59,9 +57,9 @@ namespace NeuroPi.Controllers
             var result = _permissionService.DeletePermission(id);
             if (result != null)
             {
-                return new ResponseResult<Object>(HttpStatusCode.OK, null, "Permission Deleted Successfully");
+                return new ResponseResult<object>(HttpStatusCode.OK, null, "Permission Deleted Successfully");
             }
-            return new ResponseResult<Object>(HttpStatusCode.BadRequest, null, $"Permission Not found with id {id}");
+            return new ResponseResult<object>(HttpStatusCode.BadRequest, null, $"Permission Not found with id {id}");
         }
 
         [HttpPut("id")]

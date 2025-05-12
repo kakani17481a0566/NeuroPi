@@ -1,4 +1,4 @@
-﻿namespace NeuroPi.ViewModel.Team
+﻿namespace NeuroPi.UserManagment.ViewModel.Team
 {
     public class MTeamVM
     {
