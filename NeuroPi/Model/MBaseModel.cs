@@ -5,7 +5,6 @@ namespace NeuroPi.Models
 {
     public abstract class MBaseModel
     {
-
         [Column("created_on")]
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
 
@@ -18,7 +17,10 @@ namespace NeuroPi.Models
         [Column("updated_by")]
         public int? UpdatedBy { get; set; }
 
-        [Column("deleted_at")]
-        public DateTime? DeletedAt { get; set; }
+        //[Column("deleted_at")]
+        //public DateTime? DeletedAt { get; set; }
+
+        [Column("is_deleted")]
+        public bool IsDeleted { get; set; } = false; // Changed from DeletedAt to IsDeleted
     }
 }

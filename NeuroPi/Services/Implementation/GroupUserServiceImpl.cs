@@ -1,4 +1,6 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using NeuroPi.Data;
 using NeuroPi.Models;
 using NeuroPi.Services.Interface;
@@ -15,85 +17,94 @@ namespace NeuroPi.Services.Implementation
             _context = context;
         }
 
+        // Create new GroupUser
         public GroupUserVM createGroupUser(GroupUserInputVM input)
         {
+            // Basic validation check
+            if (input == null)
+                throw new ArgumentNullException(nameof(input));
+
             var groupUser = new MGroupUser
             {
                 GroupId = input.GroupId,
                 UserId = input.UserId,
                 TenantId = input.TenantId,
                 CreatedBy = input.CreatedBy,
-
+                CreatedOn = DateTime.UtcNow // Always set CreatedOn
             };
+
             _context.GroupUsers.Add(groupUser);
             _context.SaveChanges();
-            return new GroupUserVM {
 
+            // Returning the newly created GroupUserVM
+            return new GroupUserVM
+            {
                 GroupId = input.GroupId,
                 UserId = input.UserId,
-                TenantId = input.TenantId,
-                //CreatedBy = input.CreatedBy,
-
+                TenantId = input.TenantId
             };
-            
-
         }
 
-        public GroupUserUpdateVM updateGroupUserById(int GroupUserId, GroupUserUpdateVM input)
-
+        // Update GroupUser by ID
+        public GroupUserUpdateVM updateGroupUserById(int groupUserId, GroupUserUpdateVM input)
         {
-            var groupUser = _context.GroupUsers.FirstOrDefault(x => x.GroupUserId == GroupUserId);
-            if (groupUser != null)
-            {
+            if (input == null)
+                throw new ArgumentNullException(nameof(input));
 
-                groupUser.GroupId = input.GroupId;
-                groupUser.UserId = input.UserId;
-                groupUser.TenantId = input.TenantId;
-                groupUser.UpdatedBy = input.UpdatedBy;
-                groupUser.UpdatedOn = DateTime.UtcNow;
+            var groupUser = _context.GroupUsers.FirstOrDefault(x => x.GroupUserId == groupUserId && !x.IsDeleted);
+            if (groupUser == null)
+                return null; // If the groupUser doesn't exist, return null
 
-                _context.SaveChanges();
-            }
+            groupUser.GroupId = input.GroupId;
+            groupUser.UserId = input.UserId;
+            groupUser.TenantId = input.TenantId;
+            groupUser.UpdatedBy = input.UpdatedBy;
+            groupUser.UpdatedOn = DateTime.UtcNow;
 
-            return input;
-            
+            _context.SaveChanges();
+            return input; // Return the updated GroupUser
         }
 
-        public bool deleteGroupUserById(int GroupId)
+        // Soft delete a GroupUser by GroupId
+        public bool deleteGroupUserById(int groupUserId)
         {
-            var groupUser = _context.GroupUsers.Find(GroupId);
+            var groupUser = _context.GroupUsers.FirstOrDefault(x => x.GroupUserId == groupUserId && !x.IsDeleted);
             if (groupUser == null)
             {
-                return false;
+                return false; // If the groupUser doesn't exist, return false
             }
-            _context.Remove(groupUser);
+
+            // Mark as deleted instead of actually removing
+            groupUser.IsDeleted = true;
             _context.SaveChanges();
 
             return true;
         }
 
+        // Get all GroupUsers (non-deleted)
         public List<GroupUserVM> getAllGroupUsers()
         {
-            var result= _context.GroupUsers.ToList();
+            var result = _context.GroupUsers
+                                 .Where(x => !x.IsDeleted)  // Ensure you're only fetching non-deleted records
+                                 .ToList();
+
             return GroupUserVM.ToViewModelList(result);
-            
         }
 
-        public GroupUserVM getGroupUserById(int Groupid)
+        // Get GroupUser by GroupId (non-deleted)
+        public GroupUserVM getGroupUserById(int groupId)
         {
             var groupUser = _context.GroupUsers
-                .Where(x => x.GroupId == Groupid)
-                .Select(g => new GroupUserVM
-                {
-                    GroupId = g.GroupId,
-                    UserId = g.UserId,
-                    TenantId = g.TenantId,
-                })
-                .FirstOrDefault();
+                                    .Where(x => x.GroupId == groupId && !x.IsDeleted)  // Exclude soft-deleted
+                                    .Select(g => new GroupUserVM
+                                    {
+                                        GroupId = g.GroupId,
+                                        UserId = g.UserId,
+                                        TenantId = g.TenantId,
+                                    })
+                                    .FirstOrDefault();
+
             return groupUser;
-
         }
-
-        
     }
 }

@@ -17,9 +17,11 @@ namespace NeuroPi.Services.Implementation
             _context = context;
         }
 
+        // Get all non-deleted tenants
         public List<TenantVM> GetAllTenants()
         {
             return _context.Tenants
+                .Where(t => !t.IsDeleted)
                 .Select(t => new TenantVM
                 {
                     TenantId = t.TenantId,
@@ -30,10 +32,11 @@ namespace NeuroPi.Services.Implementation
                 .ToList();
         }
 
+        // Get a non-deleted tenant by ID
         public TenantVM GetTenantById(int id)
         {
             var tenant = _context.Tenants
-                .Where(t => t.TenantId == id)
+                .Where(t => t.TenantId == id && !t.IsDeleted)
                 .Select(t => new TenantVM
                 {
                     TenantId = t.TenantId,
@@ -46,13 +49,15 @@ namespace NeuroPi.Services.Implementation
             return tenant;
         }
 
+        // Create a new tenant
         public TenantVM CreateTenant(TenantInputVM input)
         {
             var tenant = new MTenant
             {
                 Name = input.Name,
                 CreatedBy = input.CreatedBy,
-                CreatedOn = DateTime.UtcNow
+                CreatedOn = DateTime.UtcNow,
+                IsDeleted = false
             };
 
             _context.Tenants.Add(tenant);
@@ -66,9 +71,10 @@ namespace NeuroPi.Services.Implementation
             };
         }
 
+        // Update an existing tenant
         public TenantVM UpdateTenant(int id, TenantUpdateInputVM input)
         {
-            var existingTenant = _context.Tenants.Find(id);
+            var existingTenant = _context.Tenants.FirstOrDefault(t => t.TenantId == id && !t.IsDeleted);
             if (existingTenant == null)
                 return null;
 
@@ -88,13 +94,14 @@ namespace NeuroPi.Services.Implementation
             };
         }
 
+        // Soft delete a tenant
         public bool DeleteTenant(int id)
         {
-            var tenant = _context.Tenants.Find(id);
+            var tenant = _context.Tenants.FirstOrDefault(t => t.TenantId == id && !t.IsDeleted);
             if (tenant == null)
                 return false;
 
-            _context.Tenants.Remove(tenant);
+            tenant.IsDeleted = true;
             _context.SaveChanges();
 
             return true;

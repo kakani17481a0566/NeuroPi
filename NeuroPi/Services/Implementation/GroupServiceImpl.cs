@@ -16,21 +16,23 @@ namespace NeuroPi.Services.Implementation
             _context = context;
         }
 
-        // Get all groups
+        // Get all groups (excluding soft-deleted)
         public List<GroupVM> GetAll()
         {
-            return _context.Groups.Select(g => new GroupVM
-            {
-                GroupId = g.GroupId,
-                Name = g.Name,
-                TenantId = g.TenantId
-            }).ToList();
+            return _context.Groups
+                .Where(g => !g.IsDeleted)
+                .Select(g => new GroupVM
+                {
+                    GroupId = g.GroupId,
+                    Name = g.Name,
+                    TenantId = g.TenantId
+                }).ToList();
         }
 
-        // Get group by ID
+        // Get group by ID (excluding soft-deleted)
         public GroupVM GetById(int id)
         {
-            var group = _context.Groups.FirstOrDefault(g => g.GroupId == id);
+            var group = _context.Groups.FirstOrDefault(g => g.GroupId == id && !g.IsDeleted);
             if (group == null) return null;
 
             return new GroupVM
@@ -47,7 +49,8 @@ namespace NeuroPi.Services.Implementation
             var group = new MGroup
             {
                 Name = input.Name,
-                TenantId = input.TenantId
+                TenantId = input.TenantId,
+                IsDeleted = false
             };
 
             _context.Groups.Add(group);
@@ -64,7 +67,7 @@ namespace NeuroPi.Services.Implementation
         // Update an existing group
         public GroupVM Update(int id, GroupUpdateInputVM input)
         {
-            var group = _context.Groups.FirstOrDefault(g => g.GroupId == id);
+            var group = _context.Groups.FirstOrDefault(g => g.GroupId == id && !g.IsDeleted);
             if (group == null) return null;
 
             group.Name = input.Name;
@@ -78,13 +81,13 @@ namespace NeuroPi.Services.Implementation
             };
         }
 
-        // Delete a group
+        // Soft delete a group
         public bool Delete(int id)
         {
-            var group = _context.Groups.FirstOrDefault(g => g.GroupId == id);
+            var group = _context.Groups.FirstOrDefault(g => g.GroupId == id && !g.IsDeleted);
             if (group == null) return false;
 
-            _context.Groups.Remove(group);
+            group.IsDeleted = true;
             _context.SaveChanges();
             return true;
         }

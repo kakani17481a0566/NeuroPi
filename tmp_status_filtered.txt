@@ -1,6 +1,9 @@
-NeuroPi/Program.cs
-NeuroPi/Services/Implementation/TeamService.cs
+NeuroPi/Model/MBaseModel.cs
+NeuroPi/Services/Implementation/DepartmentServiceImpl.cs
+NeuroPi/Services/Implementation/GroupServiceImpl.cs
+NeuroPi/Services/Implementation/GroupUserServiceImpl.cs
 NeuroPi/Services/Implementation/TeamServiceImpl.cs
+NeuroPi/Services/Implementation/TenantServiceImpl.cs
+NeuroPi/Services/Implementation/UserRolesServiceImpl.cs
+NeuroPi/Services/Implementation/UserServiceImpl.cs
 tmp_status.txt
-tmp_status_filtered.txt
-tmp_status_sorted.txt

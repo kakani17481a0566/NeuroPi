@@ -3,12 +3,12 @@ using NeuroPi.Data;
 using NeuroPi.Models;
 using NeuroPi.Services.Interface;
 using NeuroPi.ViewModel.Department;
+using System.Linq;
 
 namespace NeuroPi.Services.Implementation
 {
-    public class DepartmentServiceImpl:IDepartmentService
+    public class DepartmentServiceImpl : IDepartmentService
     {
-
         private readonly NeuroPiDbContext _context;
 
         public DepartmentServiceImpl(NeuroPiDbContext context)
@@ -16,13 +16,14 @@ namespace NeuroPi.Services.Implementation
             _context = context;
         }
 
-        
-
+        // Get all departments (excluding soft-deleted ones)
         public List<DepartmentResponseVM> GetAllDepartments()
         {
-            var result=_context.Departments.Include(d=>d.Organization)
-                                            .Include(d=>d.Tenant)
-                                            .ToList();
+            var result = _context.Departments
+                                 .Include(d => d.Organization)
+                                 .Include(d => d.Tenant)
+                                 .Where(d => !d.IsDeleted)  // Exclude soft-deleted departments
+                                 .ToList();
             if (result != null)
             {
                 return DepartmentResponseVM.ToViewModelList(result);
@@ -30,34 +31,45 @@ namespace NeuroPi.Services.Implementation
             return null;
         }
 
+        // Get department by ID (only if not soft-deleted)
         public DepartmentResponseVM GetDepartmentById(int id)
         {
-            var result = _context.Departments.Include(d => d.Organization)
-                                           .Include(d => d.Tenant)
-                                           .FirstOrDefault(d => d.DepartmentId == id);
-            if(result != null)
+            var result = _context.Departments
+                                 .Include(d => d.Organization)
+                                 .Include(d => d.Tenant)
+                                 .FirstOrDefault(d => d.DepartmentId == id && !d.IsDeleted);  // Exclude soft-deleted departments
+            if (result != null)
             {
                 return DepartmentResponseVM.ToViewModel(result);
             }
             return null;
         }
 
+        // Soft delete a department (set IsDeleted to true)
         public bool DeleteById(int id)
         {
-            var department = _context.Departments.FirstOrDefault(d => d.DepartmentId == id);
-            if (department == null) { return false; }
+            var department = _context.Departments.FirstOrDefault(d => d.DepartmentId == id && !d.IsDeleted);  // Ensure it's not already soft-deleted
+            if (department == null)
+            {
+                return false;
+            }
 
-            _context.Departments.Remove(department);
+            // Perform soft delete by setting IsDeleted to true
+            department.IsDeleted = true;
             _context.SaveChanges();
             return true;
         }
 
+        // Add a new department
         public DepartmentResponseVM AddDepartment(DepartmentRequestVM department)
         {
             if (department != null)
             {
-                _context.Departments.Add(DepartmentRequestVM.ToModel(department));
+                var departmentModel = DepartmentRequestVM.ToModel(department);
+                departmentModel.IsDeleted = false; // Ensure the department is not soft-deleted by default
+                _context.Departments.Add(departmentModel);
                 _context.SaveChanges();
+
                 return new DepartmentResponseVM()
                 {
                     TenantId = department.TenantId,
@@ -67,14 +79,17 @@ namespace NeuroPi.Services.Implementation
             return null;
         }
 
+        // Update an existing department
         public DepartmentResponseVM UpdateDepartment(int id, DepartmentRequestVM department)
         {
-            MDepartment existedDepartment = _context.Departments.FirstOrDefault(d=>d.DepartmentId==id);
-            if (existedDepartment != null) {
+            var existedDepartment = _context.Departments.FirstOrDefault(d => d.DepartmentId == id && !d.IsDeleted);  // Ensure the department is not soft-deleted
+            if (existedDepartment != null)
+            {
                 existedDepartment.TenantId = department.TenantId;
                 existedDepartment.Name = department.Name;
-                existedDepartment.HeadUserId= department.HeadUserId;
+                existedDepartment.HeadUserId = department.HeadUserId;
                 existedDepartment.OrganizationId = department.OrganizationId;
+
                 _context.SaveChanges();
                 return new DepartmentResponseVM()
                 {
@@ -83,11 +98,9 @@ namespace NeuroPi.Services.Implementation
                     TenantId = department.TenantId,
                     HeadUserId = department.HeadUserId,
                     OrganizationId = department.OrganizationId,
-
                 };
-             }
+            }
             return null;
-
         }
     }
 }

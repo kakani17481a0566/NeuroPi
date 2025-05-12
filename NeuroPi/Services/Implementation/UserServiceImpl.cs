@@ -24,7 +24,7 @@ namespace NeuroPi.Services.Implementation
             {
                 var users = await _context.Users
                                           .Include(u => u.Tenant)
-                                          .Where(u => u.DeletedAt == null)
+                                          .Where(u => !u.IsDeleted)  // Change to IsDeleted
                                           .ToListAsync();
 
                 var response = UserResponseVM.ToViewModelList(users);
@@ -43,7 +43,7 @@ namespace NeuroPi.Services.Implementation
             {
                 var user = await _context.Users
                                          .Include(u => u.Tenant)
-                                         .FirstOrDefaultAsync(u => u.UserId == userId && u.DeletedAt == null);
+                                         .FirstOrDefaultAsync(u => u.UserId == userId && !u.IsDeleted);  // Change to IsDeleted
 
                 if (user == null)
                     return ResponseResult<UserResponseVM>.FailResponse(HttpStatusCode.NotFound, $"User with ID {userId} not found.");
@@ -80,7 +80,8 @@ namespace NeuroPi.Services.Implementation
                     Password = userRequest.Password,
                     TenantId = userRequest.TenantId.Value,
                     CreatedOn = DateTime.UtcNow,
-                    CreatedBy = userRequest.CreatedBy.Value
+                    CreatedBy = userRequest.CreatedBy.Value,
+                    IsDeleted = false  // Set IsDeleted to false by default
                 };
 
                 _context.Users.Add(user);
@@ -104,7 +105,7 @@ namespace NeuroPi.Services.Implementation
                     return ResponseResult<UserResponseVM>.FailResponse(HttpStatusCode.BadRequest, "User request data cannot be null.");
 
                 var user = await _context.Users
-                                         .FirstOrDefaultAsync(u => u.UserId == userId && u.DeletedAt == null);
+                                         .FirstOrDefaultAsync(u => u.UserId == userId && !u.IsDeleted);  // Change to IsDeleted
 
                 if (user == null)
                     return ResponseResult<UserResponseVM>.FailResponse(HttpStatusCode.NotFound, "User not found.");
@@ -131,18 +132,18 @@ namespace NeuroPi.Services.Implementation
             }
         }
 
-        // Soft delete user
+        // Soft delete user (Set IsDeleted to true)
         public async Task<ResponseResult<object>> DeleteUser(int userId)
         {
             try
             {
                 var user = await _context.Users
-                                         .FirstOrDefaultAsync(u => u.UserId == userId && u.DeletedAt == null);
+                                         .FirstOrDefaultAsync(u => u.UserId == userId && !u.IsDeleted);  // Change to IsDeleted
 
                 if (user == null)
                     return ResponseResult<object>.FailResponse(HttpStatusCode.NotFound, $"User with ID {userId} not found.");
 
-                user.DeletedAt = DateTime.UtcNow;
+                user.IsDeleted = true;  // Soft delete (Set IsDeleted to true)
 
                 await _context.SaveChangesAsync();
 
