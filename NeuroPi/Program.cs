@@ -21,6 +21,8 @@ builder.Services.AddTransient<IRolePermisisionService, RolePermissionServiceImpl
 builder.Services.AddScoped<ITeamService, TeamService>();
 builder.Services.AddScoped<ITeamService, TeamService>(); 
 builder.Services.AddTransient<ITeamUserService, TeamUserServiceImpl>();
+builder.Services.AddTransient<IPermissionService, PermissionServiceImpl>();
+
 
 
 
@@ -46,5 +48,4 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
-
 app.Run();
