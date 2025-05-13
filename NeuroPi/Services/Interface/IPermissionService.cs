@@ -10,7 +10,7 @@ namespace NeuroPi.UserManagment.Services.Interface
 
         List<PermissionResponseVM> GetPermissions();
 
-        MPermission GetById(int id);
+        PermissionResponseVM GetById(int id);
 
         MPermission DeletePermission(int id);
 

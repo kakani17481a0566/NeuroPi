@@ -18,7 +18,7 @@ namespace NeuroPi.UserManagment.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddPermission([FromBody] PermissionRequestVM requestVM)
+        public ResponseResult<PermissionResponseVM> AddPermission([FromBody] PermissionRequestVM requestVM)
         {
             var result = _permissionService.AddPermission(requestVM);
             if (result != null)
@@ -29,7 +29,7 @@ namespace NeuroPi.UserManagment.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAllPermissions()
+        public ResponseResult<List<PermissionResponseVM>> GetAllPermissions()
         {
             var result = _permissionService.GetPermissions();
             if (result != null)
@@ -40,19 +40,19 @@ namespace NeuroPi.UserManagment.Controllers
         }
 
         [HttpGet("id")]
-        public IActionResult GetPermissionById(int id)
+        public ResponseResult<PermissionResponseVM> GetPermissionById(int  id)
         {
             var result = _permissionService.GetById(id);
             if (result != null)
             {
-                var response = PermissionResponseVM.ToViewModel(result);
-                return new ResponseResult<PermissionResponseVM>(HttpStatusCode.OK, response, "Permissions Fetched By id Successfully");
+                //var response = PermissionResponseVM.ToViewModel(result);
+                return new ResponseResult<PermissionResponseVM>(HttpStatusCode.OK, result, "Permissions Fetched By id Successfully");
             }
             return new ResponseResult<PermissionResponseVM>(HttpStatusCode.NotFound, null, $"Permission not found with id {id}");
         }
 
         [HttpDelete("id")]
-        public IActionResult DeleteById(int id)
+        public ResponseResult<Object> DeleteById(int id)
         {
             var result = _permissionService.DeletePermission(id);
             if (result != null)
@@ -63,7 +63,7 @@ namespace NeuroPi.UserManagment.Controllers
         }
 
         [HttpPut("id")]
-        public IActionResult UpdatePermissionById(int id, PermissionRequestVM permission)
+        public ResponseResult<PermissionResponseVM> UpdatePermissionById(int id, PermissionRequestVM permission)
         {
             var result = _permissionService.UpdatePermission(id, permission);
             if (result != null)
@@ -71,6 +71,17 @@ namespace NeuroPi.UserManagment.Controllers
                 return new ResponseResult<PermissionResponseVM>(HttpStatusCode.OK, result, "Permission Updated successfully");
             }
             return new ResponseResult<PermissionResponseVM>(HttpStatusCode.BadGateway, null, "Permission not updated");
+        }
+        [HttpGet]
+        [Route("/get-by-tenantId")]
+        public ResponseResult<List<PermissionResponseVM>> GetAllByTenantId(int id)
+        {
+            var result=_permissionService.GetAllPermissionsByTenantId(id);
+            if(result != null)
+            {
+                return new ResponseResult<List<PermissionResponseVM>>(HttpStatusCode.OK, result, "Permissions fetched successfully by using tenant id");
+            }
+            return new ResponseResult<List<PermissionResponseVM>>(HttpStatusCode.NotFound, null, "Permissions not found ");
         }
     }
 }
