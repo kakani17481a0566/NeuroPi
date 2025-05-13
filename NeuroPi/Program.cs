@@ -22,6 +22,7 @@ builder.Services.AddScoped<ITeamService, TeamServiceImpl>();
 builder.Services.AddScoped<ITeamService, TeamServiceImpl>();
 builder.Services.AddTransient<ITeamUserService, TeamUserServiceImpl>();
 builder.Services.AddTransient<IPermissionService, PermissionServiceImpl>();
+builder.Services.AddTransient<IUserDepartmentService, UserDepartmentServiceImpl>();
 
 
 

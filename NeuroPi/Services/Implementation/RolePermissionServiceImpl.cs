@@ -53,14 +53,14 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
             if (rolePermission == null) return false;
 
-            _context.RolePermissions.Remove(rolePermission);
+            rolePermission.IsDeleted = true;
             _context.SaveChanges();
             return true;
         }
 
         public List<RolePermissionResponseVM> GetAllRolePermissions()
         {
-            var rolePermissions = _context.RolePermissions.ToList();
+            var rolePermissions = _context.RolePermissions.Where(r=>!r.IsDeleted).ToList();
             return rolePermissions?.Count > 0
                 ? RolePermissionResponseVM.ToViewModelList(rolePermissions)
                 : new List<RolePermissionResponseVM>();
