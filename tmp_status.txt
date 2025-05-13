@@ -1,7 +1,2 @@
-NeuroPi/Controllers/GroupUserController.cs
 NeuroPi/Program.cs
-NeuroPi/Services/Implementation/GroupUserServiceImpl.cs
-NeuroPi/Services/Interface/IGroupUserService.cs
 tmp_status.txt
-tmp_status_filtered.txt
-tmp_status_sorted.txt

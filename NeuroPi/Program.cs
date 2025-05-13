@@ -18,7 +18,7 @@ builder.Services.AddScoped<IOrganizationService, OrganizationImpl>();
 builder.Services.AddScoped<IGroupUserService, GroupUserServiceImpl>();
 builder.Services.AddScoped<IRolePermissionService, RolePermissionServiceImpl>();
 builder.Services.AddScoped<ITeamService, TeamServiceImpl>();
-builder.Services.AddTransient<IRoleService, RoleServiceImpl>();
+builder.Services.AddScoped<IRoleService, RoleServiceImpl>();
 builder.Services.AddScoped<ITeamUserService, TeamUserServiceImpl>();
 builder.Services.AddScoped<IPermissionService, PermissionServiceImpl>();
 builder.Services.AddScoped<IUserDepartmentService, UserDepartmentServiceImpl>();
