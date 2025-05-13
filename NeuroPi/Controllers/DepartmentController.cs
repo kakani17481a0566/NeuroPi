@@ -39,6 +39,18 @@ namespace NeuroPi.UserManagment.Controllers
             return new ResponseResult<DepartmentResponseVM>(HttpStatusCode.NotFound, null, $"No data found with id {id}");
         }
 
+        // New endpoint for GetByIdAndTenantId
+        [HttpGet("id/{id}/tenant/{tenantId}")]
+        public ResponseResult<DepartmentResponseVM> GetByIdAndTenantId(int id, int tenantId)
+        {
+            var result = _departmentService.GetDepartmentByIdAndTenantId(id, tenantId);
+            if (result != null)
+            {
+                return new ResponseResult<DepartmentResponseVM>(HttpStatusCode.OK, result, "Found the department");
+            }
+            return new ResponseResult<DepartmentResponseVM>(HttpStatusCode.NotFound, null, $"No department found with id {id} and tenantId {tenantId}");
+        }
+
         [HttpDelete("id")]
         public ResponseResult<bool> DeleteDepartmentById(int id)
         {
@@ -71,5 +83,19 @@ namespace NeuroPi.UserManagment.Controllers
             }
             return new ResponseResult<DepartmentResponseVM>(HttpStatusCode.NotAcceptable, null, "Department not updated");
         }
+
+
+        [HttpGet("tenant/{tenantId}")]
+        public ResponseResult<List<DepartmentResponseVM>> GetByTenantId(int tenantId)
+        {
+            var result = _departmentService.GetDepartmentsByTenantId(tenantId);
+            if (result != null && result.Count > 0)
+            {
+                return new ResponseResult<List<DepartmentResponseVM>>(HttpStatusCode.OK, result, "Departments fetched by tenant ID");
+            }
+
+            return new ResponseResult<List<DepartmentResponseVM>>(HttpStatusCode.NotFound, null, $"No departments found for tenant ID {tenantId}");
+        }
+
     }
 }

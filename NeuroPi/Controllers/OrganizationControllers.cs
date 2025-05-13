@@ -104,5 +104,23 @@ namespace NeuroPi.UserManagment.Controllers
                 return new ResponseResult<object>(HttpStatusCode.InternalServerError, null, ex.Message);
             }
         }
+
+        [HttpGet("tenant/{tenantId}")]
+        public ResponseResult<object> GetByTenantId(int tenantId)
+        {
+            try
+            {
+                var result = _organizationService.GetByTenantId(tenantId);
+                if (result == null || result.Count == 0)
+                    return new ResponseResult<object>(HttpStatusCode.NotFound, null, "No organizations found for the given tenant");
+
+                return new ResponseResult<object>(HttpStatusCode.OK, result, "Organizations fetched successfully");
+            }
+            catch (Exception ex)
+            {
+                return new ResponseResult<object>(HttpStatusCode.InternalServerError, null, ex.Message);
+            }
+        }
+
     }
 }
