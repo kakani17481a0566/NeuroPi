@@ -1,3 +1,6 @@
+NeuroPi/Controllers/GroupsController.cs
+NeuroPi/Services/Implementation/GroupServiceImpl.cs
+NeuroPi/Services/Interface/IGroupService.cs
 tmp_status.txt
 tmp_status_filtered.txt
 tmp_status_sorted.txt
