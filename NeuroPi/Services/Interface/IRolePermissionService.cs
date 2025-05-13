@@ -4,10 +4,10 @@ namespace NeuroPi.UserManagment.Services.Interface
 {
     public interface IRolePermissionService
     {
-        Task<RolePermissionResponseVM> AddRolePermissionAsync(RolePermissionRequestVM rolePermission);
-        Task<RolePermissionResponseVM> UpdateRolePermissionByIdAsync(int id, RolePermissionVM rolePermission);
-        Task<bool> DeleteByIdAsync(int id);
-        Task<List<RolePermissionResponseVM>> GetAllRolePermissionsAsync();
-        Task<RolePermissionResponseVM> GetRolePermissionByIdAsync(int id);
+        RolePermissionResponseVM AddRolePermission(RolePermissionRequestVM rolePermission);
+        RolePermissionResponseVM UpdateRolePermissionById(int id, RolePermissionVM rolePermission);
+        bool DeleteById(int id);
+        List<RolePermissionResponseVM> GetAllRolePermissions();
+        RolePermissionResponseVM GetRolePermissionById(int id);
     }
 }

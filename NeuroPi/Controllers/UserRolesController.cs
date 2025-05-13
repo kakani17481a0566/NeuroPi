@@ -1,9 +1,9 @@
 ﻿using System.Net;
-using Microsoft.AspNetCore.Mvc;
 using NeuroPi.UserManagment.Model;
 using NeuroPi.UserManagment.Response;
 using NeuroPi.UserManagment.Services.Interface;
 using NeuroPi.UserManagment.ViewModel.UserRoles;
+using Microsoft.AspNetCore.Mvc;
 
 namespace NeuroPi.UserManagment.Controllers
 {
@@ -20,7 +20,7 @@ namespace NeuroPi.UserManagment.Controllers
 
         // GET: api/userroles
         [HttpGet]
-        public IActionResult GetAll()
+        public ResponseResult<List<UserRoleVM>> GetAll()
         {
             var roles = _service.GetAll()
                 .Select(r => new UserRoleVM
@@ -39,7 +39,7 @@ namespace NeuroPi.UserManagment.Controllers
 
         // GET: api/userroles/{id}
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public ResponseResult<UserRoleVM> GetById(int id)
         {
             var role = _service.GetById(id);
             if (role == null)
@@ -64,7 +64,7 @@ namespace NeuroPi.UserManagment.Controllers
 
         // POST: api/userroles
         [HttpPost]
-        public IActionResult Create([FromBody] UserRoleCreateVM input)
+        public ResponseResult<UserRoleVM> Create([FromBody] UserRoleCreateVM input)
         {
             var entity = new MUserRole
             {
@@ -93,7 +93,7 @@ namespace NeuroPi.UserManagment.Controllers
 
         // PUT: api/userroles/{id}
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] UserRoleUpdateVM input)
+        public ResponseResult<UserRoleVM> Update(int id, [FromBody] UserRoleUpdateVM input)
         {
             var entity = new MUserRole
             {
@@ -126,7 +126,7 @@ namespace NeuroPi.UserManagment.Controllers
 
         // DELETE: api/userroles/{id}
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public ResponseResult<object> Delete(int id)
         {
             var success = _service.Delete(id);
             if (!success)

@@ -14,23 +14,23 @@ namespace NeuroPi.UserManagment.Services.Implementation
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public async Task<RolePermissionResponseVM> AddRolePermissionAsync(RolePermissionRequestVM rolePermission)
+        public RolePermissionResponseVM AddRolePermission(RolePermissionRequestVM rolePermission)
         {
             if (rolePermission == null) throw new ArgumentNullException(nameof(rolePermission));
 
             var newPermission = RolePermissionRequestVM.ToModel(rolePermission);
-            await _context.RolePermissions.AddAsync(newPermission);
-            await _context.SaveChangesAsync();
+            _context.RolePermissions.Add(newPermission);
+            _context.SaveChanges();
 
             return RolePermissionResponseVM.ToViewModel(newPermission);
         }
 
-        public async Task<RolePermissionResponseVM> UpdateRolePermissionByIdAsync(int id, RolePermissionVM rolePermission)
+        public RolePermissionResponseVM UpdateRolePermissionById(int id, RolePermissionVM rolePermission)
         {
             if (rolePermission == null) throw new ArgumentNullException(nameof(rolePermission));
 
-            var existingPermission = await _context.RolePermissions
-                .FirstOrDefaultAsync(rp => rp.RolePermissionId == id);
+            var existingPermission = _context.RolePermissions
+                .FirstOrDefault(rp => rp.RolePermissionId == id);
 
             if (existingPermission == null) return null;
 
@@ -42,34 +42,34 @@ namespace NeuroPi.UserManagment.Services.Implementation
             existingPermission.CanUpdate = rolePermission.CanUpdate;
             existingPermission.CanDelete = rolePermission.CanDelete;
 
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
             return RolePermissionResponseVM.ToViewModel(existingPermission);
         }
 
-        public async Task<bool> DeleteByIdAsync(int id)
+        public bool DeleteById(int id)
         {
-            var rolePermission = await _context.RolePermissions
-                .FirstOrDefaultAsync(r => r.RolePermissionId == id);
+            var rolePermission = _context.RolePermissions
+                .FirstOrDefault(r => r.RolePermissionId == id);
 
             if (rolePermission == null) return false;
 
             _context.RolePermissions.Remove(rolePermission);
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
             return true;
         }
 
-        public async Task<List<RolePermissionResponseVM>> GetAllRolePermissionsAsync()
+        public List<RolePermissionResponseVM> GetAllRolePermissions()
         {
-            var rolePermissions = await _context.RolePermissions.ToListAsync();
+            var rolePermissions = _context.RolePermissions.ToList();
             return rolePermissions?.Count > 0
                 ? RolePermissionResponseVM.ToViewModelList(rolePermissions)
                 : new List<RolePermissionResponseVM>();
         }
 
-        public async Task<RolePermissionResponseVM> GetRolePermissionByIdAsync(int id)
+        public RolePermissionResponseVM GetRolePermissionById(int id)
         {
-            var rolePermission = await _context.RolePermissions
-                .FirstOrDefaultAsync(rp => rp.RolePermissionId == id);
+            var rolePermission = _context.RolePermissions
+                .FirstOrDefault(rp => rp.RolePermissionId == id);
 
             return rolePermission != null
                 ? RolePermissionResponseVM.ToViewModel(rolePermission)

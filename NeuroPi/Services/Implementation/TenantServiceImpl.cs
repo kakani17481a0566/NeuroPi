@@ -82,7 +82,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
             _context.Tenants.Update(existingTenant);
             _context.SaveChanges();
 
-            return new TenantVM
+            return new  TenantVM
             {
                 TenantId = existingTenant.TenantId,
                 Name = existingTenant.Name,

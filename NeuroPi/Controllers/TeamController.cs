@@ -20,7 +20,7 @@ namespace NeuroPi.UserManagment.Controllers
 
         // GET: api/Team
         [HttpGet]
-        public IActionResult GetAll()
+        public ResponseResult<List<MTeamVM>> GetAll()
         {
             var teams = _teamService.GetAllTeams();
 
@@ -39,7 +39,7 @@ namespace NeuroPi.UserManagment.Controllers
 
         // GET: api/Team/{id}
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public ResponseResult<MTeamVM> GetById(int id)
         {
             var team = _teamService.GetTeamById(id);
             if (team == null)
@@ -65,7 +65,7 @@ namespace NeuroPi.UserManagment.Controllers
 
         // POST: api/Team
         [HttpPost]
-        public IActionResult Create([FromBody] MTeamInsertVM vm)
+        public ResponseResult<object> Create([FromBody] MTeamInsertVM vm)
         {
             var team = new MTeam
             {
@@ -86,7 +86,7 @@ namespace NeuroPi.UserManagment.Controllers
 
         // PUT: api/Team/{id}
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] MTeamUpdateVM vm)
+        public ResponseResult<MTeamVM> Update(int id, [FromBody] MTeamUpdateVM vm)
         {
             var update = new MTeam
             {
@@ -119,7 +119,7 @@ namespace NeuroPi.UserManagment.Controllers
 
         // DELETE: api/Team/{id}
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public ResponseResult<string> Delete(int id)
         {
             bool success = _teamService.SoftDeleteTeam(id);
             if (!success)

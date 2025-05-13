@@ -19,7 +19,7 @@ namespace NeuroPi.UserManagment.Controllers
 
         // GET: api/TeamUser
         [HttpGet]
-        public IActionResult GetAllTeamUsers()
+        public ResponseResult<List<TeamUserResponseVM>> GetAllTeamUsers()
         {
             var result = _teamUserService.GetTeamUsers();
             if (result == null || result.Count == 0)
@@ -38,7 +38,7 @@ namespace NeuroPi.UserManagment.Controllers
 
         // GET: api/TeamUser/{id}
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public ResponseResult<TeamUserResponseVM> GetById(int id)
         {
             var result = _teamUserService.GetTeamUserById(id);
             if (result == null)
@@ -57,7 +57,7 @@ namespace NeuroPi.UserManagment.Controllers
 
         // POST: api/TeamUser
         [HttpPost]
-        public IActionResult AddTeamUser([FromBody] TeamUserRequestVM teamUser)
+        public ResponseResult<TeamUserResponseVM> AddTeamUser([FromBody] TeamUserRequestVM teamUser)
         {
             var result = _teamUserService.AddTeamUser(teamUser);
             if (result == null)
@@ -76,7 +76,7 @@ namespace NeuroPi.UserManagment.Controllers
 
         // PUT: api/TeamUser/{id}
         [HttpPut("{id}")]
-        public IActionResult UpdateTeamUserById(int id, [FromBody] TeamUserRequestVM teamUser)
+        public ResponseResult<TeamUserResponseVM> UpdateTeamUserById(int id, [FromBody] TeamUserRequestVM teamUser)
         {
             var result = _teamUserService.UpdateTeamUser(id, teamUser);
             if (result == null)
@@ -95,7 +95,7 @@ namespace NeuroPi.UserManagment.Controllers
 
         // DELETE: api/TeamUser/{id}
         [HttpDelete("{id}")]
-        public IActionResult DeleteById(int id)
+        public ResponseResult<object> DeleteById(int id)
         {
             _teamUserService.DeleteTeamUser(id);
 

@@ -1,8 +1,8 @@
 using System.Net;
-using Microsoft.AspNetCore.Mvc;
 using NeuroPi.UserManagment.Response;
 using NeuroPi.UserManagment.Services.Interface;
 using NeuroPi.UserManagment.ViewModel.Tenent;
+using Microsoft.AspNetCore.Mvc;
 
 namespace NeuroPi.UserManagment.Controllers
 {
@@ -19,7 +19,7 @@ namespace NeuroPi.UserManagment.Controllers
 
         // GET: api/tenants
         [HttpGet]
-        public IActionResult GetAll()
+        public ResponseResult<List<TenantVM>> GetAll()
         {
             var tenants = _tenantService.GetAllTenants();
 
@@ -39,7 +39,7 @@ namespace NeuroPi.UserManagment.Controllers
 
         // GET: api/tenants/{id}
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public ResponseResult<TenantVM> GetById(int id)
         {
             var tenant = _tenantService.GetTenantById(id);
 
@@ -59,7 +59,7 @@ namespace NeuroPi.UserManagment.Controllers
 
         // POST: api/tenants
         [HttpPost]
-        public IActionResult Create([FromBody] TenantInputVM tenantInput)
+        public ResponseResult<TenantVM> Create([FromBody] TenantInputVM tenantInput)
         {
             if (!ModelState.IsValid)
             {
@@ -79,7 +79,7 @@ namespace NeuroPi.UserManagment.Controllers
 
         // PUT: api/tenants/{id}
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] TenantUpdateInputVM tenantUpdateInput)
+        public ResponseResult<TenantVM> Update(int id, [FromBody] TenantUpdateInputVM tenantUpdateInput)
         {
             if (!ModelState.IsValid)
             {
@@ -107,7 +107,7 @@ namespace NeuroPi.UserManagment.Controllers
 
         // DELETE: api/tenants/{id}
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public ResponseResult<bool> Delete(int id)
         {
             var result = _tenantService.DeleteTenant(id);
 

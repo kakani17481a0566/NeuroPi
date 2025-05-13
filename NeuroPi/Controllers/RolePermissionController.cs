@@ -18,7 +18,7 @@ namespace NeuroPi.UserManagment.Controllers
         }
 
         [HttpPost]
-        public async Task<ResponseResult<RolePermissionResponseVM>> AddRolePermission([FromBody] RolePermissionRequestVM rolePermission)
+        public ResponseResult<RolePermissionResponseVM> AddRolePermission([FromBody] RolePermissionRequestVM rolePermission)
         {
             if (!ModelState.IsValid)
             {
@@ -27,7 +27,7 @@ namespace NeuroPi.UserManagment.Controllers
 
             try
             {
-                var createdRolePermission = await _rolePermissionService.AddRolePermissionAsync(rolePermission);
+                var createdRolePermission = _rolePermissionService.AddRolePermission(rolePermission);
                 return new ResponseResult<RolePermissionResponseVM>(HttpStatusCode.Created, createdRolePermission, "Role permission created successfully");
             }
             catch (Exception ex)
@@ -37,7 +37,7 @@ namespace NeuroPi.UserManagment.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ResponseResult<RolePermissionResponseVM>> UpdateRolePermission(int id, [FromBody] RolePermissionVM rolePermission)
+        public ResponseResult<RolePermissionResponseVM> UpdateRolePermission(int id, [FromBody] RolePermissionVM rolePermission)
         {
             if (!ModelState.IsValid)
             {
@@ -46,7 +46,7 @@ namespace NeuroPi.UserManagment.Controllers
 
             try
             {
-                var updatedRolePermission = await _rolePermissionService.UpdateRolePermissionByIdAsync(id, rolePermission);
+                var updatedRolePermission = _rolePermissionService.UpdateRolePermissionById(id, rolePermission);
                 return updatedRolePermission == null
                     ? new ResponseResult<RolePermissionResponseVM>(HttpStatusCode.NotFound, null, "Role permission not found")
                     : new ResponseResult<RolePermissionResponseVM>(HttpStatusCode.OK, updatedRolePermission, "Role permission updated successfully");
@@ -58,11 +58,11 @@ namespace NeuroPi.UserManagment.Controllers
         }
 
         [HttpGet]
-        public async Task<ResponseResult<List<RolePermissionResponseVM>>> GetAll()
+        public ResponseResult<List<RolePermissionResponseVM>> GetAll()
         {
             try
             {
-                var result = await _rolePermissionService.GetAllRolePermissionsAsync();
+                var result = _rolePermissionService.GetAllRolePermissions();
                 return result.Count > 0
                     ? new ResponseResult<List<RolePermissionResponseVM>>(HttpStatusCode.OK, result, "Role Permissions retrieved successfully")
                     : new ResponseResult<List<RolePermissionResponseVM>>(HttpStatusCode.NoContent, result, "No role permissions found");
@@ -74,11 +74,11 @@ namespace NeuroPi.UserManagment.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ResponseResult<RolePermissionResponseVM>> GetById(int id)
+        public ResponseResult<RolePermissionResponseVM> GetById(int id)
         {
             try
             {
-                var result = await _rolePermissionService.GetRolePermissionByIdAsync(id);
+                var result = _rolePermissionService.GetRolePermissionById(id);
                 return result != null
                     ? new ResponseResult<RolePermissionResponseVM>(HttpStatusCode.OK, result, "Role permission found")
                     : new ResponseResult<RolePermissionResponseVM>(HttpStatusCode.NotFound, null, $"No role permission found with id {id}");
@@ -90,11 +90,11 @@ namespace NeuroPi.UserManagment.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ResponseResult<bool>> Delete(int id)
+        public ResponseResult<bool> Delete(int id)
         {
             try
             {
-                var response = await _rolePermissionService.DeleteByIdAsync(id);
+                var response = _rolePermissionService.DeleteById(id);
                 return response
                     ? new ResponseResult<bool>(HttpStatusCode.OK, true, "Role permission deleted successfully")
                     : new ResponseResult<bool>(HttpStatusCode.NotFound, false, "Role permission not found");

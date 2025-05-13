@@ -19,7 +19,7 @@ namespace NeuroPi.UserManagment.Controllers
 
         // Get all groups
         [HttpGet]
-        public IActionResult GetAll()
+        public ResponseResult<object> GetAll()
         {
             try
             {
@@ -39,7 +39,7 @@ namespace NeuroPi.UserManagment.Controllers
 
         // Get a group by ID
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public ResponseResult<object> GetById(int id)
         {
             try
             {
@@ -59,7 +59,7 @@ namespace NeuroPi.UserManagment.Controllers
 
         // Create a new group
         [HttpPost]
-        public IActionResult Create([FromBody] GroupInputVM input)
+        public ResponseResult<object> Create([FromBody] GroupInputVM input)
         {
             if (input == null || string.IsNullOrEmpty(input.Name) || input.TenantId <= 0)
             {
@@ -79,7 +79,7 @@ namespace NeuroPi.UserManagment.Controllers
 
         // Update an existing group
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] GroupUpdateInputVM input)
+        public ResponseResult<object> Update(int id, [FromBody] GroupUpdateInputVM input)
         {
             if (input == null || string.IsNullOrEmpty(input.Name))
             {
@@ -104,7 +104,7 @@ namespace NeuroPi.UserManagment.Controllers
 
         // Delete a group
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public ResponseResult<object> Delete(int id)
         {
             try
             {
