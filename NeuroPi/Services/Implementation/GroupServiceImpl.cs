@@ -89,5 +89,18 @@ namespace NeuroPi.UserManagment.Services.Implementation
             _context.SaveChanges();
             return true;
         }
+
+        public List<GroupVM> GetByTenantId(int tenantId)
+        {
+            return _context.Groups
+                .Where(g => !g.IsDeleted && g.TenantId == tenantId)
+                .Select(g => new GroupVM
+                {
+                    GroupId = g.GroupId,
+                    Name = g.Name,
+                    TenantId = g.TenantId
+                }).ToList();
+        }
+
     }
 }

@@ -71,5 +71,18 @@ namespace NeuroPi.UserManagment.Controllers
             }
             return new ResponseResult<bool>(HttpStatusCode.NotFound, false, "Group User not found");
         }
+
+        [HttpGet("tenant/{tenantId}")]
+        public ResponseResult<List<GroupUserVM>> GetGroupUsersByTenantId(int tenantId)
+        {
+            var groupUsers = _groupUserService.getGroupUsersByTenantId(tenantId);
+            if (groupUsers != null && groupUsers.Count > 0)
+            {
+                return new ResponseResult<List<GroupUserVM>>(HttpStatusCode.OK, groupUsers, "Group Users retrieved successfully for tenant");
+            }
+
+            return new ResponseResult<List<GroupUserVM>>(HttpStatusCode.NotFound, null, "No Group Users found for tenant");
+        }
+
     }
 }

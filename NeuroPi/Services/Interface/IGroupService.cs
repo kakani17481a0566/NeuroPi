@@ -9,5 +9,8 @@ namespace NeuroPi.UserManagment.Services.Interface
         GroupVM Create(GroupInputVM input);
         GroupVM Update(int id, GroupUpdateInputVM input);
         bool Delete(int id);
+
+        List<GroupVM> GetByTenantId(int tenantId);
+
     }
 }

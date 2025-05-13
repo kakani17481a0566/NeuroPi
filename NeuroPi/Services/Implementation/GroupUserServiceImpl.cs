@@ -103,5 +103,15 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
             return groupUser;
         }
+
+        public List<GroupUserVM> getGroupUsersByTenantId(int tenantId)
+        {
+            var result = _context.GroupUsers
+                                 .Where(x => x.TenantId == tenantId && !x.IsDeleted)
+                                 .ToList();
+
+            return GroupUserVM.ToViewModelList(result);
+        }
+
     }
 }

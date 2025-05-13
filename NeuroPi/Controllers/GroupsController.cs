@@ -121,5 +121,26 @@ namespace NeuroPi.UserManagment.Controllers
                 return new ResponseResult<object>(System.Net.HttpStatusCode.InternalServerError, null, ex.Message);
             }
         }
+
+
+        [HttpGet("tenant/{tenantId}")]
+        public ResponseResult<object> GetByTenantId(int tenantId)
+        {
+            try
+            {
+                var groups = _groupService.GetByTenantId(tenantId);
+                if (groups == null || groups.Count == 0)
+                {
+                    return new ResponseResult<object>(System.Net.HttpStatusCode.NotFound, null, "No groups found for the given tenant");
+                }
+
+                return new ResponseResult<object>(System.Net.HttpStatusCode.OK, groups, "Groups fetched successfully for the tenant");
+            }
+            catch (Exception ex)
+            {
+                return new ResponseResult<object>(System.Net.HttpStatusCode.InternalServerError, null, ex.Message);
+            }
+        }
+
     }
 }

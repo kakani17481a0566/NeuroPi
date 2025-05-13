@@ -11,6 +11,8 @@ namespace NeuroPi.UserManagment.Services.Interface
 
         GroupUserVM createGroupUser(GroupUserInputVM input);
 
+        List<GroupUserVM> getGroupUsersByTenantId(int tenantId);
+
 
 
         bool deleteGroupUserById(int GroupId);

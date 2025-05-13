@@ -9,5 +9,8 @@ namespace NeuroPi.UserManagment.Services.Interface
         OrganizationVM Create(OrganizationInputVM input);
         OrganizationVM Update(int id, OrganizationUpdateInputVM input);
         bool Delete(int id);
+
+        List<OrganizationVM> GetByTenantId(int tenantId);
+
     }
 }
