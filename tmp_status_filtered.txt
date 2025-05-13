@@ -1,3 +1,2 @@
-NeuroPi.sln
-NeuroPi.UserManagment.sln
+NeuroPi/Model/MBaseModel.cs
 tmp_status.txt
