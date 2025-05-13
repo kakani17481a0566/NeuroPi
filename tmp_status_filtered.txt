@@ -1,4 +1,4 @@
-NeuroPi/Controllers/DepartmentController.cs
-NeuroPi/Services/Implementation/DepartmentServiceImpl.cs
-NeuroPi/Services/Interface/IDepartmentService.cs
+NeuroPi/Controllers/OrganizationControllers.cs
+NeuroPi/Services/Implementation/OrganizationImpl.cs
+NeuroPi/Services/Interface/IOrganizationService.cs
 tmp_status.txt
