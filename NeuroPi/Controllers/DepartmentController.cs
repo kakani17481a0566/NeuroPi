@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using NeuroPi.UserManagment.Response;
 using NeuroPi.UserManagment.Services.Interface;
 using NeuroPi.UserManagment.ViewModel.Department;
+using System.Collections.Generic;
 
 namespace NeuroPi.UserManagment.Controllers
 {
@@ -10,97 +11,93 @@ namespace NeuroPi.UserManagment.Controllers
     [ApiController]
     public class DepartmentController : ControllerBase
     {
-        private readonly IDepartmentService _departmentService;
+        private readonly IDepartmentService _service;
 
-        public DepartmentController(IDepartmentService departmentService)
+        public DepartmentController(IDepartmentService service)
         {
-            _departmentService = departmentService;
-        }
-
-        private int GetCurrentUserId()
-        {
-            var userIdClaim = User.FindFirst("user_id");
-            return userIdClaim != null ? int.Parse(userIdClaim.Value) : 0;
+            _service = service;
         }
 
         [HttpGet]
-        public IActionResult GetAllDepartments()
+        public ResponseResult<List<DepartmentResponseVM>> GetAll()
         {
-            var result = _departmentService.GetAllDepartments();
+            var data = _service.GetAllDepartments();
             return new ResponseResult<List<DepartmentResponseVM>>(
-                result.Count > 0 ? HttpStatusCode.OK : HttpStatusCode.NoContent,
-                result,
-                result.Count > 0 ? "Fetched successfully" : "No data found"
+                data.Count > 0 ? HttpStatusCode.OK : HttpStatusCode.NoContent,
+                data,
+                data.Count > 0 ? "Departments fetched" : "No departments found"
             );
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public ResponseResult<DepartmentResponseVM> GetById(int id)
         {
-            var result = _departmentService.GetDepartmentById(id);
+            var data = _service.GetDepartmentById(id);
             return new ResponseResult<DepartmentResponseVM>(
-                result != null ? HttpStatusCode.OK : HttpStatusCode.NotFound,
-                result,
-                result != null ? "Found the data" : $"No data found with id {id}"
+                data != null ? HttpStatusCode.OK : HttpStatusCode.NotFound,
+                data,
+                data != null ? "Department found" : "Not found"
             );
         }
 
         [HttpGet("{id}/tenant/{tenantId}")]
-        public IActionResult GetByIdAndTenantId(int id, int tenantId)
+        public ResponseResult<DepartmentResponseVM> GetByIdAndTenantId(int id, int tenantId)
         {
-            var result = _departmentService.GetDepartmentByIdAndTenantId(id, tenantId);
+            var data = _service.GetDepartmentByIdAndTenantId(id, tenantId);
             return new ResponseResult<DepartmentResponseVM>(
-                result != null ? HttpStatusCode.OK : HttpStatusCode.NotFound,
-                result,
-                result != null ? "Found the department" : $"No department found with id {id} and tenantId {tenantId}"
-            );
-        }
-
-        // Safe Delete by checking both DepartmentId and TenantId
-        [HttpDelete("{id}/tenant/{tenantId}")]
-        public IActionResult DeleteDepartmentById(int id, int tenantId)
-        {
-            var deleted = _departmentService.DeleteById(id, tenantId, GetCurrentUserId());
-            return new ResponseResult<bool>(
-                deleted ? HttpStatusCode.OK : HttpStatusCode.BadRequest,
-                deleted,
-                deleted ? "Department deleted successfully" : "Department not deleted"
-            );
-        }
-
-        [HttpPost]
-        public IActionResult AddDepartment([FromBody] DepartmentCreateVM requestVM)
-        {
-            requestVM.CreatedBy = GetCurrentUserId();
-            var result = _departmentService.AddDepartment(requestVM);
-            return new ResponseResult<DepartmentResponseVM>(
-                result != null ? HttpStatusCode.Created : HttpStatusCode.BadRequest,
-                result,
-                result != null ? "Department added successfully" : "Department not added"
-            );
-        }
-
-        // Safe Update by checking both DepartmentId and TenantId
-        [HttpPut("{id}/tenant/{tenantId}")]
-        public IActionResult UpdateDepartmentById(int id, int tenantId, [FromBody] DepartmentUpdateVM request)
-        {
-            request.UpdatedBy = GetCurrentUserId();
-            var result = _departmentService.UpdateDepartment(id, tenantId, request);
-            return new ResponseResult<DepartmentResponseVM>(
-                result != null ? HttpStatusCode.OK : HttpStatusCode.BadRequest,
-                result,
-                result != null ? "Department updated successfully" : "Department not updated"
+                data != null ? HttpStatusCode.OK : HttpStatusCode.NotFound,
+                data,
+                data != null ? "Department found" : "Not found"
             );
         }
 
         [HttpGet("tenant/{tenantId}")]
-        public IActionResult GetByTenantId(int tenantId)
+        public ResponseResult<List<DepartmentResponseVM>> GetByTenantId(int tenantId)
         {
-            var result = _departmentService.GetDepartmentsByTenantId(tenantId);
+            var data = _service.GetDepartmentsByTenantId(tenantId);
             return new ResponseResult<List<DepartmentResponseVM>>(
-                result.Count > 0 ? HttpStatusCode.OK : HttpStatusCode.NotFound,
+                data.Count > 0 ? HttpStatusCode.OK : HttpStatusCode.NoContent,
+                data,
+                data.Count > 0 ? "Departments found" : "No departments found"
+            );
+        }
+
+        [HttpPost]
+        public ResponseResult<DepartmentResponseVM> Add([FromBody] DepartmentCreateVM vm)
+        {
+            if (vm.CreatedBy <= 0)
+                return new ResponseResult<DepartmentResponseVM>(HttpStatusCode.BadRequest, null, "Invalid CreatedBy");
+
+            var result = _service.AddDepartment(vm);
+            return new ResponseResult<DepartmentResponseVM>(
+                result != null ? HttpStatusCode.Created : HttpStatusCode.BadRequest,
                 result,
-                result.Count > 0 ? "Departments fetched by tenant ID" : $"No departments found for tenant ID {tenantId}"
+                result != null ? "Department created" : "Creation failed"
+            );
+        }
+
+        [HttpPut("{id}/tenant/{tenantId}")]
+        public ResponseResult<DepartmentResponseVM> Update(int id, int tenantId, [FromBody] DepartmentUpdateVM vm)
+        {
+            if (vm.UpdatedBy <= 0)
+                return new ResponseResult<DepartmentResponseVM>(HttpStatusCode.BadRequest, null, "Invalid UpdatedBy");
+
+            var result = _service.UpdateDepartment(id, tenantId, vm);
+            return new ResponseResult<DepartmentResponseVM>(
+                result != null ? HttpStatusCode.OK : HttpStatusCode.BadRequest,
+                result,
+                result != null ? "Updated" : "Update failed"
+            );
+        }
+
+        [HttpDelete("{id}/tenant/{tenantId}")]
+        public ResponseResult<bool> Delete(int id, int tenantId)
+        {
+            var success = _service.DeleteById(id, tenantId, 0);
+            return new ResponseResult<bool>(
+                success ? HttpStatusCode.OK : HttpStatusCode.BadRequest,
+                success,
+                success ? "Deleted" : "Delete failed"
             );
         }
     }
