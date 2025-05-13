@@ -7,10 +7,10 @@ namespace NeuroPi.UserManagment.Services.Implementation
     public class TeamUserServiceImpl : ITeamUserService
     {
         private readonly NeuroPiDbContext _context;
+
         public TeamUserServiceImpl(NeuroPiDbContext context)
         {
             _context = context;
-
         }
 
         public TeamUserResponseVM AddTeamUser(TeamUserRequestVM teamUser)
@@ -18,6 +18,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
             var teamUserModel = TeamUserRequestVM.ToModel(teamUser);
             _context.TeamUsers.Add(teamUserModel);
             int result = _context.SaveChanges();
+
             if (result > 0)
             {
                 TeamUserResponseVM response = new TeamUserResponseVM()
@@ -29,57 +30,65 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 };
                 return response;
             }
+
             return null;
-
-
         }
 
         public void DeleteTeamUser(int id)
         {
-            var teamuser = _context.TeamUsers.FirstOrDefault(t => t.TeamUserId == id);
-            if (teamuser != null)
+            var teamUser = _context.TeamUsers.FirstOrDefault(t => t.TeamUserId == id);
+            if (teamUser != null && !teamUser.IsDeleted)
             {
-                _context.TeamUsers.Remove(teamuser);
+                teamUser.IsDeleted = true;
+                teamUser.UpdatedOn = DateTime.UtcNow;
                 _context.SaveChanges();
             }
-
-
         }
 
         public TeamUserResponseVM GetTeamUserById(int id)
         {
-            var result = _context.TeamUsers.FirstOrDefault(t => t.TeamUserId == id);
+            var result = _context.TeamUsers.FirstOrDefault(t => t.TeamUserId == id && !t.IsDeleted);
             if (result != null)
             {
                 return TeamUserResponseVM.ToViewModel(result);
             }
             return null;
         }
+
         public List<TeamUserResponseVM> GetTeamUsers()
         {
-            var result = _context.TeamUsers.ToList();
+            var result = _context.TeamUsers.Where(t => !t.IsDeleted).ToList();
             if (result != null && result.Count > 0)
             {
                 return TeamUserResponseVM.ToViewModelList(result);
             }
             return null;
-
         }
 
         public TeamUserResponseVM UpdateTeamUser(int id, TeamUserRequestVM teamUser)
         {
-            var teamUserModel = _context.TeamUsers.FirstOrDefault(t => t.TeamUserId == id);
+            var teamUserModel = _context.TeamUsers.FirstOrDefault(t => t.TeamUserId == id && !t.IsDeleted);
             if (teamUserModel != null)
             {
                 teamUserModel.TeamUserId = id;
                 teamUserModel.UserId = teamUser.UserId;
                 teamUserModel.TenantId = teamUser.TenantId;
                 teamUserModel.TeamId = teamUser.TeamId;
+                teamUserModel.UpdatedOn = DateTime.UtcNow;
                 _context.SaveChanges();
                 return TeamUserResponseVM.ToViewModel(teamUserModel);
             }
             return null;
+        }
 
+        public List<TeamUserResponseVM> GetTeamUsersByTenantId(int tenantId)
+        {
+            var result = _context.TeamUsers.Where(t => t.TenantId == tenantId && !t.IsDeleted).ToList();
+            if (result != null && result.Count > 0)
+            {
+                return TeamUserResponseVM.ToViewModelList(result);
+            }
+            return null;
         }
     }
 }
