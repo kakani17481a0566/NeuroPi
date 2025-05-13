@@ -32,6 +32,17 @@ namespace NeuroPi.UserManagment.Services.Implementation
             return null;
         }
 
+        public List<PermissionResponseVM> GetAllPermissionsByTenantId(int tenantId)
+        {
+            var result=_context.Permissions.Where(p=>p.TenantId==tenantId).ToList();
+            if (result != null)
+            {
+                return PermissionResponseVM.ToViewModelList(result);
+            }
+            return null;
+
+        }
+
         public MPermission GetById(int id)
         {
             var result = _context.Permissions.FirstOrDefault(p => p.PermissionId == id);
