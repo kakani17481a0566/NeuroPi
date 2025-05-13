@@ -52,17 +52,10 @@ namespace NeuroPi.UserManagment.Controllers
         }
 
         [HttpPost]
-        public ResponseResult<object> Create([FromQuery] string name, [FromQuery] int tenantId, [FromQuery] int? parentId)
+        public ResponseResult<object> Create([FromBody] OrganizationInputVM input)
         {
-            if (string.IsNullOrWhiteSpace(name) || tenantId <= 0)
+            if (input == null || string.IsNullOrWhiteSpace(input.Name) || input.TenantId <= 0)
                 return new ResponseResult<object>(HttpStatusCode.BadRequest, null, "Invalid input");
-
-            var input = new OrganizationInputVM
-            {
-                Name = name,
-                TenantId = tenantId,
-                ParentId = parentId
-            };
 
             try
             {
@@ -76,16 +69,10 @@ namespace NeuroPi.UserManagment.Controllers
         }
 
         [HttpPut("{id}")]
-        public ResponseResult<object> Update(int id, [FromQuery] string name, [FromQuery] int? parentId)
+        public ResponseResult<object> Update(int id, [FromBody] OrganizationUpdateInputVM input)
         {
-            if (string.IsNullOrWhiteSpace(name))
+            if (input == null || string.IsNullOrWhiteSpace(input.Name))
                 return new ResponseResult<object>(HttpStatusCode.BadRequest, null, "Invalid input");
-
-            var input = new OrganizationUpdateInputVM
-            {
-                Name = name,
-                ParentId = parentId
-            };
 
             try
             {

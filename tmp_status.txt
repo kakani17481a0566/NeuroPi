@@ -1,10 +1,2 @@
-NeuroPi/Controllers/GroupsController.cs
-NeuroPi/Controllers/RolePermissionController.cs
-NeuroPi/Controllers/TeamController.cs
-NeuroPi/Controllers/TeamUserController.cs
-NeuroPi/Controllers/TenantsController.cs
-NeuroPi/Controllers/UserRolesController.cs
-NeuroPi/Services/Implementation/RolePermissionServiceImpl.cs
-NeuroPi/Services/Implementation/TenantServiceImpl.cs
-NeuroPi/Services/Interface/IRolePermissionService.cs
+NeuroPi/Controllers/OrganizationControllers.cs
 tmp_status.txt
