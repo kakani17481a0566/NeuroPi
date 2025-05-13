@@ -29,32 +29,43 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
         public bool DeleteRoleById(int id)
         {
-            var role = _context.Roles.SingleOrDefault(r => r.RoleId == id);
-            if (role == null)
-            {
-                return false; // Role not found
-            }
-
-            _context.Roles.Remove(role);
+            var role = _context.Roles.FirstOrDefault(r => r.RoleId == id);
+            if (role == null)return false; 
+            role.IsDeleted = true;
             var result = _context.SaveChanges();
-            return result > 0; // Return true if the deletion was successful
+            return result > 0;
         }
 
         public List<RoleResponseVM> GetAllRoles()
         {
-            var roles = _context.Roles.Include(r => r.Tenant).ToList();
-            return RoleResponseVM.ToViewModelList(roles);
+            var roles = _context.Roles.Include(r => r.Tenant).Where(r=>!r.IsDeleted).ToList();
+            if (roles != null && roles.Count > 0)
+            {
+                return RoleResponseVM.ToViewModelList(roles);
+            }
+            return null;
+        }
+
+        public List<RoleResponseVM> GetAllRolesByTenantId(int tenantId)
+        {
+            var roles=_context.Roles.Where(r=>!r.IsDeleted && r.TenantId== tenantId).ToList();
+            if(roles!=null && roles.Count > 0)
+            {
+                return RoleResponseVM.ToViewModelList(roles);
+            }
+            return null;
+            
         }
 
         public RoleResponseVM GetRoleById(int id)
         {
-            var role = _context.Roles.FirstOrDefault(r => r.RoleId == id);
+            var role = _context.Roles.Where(r=>!r.IsDeleted).FirstOrDefault(r => r.RoleId == id);
             return role == null ? null : RoleResponseVM.ToViewModel(role); // Return null if not found
         }
 
         public RoleResponseVM UpdateRole(int id, RoleRequestVM roleRequestVM)
         {
-            var existingRole = _context.Roles.FirstOrDefault(r => r.RoleId == id);
+            var existingRole = _context.Roles.Where(r=>!r.IsDeleted).FirstOrDefault(r => r.RoleId == id);
             if (existingRole == null)
             {
                 return null; // Role not found
@@ -66,5 +77,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
             var result = _context.SaveChanges();
             return result > 0 ? RoleResponseVM.ToViewModel(existingRole) : null;
         }
+
+        
     }
 }

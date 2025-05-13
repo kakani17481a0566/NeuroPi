@@ -14,6 +14,8 @@ namespace NeuroPi.UserManagment.Services.Interface
 
         bool DeleteRoleById(int id);
 
+        List<RoleResponseVM> GetAllRolesByTenantId(int tenantId);
+
 
     }
 }
