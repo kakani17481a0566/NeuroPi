@@ -22,22 +22,33 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
         public MPermission DeletePermission(int id)
         {
-            var result = GetById(id);
+            var result = _context.Permissions.Where(p=>!p.IsDeleted).FirstOrDefault(p => p.PermissionId == id);
             if (result != null)
             {
-                _context.Permissions.Remove(result);
+                result.IsDeleted = true;
                 _context.SaveChanges();
                 return result;
             }
             return null;
         }
 
-        public MPermission GetById(int id)
+        public List<PermissionResponseVM> GetAllPermissionsByTenantId(int tenantId)
         {
-            var result = _context.Permissions.FirstOrDefault(p => p.PermissionId == id);
-            if (result != null)
+            var result=_context.Permissions.Where(p=>p.TenantId==tenantId).Where(p=>!p.IsDeleted).ToList();
+            if (result != null && result.Count>0)
             {
-                return result;
+                return PermissionResponseVM.ToViewModelList(result);
+            }
+            return null;
+
+        }
+
+        public PermissionResponseVM GetById(int id)
+        {
+            var result = _context.Permissions.Where(p=>!p.IsDeleted).FirstOrDefault(p => p.PermissionId == id);
+            if (result != null )
+            {
+                return PermissionResponseVM.ToViewModel(result);
             }
             return null;
 
@@ -45,8 +56,9 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
         public List<PermissionResponseVM> GetPermissions()
         {
-            var result = _context.Permissions.ToList();
-            if (result != null)
+            var result = _context.Permissions.Where(p => !p.IsDeleted).ToList();
+            if (result != null && result.Count>0)
+
             {
                 return PermissionResponseVM.ToViewModelList(result);
             }
@@ -55,7 +67,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
         public PermissionResponseVM UpdatePermission(int id, PermissionRequestVM requestVM)
         {
-            var result = GetById(id);
+            var result = _context.Permissions.Where(p => !p.IsDeleted).FirstOrDefault(p => p.PermissionId == id);
             if (result != null)
             {
                 result.PermissionId = id;
