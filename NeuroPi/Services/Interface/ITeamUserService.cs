@@ -13,5 +13,7 @@ namespace NeuroPi.UserManagment.Services.Interface
         TeamUserResponseVM UpdateTeamUser(int id, TeamUserRequestVM teamUser);
 
         void DeleteTeamUser(int id);
+
+        List<TeamUserResponseVM> GetTeamUsersByTenantId(int tenantId);
     }
 }

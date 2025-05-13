@@ -104,5 +104,24 @@ namespace NeuroPi.UserManagment.Controllers
                 null,
                 "Team user deleted successfully");
         }
+
+
+        // GET: api/TeamUser/Tenant/{tenantId}
+        [HttpGet("Tenant/{tenantId}")]
+        public ResponseResult<List<TeamUserResponseVM>> GetTeamUsersByTenantId(int tenantId)
+        {
+            var result = _teamUserService.GetTeamUsersByTenantId(tenantId);
+            if (result == null || result.Count == 0)
+            {
+                return new ResponseResult<List<TeamUserResponseVM>>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    "No data for team users");
+            }
+            return new ResponseResult<List<TeamUserResponseVM>>(
+                HttpStatusCode.OK,
+                result,
+                "Team users fetched successfully");
+        }
     }
 }

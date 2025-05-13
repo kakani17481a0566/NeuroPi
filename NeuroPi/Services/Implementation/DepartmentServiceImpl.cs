@@ -77,19 +77,42 @@ namespace NeuroPi.UserManagment.Services.Implementation
         {
             if (department != null)
             {
+           
                 var departmentModel = DepartmentRequestVM.ToModel(department);
-                departmentModel.IsDeleted = false; // Ensure the department is not soft-deleted by default
+                departmentModel.IsDeleted = false; 
+
+               
                 _context.Departments.Add(departmentModel);
                 _context.SaveChanges();
 
-                return new DepartmentResponseVM()
+             
+                var departmentWithRelations = _context.Departments
+                    .Include(d => d.Tenant)  
+                    .Include(d => d.Organization)  
+                    .FirstOrDefault(d => d.DepartmentId == departmentModel.DepartmentId);
+
+                if (departmentWithRelations != null)
                 {
-                    TenantId = department.TenantId,
-                    TenantName = department.Name
-                };
+                   
+                    string tenantName = departmentWithRelations.Tenant?.Name ?? "Unknown Tenant";
+                    string organizationName = departmentWithRelations.Organization?.Name ?? "Unknown Organization";
+
+                    return new DepartmentResponseVM()
+                    {
+                        Id = departmentWithRelations.DepartmentId,
+                        TenantId = departmentWithRelations.TenantId,
+                        TenantName = tenantName, 
+                        Name = departmentWithRelations.Name,
+                        HeadUserId = departmentWithRelations.HeadUserId,
+                        OrganizationId = departmentWithRelations.OrganizationId,
+                        OrganizationName = organizationName 
+                    };
+                }
             }
             return null;
         }
+
+
 
         // Update an existing department
         public DepartmentResponseVM UpdateDepartment(int id, DepartmentRequestVM department)
