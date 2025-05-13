@@ -43,6 +43,20 @@ namespace NeuroPi.UserManagment.Services.Implementation
             return null;
         }
 
+        // Get department by ID and TenantId (only if not soft-deleted)
+        public DepartmentResponseVM GetDepartmentByIdAndTenantId(int id, int tenantId)
+        {
+            var result = _context.Departments
+                                 .Include(d => d.Organization)
+                                 .Include(d => d.Tenant)
+                                 .FirstOrDefault(d => d.DepartmentId == id && d.TenantId == tenantId && !d.IsDeleted);  // Exclude soft-deleted departments
+            if (result != null)
+            {
+                return DepartmentResponseVM.ToViewModel(result);
+            }
+            return null;
+        }
+
         // Soft delete a department (set IsDeleted to true)
         public bool DeleteById(int id)
         {
@@ -100,5 +114,19 @@ namespace NeuroPi.UserManagment.Services.Implementation
             }
             return null;
         }
+
+
+        public List<DepartmentResponseVM> GetDepartmentsByTenantId(int tenantId)
+        {
+            var result = _context.Departments
+                                 .Include(d => d.Organization)
+                                 .Include(d => d.Tenant)
+                                 .Where(d => d.TenantId == tenantId && !d.IsDeleted)
+                                 .ToList();
+
+            return result?.Count > 0 ? DepartmentResponseVM.ToViewModelList(result) : new List<DepartmentResponseVM>();
+        }
+
     }
 }
+
