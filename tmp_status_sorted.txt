@@ -1,2 +1,3 @@
-NeuroPi/Controllers/OrganizationControllers.cs
 tmp_status.txt
+tmp_status_filtered.txt
+tmp_status_sorted.txt
