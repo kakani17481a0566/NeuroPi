@@ -2,16 +2,15 @@
 
 namespace NeuroPi.UserManagment.ViewModel.Department
 {
-    public class DepartmentRequestVM
+    public class DepartmentCreateVM
     {
         public string Name { get; set; }
         public int TenantId { get; set; }
         public int? HeadUserId { get; set; }
         public int OrganizationId { get; set; }
         public int? CreatedBy { get; set; }
-        public int? UpdatedBy { get; set; }
 
-        public static MDepartment ToModel(DepartmentRequestVM vm)
+        public static MDepartment ToModel(DepartmentCreateVM vm)
         {
             return new MDepartment
             {

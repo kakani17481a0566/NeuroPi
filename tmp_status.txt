@@ -1,7 +1,8 @@
-NeuroPi/Controllers/TeamUserController.cs
+NeuroPi/Controllers/DepartmentController.cs
 NeuroPi/Services/Implementation/DepartmentServiceImpl.cs
-NeuroPi/Services/Implementation/TeamUserServiceImpl.cs
-NeuroPi/Services/Interface/ITeamUserService.cs
+NeuroPi/Services/Interface/IDepartmentService.cs
+NeuroPi/ViewModel/Department/DepartmentRequestVM.cs
+NeuroPi/ViewModel/Department/DepartmentResponseVM.cs
 tmp_status.txt
-tmp_status_filtered.txt
-tmp_status_sorted.txt
+NeuroPi/ViewModel/Department/DepartmentCreateVM.cs
+NeuroPi/ViewModel/Department/DepartmentUpdateVM.cs

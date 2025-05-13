@@ -2,6 +2,8 @@
 using NeuroPi.UserManagment.Data;
 using NeuroPi.UserManagment.Services.Interface;
 using NeuroPi.UserManagment.ViewModel.Department;
+using NeuroPi.UserManagment.Model;
+using System.Linq;
 
 namespace NeuroPi.UserManagment.Services.Implementation
 {
@@ -14,142 +16,109 @@ namespace NeuroPi.UserManagment.Services.Implementation
             _context = context;
         }
 
-        // Get all departments (excluding soft-deleted ones)
         public List<DepartmentResponseVM> GetAllDepartments()
         {
             var result = _context.Departments
-                                 .Include(d => d.Organization)
-                                 .Include(d => d.Tenant)
-                                 .Where(d => !d.IsDeleted)  // Exclude soft-deleted departments
-                                 .ToList();
-            if (result != null)
-            {
-                return DepartmentResponseVM.ToViewModelList(result);
-            }
-            return null;
+                .Include(d => d.Organization)
+                .Include(d => d.Tenant)
+                .Where(d => !d.IsDeleted)
+                .ToList();
+
+            return DepartmentResponseVM.ToViewModelList(result);
         }
 
-        // Get department by ID (only if not soft-deleted)
         public DepartmentResponseVM GetDepartmentById(int id)
         {
-            var result = _context.Departments
-                                 .Include(d => d.Organization)
-                                 .Include(d => d.Tenant)
-                                 .FirstOrDefault(d => d.DepartmentId == id && !d.IsDeleted);  // Exclude soft-deleted departments
-            if (result != null)
-            {
-                return DepartmentResponseVM.ToViewModel(result);
-            }
-            return null;
+            var department = _context.Departments
+                .Include(d => d.Organization)
+                .Include(d => d.Tenant)
+                .FirstOrDefault(d => d.DepartmentId == id && !d.IsDeleted);
+
+            return department != null ? DepartmentResponseVM.ToViewModel(department) : null;
         }
 
-        // Get department by ID and TenantId (only if not soft-deleted)
         public DepartmentResponseVM GetDepartmentByIdAndTenantId(int id, int tenantId)
         {
-            var result = _context.Departments
-                                 .Include(d => d.Organization)
-                                 .Include(d => d.Tenant)
-                                 .FirstOrDefault(d => d.DepartmentId == id && d.TenantId == tenantId && !d.IsDeleted);  // Exclude soft-deleted departments
-            if (result != null)
-            {
-                return DepartmentResponseVM.ToViewModel(result);
-            }
-            return null;
+            var department = _context.Departments
+                .Include(d => d.Organization)
+                .Include(d => d.Tenant)
+                .FirstOrDefault(d => d.DepartmentId == id && d.TenantId == tenantId && !d.IsDeleted);
+
+            return department != null ? DepartmentResponseVM.ToViewModel(department) : null;
         }
 
-        // Soft delete a department (set IsDeleted to true)
-        public bool DeleteById(int id)
+        public bool DeleteById(int id, int deletedBy)
         {
-            var department = _context.Departments.FirstOrDefault(d => d.DepartmentId == id && !d.IsDeleted);  // Ensure it's not already soft-deleted
-            if (department == null)
-            {
-                return false;
-            }
+            var department = _context.Departments.FirstOrDefault(d => d.DepartmentId == id && !d.IsDeleted);
+            if (department == null) return false;
 
-            // Perform soft delete by setting IsDeleted to true
             department.IsDeleted = true;
+            department.UpdatedOn = DateTime.UtcNow;
+            department.UpdatedBy = deletedBy;
+
             _context.SaveChanges();
             return true;
         }
 
-        // Add a new department
-        public DepartmentResponseVM AddDepartment(DepartmentRequestVM department)
+        // **AddDepartment Implementation**
+        public DepartmentResponseVM AddDepartment(DepartmentCreateVM request)
         {
-            if (department != null)
-            {
-           
-                var departmentModel = DepartmentRequestVM.ToModel(department);
-                departmentModel.IsDeleted = false; 
+            // Convert the DepartmentCreateVM to MDepartment (the model)
+            var model = DepartmentCreateVM.ToModel(request);
 
-               
-                _context.Departments.Add(departmentModel);
-                _context.SaveChanges();
+            // Set the creation information
+            model.CreatedOn = DateTime.UtcNow;
+            model.CreatedBy = request.CreatedBy ?? 0;
+            model.IsDeleted = false;
 
-             
-                var departmentWithRelations = _context.Departments
-                    .Include(d => d.Tenant)  
-                    .Include(d => d.Organization)  
-                    .FirstOrDefault(d => d.DepartmentId == departmentModel.DepartmentId);
+            // Add the department to the database
+            _context.Departments.Add(model);
+            _context.SaveChanges();
 
-                if (departmentWithRelations != null)
-                {
-                   
-                    string tenantName = departmentWithRelations.Tenant?.Name ?? "Unknown Tenant";
-                    string organizationName = departmentWithRelations.Organization?.Name ?? "Unknown Organization";
+            // Get the newly added department and map it to the response view model
+            var department = _context.Departments
+                .Include(d => d.Organization)
+                .Include(d => d.Tenant)
+                .FirstOrDefault(d => d.DepartmentId == model.DepartmentId);
 
-                    return new DepartmentResponseVM()
-                    {
-                        Id = departmentWithRelations.DepartmentId,
-                        TenantId = departmentWithRelations.TenantId,
-                        TenantName = tenantName, 
-                        Name = departmentWithRelations.Name,
-                        HeadUserId = departmentWithRelations.HeadUserId,
-                        OrganizationId = departmentWithRelations.OrganizationId,
-                        OrganizationName = organizationName 
-                    };
-                }
-            }
-            return null;
+            return department != null ? DepartmentResponseVM.ToViewModel(department) : null;
         }
 
-
-
-        // Update an existing department
-        public DepartmentResponseVM UpdateDepartment(int id, DepartmentRequestVM department)
+        // **UpdateDepartment Implementation**
+        public DepartmentResponseVM UpdateDepartment(int id, DepartmentUpdateVM request)
         {
-            var existedDepartment = _context.Departments.FirstOrDefault(d => d.DepartmentId == id && !d.IsDeleted);  // Ensure the department is not soft-deleted
-            if (existedDepartment != null)
-            {
-                existedDepartment.TenantId = department.TenantId;
-                existedDepartment.Name = department.Name;
-                existedDepartment.HeadUserId = department.HeadUserId;
-                existedDepartment.OrganizationId = department.OrganizationId;
+            var department = _context.Departments.FirstOrDefault(d => d.DepartmentId == id && !d.IsDeleted);
+            if (department == null) return null;
 
-                _context.SaveChanges();
-                return new DepartmentResponseVM()
-                {
-                    Id = existedDepartment.DepartmentId,
-                    Name = department.Name,
-                    TenantId = department.TenantId,
-                    HeadUserId = department.HeadUserId,
-                    OrganizationId = department.OrganizationId,
-                };
-            }
-            return null;
+            // Update the department fields with the request data
+            department.Name = request.Name;
+            department.TenantId = request.TenantId;
+            department.OrganizationId = request.OrganizationId;
+            department.HeadUserId = request.HeadUserId;
+            department.UpdatedOn = DateTime.UtcNow;
+            department.UpdatedBy = request.UpdatedBy ?? 0;
+
+            // Save the changes to the database
+            _context.SaveChanges();
+
+            // Get the updated department and map it to the response view model
+            var updatedDepartment = _context.Departments
+                .Include(d => d.Organization)
+                .Include(d => d.Tenant)
+                .FirstOrDefault(d => d.DepartmentId == id);
+
+            return updatedDepartment != null ? DepartmentResponseVM.ToViewModel(updatedDepartment) : null;
         }
-
 
         public List<DepartmentResponseVM> GetDepartmentsByTenantId(int tenantId)
         {
             var result = _context.Departments
-                                 .Include(d => d.Organization)
-                                 .Include(d => d.Tenant)
-                                 .Where(d => d.TenantId == tenantId && !d.IsDeleted)
-                                 .ToList();
+                .Include(d => d.Organization)
+                .Include(d => d.Tenant)
+                .Where(d => d.TenantId == tenantId && !d.IsDeleted)
+                .ToList();
 
-            return result?.Count > 0 ? DepartmentResponseVM.ToViewModelList(result) : new List<DepartmentResponseVM>();
+            return DepartmentResponseVM.ToViewModelList(result);
         }
-
     }
 }
-
