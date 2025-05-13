@@ -16,18 +16,20 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
         public List<OrganizationVM> GetAll()
         {
-            return _context.Organizations.Select(o => new OrganizationVM
-            {
-                OrganizationId = o.OrganizationId,
-                Name = o.Name,
-                ParentId = o.ParentId,
-                TenantId = o.TenantId
-            }).ToList();
+            return _context.Organizations
+                .Where(o => !o.IsDeleted)
+                .Select(o => new OrganizationVM
+                {
+                    OrganizationId = o.OrganizationId,
+                    Name = o.Name,
+                    ParentId = o.ParentId,
+                    TenantId = o.TenantId
+                }).ToList();
         }
 
         public OrganizationVM GetById(int id)
         {
-            var org = _context.Organizations.FirstOrDefault(o => o.OrganizationId == id);
+            var org = _context.Organizations.FirstOrDefault(o => o.OrganizationId == id && !o.IsDeleted);
             if (org == null) return null;
 
             return new OrganizationVM
@@ -45,7 +47,8 @@ namespace NeuroPi.UserManagment.Services.Implementation
             {
                 Name = input.Name,
                 ParentId = input.ParentId,
-                TenantId = input.TenantId
+                TenantId = input.TenantId,
+                IsDeleted = false
             };
 
             _context.Organizations.Add(entity);
@@ -62,15 +65,11 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
         public OrganizationVM Update(int id, OrganizationUpdateInputVM input)
         {
-            var org = _context.Organizations.FirstOrDefault(o => o.OrganizationId == id);
-            if (org == null)
-            {
-                return null;
-            }
+            var org = _context.Organizations.FirstOrDefault(o => o.OrganizationId == id && !o.IsDeleted);
+            if (org == null) return null;
 
             org.Name = input.Name;
             org.ParentId = input.ParentId;
-
             org.UpdatedBy = input.UpdatedBy;
             org.UpdatedOn = DateTime.UtcNow;
 
@@ -85,15 +84,31 @@ namespace NeuroPi.UserManagment.Services.Implementation
             };
         }
 
-
         public bool Delete(int id)
         {
-            var org = _context.Organizations.FirstOrDefault(o => o.OrganizationId == id);
+            var org = _context.Organizations.FirstOrDefault(o => o.OrganizationId == id && !o.IsDeleted);
             if (org == null) return false;
 
-            _context.Organizations.Remove(org);
+            org.IsDeleted = true;
+            org.UpdatedOn = DateTime.UtcNow;
             _context.SaveChanges();
             return true;
         }
+
+
+        public List<OrganizationVM> GetByTenantId(int tenantId)
+        {
+            return _context.Organizations
+                .Where(o => o.TenantId == tenantId && !o.IsDeleted)
+                .Select(o => new OrganizationVM
+                {
+                    OrganizationId = o.OrganizationId,
+                    Name = o.Name,
+                    ParentId = o.ParentId,
+                    TenantId = o.TenantId
+                }).ToList();
+        }
+
+
     }
 }

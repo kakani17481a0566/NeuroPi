@@ -9,6 +9,10 @@ namespace NeuroPi.UserManagment.Services.Interface
 
         DepartmentResponseVM GetDepartmentById(int id);
 
+        DepartmentResponseVM GetDepartmentByIdAndTenantId(int id, int tenantId);
+        List<DepartmentResponseVM> GetDepartmentsByTenantId(int tenantId);
+
+
         bool DeleteById(int id);
 
         DepartmentResponseVM AddDepartment(DepartmentRequestVM department);

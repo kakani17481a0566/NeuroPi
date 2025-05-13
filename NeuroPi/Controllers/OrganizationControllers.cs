@@ -52,17 +52,10 @@ namespace NeuroPi.UserManagment.Controllers
         }
 
         [HttpPost]
-        public ResponseResult<object> Create([FromQuery] string name, [FromQuery] int tenantId, [FromQuery] int? parentId)
+        public ResponseResult<object> Create([FromBody] OrganizationInputVM input)
         {
-            if (string.IsNullOrWhiteSpace(name) || tenantId <= 0)
+            if (input == null || string.IsNullOrWhiteSpace(input.Name) || input.TenantId <= 0)
                 return new ResponseResult<object>(HttpStatusCode.BadRequest, null, "Invalid input");
-
-            var input = new OrganizationInputVM
-            {
-                Name = name,
-                TenantId = tenantId,
-                ParentId = parentId
-            };
 
             try
             {
@@ -76,16 +69,10 @@ namespace NeuroPi.UserManagment.Controllers
         }
 
         [HttpPut("{id}")]
-        public ResponseResult<object> Update(int id, [FromQuery] string name, [FromQuery] int? parentId)
+        public ResponseResult<object> Update(int id, [FromBody] OrganizationUpdateInputVM input)
         {
-            if (string.IsNullOrWhiteSpace(name))
+            if (input == null || string.IsNullOrWhiteSpace(input.Name))
                 return new ResponseResult<object>(HttpStatusCode.BadRequest, null, "Invalid input");
-
-            var input = new OrganizationUpdateInputVM
-            {
-                Name = name,
-                ParentId = parentId
-            };
 
             try
             {
@@ -117,5 +104,23 @@ namespace NeuroPi.UserManagment.Controllers
                 return new ResponseResult<object>(HttpStatusCode.InternalServerError, null, ex.Message);
             }
         }
+
+        [HttpGet("tenant/{tenantId}")]
+        public ResponseResult<object> GetByTenantId(int tenantId)
+        {
+            try
+            {
+                var result = _organizationService.GetByTenantId(tenantId);
+                if (result == null || result.Count == 0)
+                    return new ResponseResult<object>(HttpStatusCode.NotFound, null, "No organizations found for the given tenant");
+
+                return new ResponseResult<object>(HttpStatusCode.OK, result, "Organizations fetched successfully");
+            }
+            catch (Exception ex)
+            {
+                return new ResponseResult<object>(HttpStatusCode.InternalServerError, null, ex.Message);
+            }
+        }
+
     }
 }
