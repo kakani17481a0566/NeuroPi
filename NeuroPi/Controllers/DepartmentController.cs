@@ -56,10 +56,11 @@ namespace NeuroPi.UserManagment.Controllers
             );
         }
 
-        [HttpDelete("{id}")]
-        public IActionResult DeleteDepartmentById(int id)
+        // Safe Delete by checking both DepartmentId and TenantId
+        [HttpDelete("{id}/tenant/{tenantId}")]
+        public IActionResult DeleteDepartmentById(int id, int tenantId)
         {
-            var deleted = _departmentService.DeleteById(id, GetCurrentUserId());
+            var deleted = _departmentService.DeleteById(id, tenantId, GetCurrentUserId());
             return new ResponseResult<bool>(
                 deleted ? HttpStatusCode.OK : HttpStatusCode.BadRequest,
                 deleted,
@@ -79,11 +80,12 @@ namespace NeuroPi.UserManagment.Controllers
             );
         }
 
-        [HttpPut("{id}")]
-        public IActionResult UpdateDepartmentById(int id, [FromBody] DepartmentUpdateVM request)
+        // Safe Update by checking both DepartmentId and TenantId
+        [HttpPut("{id}/tenant/{tenantId}")]
+        public IActionResult UpdateDepartmentById(int id, int tenantId, [FromBody] DepartmentUpdateVM request)
         {
             request.UpdatedBy = GetCurrentUserId();
-            var result = _departmentService.UpdateDepartment(id, request);
+            var result = _departmentService.UpdateDepartment(id, tenantId, request);
             return new ResponseResult<DepartmentResponseVM>(
                 result != null ? HttpStatusCode.OK : HttpStatusCode.BadRequest,
                 result,

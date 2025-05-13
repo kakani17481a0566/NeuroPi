@@ -47,11 +47,15 @@ namespace NeuroPi.UserManagment.Services.Implementation
             return department != null ? DepartmentResponseVM.ToViewModel(department) : null;
         }
 
-        public bool DeleteById(int id, int deletedBy)
+        // Safe Delete by checking both DepartmentId and TenantId
+        public bool DeleteById(int id, int tenantId, int deletedBy)
         {
-            var department = _context.Departments.FirstOrDefault(d => d.DepartmentId == id && !d.IsDeleted);
+            var department = _context.Departments
+                .FirstOrDefault(d => d.DepartmentId == id && d.TenantId == tenantId && !d.IsDeleted);
+
             if (department == null) return false;
 
+            // Soft delete the department
             department.IsDeleted = true;
             department.UpdatedOn = DateTime.UtcNow;
             department.UpdatedBy = deletedBy;
@@ -60,7 +64,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
             return true;
         }
 
-        // **AddDepartment Implementation**
+        // AddDepartment Implementation
         public DepartmentResponseVM AddDepartment(DepartmentCreateVM request)
         {
             // Convert the DepartmentCreateVM to MDepartment (the model)
@@ -84,10 +88,12 @@ namespace NeuroPi.UserManagment.Services.Implementation
             return department != null ? DepartmentResponseVM.ToViewModel(department) : null;
         }
 
-        // **UpdateDepartment Implementation**
-        public DepartmentResponseVM UpdateDepartment(int id, DepartmentUpdateVM request)
+        // UpdateDepartment Implementation
+        public DepartmentResponseVM UpdateDepartment(int id, int tenantId, DepartmentUpdateVM request)
         {
-            var department = _context.Departments.FirstOrDefault(d => d.DepartmentId == id && !d.IsDeleted);
+            var department = _context.Departments
+                .FirstOrDefault(d => d.DepartmentId == id && d.TenantId == tenantId && !d.IsDeleted);
+
             if (department == null) return null;
 
             // Update the department fields with the request data
@@ -105,11 +111,12 @@ namespace NeuroPi.UserManagment.Services.Implementation
             var updatedDepartment = _context.Departments
                 .Include(d => d.Organization)
                 .Include(d => d.Tenant)
-                .FirstOrDefault(d => d.DepartmentId == id);
+                .FirstOrDefault(d => d.DepartmentId == id && d.TenantId == tenantId);
 
             return updatedDepartment != null ? DepartmentResponseVM.ToViewModel(updatedDepartment) : null;
         }
 
+        // Get departments by TenantId
         public List<DepartmentResponseVM> GetDepartmentsByTenantId(int tenantId)
         {
             var result = _context.Departments
