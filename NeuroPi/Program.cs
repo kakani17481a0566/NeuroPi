@@ -12,19 +12,15 @@ builder.Services.AddSwaggerGen();
 
 // Register application services
 builder.Services.AddScoped<ITenantService, TenantServiceImpl>();
-
-builder.Services.AddTransient<IDepartmentService, DepartmentServiceImpl>();
+builder.Services.AddScoped<IDepartmentService, DepartmentServiceImpl>();
 builder.Services.AddScoped<IGroupService, GroupServiceImpl>();
 builder.Services.AddScoped<IOrganizationService, OrganizationImpl>();
-builder.Services.AddTransient<IGroupUserService, GroupUserServiceImpl>();
-builder.Services.AddTransient<IRolePermissionService, RolePermissionServiceImpl>();
+builder.Services.AddScoped<IGroupUserService, GroupUserServiceImpl>();
+builder.Services.AddScoped<IRolePermissionService, RolePermissionServiceImpl>();
 builder.Services.AddScoped<ITeamService, TeamServiceImpl>();
-builder.Services.AddScoped<ITeamService, TeamServiceImpl>();
-builder.Services.AddTransient<ITeamUserService, TeamUserServiceImpl>();
-builder.Services.AddTransient<IPermissionService, PermissionServiceImpl>();
-builder.Services.AddTransient<IUserDepartmentService, UserDepartmentServiceImpl>();
-
-
+builder.Services.AddScoped<ITeamUserService, TeamUserServiceImpl>();
+builder.Services.AddScoped<IPermissionService, PermissionServiceImpl>();
+builder.Services.AddScoped<IUserDepartmentService, UserDepartmentServiceImpl>();
 
 
 
