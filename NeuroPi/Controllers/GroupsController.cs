@@ -121,7 +121,7 @@ public class GroupsController : ControllerBase
 
     // Delete a group
     [HttpDelete("{id}/tenant/{tenantId}")]
-    public ResponseResult<object> Delete(int id, [FromQuery] int tenantId)
+    public ResponseResult<object> Delete(int id, int tenantId)  // Removed [FromQuery] here
     {
         try
         {
@@ -152,6 +152,7 @@ public class GroupsController : ControllerBase
             return new ResponseResult<object>(System.Net.HttpStatusCode.InternalServerError, null, ex.Message);
         }
     }
+
 
 
     // Get groups by TenantId
