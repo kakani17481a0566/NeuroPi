@@ -174,37 +174,29 @@ namespace NeuroPi.UserManagment.Controllers
 
         // Delete a group
         [HttpDelete("{groupId}/tenant/{tenantId}")]
-        public ResponseResult<object> Delete(int groupId, int tenantId)
+        public ResponseResult<bool> Delete(int groupId, int tenantId)
         {
             try
             {
-                // Fetch the group by groupId
-                var group = _groupService.GetByGroupId(groupId);
-                if (group == null)
-                {
-                    return new ResponseResult<object>(HttpStatusCode.NotFound, null, "Group not found");
-                }
+                // Call the service method to delete the group
+                var success = _groupService.DeleteById(groupId, tenantId); // 0 can be replaced with actual deletedBy user ID if needed
 
-                // Validate that the TenantId in the request matches the TenantId of the group
-                if (group.TenantId != tenantId)
-                {
-                    return new ResponseResult<object>(HttpStatusCode.BadRequest, null, "TenantId does not match");
-                }
-
-                // Soft delete the group
-                var success = _groupService.Delete(groupId);
-                if (!success)
-                {
-                    return new ResponseResult<object>(HttpStatusCode.NotFound, null, "Group not found or already deleted");
-                }
-
-                return new ResponseResult<object>(HttpStatusCode.NoContent, null, "Group deleted successfully");
+                // Return appropriate HTTP response based on success or failure
+                return new ResponseResult<bool>(
+                    success ? HttpStatusCode.OK : HttpStatusCode.BadRequest, // 204 No Content for success
+                    success,
+                    success ? "Group deleted successfully" : "Delete failed: Group not found or already deleted"
+                );
             }
             catch (Exception ex)
             {
-                return new ResponseResult<object>(HttpStatusCode.InternalServerError, null, ex.Message);
+                // Handle any exceptions that occur during the delete operation
+                return new ResponseResult<bool>(HttpStatusCode.InternalServerError, false, ex.Message);
             }
         }
+
+
+
 
         #endregion
     }

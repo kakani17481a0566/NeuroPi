@@ -82,15 +82,24 @@ namespace NeuroPi.UserManagment.Services.Implementation
             };
         }
 
-        public bool Delete(int groupId)
+        // Soft delete a group
+        public bool DeleteById(int groupId, int tenantId)
         {
-            var group = _context.Groups.FirstOrDefault(g => g.GroupId == groupId && !g.IsDeleted);
+            var group = _context.Groups
+                .FirstOrDefault(g => g.GroupId == groupId && g.TenantId == tenantId && !g.IsDeleted);
+
             if (group == null) return false;
 
+            // Perform the soft delete
             group.IsDeleted = true;
+            group.UpdatedOn = DateTime.UtcNow;
+
             _context.SaveChanges();
             return true;
         }
+
+
+
 
         public List<GroupVM> GetByTenantId(int tenantId)
         {
