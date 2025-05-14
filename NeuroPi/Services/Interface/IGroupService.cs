@@ -1,16 +1,16 @@
 ﻿using NeuroPi.UserManagment.ViewModel.Group;
+using System.Collections.Generic;
 
 namespace NeuroPi.UserManagment.Services.Interface
 {
     public interface IGroupService
     {
         List<GroupVM> GetAll();
-        GroupVM GetById(int id);
+        GroupVM GetByGroupId(int groupId); 
+        GroupVM GetByTenantAndGroupId(int tenantId, int groupId);
         GroupVM Create(GroupInputVM input);
-        GroupVM Update(int id, GroupUpdateInputVM input);
-        bool Delete(int id);
-
+        GroupVM Update(int groupId, GroupUpdateInputVM input); 
+        bool Delete(int groupId);  
         List<GroupVM> GetByTenantId(int tenantId);
-
     }
 }
