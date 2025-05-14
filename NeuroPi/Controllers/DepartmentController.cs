@@ -4,6 +4,7 @@ using NeuroPi.UserManagment.Response;
 using NeuroPi.UserManagment.Services.Interface;
 using NeuroPi.UserManagment.ViewModel.Department;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 
 namespace NeuroPi.UserManagment.Controllers
 {
@@ -19,6 +20,7 @@ namespace NeuroPi.UserManagment.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public ResponseResult<List<DepartmentResponseVM>> GetAll()
         {
             var data = _service.GetAllDepartments();
@@ -39,6 +41,7 @@ namespace NeuroPi.UserManagment.Controllers
                 data != null ? "Department found" : "Not found"
             );
         }
+
 
         [HttpGet("{id}/tenant/{tenantId}")]
         public ResponseResult<DepartmentResponseVM> GetByIdAndTenantId(int id, int tenantId)
