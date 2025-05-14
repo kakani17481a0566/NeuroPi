@@ -1,21 +1,21 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿    using System.ComponentModel.DataAnnotations;
 
-namespace NeuroPi.UserManagment.ViewModel.GroupUser
-{
-    public class GroupUserUpdateVM
+    namespace NeuroPi.UserManagment.ViewModel.GroupUser
     {
-        public int GroupId { get; set; }
+        public class GroupUserUpdateVM
+        {
+            public int GroupId { get; set; }
 
-        public int UserId { get; set; }
-
-        public int TenantId { get; set; }
-
-        [Required]
-        public DateTime UpdatedOn { get; set; }
-
-        [Required]
-        public int UpdatedBy { get; set; }
+            public int UserId { get; set; }
 
 
+
+            [Required]
+            public DateTime UpdatedOn { get; set; }
+
+            [Required]
+            public int UpdatedBy { get; set; }
+
+
+        }
     }
-}
