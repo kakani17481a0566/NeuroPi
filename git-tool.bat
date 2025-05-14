@@ -184,44 +184,13 @@ for /f "tokens=*" %%a in ('git branch -r') do (
 )
 goto pause_return
 
-:: Commit and push changes
+:: Commit and push changes (without tmp files)
 :commit_push
 echo.
-git diff --name-only --cached > tmp_status.txt
-git diff --name-only >> tmp_status.txt
-git ls-files --others --exclude-standard >> tmp_status.txt
-
-sort tmp_status.txt > tmp_status_sorted.txt
-
-set "prevLine="
-(
-    for /f "delims=" %%f in (tmp_status_sorted.txt) do (
-        if "%%f" neq "!prevLine!" (
-            echo %%f
-            set "prevLine=%%f"
-        )
-    )
-) > tmp_status_filtered.txt
-
-set "hasChanges="
-for /f "usebackq delims=" %%f in ("tmp_status_filtered.txt") do (
-    set "hasChanges=1"
-    goto :has_changes
-)
-
-:has_changes
-if not defined hasChanges (
-    echo No changes to commit.
-    del tmp_status.txt 2>nul
-    del tmp_status_sorted.txt 2>nul
-    del tmp_status_filtered.txt 2>nul
-    goto pause_return
-)
-
-set msg=Updated:
+set "msg=Updated:"
 setlocal EnableDelayedExpansion
 set fileCount=0
-for /f "usebackq delims=" %%f in ("tmp_status_filtered.txt") do (
+for /f "delims=" %%f in ('git diff --name-only --cached') do (
     set /a fileCount+=1
     if !fileCount! leq 5 (
         set "file=%%~nxf"
@@ -237,10 +206,6 @@ endlocal & set msg=%msg%
 call :progress_line "Committing changes"
 git add . || goto error
 git commit -m "%msg%" || goto error
-
-del tmp_status.txt 2>nul
-del tmp_status_sorted.txt 2>nul
-del tmp_status_filtered.txt 2>nul
 
 for /f %%b in ('git branch --show-current') do set currentBranch=%%b
 call :progress_line "Pushing %currentBranch%"
