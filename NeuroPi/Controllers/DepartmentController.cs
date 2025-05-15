@@ -19,6 +19,7 @@ namespace NeuroPi.UserManagment.Controllers
             _service = service;
         }
 
+        // GET api/departments
         [HttpGet]
         [Authorize]
         public ResponseResult<List<DepartmentResponseVM>> GetAll()
@@ -31,6 +32,7 @@ namespace NeuroPi.UserManagment.Controllers
             );
         }
 
+        // GET api/departments/{id}
         [HttpGet("{id}")]
         public ResponseResult<DepartmentResponseVM> GetById(int id)
         {
@@ -42,7 +44,7 @@ namespace NeuroPi.UserManagment.Controllers
             );
         }
 
-
+        // GET api/departments/{id}/tenant/{tenantId}
         [HttpGet("{id}/tenant/{tenantId}")]
         public ResponseResult<DepartmentResponseVM> GetByIdAndTenantId(int id, int tenantId)
         {
@@ -54,6 +56,7 @@ namespace NeuroPi.UserManagment.Controllers
             );
         }
 
+        // GET api/departments/tenant/{tenantId}
         [HttpGet("tenant/{tenantId}")]
         public ResponseResult<List<DepartmentResponseVM>> GetByTenantId(int tenantId)
         {
@@ -65,6 +68,7 @@ namespace NeuroPi.UserManagment.Controllers
             );
         }
 
+        // POST api/departments
         [HttpPost]
         public ResponseResult<DepartmentResponseVM> Add([FromBody] DepartmentCreateVM vm)
         {
@@ -79,6 +83,7 @@ namespace NeuroPi.UserManagment.Controllers
             );
         }
 
+        // PUT api/departments/{id}/tenant/{tenantId}
         [HttpPut("{id}/tenant/{tenantId}")]
         public ResponseResult<DepartmentResponseVM> Update(int id, int tenantId, [FromBody] DepartmentUpdateVM vm)
         {
@@ -93,6 +98,7 @@ namespace NeuroPi.UserManagment.Controllers
             );
         }
 
+        // DELETE api/departments/{id}/tenant/{tenantId}
         [HttpDelete("{id}/tenant/{tenantId}")]
         public ResponseResult<bool> Delete(int id, int tenantId)
         {
