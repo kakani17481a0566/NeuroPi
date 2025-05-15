@@ -1,6 +1,11 @@
-﻿using NeuroPi.UserManagment.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using NeuroPi.UserManagment.Model;
 using NeuroPi.UserManagment.Services.Interface;
+using NeuroPi.UserManagment.ViewModel.UserRoles;
+using Microsoft.EntityFrameworkCore;
+using NeuroPi.UserManagment.Data;
 
 namespace NeuroPi.UserManagment.Services.Implementation
 {
@@ -14,51 +19,144 @@ namespace NeuroPi.UserManagment.Services.Implementation
         }
 
         // Get all non-deleted user roles
-        public List<MUserRole> GetAll()
+        public List<UserRoleVM> GetAll()
         {
-            return _context.UserRoles.Where(x => !x.IsDeleted).ToList();
+            var roles = _context.UserRoles
+                .Where(x => !x.IsDeleted)
+                .Include(x => x.User) 
+                .Include(x => x.Role) 
+                .Include(x => x.Tenant) 
+                .Select(r => new UserRoleVM
+                {
+                    UserRoleId = r.UserRoleId,
+                    UserId = r.UserId,
+                    RoleId = r.RoleId,
+                    TenantId = r.TenantId
+                }).ToList();
+
+            return roles;
         }
 
-        // Get a non-deleted user role by ID
-        public MUserRole GetById(int id)
+        public UserRoleVM GetUserRoleById(int id)
         {
-            return _context.UserRoles.FirstOrDefault(x => x.UserRoleId == id && !x.IsDeleted);
+            var role = _context.UserRoles
+                .Where(x => x.UserRoleId == id && !x.IsDeleted)
+                .Include(x => x.User)
+                .Include(x => x.Role)
+                .Include(x => x.Tenant)
+                .FirstOrDefault();
+
+            if (role == null) return null;
+
+            return new UserRoleVM
+            {
+                UserRoleId = role.UserRoleId,
+                UserId = role.UserId,
+                RoleId = role.RoleId,
+                TenantId = role.TenantId
+            };
         }
 
-        // Create a new user role
-        public MUserRole Create(MUserRole userRole)
+        public UserRoleVM Create(UserRoleCreateVM userRole)
         {
-            userRole.IsDeleted = false; // Default value for IsDeleted
-            _context.UserRoles.Add(userRole);
+            var entity = new MUserRole
+            {
+                UserId = userRole.UserId,
+                RoleId = userRole.RoleId,
+                TenantId = userRole.TenantId,
+                CreatedBy = userRole.CreatedBy,
+                CreatedOn = DateTime.UtcNow,
+                IsDeleted = false
+            };
+
+            _context.UserRoles.Add(entity);
             _context.SaveChanges();
-            return userRole;
+
+            return new UserRoleVM
+            {
+                UserRoleId = entity.UserRoleId,
+                UserId = entity.UserId,
+                RoleId = entity.RoleId,
+                TenantId = entity.TenantId
+            };
         }
 
-        // Update an existing user role
-        public MUserRole Update(int id, MUserRole userRole)
+        public UserRoleVM Update(int id, UserRoleUpdateVM userRole)
         {
-            var existing = _context.UserRoles.FirstOrDefault(x => x.UserRoleId == id && !x.IsDeleted);
-            if (existing == null) return null;
+            var existingRole = _context.UserRoles
+                .Where(x => x.UserRoleId == id && !x.IsDeleted)
+                .FirstOrDefault();
 
-            existing.UserId = userRole.UserId;
-            existing.RoleId = userRole.RoleId;
-            existing.TenantId = userRole.TenantId;
-            existing.UpdatedBy = userRole.UpdatedBy;
-            existing.UpdatedOn = DateTime.UtcNow;
+            if (existingRole == null)
+                return null;
+
+            existingRole.UserId = userRole.UserId;
+            existingRole.RoleId = userRole.RoleId;
+            existingRole.UpdatedBy = userRole.UpdatedBy;
+            existingRole.UpdatedOn = DateTime.UtcNow;
 
             _context.SaveChanges();
-            return existing;
+
+            return new UserRoleVM
+            {
+                UserRoleId = existingRole.UserRoleId,
+                UserId = existingRole.UserId,
+                RoleId = existingRole.RoleId,
+                TenantId = existingRole.TenantId
+            };
         }
 
-        // Soft delete a user role by setting IsDeleted to true
-        public bool Delete(int id)
+        public bool DeleteByTenantIdAndId(int tenantId, int id)
         {
-            var existing = _context.UserRoles.FirstOrDefault(x => x.UserRoleId == id && !x.IsDeleted);
-            if (existing == null) return false;
+            var existingRole = _context.UserRoles
+                .Where(x => x.UserRoleId == id && x.TenantId == tenantId && !x.IsDeleted)
+                .FirstOrDefault();
 
-            existing.IsDeleted = true;
+            if (existingRole == null)
+                return false;
+
+            existingRole.IsDeleted = true;
             _context.SaveChanges();
             return true;
+        }
+
+        public List<UserRoleVM> GetUserRolesByTenantId(int tenantId)
+        {
+            var roles = _context.UserRoles
+                .Where(x => x.TenantId == tenantId && !x.IsDeleted)
+                .Include(x => x.User)
+                .Include(x => x.Role)
+                .Include(x => x.Tenant)
+                .Select(r => new UserRoleVM
+                {
+                    UserRoleId = r.UserRoleId,
+                    UserId = r.UserId,
+                    RoleId = r.RoleId,
+                    TenantId = r.TenantId
+                }).ToList();
+
+            return roles;
+        }
+
+        public UserRoleVM GetUserRoleByTenantIdAndId(int tenantId, int id)
+        {
+            var role = _context.UserRoles
+                .Where(x => x.UserRoleId == id && x.TenantId == tenantId && !x.IsDeleted)
+                .Include(x => x.User)
+                .Include(x => x.Role)
+                .Include(x => x.Tenant)
+                .FirstOrDefault();
+
+            if (role == null)
+                return null;
+
+            return new UserRoleVM
+            {
+                UserRoleId = role.UserRoleId,
+                UserId = role.UserId,
+                RoleId = role.RoleId,
+                TenantId = role.TenantId
+            };
         }
     }
 }
