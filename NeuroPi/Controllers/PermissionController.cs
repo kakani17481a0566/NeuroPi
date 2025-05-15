@@ -52,9 +52,9 @@ namespace NeuroPi.UserManagment.Controllers
         }
 
         [HttpDelete("id")]
-        public ResponseResult<Object> DeleteById(int id)
+        public ResponseResult<Object> DeleteById(int id,int tenantId)
         {
-            var result = _permissionService.DeletePermission(id);
+            var result = _permissionService.DeletePermission(id,tenantId);
             if (result != null)
             {
                 return new ResponseResult<object>(HttpStatusCode.OK, null, "Permission Deleted Successfully");

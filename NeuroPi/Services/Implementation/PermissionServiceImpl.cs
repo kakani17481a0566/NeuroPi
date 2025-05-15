@@ -20,9 +20,9 @@ namespace NeuroPi.UserManagment.Services.Implementation
             return PermissionResponseVM.ToViewModel(PermisssionModel);
         }
 
-        public MPermission DeletePermission(int id)
+        public MPermission DeletePermission(int id,int tenantId)
         {
-            var result = _context.Permissions.Where(p=>!p.IsDeleted).FirstOrDefault(p => p.PermissionId == id);
+            var result = _context.Permissions.Where(p=>!p.IsDeleted).FirstOrDefault(p => p.PermissionId == id && p.TenantId==tenantId);
             if (result != null)
             {
                 result.IsDeleted = true;
