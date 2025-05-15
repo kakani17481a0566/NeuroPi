@@ -52,7 +52,7 @@ namespace NeuroPi.UserManagment.Controllers
         }
 
         [HttpGet("id")]
-
+        
         public ResponseResult<UserResponseVM> GetUserById(int id)
         {
             var result = _userService.GetUser(id);
@@ -64,9 +64,9 @@ namespace NeuroPi.UserManagment.Controllers
         }
         [HttpPut]
 
-        public ResponseResult<UserResponseVM> UpdateUser(int id, int tenantId, UserUpdateRequestVM updateUser)
+        public ResponseResult<UserResponseVM> UpdateUser(int id,int tenantId,UserUpdateRequestVM updateUser)
         {
-            var result = _userService.UpdateUser(id, tenantId, updateUser);
+            var result = _userService.UpdateUser(id,tenantId,updateUser);
             if (result != null)
             {
                 return new ResponseResult<UserResponseVM>(HttpStatusCode.OK, result, "User updated  successfully");
@@ -75,9 +75,9 @@ namespace NeuroPi.UserManagment.Controllers
         }
 
         [HttpDelete]
-        public ResponseResult<Object> DeleteUserById(int id, int tenantId)
+        public ResponseResult<Object> DeleteUserById(int id,int tenantId)
         {
-            var result = _userService.DeleteUser(id, tenantId);
+            var result = _userService.DeleteUser(id,tenantId);
             if (result != null)
             {
                 return new ResponseResult<Object>(HttpStatusCode.OK, null, "User Deleted successfully");

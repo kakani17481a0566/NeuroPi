@@ -19,6 +19,6 @@ namespace NeuroPi.UserManagment.Services.Interface
 
         UserResponseVM UpdateUser(int id, int tenantId, UserUpdateRequestVM userUpdate);
 
-        UserResponseVM DeleteUser(int id, int tenantId);
+        UserResponseVM DeleteUser(int id,int tenantId);
     }
 }

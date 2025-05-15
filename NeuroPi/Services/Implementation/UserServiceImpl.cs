@@ -64,7 +64,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
         public List<UserResponseVM> GetAllUsers()
         {
-            var result = _context.Users.Where(r => !r.IsDeleted).ToList();
+            var result=_context.Users.Where(r=>!r.IsDeleted).ToList();
             if (result != null)
             {
                 return UserResponseVM.ToViewModelList(result);
@@ -74,7 +74,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
         public UserResponseVM GetUser(int id)
         {
-            var result = _context.Users.FirstOrDefault(r => r.UserId == id && !r.IsDeleted);
+            var result = _context.Users.FirstOrDefault(r=>r.UserId==id && !r.IsDeleted);
             if (result != null)
             {
                 return UserResponseVM.ToViewModel(result);
@@ -85,7 +85,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
         public UserResponseVM GetUserByIdAndTenantId(int id, int tenantId)
         {
-            var user = _context.Users.FirstOrDefault(u => u.UserId == id && u.TenantId == tenantId && !u.IsDeleted);
+            var user=_context.Users.FirstOrDefault(u=>u.UserId==id && u.TenantId==tenantId && !u.IsDeleted);
             if (user != null)
             {
                 return UserResponseVM.ToViewModel(user);
@@ -95,8 +95,8 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
         public List<UserResponseVM> GetAllUsersByTenantId(int tenantId)
         {
-            var users = _context.Users.Where(u => u.TenantId == tenantId && !u.IsDeleted).ToList();
-            if (users != null && users.Count > 0)
+            var users=_context.Users.Where(u=>u.TenantId==tenantId && !u.IsDeleted).ToList();
+            if(users != null && users.Count > 0)
             {
                 return UserResponseVM.ToViewModelList(users);
             }
@@ -105,16 +105,16 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
         public UserResponseVM AddUser(UserRequestVM request)
         {
-            MUser user = UserRequestVM.ToModel(request);
+            MUser user =UserRequestVM.ToModel(request);
             _context.Users.Add(user);
             _context.SaveChanges();
-            return UserResponseVM.ToViewModel(user);
+            return UserResponseVM.ToViewModel(user) ;
 
         }
 
         public UserResponseVM UpdateUser(int id, int tenantId, UserUpdateRequestVM userUpdate)
         {
-            var user = _context.Users.FirstOrDefault(u => u.UserId == id && u.TenantId == tenantId && !u.IsDeleted);
+            var user=_context.Users.FirstOrDefault(u=>u.UserId==id && u.TenantId==tenantId && !u.IsDeleted);
             if (user != null)
             {
                 user.Username = userUpdate.Username;
@@ -137,9 +137,9 @@ namespace NeuroPi.UserManagment.Services.Implementation
             return null;
         }
 
-        public UserResponseVM DeleteUser(int id, int tenantId)
+        public UserResponseVM DeleteUser(int id,int tenantId)
         {
-            var user = _context.Users.FirstOrDefault(u => u.UserId == id && u.TenantId == tenantId && !u.IsDeleted);
+            var user=_context.Users.FirstOrDefault(u=>u.UserId == id && u.TenantId==tenantId && !u.IsDeleted);
             if (user != null)
             {
                 user.IsDeleted = true;
