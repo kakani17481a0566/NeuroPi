@@ -18,8 +18,6 @@ namespace NeuroPi.UserManagment.Controllers
             _groupService = groupService;
         }
 
-       
-
         // Get all groups
         [HttpGet]
         public ResponseResult<object> GetAll()
@@ -31,7 +29,6 @@ namespace NeuroPi.UserManagment.Controllers
                 {
                     return new ResponseResult<object>(HttpStatusCode.NotFound, null, "No groups found");
                 }
-
                 return new ResponseResult<object>(HttpStatusCode.OK, groups, "Groups fetched successfully");
             }
             catch (Exception ex)
@@ -51,7 +48,6 @@ namespace NeuroPi.UserManagment.Controllers
                 {
                     return new ResponseResult<object>(HttpStatusCode.NotFound, null, "Group not found");
                 }
-
                 return new ResponseResult<object>(HttpStatusCode.OK, group, "Group fetched successfully");
             }
             catch (Exception ex)
@@ -71,7 +67,6 @@ namespace NeuroPi.UserManagment.Controllers
                 {
                     return new ResponseResult<object>(HttpStatusCode.NotFound, null, "No groups found for the given tenant");
                 }
-
                 return new ResponseResult<object>(HttpStatusCode.OK, groups, "Groups fetched successfully for the tenant");
             }
             catch (Exception ex)
@@ -91,7 +86,6 @@ namespace NeuroPi.UserManagment.Controllers
                 {
                     return new ResponseResult<object>(HttpStatusCode.NotFound, null, "Group not found for the given tenant");
                 }
-
                 return new ResponseResult<object>(HttpStatusCode.OK, group, "Group fetched successfully");
             }
             catch (Exception ex)
@@ -99,10 +93,6 @@ namespace NeuroPi.UserManagment.Controllers
                 return new ResponseResult<object>(HttpStatusCode.InternalServerError, null, ex.Message);
             }
         }
-
-
-
-  
 
         // Create a new group
         [HttpPost]
@@ -128,7 +118,6 @@ namespace NeuroPi.UserManagment.Controllers
             }
         }
 
-   
         // Update an existing group
         [HttpPut("{groupId}/tenant/{tenantId}")]
         public ResponseResult<object> Update(int groupId, int tenantId, [FromBody] GroupUpdateWithTenantVM input)
@@ -152,7 +141,7 @@ namespace NeuroPi.UserManagment.Controllers
                     return new ResponseResult<object>(HttpStatusCode.BadRequest, null, "TenantId does not match");
                 }
 
-                // Proceed with the update (we update only the Name, not the TenantId)
+                // Proceed with the update
                 var updatedGroup = _groupService.Update(groupId, new GroupUpdateInputVM { Name = input.Name });
 
                 return updatedGroup == null
@@ -165,33 +154,23 @@ namespace NeuroPi.UserManagment.Controllers
             }
         }
 
-   
-
         // Delete a group
         [HttpDelete("{groupId}/tenant/{tenantId}")]
         public ResponseResult<bool> Delete(int groupId, int tenantId)
         {
             try
             {
-                // Call the service method to delete the group
-                var success = _groupService.DeleteById(groupId, tenantId); // 0 can be replaced with actual deletedBy user ID if needed
-
-                // Return appropriate HTTP response based on success or failure
+                var success = _groupService.DeleteById(groupId, tenantId);
                 return new ResponseResult<bool>(
-                    success ? HttpStatusCode.OK : HttpStatusCode.BadRequest, // 204 No Content for success
+                    success ? HttpStatusCode.OK : HttpStatusCode.BadRequest,
                     success,
                     success ? "Group deleted successfully" : "Delete failed: Group not found or already deleted"
                 );
             }
             catch (Exception ex)
             {
-                // Handle any exceptions that occur during the delete operation
                 return new ResponseResult<bool>(HttpStatusCode.InternalServerError, false, ex.Message);
             }
         }
-
-
-
-
     }
 }
