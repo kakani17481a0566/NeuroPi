@@ -27,9 +27,11 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 }).ToList();
         }
 
+        // Keep only one GetById method here
         public OrganizationVM GetById(int id)
         {
             var org = _context.Organizations.FirstOrDefault(o => o.OrganizationId == id && !o.IsDeleted);
+
             if (org == null) return null;
 
             return new OrganizationVM
@@ -95,7 +97,6 @@ namespace NeuroPi.UserManagment.Services.Implementation
             return true;
         }
 
-
         public List<OrganizationVM> GetByTenantId(int tenantId)
         {
             return _context.Organizations
@@ -108,7 +109,5 @@ namespace NeuroPi.UserManagment.Services.Implementation
                     TenantId = o.TenantId
                 }).ToList();
         }
-
-
     }
 }

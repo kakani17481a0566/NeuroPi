@@ -1,9 +1,8 @@
 ﻿using System.Net;
-using NeuroPi.UserManagment.Model;
+using Microsoft.AspNetCore.Mvc;
 using NeuroPi.UserManagment.Response;
 using NeuroPi.UserManagment.Services.Interface;
 using NeuroPi.UserManagment.ViewModel.UserRoles;
-using Microsoft.AspNetCore.Mvc;
 
 namespace NeuroPi.UserManagment.Controllers
 {
@@ -11,134 +10,139 @@ namespace NeuroPi.UserManagment.Controllers
     [ApiController]
     public class UserRolesController : ControllerBase
     {
-        private readonly IUserRolesService _service;
+        private readonly IUserRolesService _userRolesService;
 
-        public UserRolesController(IUserRolesService service)
+        public UserRolesController(IUserRolesService userRolesService)
         {
-            _service = service;
+            _userRolesService = userRolesService;
         }
 
-        // GET: api/userroles
+        // GET: api/UserRoles
         [HttpGet]
-        public ResponseResult<List<UserRoleVM>> GetAll()
+        public ResponseResult<List<UserRoleVM>> GetAllUserRoles()
         {
-            var roles = _service.GetAll()
-                .Select(r => new UserRoleVM
-                {
-                    UserRoleId = r.UserRoleId,
-                    UserId = r.UserId,
-                    RoleId = r.RoleId,
-                    TenantId = r.TenantId
-                }).ToList();
+            var result = _userRolesService.GetAll();
+            if (result == null || result.Count == 0)
+            {
+                return new ResponseResult<List<UserRoleVM>>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    "No data for user roles");
+            }
 
             return new ResponseResult<List<UserRoleVM>>(
                 HttpStatusCode.OK,
-                roles,
-                "User roles fetched");
+                result,
+                "User roles fetched successfully");
         }
 
-        // GET: api/userroles/{id}
+        // GET: api/UserRoles/{id}
         [HttpGet("{id}")]
-        public ResponseResult<UserRoleVM> GetById(int id)
+        public ResponseResult<UserRoleVM> GetUserRoleById(int id)
         {
-            var role = _service.GetById(id);
-            if (role == null)
+            var result = _userRolesService.GetUserRoleById(id);
+            if (result == null)
+            {
                 return new ResponseResult<UserRoleVM>(
                     HttpStatusCode.NotFound,
                     null,
                     "User role not found");
-
-            var result = new UserRoleVM
-            {
-                UserRoleId = role.UserRoleId,
-                UserId = role.UserId,
-                RoleId = role.RoleId,
-                TenantId = role.TenantId
-            };
+            }
 
             return new ResponseResult<UserRoleVM>(
                 HttpStatusCode.OK,
                 result,
-                "User role found");
+                "User role fetched successfully");
         }
 
-        // POST: api/userroles
+        // POST: api/UserRoles
         [HttpPost]
-        public ResponseResult<UserRoleVM> Create([FromBody] UserRoleCreateVM input)
+        public ResponseResult<UserRoleVM> AddUserRole([FromBody] UserRoleCreateVM userRole)
         {
-            var entity = new MUserRole
+            var result = _userRolesService.Create(userRole);
+            if (result == null)
             {
-                UserId = input.UserId,
-                RoleId = input.RoleId,
-                TenantId = input.TenantId,
-                CreatedBy = input.CreatedBy,
-                CreatedOn = DateTime.UtcNow
-            };
-
-            var created = _service.Create(entity);
-
-            var result = new UserRoleVM
-            {
-                UserRoleId = created.UserRoleId,
-                UserId = created.UserId,
-                RoleId = created.RoleId,
-                TenantId = created.TenantId
-            };
+                return new ResponseResult<UserRoleVM>(HttpStatusCode.NotAcceptable, null, "Failed to create user role");
+            }
 
             return new ResponseResult<UserRoleVM>(
                 HttpStatusCode.Created,
                 result,
-                "User role created");
+                "User role created successfully");
         }
 
-        // PUT: api/userroles/{id}
+        // PUT: api/UserRoles/{id}
         [HttpPut("{id}")]
-        public ResponseResult<UserRoleVM> Update(int id, [FromBody] UserRoleUpdateVM input)
+        public ResponseResult<UserRoleVM> UpdateUserRoleById(int id, [FromBody] UserRoleUpdateVM userRole)
         {
-            var entity = new MUserRole
+            var result = _userRolesService.Update(id, userRole);
+            if (result == null)
             {
-                UserId = input.UserId,
-                RoleId = input.RoleId,
-                TenantId = input.TenantId,
-                UpdatedBy = input.UpdatedBy
-            };
-
-            var updated = _service.Update(id, entity);
-            if (updated == null)
-                return new ResponseResult<UserRoleVM>(
-                    HttpStatusCode.NotFound,
-                    null,
-                    "User role not found");
-
-            var result = new UserRoleVM
-            {
-                UserRoleId = updated.UserRoleId,
-                UserId = updated.UserId,
-                RoleId = updated.RoleId,
-                TenantId = updated.TenantId
-            };
+                return new ResponseResult<UserRoleVM>(HttpStatusCode.NotFound, null, "User role not found");
+            }
 
             return new ResponseResult<UserRoleVM>(
                 HttpStatusCode.OK,
                 result,
-                "User role updated");
+                "User role updated successfully");
         }
 
-        // DELETE: api/userroles/{id}
-        [HttpDelete("{id}")]
-        public ResponseResult<object> Delete(int id)
+        // DELETE: api/UserRoles/{id}
+        // DELETE: api/UserRoles/Tenant/{tenantId}/id/{id}
+        [HttpDelete("Tenant/{tenantId}/id/{id}")]
+        public ResponseResult<object> DeleteUserRoleByTenantIdAndId(int tenantId, int id)
         {
-            var success = _service.Delete(id);
-            if (!success)
+            var result = _userRolesService.DeleteByTenantIdAndId(tenantId, id);
+            if (result)
+            {
                 return new ResponseResult<object>(
-                    HttpStatusCode.NotFound,
+                    HttpStatusCode.OK,
                     null,
-                    "User role not found");
+                    "User role deleted successfully by tenantId and id");
+            }
 
             return new ResponseResult<object>(
-                HttpStatusCode.OK,
+                HttpStatusCode.BadRequest,
                 null,
-                "User role deleted");
+                $"User role not found with tenantId {tenantId} and id {id}");
+        }
+
+        // GET: api/UserRoles/Tenant/{tenantId}
+        [HttpGet("Tenant/{tenantId}")]
+        public ResponseResult<List<UserRoleVM>> GetUserRolesByTenantId(int tenantId)
+        {
+            var result = _userRolesService.GetUserRolesByTenantId(tenantId);
+            if (result == null || result.Count == 0)
+            {
+                return new ResponseResult<List<UserRoleVM>>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    "No data for user roles for the provided tenant");
+            }
+
+            return new ResponseResult<List<UserRoleVM>>(
+                HttpStatusCode.OK,
+                result,
+                "User roles fetched successfully for the tenant");
+        }
+
+        // GET: api/UserRoles/Tenant/{tenantId}/{id}
+        [HttpGet("Tenant/{tenantId}/{id}")]
+        public ResponseResult<UserRoleVM> GetUserRoleByTenantIdAndId(int tenantId, int id)
+        {
+            var result = _userRolesService.GetUserRoleByTenantIdAndId(tenantId, id);
+            if (result == null)
+            {
+                return new ResponseResult<UserRoleVM>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    "User role not found for the provided TenantId and Id");
+            }
+
+            return new ResponseResult<UserRoleVM>(
+                HttpStatusCode.OK,
+                result,
+                "User role fetched successfully for the tenant");
         }
     }
 }

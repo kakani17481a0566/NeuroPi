@@ -10,7 +10,7 @@ using NeuroPi.UserManagment.ViewModel.User;
 
 namespace NeuroPi.UserManagment.Services.Implementation
 {
-    public class UserServiceImpl:IUserService
+    public class UserServiceImpl : IUserService
     {
         private readonly NeuroPiDbContext _context;
 
@@ -23,7 +23,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
         public UserLogInSucessVM LogIn(string username, string password)
         {
-            var user=_context.Users.Where(u=>!u.IsDeleted).FirstOrDefault(u=>u.Username==username && u.Password==password);
+            var user = _context.Users.Where(u => !u.IsDeleted).FirstOrDefault(u => u.Username == username && u.Password == password);
             if (user != null)
             {
                 string token = GenerateJwtToken(user);

@@ -52,6 +52,8 @@ namespace NeuroPi.UserManagment.Services.Implementation
             {
                 Name = input.Name,
                 TenantId = input.TenantId,
+                CreatedBy = input.CreatedBy,
+
                 IsDeleted = false
             };
 
@@ -71,16 +73,33 @@ namespace NeuroPi.UserManagment.Services.Implementation
             var group = _context.Groups.FirstOrDefault(g => g.GroupId == groupId && !g.IsDeleted);
             if (group == null) return null;
 
-            group.Name = input.Name;
+            // Update the Name, Description and CreatedBy fields if they are provided
+            if (!string.IsNullOrEmpty(input.Name))
+            {
+                group.Name = input.Name;
+                group.UpdatedBy= input.UpdatedBy;  // Update UpdatedBy if provided
+                group.UpdatedOn = DateTime.UtcNow;  // Update UpdatedOn to current time
+            }
+
+
+          
+            // Save changes to the database
             _context.SaveChanges();
 
+            // Return the updated Group ViewModel
             return new GroupVM
             {
                 GroupId = group.GroupId,
                 Name = group.Name,
-                TenantId = group.TenantId
+                TenantId = group.TenantId,
+
+                UpdatedBy =group.UpdatedBy,
+
+                CreatedBy = group.CreatedBy,
+                IsDeleted = group.IsDeleted
             };
         }
+
 
         // Soft delete a group
         public bool DeleteById(int groupId, int tenantId)

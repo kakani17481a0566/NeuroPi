@@ -18,7 +18,7 @@ namespace NeuroPi.UserManagment.Controllers
             _groupService = groupService;
         }
 
-        #region GET Methods
+       
 
         // Get all groups
         [HttpGet]
@@ -100,9 +100,9 @@ namespace NeuroPi.UserManagment.Controllers
             }
         }
 
-        #endregion
 
-        #region POST Method
+
+  
 
         // Create a new group
         [HttpPost]
@@ -128,10 +128,7 @@ namespace NeuroPi.UserManagment.Controllers
             }
         }
 
-        #endregion
-
-        #region PUT Method
-
+   
         // Update an existing group
         [HttpPut("{groupId}/tenant/{tenantId}")]
         public ResponseResult<object> Update(int groupId, int tenantId, [FromBody] GroupUpdateWithTenantVM input)
@@ -168,9 +165,7 @@ namespace NeuroPi.UserManagment.Controllers
             }
         }
 
-        #endregion
-
-        #region DELETE Method
+   
 
         // Delete a group
         [HttpDelete("{groupId}/tenant/{tenantId}")]
@@ -198,6 +193,5 @@ namespace NeuroPi.UserManagment.Controllers
 
 
 
-        #endregion
     }
 }

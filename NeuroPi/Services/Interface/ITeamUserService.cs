@@ -10,9 +10,9 @@ public interface ITeamUserService
 
     TeamUserResponseVM UpdateTeamUser(int id, TeamUserRequestVM teamUser);
 
-    bool DeleteTeamUserByTenantIdAndId(int tenantId, int id); // Safe delete method
+    bool DeleteTeamUserByTenantIdAndId(int tenantId, int id); 
 
-    List<TeamUserResponseVM> GetTeamUsersByTenantId(int tenantId); // Method for getting team users by tenantId
+    List<TeamUserResponseVM> GetTeamUsersByTenantId(int tenantId);
 
-    TeamUserResponseVM GetTeamUserByTenantIdAndId(int tenantId, int id); // New method to get by tenantId and id
+    TeamUserResponseVM GetTeamUserByTenantIdAndId(int tenantId, int id);
 }

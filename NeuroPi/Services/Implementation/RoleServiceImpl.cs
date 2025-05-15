@@ -30,7 +30,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
             if (role == null)
             {
-                return false; // Role not found or mismatch with tenantId and id
+                return false;
             }
 
             // Mark the role as deleted (soft delete)
@@ -60,21 +60,21 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
         public RoleResponseVM UpdateRoleByTenantIdAndId(int tenantId, int id, RoleRequestVM roleRequestVM)
         {
-            // Find the role by both tenantId and roleId
+           
             var existingRole = _context.Roles
                 .Where(r => !r.IsDeleted && r.TenantId == tenantId && r.RoleId == id)
                 .FirstOrDefault();
 
             if (existingRole == null)
             {
-                return null; // Role not found or mismatch with tenantId and id
+                return null;
             }
 
-            // Update only the properties that can be changed, not the tenantId
+        
             existingRole.Name = roleRequestVM.Name;
 
-            // Optionally, update other fields if required but avoid updating tenantId
-            existingRole.UpdatedOn = DateTime.UtcNow; // Example field, if you have other fields to update
+          
+            existingRole.UpdatedOn = DateTime.UtcNow;
 
             var result = _context.SaveChanges();
             return result > 0 ? RoleResponseVM.ToViewModel(existingRole) : null;

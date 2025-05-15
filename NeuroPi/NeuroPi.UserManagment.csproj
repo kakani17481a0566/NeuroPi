@@ -7,13 +7,6 @@
       </PropertyGroup>
 
       <ItemGroup>
-        <Compile Remove="ViewModel\NewFolder\**" />
-        <Content Remove="ViewModel\NewFolder\**" />
-        <EmbeddedResource Remove="ViewModel\NewFolder\**" />
-        <None Remove="ViewModel\NewFolder\**" />
-      </ItemGroup>
-
-      <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.16" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.4" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />

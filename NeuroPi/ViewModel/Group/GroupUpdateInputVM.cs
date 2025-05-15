@@ -2,6 +2,7 @@
 {
     public class GroupUpdateInputVM
     {
-        public string Name { get; set; }   // Only Name is allowed to be updated, not TenantId
+        public string Name { get; set; }  // Name of the group, which can be updated
+        public int? UpdatedBy { get; set; }  // Nullable UpdatedBy field
     }
 }
