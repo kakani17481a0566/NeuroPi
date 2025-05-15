@@ -52,6 +52,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
             {
                 Name = input.Name,
                 TenantId = input.TenantId,
+                CreatedBy = input.CreatedBy,
 
                 IsDeleted = false
             };
@@ -76,14 +77,12 @@ namespace NeuroPi.UserManagment.Services.Implementation
             if (!string.IsNullOrEmpty(input.Name))
             {
                 group.Name = input.Name;
+                group.UpdatedBy= input.UpdatedBy;  // Update UpdatedBy if provided
+                group.UpdatedOn = DateTime.UtcNow;  // Update UpdatedOn to current time
             }
 
 
-            if (input.CreatedBy.HasValue)
-            {
-                group.CreatedBy = input.CreatedBy.Value;  // Update CreatedBy if provided
-            }
-
+          
             // Save changes to the database
             _context.SaveChanges();
 
@@ -93,7 +92,9 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 GroupId = group.GroupId,
                 Name = group.Name,
                 TenantId = group.TenantId,
-              
+
+                UpdatedBy =group.UpdatedBy,
+
                 CreatedBy = group.CreatedBy,
                 IsDeleted = group.IsDeleted
             };
