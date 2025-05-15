@@ -13,7 +13,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
-{   options.SwaggerDoc("v1", new OpenApiInfo { Title = "NeuroPi.UserManagment", Version = "v1" });
+{
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "NeuroPi.UserManagment", Version = "v1" });
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = @"JWT Authorization header using the Bearer scheme. \r\n\r\n 
@@ -28,77 +29,75 @@ builder.Services.AddSwaggerGen(options =>
     options.AddSecurityRequirement(new OpenApiSecurityRequirement()
     {
         {
-          new OpenApiSecurityScheme
-          {
-            Reference = new OpenApiReference
+            new OpenApiSecurityScheme
             {
-                Type = ReferenceType.SecurityScheme,
-                Id = "Bearer"
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                },
+                Scheme = "oauth2",
+                Name = "Bearer",
+                In = ParameterLocation.Header,
             },
-              Scheme = "oauth2",
-              Name = "Bearer",
-              In = ParameterLocation.Header,
-
-          },
             new List<string>()
         }
     });
- 
-
 });
 
-    // Register application services
-    builder.Services.AddScoped<ITenantService, TenantServiceImpl>();
-    builder.Services.AddScoped<IDepartmentService, DepartmentServiceImpl>();
-    builder.Services.AddScoped<IGroupService, GroupServiceImpl>();
-    builder.Services.AddScoped<IOrganizationService, OrganizationImpl>();
-    builder.Services.AddScoped<IGroupUserService, GroupUserServiceImpl>();
-    builder.Services.AddScoped<IRolePermissionService, RolePermissionServiceImpl>();
-    builder.Services.AddScoped<ITeamService, TeamServiceImpl>();
-    builder.Services.AddScoped<IRoleService, RoleServiceImpl>();
-    builder.Services.AddScoped<ITeamUserService, TeamUserServiceImpl>();
-    builder.Services.AddScoped<IPermissionService, PermissionServiceImpl>();
-    builder.Services.AddScoped<IUserDepartmentService, UserDepartmentServiceImpl>();
+// Register application services
+builder.Services.AddScoped<ITenantService, TenantServiceImpl>();
+builder.Services.AddScoped<IDepartmentService, DepartmentServiceImpl>();
+builder.Services.AddScoped<IGroupService, GroupServiceImpl>();
+builder.Services.AddScoped<IOrganizationService, OrganizationImpl>();
+builder.Services.AddScoped<IGroupUserService, GroupUserServiceImpl>();
+builder.Services.AddScoped<IRolePermissionService, RolePermissionServiceImpl>();
+builder.Services.AddScoped<ITeamService, TeamServiceImpl>();
+builder.Services.AddScoped<IRoleService, RoleServiceImpl>();
+builder.Services.AddScoped<ITeamUserService, TeamUserServiceImpl>();
+builder.Services.AddScoped<IPermissionService, PermissionServiceImpl>();
+builder.Services.AddScoped<IUserDepartmentService, UserDepartmentServiceImpl>();
+builder.Services.AddScoped<IConfigService, ConfigServiceImpl>();
+builder.Services.AddScoped<IUserRolesService, UserRolesServiceImpl>();
+builder.Services.AddScoped<IUserService, UserServiceImpl>();
 
-    //builder.Services.AddScoped<IUserService, UserServiceImpl>();
-    builder.Services.AddScoped<IUserRolesService, UserRolesServiceImpl>();
-    builder.Services.AddScoped<IUserService, UserServiceImpl>();
-    builder.Services.AddAuthentication(options =>
+// Configure authentication with JWT Bearer
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
     {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    }).AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
-        };
-    });
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+    };
+});
 
+// Configure DbContext
+builder.Services.AddDbContext<NeuroPiDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+);
 
+var app = builder.Build();
 
+// Configure the HTTP request pipeline
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
-    builder.Services.AddDbContext<NeuroPiDbContext>(options =>
-        options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
-    );
+app.UseHttpsRedirection();
+app.UseAuthentication(); // Add this line for authentication
+app.UseAuthorization();
 
-    var app = builder.Build();
-
-    // Configure HTTP request pipeline
-    if (app.Environment.IsDevelopment())
-    {
-        app.UseSwagger();
-        app.UseSwaggerUI();
-    }
-
-    app.UseHttpsRedirection();
-    app.UseAuthorization();
-    app.MapControllers();
-    app.Run();
-    
+app.MapControllers();
+app.Run();
