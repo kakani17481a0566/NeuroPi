@@ -34,15 +34,22 @@ namespace NeuroPi.UserManagment.Services.Implementation
             return null;
         }
 
-        public void DeleteTeamUser(int id)
+        public bool DeleteTeamUserByTenantIdAndId(int tenantId, int id)
         {
-            var teamUser = _context.TeamUsers.FirstOrDefault(t => t.TeamUserId == id);
-            if (teamUser != null && !teamUser.IsDeleted)
+            var teamUser = _context.TeamUsers
+                .FirstOrDefault(t => t.TeamUserId == id && t.TenantId == tenantId && !t.IsDeleted);
+
+            if (teamUser == null)
             {
-                teamUser.IsDeleted = true;
-                teamUser.UpdatedOn = DateTime.UtcNow;
-                _context.SaveChanges();
+                return false; // Team user not found or mismatch with tenantId and id
             }
+
+            // Mark the team user as deleted (soft delete)
+            teamUser.IsDeleted = true;
+            teamUser.UpdatedOn = DateTime.UtcNow;
+            _context.SaveChanges();
+
+            return true;
         }
 
         public TeamUserResponseVM GetTeamUserById(int id)
@@ -81,6 +88,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
             return null;
         }
 
+        // Keep only one definition of GetTeamUsersByTenantId
         public List<TeamUserResponseVM> GetTeamUsersByTenantId(int tenantId)
         {
             var result = _context.TeamUsers.Where(t => t.TenantId == tenantId && !t.IsDeleted).ToList();
@@ -90,5 +98,19 @@ namespace NeuroPi.UserManagment.Services.Implementation
             }
             return null;
         }
+
+        public TeamUserResponseVM GetTeamUserByTenantIdAndId(int tenantId, int id)
+        {
+            var result = _context.TeamUsers
+                                 .FirstOrDefault(t => t.TenantId == tenantId && t.TeamUserId == id && !t.IsDeleted);
+
+            if (result != null)
+            {
+                return TeamUserResponseVM.ToViewModel(result);
+            }
+
+            return null; // Return null if no matching team user is found
+        }
+
     }
 }
