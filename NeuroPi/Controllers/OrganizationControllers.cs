@@ -148,5 +148,25 @@ namespace NeuroPi.UserManagment.Controllers
             }
         }
 
+        // GET api/Organization/{id}
+        [HttpGet("{id}")]
+        public ResponseResult<object> GetByIdOnly(int id)
+        {
+            try
+            {
+                var org = _organizationService.GetById(id);
+
+                if (org == null)
+                    return new ResponseResult<object>(HttpStatusCode.NotFound, null, "Organization not found");
+
+                return new ResponseResult<object>(HttpStatusCode.OK, org, "Organization found successfully");
+            }
+            catch (Exception ex)
+            {
+                return new ResponseResult<object>(HttpStatusCode.InternalServerError, null, ex.Message);
+            }
+        }
+
+
     }
 }
