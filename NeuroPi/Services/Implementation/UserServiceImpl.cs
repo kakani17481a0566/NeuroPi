@@ -61,5 +61,92 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
             return tokenValue;
         }
+
+        public List<UserResponseVM> GetAllUsers()
+        {
+            var result=_context.Users.Where(r=>!r.IsDeleted).ToList();
+            if (result != null)
+            {
+                return UserResponseVM.ToViewModelList(result);
+            }
+            return null;
+        }
+
+        public UserResponseVM GetUser(int id)
+        {
+            var result = _context.Users.FirstOrDefault(r=>r.UserId==id && !r.IsDeleted);
+            if (result != null)
+            {
+                return UserResponseVM.ToViewModel(result);
+            }
+            return null;
+
+        }
+
+        public UserResponseVM GetUserByIdAndTenantId(int id, int tenantId)
+        {
+            var user=_context.Users.FirstOrDefault(u=>u.UserId==id && u.TenantId==tenantId && !u.IsDeleted);
+            if (user != null)
+            {
+                return UserResponseVM.ToViewModel(user);
+            }
+            return null;
+        }
+
+        public List<UserResponseVM> GetAllUsersByTenantId(int tenantId)
+        {
+            var users=_context.Users.Where(u=>u.TenantId==tenantId && !u.IsDeleted).ToList();
+            if(users != null && users.Count > 0)
+            {
+                return UserResponseVM.ToViewModelList(users);
+            }
+            return null;
+        }
+
+        public UserResponseVM AddUser(UserRequestVM request)
+        {
+            MUser user =UserRequestVM.ToModel(request);
+            _context.Users.Add(user);
+            _context.SaveChanges();
+            return UserResponseVM.ToViewModel(user) ;
+
+        }
+
+        public UserResponseVM UpdateUser(int id, int tenantId, UserUpdateRequestVM userUpdate)
+        {
+            var user=_context.Users.FirstOrDefault(u=>u.UserId==id && u.TenantId==tenantId && !u.IsDeleted);
+            if (user != null)
+            {
+                user.Username = userUpdate.Username;
+                user.TenantId = tenantId;
+                user.AlternateNumber = userUpdate.AlternateNumber;
+                user.Address = userUpdate.Address;
+                user.Email = userUpdate.Email;
+                user.DateOfBirth = userUpdate.DateOfBirth;
+                user.MiddleName = userUpdate.MiddleName;
+                user.FirstName = userUpdate.FirstName;
+                user.LastName = userUpdate.LastName;
+                user.Password = userUpdate.Password;
+                user.UpdatedBy = userUpdate.UpdatedBy;
+                user.UpdatedOn = DateTime.UtcNow;
+                user.MobileNumber = userUpdate.MobileNumber;
+                user.UserId = id;
+                _context.SaveChanges();
+                return UserResponseVM.ToViewModel(user);
+            }
+            return null;
+        }
+
+        public UserResponseVM DeleteUser(int id,int tenantId)
+        {
+            var user=_context.Users.FirstOrDefault(u=>u.UserId == id && u.TenantId==tenantId && !u.IsDeleted);
+            if (user != null)
+            {
+                user.IsDeleted = true;
+                _context.SaveChanges();
+                return UserResponseVM.ToViewModel(user);
+            }
+            return null;
+        }
     }
 }

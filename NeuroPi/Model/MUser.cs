@@ -51,7 +51,7 @@ namespace NeuroPi.UserManagment.Model
 
         // Personal Information
         [Column("dob")]
-        public DateTime? DateOfBirth { get; set; }
+        public DateOnly DateOfBirth { get; set; }
 
         [Column("address", TypeName = "text")]
         public string? Address { get; set; }

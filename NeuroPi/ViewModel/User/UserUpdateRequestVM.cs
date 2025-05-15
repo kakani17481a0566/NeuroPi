@@ -11,18 +11,14 @@ namespace NeuroPi.UserManagment.ViewModel.User
         public string? MiddleName { get; set; }
 
         public string? LastName { get; set; }
-
-        [EmailAddress]
         public string? Email { get; set; }
 
         public string? Password { get; set; }  // Optional during update
 
         public string? MobileNumber { get; set; }
         public string? AlternateNumber { get; set; }
-        public DateTime? DateOfBirth { get; set; }
+        public DateOnly DateOfBirth { get; set; }
         public string? Address { get; set; }
-
-        public int? TenantId { get; set; }  // Optional during update
 
         public int? UpdatedBy { get; set; }
     }
