@@ -54,6 +54,17 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
         }
 
+        public PermissionResponseVM GetByIdAndTenantId(int id, int tenantId)
+        { 
+            var result=_context.Permissions.FirstOrDefault(p=>p.PermissionId==id &&p.TenantId==tenantId);
+            if (result != null)
+            {
+                return PermissionResponseVM.ToViewModel(result);
+            }
+            return null;
+            
+        }
+
         public List<PermissionResponseVM> GetPermissions()
         {
             var result = _context.Permissions.Where(p => !p.IsDeleted).ToList();
@@ -65,19 +76,20 @@ namespace NeuroPi.UserManagment.Services.Implementation
             return null;
         }
 
-        public PermissionResponseVM UpdatePermission(int id, PermissionRequestVM requestVM)
+        public PermissionResponseVM UpdatePermission(int id,int tenantId, PermissionUpdateRequestVM requestVM)
         {
-            var result = _context.Permissions.Where(p => !p.IsDeleted).FirstOrDefault(p => p.PermissionId == id);
+            var result = _context.Permissions.Where(p => !p.IsDeleted).FirstOrDefault(p => p.PermissionId == id && p.TenantId==tenantId);
             if (result != null)
             {
                 result.PermissionId = id;
                 result.Name = requestVM.Name;
                 result.Description = requestVM.Description;
-                result.TenantId = requestVM.TenantId;
+                result.TenantId = tenantId;
                 _context.SaveChanges();
                 return PermissionResponseVM.ToViewModel(result);
             }
             return null;
         }
+        
     }
 }

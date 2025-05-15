@@ -14,8 +14,10 @@ namespace NeuroPi.UserManagment.Services.Interface
 
         MPermission DeletePermission(int id,int tenantId);
 
-        PermissionResponseVM UpdatePermission(int id,PermissionRequestVM requestVM);
+        PermissionResponseVM UpdatePermission(int id,int tenantId,PermissionUpdateRequestVM requestVM);
 
         List<PermissionResponseVM> GetAllPermissionsByTenantId(int tenantId);
+
+        PermissionResponseVM GetByIdAndTenantId(int id,int tenantId);
     }
 }
