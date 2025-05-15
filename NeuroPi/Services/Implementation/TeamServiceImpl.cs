@@ -1,6 +1,7 @@
 ﻿using NeuroPi.UserManagment.Data;
 using NeuroPi.UserManagment.Model;
 using NeuroPi.UserManagment.Services.Interface;
+using NeuroPi.UserManagment.ViewModel.Team;
 
 namespace NeuroPi.UserManagment.Services.Implementation
 {
@@ -22,10 +23,15 @@ namespace NeuroPi.UserManagment.Services.Implementation
         }
 
         // Get a non-deleted team by ID
-        public MTeam GetTeamById(int id)
+        public MTeamVM GetTeamById(int id)
         {
-            return _context.Teams
-                .FirstOrDefault(t => t.TeamId == id && !t.IsDeleted);
+            var result = _context.Teams.FirstOrDefault(t => t.TeamId == id && !t.IsDeleted);
+            if (result != null)
+            {
+                return MTeamVM.ToViewModel(result);
+            }
+            return null;
+
         }
 
         // Create a new team
@@ -38,29 +44,49 @@ namespace NeuroPi.UserManagment.Services.Implementation
         }
 
         // Update an existing team
-        public MTeam UpdateTeam(int id, MTeam updatedTeam)
+        public MTeamVM UpdateTeam(int id, int tenantId,MTeamUpdateVM updatedTeam)
         {
-            var existing = _context.Teams.FirstOrDefault(t => t.TeamId == id && !t.IsDeleted);
+            var existing = _context.Teams.FirstOrDefault(t => t.TeamId == id && !t.IsDeleted && t.TenantId==tenantId);
             if (existing == null) return null;
 
             existing.Name = updatedTeam.Name;
-            existing.TenantId = updatedTeam.TenantId;
+            existing.TenantId = tenantId;
             existing.UpdatedBy = updatedTeam.UpdatedBy;
             existing.UpdatedOn = DateTime.UtcNow;
 
             _context.SaveChanges();
-            return existing;
+            return MTeamVM.ToViewModel(existing);
         }
 
         // Soft delete a team using IsDeleted
-        public bool SoftDeleteTeam(int id)
+        public bool DeleteTeam(int id, int tenantId)
         {
-            var team = _context.Teams.FirstOrDefault(t => t.TeamId == id && !t.IsDeleted);
+            var team = _context.Teams.FirstOrDefault(t => t.TeamId == id && !t.IsDeleted && t.TenantId==tenantId);
             if (team == null) return false;
 
             team.IsDeleted = true;
             _context.SaveChanges();
             return true;
+        }
+
+        public List<MTeamVM> GetAllTeamsByTenantId(int tenantId)
+        {
+            var result=_context.Teams.Where(t=>t.TenantId == tenantId && !t.IsDeleted).ToList();
+            if(result!=null &&  result.Count()>0)
+            {
+                return MTeamVM.ToViewModelList(result);
+            }
+            return null;
+        }
+
+        public MTeamVM GetByIdAndTenantId(int id, int tenantId)
+        {
+            var result=_context.Teams.FirstOrDefault(t=>t.TeamId==id && t.TenantId==tenantId && !t.IsDeleted);
+            if (result != null)
+            {
+                return MTeamVM.ToViewModel(result);
+            }
+            return null;
         }
     }
 }

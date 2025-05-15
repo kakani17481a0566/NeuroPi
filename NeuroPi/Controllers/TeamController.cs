@@ -41,21 +41,11 @@ namespace NeuroPi.UserManagment.Controllers
         [HttpGet("{id}")]
         public ResponseResult<MTeamVM> GetById(int id)
         {
-            var team = _teamService.GetTeamById(id);
-            if (team == null)
+            var result = _teamService.GetTeamById(id);
+            if (result == null)
             {
-                return new ResponseResult<MTeamVM>(
-                    HttpStatusCode.NotFound,
-                    null,
-                    "Team not found");
+                return new ResponseResult<MTeamVM>(HttpStatusCode.NotFound,null,"Team not found");
             }
-
-            var result = new MTeamVM
-            {
-                TeamId = team.TeamId,
-                Name = team.Name,
-                TenantId = team.TenantId
-            };
 
             return new ResponseResult<MTeamVM>(
                 HttpStatusCode.OK,
@@ -86,17 +76,10 @@ namespace NeuroPi.UserManagment.Controllers
 
         // PUT: api/Team/{id}
         [HttpPut("{id}")]
-        public ResponseResult<MTeamVM> Update(int id, [FromBody] MTeamUpdateVM vm)
+        public ResponseResult<MTeamVM> Update(int id,int tenantId, [FromBody] MTeamUpdateVM vm)
         {
-            var update = new MTeam
-            {
-                Name = vm.Name,
-                TenantId = vm.TenantId,
-                UpdatedBy = vm.UpdatedBy
-            };
-
-            var updated = _teamService.UpdateTeam(id, update);
-            if (updated == null)
+            var result = _teamService.UpdateTeam(id,tenantId, vm);
+            if (result == null)
             {
                 return new ResponseResult<MTeamVM>(
                     HttpStatusCode.NotFound,
@@ -104,24 +87,14 @@ namespace NeuroPi.UserManagment.Controllers
                     "Team not found");
             }
 
-            var result = new MTeamVM
-            {
-                TeamId = updated.TeamId,
-                Name = updated.Name,
-                TenantId = updated.TenantId
-            };
-
-            return new ResponseResult<MTeamVM>(
-                HttpStatusCode.OK,
-                result,
-                "Team updated");
+            return new ResponseResult<MTeamVM>(HttpStatusCode.OK, result, "Team updated Successfully");
         }
 
         // DELETE: api/Team/{id}
         [HttpDelete("{id}")]
-        public ResponseResult<string> Delete(int id)
+        public ResponseResult<string> Delete(int id,int tenantId)
         {
-            bool success = _teamService.SoftDeleteTeam(id);
+            bool success = _teamService.DeleteTeam(id,tenantId);
             if (!success)
             {
                 return new ResponseResult<string>(
@@ -130,10 +103,30 @@ namespace NeuroPi.UserManagment.Controllers
                     "Team not found");
             }
 
-            return new ResponseResult<string>(
-                HttpStatusCode.OK,
-                null,
-                "Team deleted");
+            return new ResponseResult<string>(HttpStatusCode.OK,null,"Team deleted");
+        }
+        [HttpGet("tenantId")]
+        public ResponseResult<List<MTeamVM>> GetByTenantId(int id)
+        {
+            var result = _teamService.GetAllTeamsByTenantId(id);
+            if (result == null)
+            {
+                return new ResponseResult<List<MTeamVM>>(HttpStatusCode.NotFound,null,"Team not found");
+            }
+            return new ResponseResult<List<MTeamVM>>(HttpStatusCode.OK,result,"Team fetched Successfully");
+        }
+        [HttpGet("id")]
+        public ResponseResult<MTeamVM> GetByIdAndTenantId(int id,int tenantId)
+        {
+            var result = _teamService.GetByIdAndTenantId(id,tenantId);
+            if (result == null)
+            {
+                return new ResponseResult<MTeamVM>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    "Team not found");
+            }
+            return new ResponseResult<MTeamVM>(HttpStatusCode.OK,result,"Team found successfully");
         }
     }
 }
