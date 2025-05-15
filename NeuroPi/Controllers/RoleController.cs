@@ -50,33 +50,45 @@ namespace NeuroPi.UserManagment.Controllers
             return new ResponseResult<RoleResponseVM>(HttpStatusCode.NotFound, null, "Role not created");
         }
 
-        [HttpPut("id")]
-        public ResponseResult<RoleResponseVM> UpdateRole(int id, [FromBody] RoleRequestVM roleRequest)
+        [HttpPut("tenant/{tenantId}/id/{id}")]
+        public ResponseResult<RoleResponseVM> UpdateRoleByTenantIdAndId(int tenantId, int id, [FromBody] RoleRequestVM roleRequest)
         {
-            var result = _roleService.UpdateRole(id, roleRequest);
+            var result = _roleService.UpdateRoleByTenantIdAndId(tenantId, id, roleRequest);
             if (result != null)
             {
-                return new ResponseResult<RoleResponseVM>(HttpStatusCode.OK, result, "Role updated successfully");
+                return new ResponseResult<RoleResponseVM>(HttpStatusCode.OK, result, "Role updated successfully by tenant and ID");
             }
-            return new ResponseResult<RoleResponseVM>(HttpStatusCode.NotModified, null, "Role not updated");
+            return new ResponseResult<RoleResponseVM>(HttpStatusCode.NotModified, null, "Role not updated, role not found or mismatch with tenantId and id");
         }
 
-        [HttpDelete("id")]
-        public ResponseResult<object> DeleteRoleById(int id)
+        [HttpDelete("tenant/{tenantId}/id/{id}")]
+        public ResponseResult<object> DeleteRoleByTenantIdAndId(int tenantId, int id)
         {
-            var result = _roleService.DeleteRoleById(id);
+            var result = _roleService.DeleteRoleByTenantIdAndId(tenantId, id);
             if (result)
             {
-                return new ResponseResult<object>(HttpStatusCode.OK, null, "Role deleted successfully");
+                return new ResponseResult<object>(HttpStatusCode.OK, null, "Role deleted successfully by tenantId and id");
             }
-            return new ResponseResult<object>(HttpStatusCode.BadRequest, null, $"Role not found with id {id}");
-        }
-        [HttpGet("/tenant/{tenantId}")]
-        public ResponseResult<List<RoleResponseVM>> GetAllRolesByTenantId(int tenantId)
-        {
-            var result=_roleService.GetAllRolesByTenantId(tenantId);
-            return result != null ? new ResponseResult<List<RoleResponseVM>>(HttpStatusCode.OK, result, "Roles fetched successfully with tenant id") : new ResponseResult<List<RoleResponseVM>>(HttpStatusCode.NotFound, null, $"Roles Not found with tenantId{tenantId}");
+            return new ResponseResult<object>(HttpStatusCode.BadRequest, null, $"Role not found with tenantId {tenantId} and id {id}");
         }
 
+
+        [HttpGet("tenant/{tenantId}")]
+        public ResponseResult<List<RoleResponseVM>> GetAllRolesByTenantId(int tenantId)
+        {
+            var result = _roleService.GetAllRolesByTenantId(tenantId);
+            return result != null ? new ResponseResult<List<RoleResponseVM>>(HttpStatusCode.OK, result, "Roles fetched successfully with tenant id") : new ResponseResult<List<RoleResponseVM>>(HttpStatusCode.NotFound, null, $"Roles Not found with tenantId {tenantId}");
+        }
+
+        [HttpGet("tenant/{tenantId}/id/{id}")]
+        public ResponseResult<RoleResponseVM> GetRoleByTenantIdAndId(int tenantId, int id)
+        {
+            var result = _roleService.GetRoleByTenantIdAndId(tenantId, id);
+            if (result != null)
+            {
+                return new ResponseResult<RoleResponseVM>(HttpStatusCode.OK, result, "Role fetched successfully by tenant and ID");
+            }
+            return new ResponseResult<RoleResponseVM>(HttpStatusCode.NotFound, null, "Role not found with the provided tenantId and id");
+        }
     }
 }
