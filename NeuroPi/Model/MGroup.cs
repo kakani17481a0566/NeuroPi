@@ -19,6 +19,8 @@ namespace NeuroPi.UserManagment.Model
         [ForeignKey("Tenant")]
         public int TenantId { get; set; }
 
+
+
         // Navigation properties
         public virtual MTenant Tenant { get; set; }
         public virtual ICollection<MGroupUser> GroupUsers { get; set; } = new List<MGroupUser>();
