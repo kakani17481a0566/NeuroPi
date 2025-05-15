@@ -9,6 +9,7 @@ namespace NeuroPi.UserManagment.Services.Interface
         UserDepartmentResponseVM GetUserDepartmentById(int id);
 
         UserDepartmentResponseVM GetUserDepartmentByIdAndTenantId(int id, int tenantId);
+
         List<UserDepartmentResponseVM> GetUserDepartmentsByTenantId(int tenantId);
 
 

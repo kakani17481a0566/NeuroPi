@@ -96,7 +96,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
         public bool DeleteUserDepartmentByUserDeptIdAndTenantId(int id, int tenantId)
         {
-            var userDepartment = _context.UserDepartments.FirstOrDefault(t => t.UserDeptId == id);
+            var userDepartment = _context.UserDepartments.FirstOrDefault(t => t.UserDeptId == id && t.TenantId==tenantId&&!t.IsDeleted);
             if (userDepartment == null)
             {
                 return false;
