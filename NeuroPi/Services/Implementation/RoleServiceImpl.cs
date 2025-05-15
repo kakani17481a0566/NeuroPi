@@ -20,64 +20,72 @@ namespace NeuroPi.UserManagment.Services.Implementation
             _context.Roles.Add(roleModel);
             var result = _context.SaveChanges();
 
-            if (result > 0)
-            {
-                return RoleResponseVM.ToViewModel(roleModel);
-            }
-            return null; // Or throw an exception depending on how you want to handle this.
+            return result > 0 ? RoleResponseVM.ToViewModel(roleModel) : null;
         }
 
-        public bool DeleteRoleById(int id)
+        public bool DeleteRoleByTenantIdAndId(int tenantId, int id)
         {
-            var role = _context.Roles.FirstOrDefault(r => r.RoleId == id);
-            if (role == null)return false; 
+            var role = _context.Roles
+                .FirstOrDefault(r => r.RoleId == id && r.TenantId == tenantId && !r.IsDeleted);
+
+            if (role == null)
+            {
+                return false; // Role not found or mismatch with tenantId and id
+            }
+
+            // Mark the role as deleted (soft delete)
             role.IsDeleted = true;
             var result = _context.SaveChanges();
             return result > 0;
         }
 
+
         public List<RoleResponseVM> GetAllRoles()
         {
-            var roles = _context.Roles.Include(r => r.Tenant).Where(r=>!r.IsDeleted).ToList();
-            if (roles != null && roles.Count > 0)
-            {
-                return RoleResponseVM.ToViewModelList(roles);
-            }
-            return null;
+            var roles = _context.Roles.Include(r => r.Tenant).Where(r => !r.IsDeleted).ToList();
+            return roles.Any() ? RoleResponseVM.ToViewModelList(roles) : null;
         }
 
         public List<RoleResponseVM> GetAllRolesByTenantId(int tenantId)
         {
-            var roles=_context.Roles.Where(r=>!r.IsDeleted && r.TenantId== tenantId).ToList();
-            if(roles!=null && roles.Count > 0)
-            {
-                return RoleResponseVM.ToViewModelList(roles);
-            }
-            return null;
-            
+            var roles = _context.Roles.Where(r => !r.IsDeleted && r.TenantId == tenantId).ToList();
+            return roles.Any() ? RoleResponseVM.ToViewModelList(roles) : null;
         }
 
         public RoleResponseVM GetRoleById(int id)
         {
-            var role = _context.Roles.Where(r=>!r.IsDeleted).FirstOrDefault(r => r.RoleId == id);
-            return role == null ? null : RoleResponseVM.ToViewModel(role); // Return null if not found
+            var role = _context.Roles.FirstOrDefault(r => !r.IsDeleted && r.RoleId == id);
+            return role != null ? RoleResponseVM.ToViewModel(role) : null;
         }
 
-        public RoleResponseVM UpdateRole(int id, RoleRequestVM roleRequestVM)
+        public RoleResponseVM UpdateRoleByTenantIdAndId(int tenantId, int id, RoleRequestVM roleRequestVM)
         {
-            var existingRole = _context.Roles.Where(r=>!r.IsDeleted).FirstOrDefault(r => r.RoleId == id);
+            // Find the role by both tenantId and roleId
+            var existingRole = _context.Roles
+                .Where(r => !r.IsDeleted && r.TenantId == tenantId && r.RoleId == id)
+                .FirstOrDefault();
+
             if (existingRole == null)
             {
-                return null; // Role not found
+                return null; // Role not found or mismatch with tenantId and id
             }
 
+            // Update only the properties that can be changed, not the tenantId
             existingRole.Name = roleRequestVM.Name;
-            existingRole.TenantId = roleRequestVM.TenantId;
+
+            // Optionally, update other fields if required but avoid updating tenantId
+            existingRole.UpdatedOn = DateTime.UtcNow; // Example field, if you have other fields to update
 
             var result = _context.SaveChanges();
             return result > 0 ? RoleResponseVM.ToViewModel(existingRole) : null;
         }
 
-        
+
+        public RoleResponseVM GetRoleByTenantIdAndId(int tenantId, int id)
+        {
+            var role = _context.Roles
+                .FirstOrDefault(r => !r.IsDeleted && r.TenantId == tenantId && r.RoleId == id);
+            return role != null ? RoleResponseVM.ToViewModel(role) : null;
+        }
     }
 }

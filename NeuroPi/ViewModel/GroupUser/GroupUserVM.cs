@@ -1,46 +1,37 @@
 ﻿using NeuroPi.UserManagment.Model;
 
-namespace NeuroPi.UserManagment.ViewModel.GroupUser
+public class GroupUserVM
 {
-    public class GroupUserVM
+    public int GroupUserId { get; set; }  // Add GroupUserId here
+    public int GroupId { get; set; }
+    public int UserId { get; set; }
+    public int TenantId { get; set; }
+    public int? CreatedBy { get; set; }
+    public DateTime CreatedOn { get; set; }
+    public DateTime? UpdatedOn { get; set; }
+
+    // Mapping function to map MGroupUser to GroupUserVM
+    public static GroupUserVM ToViewModel(MGroupUser user)
     {
-
-        public int GroupId { get; set; }
-
-        public int UserId { get; set; }
-
-        public int TenantId { get; set; }
-
-        //[Required]
-        //public int? CreatedBy { get; set; }
-
-        //public DateTime CreatedOn { get; set; }
-
-        //public DateTime UpdatedOn { get; set; }
-
-        public static GroupUserVM ToViewModel(MGroupUser user)
+        return new GroupUserVM
         {
-            return new GroupUserVM
-            {
-                GroupId = user.GroupId,
-                UserId = user.UserId,
-                TenantId = user.TenantId,
-                //CreatedBy = user.CreatedBy,
-                //CreatedOn = user.CreatedOn
+            GroupUserId = user.GroupUserId,  // Map GroupUserId
+            GroupId = user.GroupId,
+            UserId = user.UserId,
+            TenantId = user.TenantId,
+            CreatedBy = user.CreatedBy,
+            CreatedOn = user.CreatedOn,
+            UpdatedOn = user.UpdatedOn
+        };
+    }
 
-            };
-        }
-        public static List<GroupUserVM> ToViewModelList(List<MGroupUser> groupUsers)
+    public static List<GroupUserVM> ToViewModelList(List<MGroupUser> groupUsers)
+    {
+        List<GroupUserVM> groupUserVMs = new List<GroupUserVM>();
+        foreach (MGroupUser user in groupUsers)
         {
-            List<GroupUserVM> groupUserVMs = new List<GroupUserVM>();
-            foreach (MGroupUser user in groupUsers)
-            {
-                groupUserVMs.Add(ToViewModel(user));
-            }
-            return groupUserVMs;
+            groupUserVMs.Add(ToViewModel(user));
         }
-
-
-
+        return groupUserVMs;
     }
 }

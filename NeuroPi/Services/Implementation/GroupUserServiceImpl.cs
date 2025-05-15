@@ -2,6 +2,9 @@
 using NeuroPi.UserManagment.Model;
 using NeuroPi.UserManagment.Services.Interface;
 using NeuroPi.UserManagment.ViewModel.GroupUser;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace NeuroPi.UserManagment.Services.Implementation
 {
@@ -14,10 +17,8 @@ namespace NeuroPi.UserManagment.Services.Implementation
             _context = context;
         }
 
-        // Create new GroupUser
         public GroupUserVM createGroupUser(GroupUserInputVM input)
         {
-            // Basic validation check
             if (input == null)
                 throw new ArgumentNullException(nameof(input));
 
@@ -27,91 +28,93 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 UserId = input.UserId,
                 TenantId = input.TenantId,
                 CreatedBy = input.CreatedBy,
-                CreatedOn = DateTime.UtcNow // Always set CreatedOn
+                CreatedOn = DateTime.UtcNow
             };
 
             _context.GroupUsers.Add(groupUser);
             _context.SaveChanges();
 
-            // Returning the newly created GroupUserVM
-            return new GroupUserVM
-            {
-                GroupId = input.GroupId,
-                UserId = input.UserId,
-                TenantId = input.TenantId
-            };
+            return GroupUserVM.ToViewModel(groupUser);
         }
 
-        // Update GroupUser by ID
-        public GroupUserUpdateVM updateGroupUserById(int groupUserId, GroupUserUpdateVM input)
+        public GroupUserUpdateVM updateGroupUserByIdAndTenantId(int groupUserId, int tenantId, GroupUserUpdateVM input)
         {
             if (input == null)
                 throw new ArgumentNullException(nameof(input));
 
-            var groupUser = _context.GroupUsers.FirstOrDefault(x => x.GroupUserId == groupUserId && !x.IsDeleted);
+            var groupUser = _context.GroupUsers
+                                    .FirstOrDefault(x => x.GroupUserId == groupUserId && x.TenantId == tenantId && !x.IsDeleted);
             if (groupUser == null)
-                return null; // If the groupUser doesn't exist, return null
+                return null;
 
             groupUser.GroupId = input.GroupId;
             groupUser.UserId = input.UserId;
-            groupUser.TenantId = input.TenantId;
             groupUser.UpdatedBy = input.UpdatedBy;
             groupUser.UpdatedOn = DateTime.UtcNow;
 
             _context.SaveChanges();
-            return input; // Return the updated GroupUser
-        }
 
-        // Soft delete a GroupUser by GroupId
-        public bool deleteGroupUserById(int groupUserId)
-        {
-            var groupUser = _context.GroupUsers.FirstOrDefault(x => x.GroupUserId == groupUserId && !x.IsDeleted);
-            if (groupUser == null)
+            return new GroupUserUpdateVM
             {
-                return false; // If the groupUser doesn't exist, return false
-            }
-
-            // Mark as deleted instead of actually removing
-            groupUser.IsDeleted = true;
-            _context.SaveChanges();
-
-            return true;
+                GroupId = groupUser.GroupId,
+                UserId = groupUser.UserId,
+                UpdatedBy = groupUser.UpdatedBy ?? input.UpdatedBy,
+                UpdatedOn = groupUser.UpdatedOn ?? DateTime.UtcNow
+            };
         }
 
-        // Get all GroupUsers (non-deleted)
-        public List<GroupUserVM> getAllGroupUsers()
-        {
-            var result = _context.GroupUsers
-                                 .Where(x => !x.IsDeleted)  // Ensure you're only fetching non-deleted records
-                                 .ToList();
-
-            return GroupUserVM.ToViewModelList(result);
-        }
-
-        // Get GroupUser by GroupId (non-deleted)
-        public GroupUserVM getGroupUserById(int groupId)
+        public bool deleteGroupUserByGroupUserIdAndTenantId(int groupUserId, int tenantId)
         {
             var groupUser = _context.GroupUsers
-                                    .Where(x => x.GroupId == groupId && !x.IsDeleted)  // Exclude soft-deleted
-                                    .Select(g => new GroupUserVM
-                                    {
-                                        GroupId = g.GroupId,
-                                        UserId = g.UserId,
-                                        TenantId = g.TenantId,
-                                    })
+                                    .FirstOrDefault(x => x.GroupUserId == groupUserId && x.TenantId == tenantId && !x.IsDeleted);
+
+            if (groupUser != null)
+            {
+                groupUser.IsDeleted = true;
+                groupUser.UpdatedOn = DateTime.UtcNow;
+                // optionally track who deleted it via UpdatedBy if needed
+                _context.SaveChanges();
+                return true;
+            }
+
+            return false;
+        }
+
+
+        public List<GroupUserVM> getAllGroupUsers()
+        {
+            var groupUsers = _context.GroupUsers
+                                     .Where(x => !x.IsDeleted)
+                                     .ToList();
+
+            return GroupUserVM.ToViewModelList(groupUsers);
+        }
+
+        public GroupUserVM getGroupUserByGroupUserId(int groupUserId)
+        {
+            var groupUser = _context.GroupUsers
+                                    .Where(x => x.GroupUserId == groupUserId && !x.IsDeleted)
                                     .FirstOrDefault();
 
-            return groupUser;
+            return groupUser != null ? GroupUserVM.ToViewModel(groupUser) : null;
+        }
+
+        public GroupUserVM getGroupUserByGroupUserIdAndTenantId(int groupUserId, int tenantId)
+        {
+            var groupUser = _context.GroupUsers
+                                    .Where(x => x.GroupUserId == groupUserId && x.TenantId == tenantId && !x.IsDeleted)
+                                    .FirstOrDefault();
+
+            return groupUser != null ? GroupUserVM.ToViewModel(groupUser) : null;
         }
 
         public List<GroupUserVM> getGroupUsersByTenantId(int tenantId)
         {
-            var result = _context.GroupUsers
-                                 .Where(x => x.TenantId == tenantId && !x.IsDeleted)
-                                 .ToList();
+            var groupUsers = _context.GroupUsers
+                                     .Where(x => x.TenantId == tenantId && !x.IsDeleted)
+                                     .ToList();
 
-            return GroupUserVM.ToViewModelList(result);
+            return GroupUserVM.ToViewModelList(groupUsers);
         }
-
     }
 }

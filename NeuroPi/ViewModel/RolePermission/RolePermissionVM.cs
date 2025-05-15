@@ -1,4 +1,5 @@
-﻿namespace NeuroPi.UserManagment.ViewModel.RolePermission
+﻿
+namespace NeuroPi.UserManagment.ViewModel.RolePermission
 {
     public class RolePermissionVM
     {
@@ -16,5 +17,7 @@
         public int CanUpdate { get; set; }
 
         public int CanDelete { get; set; }
+        public int? UpdatedBy { get;  set; }
+        public DateTime? UpdatedOn { get; set; }
     }
 }

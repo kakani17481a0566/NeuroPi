@@ -30,14 +30,17 @@ namespace NeuroPi.UserManagment.ViewModel.TeamUser
                 Team = user.Team,
             };
         }
-        public static List<TeamUserResponseVM> ToViewModelList(List<MTeamUser> users)
+        public static List<TeamUserResponseVM> ToViewModelList(List<MTeamUser> teamUsers)
         {
-            List<TeamUserResponseVM> teamUserResponseVMs = new List<TeamUserResponseVM>();
-            foreach (MTeamUser user in users)
+            return teamUsers.Select(t => new TeamUserResponseVM
             {
-                teamUserResponseVMs.Add(ToViewModel(user));
-            }
-            return teamUserResponseVMs;
+                Id = t.TeamUserId,
+                TenantId = t.TenantId,
+                UserId = t.UserId,
+                TeamId = t.TeamId,
+                // Include any other fields as required
+            }).ToList();
         }
+
     }
 }
