@@ -41,10 +41,10 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
             if (teamUser == null)
             {
-                return false; // Team user not found or mismatch with tenantId and id
+                return false; 
             }
 
-            // Mark the team user as deleted (soft delete)
+            
             teamUser.IsDeleted = true;
             teamUser.UpdatedOn = DateTime.UtcNow;
             _context.SaveChanges();
@@ -88,7 +88,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
             return null;
         }
 
-        // Keep only one definition of GetTeamUsersByTenantId
+
         public List<TeamUserResponseVM> GetTeamUsersByTenantId(int tenantId)
         {
             var result = _context.TeamUsers.Where(t => t.TenantId == tenantId && !t.IsDeleted).ToList();
@@ -109,7 +109,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 return TeamUserResponseVM.ToViewModel(result);
             }
 
-            return null; // Return null if no matching team user is found
+            return null; 
         }
 
     }

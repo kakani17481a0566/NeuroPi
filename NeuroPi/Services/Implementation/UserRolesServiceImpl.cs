@@ -18,7 +18,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
             _context = context;
         }
 
-        // Get all non-deleted user roles
+    
         public List<UserRoleVM> GetAll()
         {
             var roles = _context.UserRoles

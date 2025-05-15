@@ -14,7 +14,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
             _context = context;
         }
 
-        // Get all non-deleted tenants
+    
         public List<TenantVM> GetAllTenants()
         {
             return _context.Tenants
@@ -29,7 +29,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 .ToList();
         }
 
-        // Get a non-deleted tenant by ID
+        
         public TenantVM GetTenantById(int id)
         {
             var tenant = _context.Tenants
@@ -46,7 +46,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
             return tenant;
         }
 
-        // Create a new tenant
+     
         public TenantVM CreateTenant(TenantInputVM input)
         {
             var tenant = new MTenant
@@ -68,7 +68,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
             };
         }
 
-        // Update an existing tenant
+      
         public TenantVM UpdateTenant(int id, TenantUpdateInputVM input)
         {
             var existingTenant = _context.Tenants.FirstOrDefault(t => t.TenantId == id && !t.IsDeleted);
@@ -91,7 +91,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
             };
         }
 
-        // Soft delete a tenant
+        
         public bool DeleteTenant(int id)
         {
             var tenant = _context.Tenants.FirstOrDefault(t => t.TenantId == id && !t.IsDeleted);

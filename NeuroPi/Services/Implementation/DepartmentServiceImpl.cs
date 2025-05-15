@@ -22,7 +22,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
             var departments = _context.Departments
                 .Include(d => d.Organization)
                 .Include(d => d.Tenant)
-                .Where(d => d.IsDeleted == false) // Explicit check for bool false
+                .Where(d => d.IsDeleted == false) 
                 .ToList();
 
             return DepartmentResponseVM.ToViewModelList(departments);

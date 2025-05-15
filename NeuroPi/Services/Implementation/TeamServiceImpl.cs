@@ -14,7 +14,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
             _context = context;
         }
 
-        // Get all non-deleted teams
+      
         public List<MTeam> GetAllTeams()
         {
             return _context.Teams
@@ -22,7 +22,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 .ToList();
         }
 
-        // Get a non-deleted team by ID
+      
         public MTeamVM GetTeamById(int id)
         {
             var result = _context.Teams.FirstOrDefault(t => t.TeamId == id && !t.IsDeleted);
@@ -34,7 +34,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
         }
 
-        // Create a new team
+       
         public MTeam CreateTeam(MTeam team)
         {
             team.IsDeleted = false;
@@ -43,7 +43,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
             return team;
         }
 
-        // Update an existing team
+  
         public MTeamVM UpdateTeam(int id, int tenantId,MTeamUpdateVM updatedTeam)
         {
             var existing = _context.Teams.FirstOrDefault(t => t.TeamId == id && !t.IsDeleted && t.TenantId==tenantId);
@@ -58,7 +58,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
             return MTeamVM.ToViewModel(existing);
         }
 
-        // Soft delete a team using IsDeleted
+      
         public bool DeleteTeam(int id, int tenantId)
         {
             var team = _context.Teams.FirstOrDefault(t => t.TeamId == id && !t.IsDeleted && t.TenantId==tenantId);
