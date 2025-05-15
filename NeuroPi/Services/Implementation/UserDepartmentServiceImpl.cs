@@ -18,34 +18,22 @@ namespace NeuroPi.UserManagment.Services.Implementation
             _context.UserDepartments.Add(userDepartment);
             _context.SaveChanges();
 
-            return new UserDepartmentCreateVM 
+            return new UserDepartmentCreateVM
             {
-                
+
                 UserId = userDepartment.UserId,
                 DepartmentId = userDepartment.DepartmentId,
                 TenantId = userDepartment.TenantId,
                 CreatedBy = (int)userDepartment.CreatedBy
-                
+
             };
-            
 
-        }
 
-        public bool DeleteUserDepartment(int id)
-        {
-            var userDepartment = _context.UserDepartments.FirstOrDefault(t => t.UserDeptId == id);
-            if (userDepartment == null)
-            {
-                return false;
-            }
-            userDepartment.IsDeleted = true; // Soft delete
-            _context.SaveChanges();
-            return true;
         }
 
         public List<UserDepartmentResponseVM> GetAllUserDepartments()
         {
-            var result = _context.UserDepartments.Where(r=>!r.IsDeleted).ToList();
+            var result = _context.UserDepartments.Where(r => !r.IsDeleted).ToList();
             if (result != null)
             {
                 return UserDepartmentResponseVM.ToViewModelList(result);
@@ -66,22 +54,57 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
         }
 
-        public UserDepartmentResponseVM UpdateUserDepartment(int id, UserDepartmentUpdateVM input)
+        public List<UserDepartmentResponseVM> GetUserDepartmentsByTenantId(int tenantId)
         {
-            var userDepartment = _context.UserDepartments.FirstOrDefault(t => t.UserDeptId == id);
-            if (userDepartment != null)
+            var result = _context.UserDepartments.Where(t => t.TenantId == tenantId && !t.IsDeleted).ToList();
+            if (result != null)
             {
-                userDepartment.UserId = input.UserId;
-                userDepartment.DepartmentId = input.DepartmentId;
-                userDepartment.TenantId = input.TenantId;
-                userDepartment.UpdatedBy = input.UpdatedBy;
-                userDepartment.UpdatedOn = DateTime.UtcNow;
-                _context.SaveChanges();
-                return UserDepartmentResponseVM.ToViewModel(userDepartment);
+                return UserDepartmentResponseVM.ToViewModelList(result);
             }
             return null;
+        }
 
-            
+        public UserDepartmentResponseVM GetUserDepartmentByIdAndTenantId(int id, int tenantId)
+        {
+            var result = _context.UserDepartments.FirstOrDefault(t => t.UserDeptId == id && t.TenantId == tenantId);
+            if (result != null)
+            {
+                return UserDepartmentResponseVM.ToViewModel(result);
+            }
+            return null;
+        }
+
+
+        public UserDepartmentResponseVM UpdateUserDepartmentByUserDeptIdAndTenantId(int id, int tenantId, UserDepartmentUpdateVM input)
+        {
+            var userDepartment = _context.UserDepartments.FirstOrDefault(t => t.UserDeptId == id && t.TenantId == tenantId);
+            if (userDepartment == null)
+            {
+                return null;
+            }
+            userDepartment.UserId = input.UserId;
+            userDepartment.DepartmentId = input.DepartmentId;
+            userDepartment.TenantId = input.TenantId;
+            userDepartment.UpdatedBy = input.UpdatedBy;
+            userDepartment.UpdatedOn = DateTime.UtcNow;
+            _context.SaveChanges();
+            return UserDepartmentResponseVM.ToViewModel(userDepartment);
+
+        }
+
+
+
+        public bool DeleteUserDepartmentByUserDeptIdAndTenantId(int id, int tenantId)
+        {
+            var userDepartment = _context.UserDepartments.FirstOrDefault(t => t.UserDeptId == id && t.TenantId==tenantId&&!t.IsDeleted);
+            if (userDepartment == null)
+            {
+                return false;
+            }
+            userDepartment.IsDeleted = true;
+            _context.SaveChanges();
+            return true;
         }
     }
 }
+

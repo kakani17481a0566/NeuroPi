@@ -2,6 +2,7 @@
 using NeuroPi.UserManagment.Model;
 using NeuroPi.UserManagment.Services.Interface;
 using NeuroPi.UserManagment.ViewModel.Group;
+using System.Linq;
 
 namespace NeuroPi.UserManagment.Services.Implementation
 {
@@ -14,7 +15,6 @@ namespace NeuroPi.UserManagment.Services.Implementation
             _context = context;
         }
 
-        // Get all groups (excluding soft-deleted)
         public List<GroupVM> GetAll()
         {
             return _context.Groups
@@ -27,10 +27,9 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 }).ToList();
         }
 
-        // Get group by ID (excluding soft-deleted)
-        public GroupVM GetById(int id)
+        public GroupVM GetByGroupId(int groupId)
         {
-            var group = _context.Groups.FirstOrDefault(g => g.GroupId == id && !g.IsDeleted);
+            var group = _context.Groups.FirstOrDefault(g => g.GroupId == groupId && !g.IsDeleted);
             if (group == null) return null;
 
             return new GroupVM
@@ -41,9 +40,14 @@ namespace NeuroPi.UserManagment.Services.Implementation
             };
         }
 
-        // Create a new group
         public GroupVM Create(GroupInputVM input)
         {
+            var tenantExists = _context.Tenants.Any(t => t.TenantId == input.TenantId);
+            if (!tenantExists)
+            {
+                return null;
+            }
+
             var group = new MGroup
             {
                 Name = input.Name,
@@ -62,10 +66,9 @@ namespace NeuroPi.UserManagment.Services.Implementation
             };
         }
 
-        // Update an existing group
-        public GroupVM Update(int id, GroupUpdateInputVM input)
+        public GroupVM Update(int groupId, GroupUpdateInputVM input)
         {
-            var group = _context.Groups.FirstOrDefault(g => g.GroupId == id && !g.IsDeleted);
+            var group = _context.Groups.FirstOrDefault(g => g.GroupId == groupId && !g.IsDeleted);
             if (group == null) return null;
 
             group.Name = input.Name;
@@ -80,15 +83,23 @@ namespace NeuroPi.UserManagment.Services.Implementation
         }
 
         // Soft delete a group
-        public bool Delete(int id)
+        public bool DeleteById(int groupId, int tenantId)
         {
-            var group = _context.Groups.FirstOrDefault(g => g.GroupId == id && !g.IsDeleted);
+            var group = _context.Groups
+                .FirstOrDefault(g => g.GroupId == groupId && g.TenantId == tenantId && !g.IsDeleted);
+
             if (group == null) return false;
 
+            // Perform the soft delete
             group.IsDeleted = true;
+            group.UpdatedOn = DateTime.UtcNow;
+
             _context.SaveChanges();
             return true;
         }
+
+
+
 
         public List<GroupVM> GetByTenantId(int tenantId)
         {
@@ -102,5 +113,18 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 }).ToList();
         }
 
+        public GroupVM GetByTenantAndGroupId(int tenantId, int groupId)
+        {
+            var group = _context.Groups
+                .FirstOrDefault(g => g.GroupId == groupId && g.TenantId == tenantId && !g.IsDeleted);
+            if (group == null) return null;
+
+            return new GroupVM
+            {
+                GroupId = group.GroupId,
+                Name = group.Name,
+                TenantId = group.TenantId
+            };
+        }
     }
 }

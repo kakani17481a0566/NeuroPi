@@ -25,38 +25,34 @@ namespace NeuroPi.UserManagment.Services.Implementation
             return RolePermissionResponseVM.ToViewModel(newPermission);
         }
 
-        public RolePermissionResponseVM UpdateRolePermissionById(int id, RolePermissionVM rolePermission)
+        public RolePermissionResponseVM UpdateRolePermissionByIdAndTenantId(int id, int tenantId, RolePermissionVM rolePermission)
         {
-            if (rolePermission == null) throw new ArgumentNullException(nameof(rolePermission));
-
-            var existingPermission = _context.RolePermissions
-                .FirstOrDefault(rp => rp.RolePermissionId == id);
-
-            if (existingPermission == null) return null;
-
-            existingPermission.RoleId = rolePermission.RoleId;
-            existingPermission.PermissionId = rolePermission.PermissionId;
-            existingPermission.TenantId = rolePermission.TenantId;
-            existingPermission.CanCreate = rolePermission.CanCreate;
-            existingPermission.CanRead = rolePermission.CanRead;
-            existingPermission.CanUpdate = rolePermission.CanUpdate;
-            existingPermission.CanDelete = rolePermission.CanDelete;
-
+            var result = _context.RolePermissions.FirstOrDefault(r => r.RolePermissionId == id && r.TenantId == tenantId);
+            if (result == null)
+            {
+                return null;
+            }
+            result.RoleId = rolePermission.RoleId;
+            result.PermissionId = rolePermission.PermissionId;
+            result.UpdatedBy = rolePermission.UpdatedBy;
+            result.UpdatedOn = rolePermission.UpdatedOn;
             _context.SaveChanges();
-            return RolePermissionResponseVM.ToViewModel(existingPermission);
+
+            return RolePermissionResponseVM.ToViewModel(result);
+                
         }
 
-        public bool DeleteById(int id)
+        public bool DeleteByIdAndTenantId(int id, int tenantId)
         {
-            var rolePermission = _context.RolePermissions
-                .FirstOrDefault(r => r.RolePermissionId == id);
-
-            if (rolePermission == null) return false;
-
+            var rolePermission = _context.RolePermissions.FirstOrDefault(r => r.RolePermissionId == id && r.TenantId == tenantId && !r.IsDeleted);
+            if (rolePermission == null)
+            {
+                return false;
+            }
             rolePermission.IsDeleted = true;
             _context.SaveChanges();
             return true;
-        }
+       }
 
         public List<RolePermissionResponseVM> GetAllRolePermissions()
         {
@@ -74,6 +70,27 @@ namespace NeuroPi.UserManagment.Services.Implementation
             return rolePermission != null
                 ? RolePermissionResponseVM.ToViewModel(rolePermission)
                 : null;
+        }
+
+        public RolePermissionResponseVM GetRolePermissionByIdAndTenantId(int id, int tenantId)
+        {
+            var rolePermission = _context.RolePermissions.FirstOrDefault(r => r.RolePermissionId == id &&r.TenantId==tenantId&&!r.IsDeleted);
+            if (rolePermission != null)
+            {
+                return RolePermissionResponseVM.ToViewModel(rolePermission);
+            }
+            return null;
+        }
+
+        public List<RolePermissionResponseVM> GetRolePermissionByTenantId(int tenantId)
+        {
+            var rolePermission = _context.RolePermissions.Where(r => r.TenantId == tenantId && !r.IsDeleted).ToList();
+            if (rolePermission != null)
+            {
+                return RolePermissionResponseVM.ToViewModelList(rolePermission);
+
+            }
+            return null;
         }
     }
 }

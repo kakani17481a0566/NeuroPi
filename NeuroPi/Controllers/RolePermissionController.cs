@@ -36,8 +36,8 @@ namespace NeuroPi.UserManagment.Controllers
             }
         }
 
-        [HttpPut("{id}")]
-        public ResponseResult<RolePermissionResponseVM> UpdateRolePermission(int id, [FromBody] RolePermissionVM rolePermission)
+        [HttpPut("{id}/{tenantId}")]
+        public ResponseResult<RolePermissionResponseVM> UpdateRolePermissionByIdAndTenantId(int id, int tenantId, [FromBody] RolePermissionVM rolePermission)
         {
             if (!ModelState.IsValid)
             {
@@ -46,7 +46,7 @@ namespace NeuroPi.UserManagment.Controllers
 
             try
             {
-                var updatedRolePermission = _rolePermissionService.UpdateRolePermissionById(id, rolePermission);
+                var updatedRolePermission = _rolePermissionService.UpdateRolePermissionByIdAndTenantId(id,tenantId, rolePermission);
                 return updatedRolePermission == null
                     ? new ResponseResult<RolePermissionResponseVM>(HttpStatusCode.NotFound, null, "Role permission not found")
                     : new ResponseResult<RolePermissionResponseVM>(HttpStatusCode.OK, updatedRolePermission, "Role permission updated successfully");
@@ -89,12 +89,44 @@ namespace NeuroPi.UserManagment.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
-        public ResponseResult<bool> Delete(int id)
+        [HttpGet("tenant/{tenantId}")]
+        public ResponseResult<List<RolePermissionResponseVM>> GetRolePermissionByTenantID(int tenantId)
         {
             try
             {
-                var response = _rolePermissionService.DeleteById(id);
+                var result = _rolePermissionService.GetRolePermissionByTenantId(tenantId);
+                return result.Count > 0
+                    ? new ResponseResult<List<RolePermissionResponseVM>>(HttpStatusCode.OK, result, "Role permissions found")
+                    : new ResponseResult<List<RolePermissionResponseVM>>(HttpStatusCode.NotFound, null, $"No role permissions found for tenant id {tenantId}");
+            }
+            catch (Exception ex)
+            {
+                return new ResponseResult<List<RolePermissionResponseVM>>(HttpStatusCode.InternalServerError, null, $"Error retrieving role permissions: {ex.Message}");
+            }
+        }
+
+        [HttpGet("{id}/{tenantId}")]
+        public ResponseResult<RolePermissionResponseVM> GetByIdAndTenantId(int id, int tenantId)
+        {
+            try
+            {
+                var result = _rolePermissionService.GetRolePermissionByIdAndTenantId(id, tenantId);
+                return result != null
+                    ? new ResponseResult<RolePermissionResponseVM>(HttpStatusCode.OK, result, "Role permission found")
+                    : new ResponseResult<RolePermissionResponseVM>(HttpStatusCode.NotFound, null, $"No role permission found with id {id} for tenant id {tenantId}");
+            }
+            catch (Exception ex)
+            {
+                return new ResponseResult<RolePermissionResponseVM>(HttpStatusCode.InternalServerError, null, $"Error retrieving role permission: {ex.Message}");
+            }
+        }
+
+        [HttpDelete("{id}/{tenantId}")]
+        public ResponseResult<bool> Delete(int id, int tenantId)
+        {
+            try
+            {
+                var response = _rolePermissionService.DeleteByIdAndTenantId(id, tenantId);
                 return response
                     ? new ResponseResult<bool>(HttpStatusCode.OK, true, "Role permission deleted successfully")
                     : new ResponseResult<bool>(HttpStatusCode.NotFound, false, "Role permission not found");

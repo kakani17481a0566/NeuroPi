@@ -52,6 +52,39 @@ namespace NeuroPi.UserManagment.Controllers
                 "User department retrieved successfully");
         }
 
+        [HttpGet("{id}/{tenantId}")]
+        public ResponseResult<UserDepartmentResponseVM> GetByIdAndTenantId(int id, int tenantId)
+        {
+            var userDepartment = _userDepartmentService.GetUserDepartmentByIdAndTenantId(id, tenantId);
+            if (userDepartment == null)
+            {
+                return new ResponseResult<UserDepartmentResponseVM>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    "User department not found");
+            }
+            return new ResponseResult<UserDepartmentResponseVM>(
+                HttpStatusCode.OK,
+                userDepartment,
+                "User department retrieved successfully");
+        }
+        [HttpGet("tenant/{tenantId}")]
+        public ResponseResult<List<UserDepartmentResponseVM>> GetByTenantId(int tenantId)
+        {
+            var userDepartments = _userDepartmentService.GetUserDepartmentsByTenantId(tenantId);
+            if (userDepartments == null || userDepartments.Count == 0)
+            {
+                return new ResponseResult<List<UserDepartmentResponseVM>>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    "No user departments found for the specified tenant");
+            }
+            return new ResponseResult<List<UserDepartmentResponseVM>>(
+                HttpStatusCode.OK,
+                userDepartments,
+                "User departments retrieved successfully");
+        }
+
         [HttpPost]
         public ResponseResult<UserDepartmentCreateVM> Create([FromBody] UserDepartmentRequestVM userDepartmentRequest)
         {
@@ -76,17 +109,17 @@ namespace NeuroPi.UserManagment.Controllers
                 "User department created successfully");
         }
 
-        [HttpPut("{id}")]
-        public ResponseResult<UserDepartmentResponseVM> Update(int id, [FromBody] UserDepartmentUpdateVM userDepartmentRequest)
+        [HttpPut("{id}/{tenantId}")]
+        public ResponseResult<UserDepartmentResponseVM> Update(int id, int tenantId, [FromBody] UserDepartmentUpdateVM userDepartmentUpdate)
         {
-            if (userDepartmentRequest == null)
+            if (userDepartmentUpdate == null)
             {
                 return new ResponseResult<UserDepartmentResponseVM>(
                     HttpStatusCode.BadRequest,
                     null,
                     "Invalid request");
             }
-            var updatedUserDepartment = _userDepartmentService.UpdateUserDepartment(id, userDepartmentRequest);
+            var updatedUserDepartment = _userDepartmentService.UpdateUserDepartmentByUserDeptIdAndTenantId(id, tenantId, userDepartmentUpdate);
             if (updatedUserDepartment == null)
             {
                 return new ResponseResult<UserDepartmentResponseVM>(
@@ -100,10 +133,10 @@ namespace NeuroPi.UserManagment.Controllers
                 "User department updated successfully");
         }
 
-        [HttpDelete("{id}")]
-        public ResponseResult<bool> Delete(int id)
+        [HttpDelete("{id}/{tenantId}")]
+        public ResponseResult<bool> Delete(int id, int tenantId)
         {
-            var isDeleted = _userDepartmentService.DeleteUserDepartment(id);
+            var isDeleted = _userDepartmentService.DeleteUserDepartmentByUserDeptIdAndTenantId(id, tenantId);
             if (!isDeleted)
             {
                 return new ResponseResult<bool>(

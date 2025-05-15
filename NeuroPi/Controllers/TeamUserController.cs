@@ -94,16 +94,25 @@ namespace NeuroPi.UserManagment.Controllers
         }
 
         // DELETE: api/TeamUser/{id}
-        [HttpDelete("{id}")]
-        public ResponseResult<object> DeleteById(int id)
+        // DELETE: api/TeamUser/Tenant/{tenantId}/id/{id}
+        [HttpDelete("Tenant/{tenantId}/id/{id}")]
+        public ResponseResult<object> DeleteByTenantIdAndId(int tenantId, int id)
         {
-            _teamUserService.DeleteTeamUser(id);
+            var result = _teamUserService.DeleteTeamUserByTenantIdAndId(tenantId, id);
+            if (result)
+            {
+                return new ResponseResult<object>(
+                    HttpStatusCode.OK,
+                    null,
+                    "Team user deleted successfully by tenantId and id");
+            }
 
             return new ResponseResult<object>(
-                HttpStatusCode.OK,
+                HttpStatusCode.BadRequest,
                 null,
-                "Team user deleted successfully");
+                $"Team user not found with tenantId {tenantId} and id {id}");
         }
+
 
 
         // GET: api/TeamUser/Tenant/{tenantId}
@@ -123,5 +132,28 @@ namespace NeuroPi.UserManagment.Controllers
                 result,
                 "Team users fetched successfully");
         }
+
+
+
+        // GET: api/TeamUser/Tenant/{tenantId}/{id}
+        [HttpGet("Tenant/{tenantId}/{id}")]
+        public ResponseResult<TeamUserResponseVM> GetTeamUserByTenantIdAndId(int tenantId, int id)
+        {
+            var result = _teamUserService.GetTeamUserByTenantIdAndId(tenantId, id);
+
+            if (result == null)
+            {
+                return new ResponseResult<TeamUserResponseVM>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    "Team user not found for the provided TenantId and Id");
+            }
+
+            return new ResponseResult<TeamUserResponseVM>(
+                HttpStatusCode.OK,
+                result,
+                "Team user fetched successfully");
+        }
+
     }
 }

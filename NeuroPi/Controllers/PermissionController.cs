@@ -52,9 +52,9 @@ namespace NeuroPi.UserManagment.Controllers
         }
 
         [HttpDelete("id")]
-        public ResponseResult<Object> DeleteById(int id)
+        public ResponseResult<Object> DeleteById(int id,int tenantId)
         {
-            var result = _permissionService.DeletePermission(id);
+            var result = _permissionService.DeletePermission(id,tenantId);
             if (result != null)
             {
                 return new ResponseResult<object>(HttpStatusCode.OK, null, "Permission Deleted Successfully");
@@ -63,9 +63,9 @@ namespace NeuroPi.UserManagment.Controllers
         }
 
         [HttpPut("id")]
-        public ResponseResult<PermissionResponseVM> UpdatePermissionById(int id, PermissionRequestVM permission)
+        public ResponseResult<PermissionResponseVM> UpdatePermissionById(int id,int tenantId, PermissionUpdateRequestVM permission)
         {
-            var result = _permissionService.UpdatePermission(id, permission);
+            var result = _permissionService.UpdatePermission(id,tenantId, permission);
             if (result != null)
             {
                 return new ResponseResult<PermissionResponseVM>(HttpStatusCode.OK, result, "Permission Updated successfully");
@@ -82,6 +82,18 @@ namespace NeuroPi.UserManagment.Controllers
                 return new ResponseResult<List<PermissionResponseVM>>(HttpStatusCode.OK, result, "Permissions fetched successfully by using tenant id");
             }
             return new ResponseResult<List<PermissionResponseVM>>(HttpStatusCode.NotFound, null, "Permissions not found ");
+        }
+
+        [HttpGet]
+        [Route("/get-by-Id-and-tenantId")]
+        public ResponseResult<PermissionResponseVM> GetByTenantIdAndId(int id,int tenantId)
+        {
+            var result = _permissionService.GetByIdAndTenantId(id,tenantId);
+            if (result != null)
+            {
+                return new ResponseResult<PermissionResponseVM>(HttpStatusCode.OK, result, "Permissions fetched successfully by using tenant id");
+            }
+            return new ResponseResult<PermissionResponseVM>(HttpStatusCode.NotFound, null, "Permissions not found ");
         }
     }
 }

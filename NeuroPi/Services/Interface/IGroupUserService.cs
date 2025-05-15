@@ -1,4 +1,5 @@
 ﻿using NeuroPi.UserManagment.ViewModel.GroupUser;
+using System.Collections.Generic;
 
 namespace NeuroPi.UserManagment.Services.Interface
 {
@@ -6,16 +7,17 @@ namespace NeuroPi.UserManagment.Services.Interface
     {
         List<GroupUserVM> getAllGroupUsers();
 
-        GroupUserUpdateVM updateGroupUserById(int GroupUserId, GroupUserUpdateVM input);
-        GroupUserVM getGroupUserById(int Groupid);
-
         GroupUserVM createGroupUser(GroupUserInputVM input);
+
+        GroupUserUpdateVM updateGroupUserByIdAndTenantId(int groupUserId, int tenantId, GroupUserUpdateVM input);
+
+        GroupUserVM getGroupUserByGroupUserId(int groupUserId);
+
+        GroupUserVM getGroupUserByGroupUserIdAndTenantId(int groupUserId, int tenantId);
 
         List<GroupUserVM> getGroupUsersByTenantId(int tenantId);
 
-
-
-        bool deleteGroupUserById(int GroupId);
+        bool deleteGroupUserByGroupUserIdAndTenantId(int groupUserId, int tenantId);
 
     }
 }

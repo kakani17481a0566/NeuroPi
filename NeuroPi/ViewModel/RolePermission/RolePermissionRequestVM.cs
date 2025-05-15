@@ -5,7 +5,7 @@ namespace NeuroPi.UserManagment.ViewModel.RolePermission
     public class RolePermissionRequestVM
 
     {
-        //public int RolePermissionId { get; set; }
+       
         public int RoleId { get; set; }
 
         public int PermissionId { get; set; }
@@ -34,7 +34,7 @@ namespace NeuroPi.UserManagment.ViewModel.RolePermission
                 CanRead = rolePermission.CanRead,
                 CanUpdate = rolePermission.CanUpdate,
                 CanDelete = rolePermission.CanDelete,
-                //CreatedBy = rolePermission.CreatedBy
+                
             };
         }
     }

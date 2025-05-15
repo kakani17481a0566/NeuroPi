@@ -59,7 +59,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
             string tokenValue = new JwtSecurityTokenHandler().WriteToken(token);
 
 
-            return tokenValue;
+            return "bearer " + tokenValue;
         }
 
         public List<UserResponseVM> GetAllUsers()

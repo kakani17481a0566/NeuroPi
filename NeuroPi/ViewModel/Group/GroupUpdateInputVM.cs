@@ -2,6 +2,6 @@
 {
     public class GroupUpdateInputVM
     {
-        public string Name { get; set; }
+        public string Name { get; set; }   // Only Name is allowed to be updated, not TenantId
     }
 }
