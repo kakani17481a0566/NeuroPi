@@ -56,6 +56,21 @@ namespace NeuroPi.UserManagment.Controllers
                 return new ResponseResult<RolePermissionResponseVM>(HttpStatusCode.InternalServerError, null, $"Error updating role permission: {ex.Message}");
             }
         }
+        [HttpDelete("{id}/{tenantId}")]
+        public ResponseResult<bool> Delete(int id, int tenantId)
+        {
+            try
+            {
+                var response = _rolePermissionService.DeleteByIdAndTenantId(id, tenantId);
+                return response
+                    ? new ResponseResult<bool>(HttpStatusCode.OK, true, "Role permission deleted successfully")
+                    : new ResponseResult<bool>(HttpStatusCode.NotFound, false, "Role permission not found");
+            }
+            catch (Exception ex)
+            {
+                return new ResponseResult<bool>(HttpStatusCode.InternalServerError, false, $"Error deleting role permission: {ex.Message}");
+            }
+        }
 
         [HttpGet]
         public ResponseResult<List<RolePermissionResponseVM>> GetAll()
@@ -121,20 +136,6 @@ namespace NeuroPi.UserManagment.Controllers
             }
         }
 
-        [HttpDelete("{id}/{tenantId}")]
-        public ResponseResult<bool> Delete(int id, int tenantId)
-        {
-            try
-            {
-                var response = _rolePermissionService.DeleteByIdAndTenantId(id, tenantId);
-                return response
-                    ? new ResponseResult<bool>(HttpStatusCode.OK, true, "Role permission deleted successfully")
-                    : new ResponseResult<bool>(HttpStatusCode.NotFound, false, "Role permission not found");
-            }
-            catch (Exception ex)
-            {
-                return new ResponseResult<bool>(HttpStatusCode.InternalServerError, false, $"Error deleting role permission: {ex.Message}");
-            }
-        }
+        
     }
 }

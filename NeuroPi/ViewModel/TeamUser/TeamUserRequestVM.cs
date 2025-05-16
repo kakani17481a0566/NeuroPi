@@ -10,11 +10,7 @@ namespace NeuroPi.UserManagment.ViewModel.TeamUser
         public int UserId { get; set; }
         public int TenantId { get; set; }
 
-        [Column("created_on")]
-        public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
-
-        [Column("updated_on")]
-        public DateTime? UpdatedOn { get; set; }
+        public int CreatedBy { get; set; }
 
         public static MTeamUser ToModel(TeamUserRequestVM vm)
         {
@@ -23,8 +19,8 @@ namespace NeuroPi.UserManagment.ViewModel.TeamUser
                 TeamId = vm.TeamId,
                 UserId = vm.UserId,
                 TenantId = vm.TenantId,
-                CreatedOn = vm.CreatedOn,
-                UpdatedOn = vm.UpdatedOn
+                CreatedBy = vm.CreatedBy,
+               
             };
         }
 

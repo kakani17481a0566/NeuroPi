@@ -142,7 +142,7 @@ namespace NeuroPi.UserManagment.Controllers
                 }
 
                 // Proceed with the update
-                var updatedGroup = _groupService.Update(groupId, new GroupUpdateInputVM { Name = input.Name });
+                var updatedGroup = _groupService.Update(groupId, new GroupUpdateInputVM { Name = input.Name,UpdatedBy=input.UpdatedBy });
 
                 return updatedGroup == null
                     ? new ResponseResult<object>(HttpStatusCode.NotFound, null, "Group not found")

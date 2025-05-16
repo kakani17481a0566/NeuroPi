@@ -87,21 +87,18 @@ namespace NeuroPi.UserManagment.Services.Implementation
             var group = _context.Groups.FirstOrDefault(g => g.GroupId == groupId && !g.IsDeleted);
             if (group == null) return null;
 
-            if (!string.IsNullOrEmpty(input.Name))
-            {
                 group.Name = input.Name;
                 group.UpdatedBy = input.UpdatedBy;
-              
-            }
-            group.UpdatedOn = DateTime.UtcNow;
-            _context.SaveChanges();
+                group.UpdatedOn = DateTime.UtcNow;
+                _context.SaveChanges();
 
             return new GroupVM
             {
                 GroupId = group.GroupId,
                 Name = group.Name,
                 TenantId = group.TenantId,
-                CreatedBy = group.CreatedBy,
+                //CreatedBy = group.CreatedBy,
+                UpdatedBy = group.UpdatedBy,
                 IsDeleted = group.IsDeleted
             };
         }

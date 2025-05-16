@@ -57,7 +57,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 .Where(d => d.TenantId == tenantId && !d.IsDeleted)
                 .ToList();
 
-            return departments.Select(d => DepartmentResponseVM.ToViewModel(d)).ToList();
+            return DepartmentResponseVM.ToViewModelList(departments);
         }
 
         public DepartmentResponseVM AddDepartment(DepartmentCreateVM request)
