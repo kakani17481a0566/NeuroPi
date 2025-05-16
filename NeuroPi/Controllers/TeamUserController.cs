@@ -1,8 +1,10 @@
-﻿using System.Net;
-using Microsoft.AspNetCore.Mvc;
-using NeuroPi.UserManagment.Response;
+﻿using Microsoft.AspNetCore.Mvc;
 using NeuroPi.UserManagment.Services.Interface;
 using NeuroPi.UserManagment.ViewModel.TeamUser;
+using NeuroPi.UserManagment.Response;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 
 namespace NeuroPi.UserManagment.Controllers
 {
@@ -17,143 +19,80 @@ namespace NeuroPi.UserManagment.Controllers
             _teamUserService = teamUserService;
         }
 
-        // GET: api/TeamUser
         [HttpGet]
         public ResponseResult<List<TeamUserResponseVM>> GetAllTeamUsers()
         {
-            var result = _teamUserService.GetTeamUsers();
-            if (result == null || result.Count == 0)
-            {
-                return new ResponseResult<List<TeamUserResponseVM>>(
-                    HttpStatusCode.NotFound,
-                    null,
-                    "No data for team users");
-            }
+            var teamUsers = _teamUserService.GetTeamUsers();
+            if (!teamUsers.Any())
+                return new ResponseResult<List<TeamUserResponseVM>>(HttpStatusCode.NotFound, null, "No team users found.");
 
-            return new ResponseResult<List<TeamUserResponseVM>>(
-                HttpStatusCode.OK,
-                result,
-                "Team users fetched successfully");
+            return new ResponseResult<List<TeamUserResponseVM>>(HttpStatusCode.OK, teamUsers);
         }
 
-        // GET: api/TeamUser/{id}
         [HttpGet("{id}")]
-        public ResponseResult<TeamUserResponseVM> GetById(int id)
+        public ResponseResult<TeamUserResponseVM> GetTeamUserById(int id)
         {
-            var result = _teamUserService.GetTeamUserById(id);
-            if (result == null)
-            {
-                return new ResponseResult<TeamUserResponseVM>(
-                    HttpStatusCode.NotFound,
-                    null,
-                    "No data for team user");
-            }
+            var teamUser = _teamUserService.GetTeamUserById(id);
+            if (teamUser == null)
+                return new ResponseResult<TeamUserResponseVM>(HttpStatusCode.NotFound, null, $"Team user with ID {id} not found.");
 
-            return new ResponseResult<TeamUserResponseVM>(
-                HttpStatusCode.OK,
-                result,
-                "Team user fetched successfully");
+            return new ResponseResult<TeamUserResponseVM>(HttpStatusCode.OK, teamUser);
         }
 
-        // POST: api/TeamUser
         [HttpPost]
-        public ResponseResult<TeamUserResponseVM> AddTeamUser([FromBody] TeamUserRequestVM teamUser)
+        public ResponseResult<TeamUserResponseVM> CreateTeamUser([FromBody] TeamUserRequestVM teamUserRequest)
         {
-            var result = _teamUserService.AddTeamUser(teamUser);
-            if (result == null)
-            {
-                return new ResponseResult<TeamUserResponseVM>(
-                    HttpStatusCode.NotAcceptable,
-                    null,
-                    "Failed to create team user");
-            }
+            if (!ModelState.IsValid)
+                return new ResponseResult<TeamUserResponseVM>(HttpStatusCode.BadRequest, null, "Invalid request body");
 
-            return new ResponseResult<TeamUserResponseVM>(
-                HttpStatusCode.Created,
-                result,
-                "Team user created successfully");
+            var created = _teamUserService.AddTeamUser(teamUserRequest);
+            if (created == null)
+                return new ResponseResult<TeamUserResponseVM>(HttpStatusCode.InternalServerError, null, "Error creating team user");
+
+            return new ResponseResult<TeamUserResponseVM>(HttpStatusCode.Created, created, "Team user created successfully");
         }
 
-        // PUT: api/TeamUser/{id}
-        [HttpPut("{id}")]
-        public ResponseResult<TeamUserResponseVM> UpdateTeamUserById(int id, [FromBody] TeamUserRequestVM teamUser)
+        [HttpPut("{tenantId}/{id}")]
+        public ResponseResult<TeamUserResponseVM> UpdateTeamUser(int tenantId, int id, [FromBody] TeamUserUpdateVM updateModel)
         {
-            var result = _teamUserService.UpdateTeamUser(id, teamUser);
-            if (result == null)
-            {
-                return new ResponseResult<TeamUserResponseVM>(
-                    HttpStatusCode.NotFound,
-                    null,
-                    "Team user not found");
-            }
+            if (!ModelState.IsValid)
+                return new ResponseResult<TeamUserResponseVM>(HttpStatusCode.BadRequest, null, "Invalid request body");
 
-            return new ResponseResult<TeamUserResponseVM>(
-                HttpStatusCode.OK,
-                result,
-                "Team user updated successfully");
+            var updated = _teamUserService.UpdateTeamUser(id, tenantId, updateModel);
+            if (updated == null)
+                return new ResponseResult<TeamUserResponseVM>(HttpStatusCode.NotFound, null, $"Team user with ID {id} and tenant ID {tenantId} not found.");
+
+            return new ResponseResult<TeamUserResponseVM>(HttpStatusCode.OK, updated, "Team user updated successfully");
         }
 
-        // DELETE: api/TeamUser/{id}
-        // DELETE: api/TeamUser/Tenant/{tenantId}/id/{id}
-        [HttpDelete("Tenant/{tenantId}/id/{id}")]
-        public ResponseResult<object> DeleteByTenantIdAndId(int tenantId, int id)
+        [HttpDelete("{tenantId}/{id}")]
+        public ResponseResult<string> DeleteTeamUser(int tenantId, int id)
         {
-            var result = _teamUserService.DeleteTeamUserByTenantIdAndId(tenantId, id);
-            if (result)
-            {
-                return new ResponseResult<object>(
-                    HttpStatusCode.OK,
-                    null,
-                    "Team user deleted successfully by tenantId and id");
-            }
+            var deleted = _teamUserService.DeleteTeamUserByTenantIdAndId(tenantId, id);
+            if (!deleted)
+                return new ResponseResult<string>(HttpStatusCode.NotFound, null, "Team user not found");
 
-            return new ResponseResult<object>(
-                HttpStatusCode.BadRequest,
-                null,
-                $"Team user not found with tenantId {tenantId} and id {id}");
+            return new ResponseResult<string>(HttpStatusCode.OK, null, "Team user deleted successfully");
         }
 
-
-
-        // GET: api/TeamUser/Tenant/{tenantId}
-        [HttpGet("Tenant/{tenantId}")]
+        [HttpGet("tenant/{tenantId}")]
         public ResponseResult<List<TeamUserResponseVM>> GetTeamUsersByTenantId(int tenantId)
         {
-            var result = _teamUserService.GetTeamUsersByTenantId(tenantId);
-            if (result == null || result.Count == 0)
-            {
-                return new ResponseResult<List<TeamUserResponseVM>>(
-                    HttpStatusCode.NotFound,
-                    null,
-                    "No data for team users");
-            }
-            return new ResponseResult<List<TeamUserResponseVM>>(
-                HttpStatusCode.OK,
-                result,
-                "Team users fetched successfully");
+            var teamUsers = _teamUserService.GetTeamUsersByTenantId(tenantId);
+            if (!teamUsers.Any())
+                return new ResponseResult<List<TeamUserResponseVM>>(HttpStatusCode.NotFound, null, $"No team users found for tenant ID {tenantId}");
+
+            return new ResponseResult<List<TeamUserResponseVM>>(HttpStatusCode.OK, teamUsers);
         }
 
-
-
-        // GET: api/TeamUser/Tenant/{tenantId}/{id}
-        [HttpGet("Tenant/{tenantId}/{id}")]
+        [HttpGet("tenant/{tenantId}/{id}")]
         public ResponseResult<TeamUserResponseVM> GetTeamUserByTenantIdAndId(int tenantId, int id)
         {
-            var result = _teamUserService.GetTeamUserByTenantIdAndId(tenantId, id);
+            var teamUser = _teamUserService.GetTeamUserByTenantIdAndId(tenantId, id);
+            if (teamUser == null)
+                return new ResponseResult<TeamUserResponseVM>(HttpStatusCode.NotFound, null, $"Team user not found for tenant ID {tenantId} and ID {id}");
 
-            if (result == null)
-            {
-                return new ResponseResult<TeamUserResponseVM>(
-                    HttpStatusCode.NotFound,
-                    null,
-                    "Team user not found for the provided TenantId and Id");
-            }
-
-            return new ResponseResult<TeamUserResponseVM>(
-                HttpStatusCode.OK,
-                result,
-                "Team user fetched successfully");
+            return new ResponseResult<TeamUserResponseVM>(HttpStatusCode.OK, teamUser);
         }
-
     }
 }

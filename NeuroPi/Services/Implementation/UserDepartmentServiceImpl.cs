@@ -21,6 +21,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
             return new UserDepartmentCreateVM
             {
 
+                
                 UserId = userDepartment.UserId,
                 DepartmentId = userDepartment.DepartmentId,
                 TenantId = userDepartment.TenantId,
@@ -84,7 +85,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
             }
             userDepartment.UserId = input.UserId;
             userDepartment.DepartmentId = input.DepartmentId;
-            userDepartment.TenantId = input.TenantId;
+    
             userDepartment.UpdatedBy = input.UpdatedBy;
             userDepartment.UpdatedOn = DateTime.UtcNow;
             _context.SaveChanges();

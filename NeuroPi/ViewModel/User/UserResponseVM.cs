@@ -12,7 +12,7 @@ namespace NeuroPi.UserManagment.ViewModel.User
         public int TenantId { get; set; } // Keep as int to match MUser
         public DateTime CreatedOn { get; set; }
         public int? CreatedBy { get; set; } // Keep as int? to match MBaseModel
-        public DateTime? UpdatedOn { get; set; }
+
         public int? UpdatedBy { get; set; } // Keep as int? to match MBaseModel
 
         public static UserResponseVM ToViewModel(MUser user)
@@ -27,7 +27,7 @@ namespace NeuroPi.UserManagment.ViewModel.User
                 TenantId = user.TenantId,
                 CreatedOn = user.CreatedOn,
                 CreatedBy = user.CreatedBy,
-                UpdatedOn = user.UpdatedOn,
+               
                 UpdatedBy = user.UpdatedBy
             };
         }

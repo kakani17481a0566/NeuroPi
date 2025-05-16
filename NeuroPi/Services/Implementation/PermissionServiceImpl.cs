@@ -15,7 +15,9 @@ namespace NeuroPi.UserManagment.Services.Implementation
         public PermissionResponseVM AddPermission(PermissionRequestVM permissionRequestVM)
         {
             var PermisssionModel = PermissionRequestVM.ToModel(permissionRequestVM);
+            PermisssionModel.CreatedOn = DateTime.UtcNow;
             _context.Permissions.Add(PermisssionModel);
+
             _context.SaveChanges();
             return PermissionResponseVM.ToViewModel(PermisssionModel);
         }
@@ -84,6 +86,8 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 result.PermissionId = id;
                 result.Name = requestVM.Name;
                 result.Description = requestVM.Description;
+                result.UpdatedOn = DateTime.UtcNow;
+                result.UpdatedBy = requestVM.UpdatedBy;
                 result.TenantId = tenantId;
                 _context.SaveChanges();
                 return PermissionResponseVM.ToViewModel(result);

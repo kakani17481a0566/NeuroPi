@@ -27,10 +27,10 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 GroupId = input.GroupId,
                 UserId = input.UserId,
                 TenantId = input.TenantId,
-                CreatedBy = input.CreatedBy,
-                CreatedOn = DateTime.UtcNow
+                CreatedBy = input.CreatedBy
+            
             };
-
+            groupUser.CreatedOn = DateTime.UtcNow;
             _context.GroupUsers.Add(groupUser);
             _context.SaveChanges();
 
@@ -58,8 +58,8 @@ namespace NeuroPi.UserManagment.Services.Implementation
             {
                 GroupId = groupUser.GroupId,
                 UserId = groupUser.UserId,
-                UpdatedBy = groupUser.UpdatedBy ?? input.UpdatedBy,
-                UpdatedOn = groupUser.UpdatedOn ?? DateTime.UtcNow
+                UpdatedBy = groupUser.UpdatedBy ?? input.UpdatedBy ,
+              
             };
         }
 

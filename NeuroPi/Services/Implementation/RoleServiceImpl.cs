@@ -16,7 +16,10 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
         public RoleResponseVM AddRole(RoleRequestVM roleRequestVM)
         {
+
+
             var roleModel = RoleRequestVM.ToModel(roleRequestVM);
+            roleModel.CreatedOn = DateTime.UtcNow;
             _context.Roles.Add(roleModel);
             var result = _context.SaveChanges();
 
@@ -58,27 +61,28 @@ namespace NeuroPi.UserManagment.Services.Implementation
             return role != null ? RoleResponseVM.ToViewModel(role) : null;
         }
 
-        public RoleResponseVM UpdateRoleByTenantIdAndId(int tenantId, int id, RoleRequestVM roleRequestVM)
+        public RoleResponseVM UpdateRoleByTenantIdAndId(int tenantId, int id, RoleUpdateRequestVM roleUpdateRequestVM)
         {
-           
             var existingRole = _context.Roles
                 .Where(r => !r.IsDeleted && r.TenantId == tenantId && r.RoleId == id)
                 .FirstOrDefault();
 
             if (existingRole == null)
             {
-                return null;
+                return null; 
             }
 
-        
-            existingRole.Name = roleRequestVM.Name;
-
-          
-            existingRole.UpdatedOn = DateTime.UtcNow;
+            existingRole.Name = roleUpdateRequestVM.Name;
+            existingRole.UpdatedBy = roleUpdateRequestVM.UpdatedBy;
+            existingRole.UpdatedOn = DateTime.UtcNow; 
 
             var result = _context.SaveChanges();
+
+          
             return result > 0 ? RoleResponseVM.ToViewModel(existingRole) : null;
         }
+
+
 
 
         public RoleResponseVM GetRoleByTenantIdAndId(int tenantId, int id)

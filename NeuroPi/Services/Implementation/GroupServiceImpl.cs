@@ -67,9 +67,10 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 Name = input.Name,
                 TenantId = input.TenantId,
                 CreatedBy = input.CreatedBy,
+                CreatedOn = DateTime.UtcNow,
                 IsDeleted = false
             };
-
+            group.CreatedOn = DateTime.UtcNow;
             _context.Groups.Add(group);
             _context.SaveChanges();
 
@@ -90,9 +91,9 @@ namespace NeuroPi.UserManagment.Services.Implementation
             {
                 group.Name = input.Name;
                 group.UpdatedBy = input.UpdatedBy;
-                group.UpdatedOn = DateTime.UtcNow;
+              
             }
-
+            group.UpdatedOn = DateTime.UtcNow;
             _context.SaveChanges();
 
             return new GroupVM

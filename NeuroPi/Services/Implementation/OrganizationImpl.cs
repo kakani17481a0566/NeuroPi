@@ -50,8 +50,12 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 Name = input.Name,
                 ParentId = input.ParentId,
                 TenantId = input.TenantId,
+                CreatedBy = input.CreatedBy,
+              
                 IsDeleted = false
             };
+            entity.CreatedOn = DateTime.UtcNow;
+
 
             _context.Organizations.Add(entity);
             _context.SaveChanges();
@@ -61,7 +65,8 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 OrganizationId = entity.OrganizationId,
                 Name = entity.Name,
                 ParentId = entity.ParentId,
-                TenantId = entity.TenantId
+                TenantId = entity.TenantId,
+                
             };
         }
 
@@ -82,7 +87,8 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 OrganizationId = org.OrganizationId,
                 Name = org.Name,
                 ParentId = org.ParentId,
-                TenantId = org.TenantId
+                TenantId = org.TenantId,
+                
             };
         }
 

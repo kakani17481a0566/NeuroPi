@@ -10,11 +10,9 @@
 
 
 
-            [Required]
-            public DateTime UpdatedOn { get; set; }
 
             [Required]
-            public int UpdatedBy { get; set; }
+            public int? UpdatedBy { get; set; }
 
 
         }

@@ -51,15 +51,21 @@ namespace NeuroPi.UserManagment.Controllers
         }
 
         [HttpPut("tenant/{tenantId}/id/{id}")]
-        public ResponseResult<RoleResponseVM> UpdateRoleByTenantIdAndId(int tenantId, int id, [FromBody] RoleRequestVM roleRequest)
+        public IActionResult UpdateRoleByTenantIdAndId(int tenantId, int id, [FromBody] RoleUpdateRequestVM roleUpdateRequestVM)
         {
-            var result = _roleService.UpdateRoleByTenantIdAndId(tenantId, id, roleRequest);
-            if (result != null)
+            var updatedRole = _roleService.UpdateRoleByTenantIdAndId(tenantId, id, roleUpdateRequestVM);
+
+            if (updatedRole == null)
             {
-                return new ResponseResult<RoleResponseVM>(HttpStatusCode.OK, result, "Role updated successfully by tenant and ID");
+                // Return a not found error with a message
+                return new ResponseResult<RoleResponseVM>(HttpStatusCode.NotFound, null, "Role not found or mismatch with tenantId and id");
             }
-            return new ResponseResult<RoleResponseVM>(HttpStatusCode.NotModified, null, "Role not updated, role not found or mismatch with tenantId and id");
+
+            // Return the updated role along with a success message
+            return new ResponseResult<RoleResponseVM>(HttpStatusCode.OK, updatedRole, "Role updated successfully by tenant and ID");
         }
+
+
 
         [HttpDelete("tenant/{tenantId}/id/{id}")]
         public ResponseResult<object> DeleteRoleByTenantIdAndId(int tenantId, int id)

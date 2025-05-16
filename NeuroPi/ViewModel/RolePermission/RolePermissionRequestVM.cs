@@ -34,6 +34,7 @@ namespace NeuroPi.UserManagment.ViewModel.RolePermission
                 CanRead = rolePermission.CanRead,
                 CanUpdate = rolePermission.CanUpdate,
                 CanDelete = rolePermission.CanDelete,
+                CreatedBy = rolePermission.CreatedBy
                 
             };
         }

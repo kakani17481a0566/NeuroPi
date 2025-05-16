@@ -1,46 +1,33 @@
-﻿using NeuroPi.UserManagment.Model;
+﻿using System;
+using NeuroPi.UserManagment.Model;
 
 namespace NeuroPi.UserManagment.ViewModel.TeamUser
 {
     public class TeamUserResponseVM
     {
-        public int Id { get; set; }
-
-        public int TenantId { get; set; }
-
-        public MTenant Tenant { get; set; }
-
-        public int UserId { get; set; }
-
-        public MUser User { get; set; }
-
+        public int TeamUserId { get; set; }
         public int TeamId { get; set; }
+        public int UserId { get; set; }
+        public int TenantId { get; set; }
+        public DateTime CreatedOn { get; set; }
+        public DateTime? UpdatedOn { get; set; }
 
-        public MTeam Team { get; set; }
-
-        public static TeamUserResponseVM ToViewModel(MTeamUser user)
+        public static TeamUserResponseVM ToViewModel(MTeamUser model)
         {
             return new TeamUserResponseVM
             {
-                Id = user.TeamUserId,
-                TenantId = user.TenantId,
-                TeamId = user.TeamId,
-                UserId = user.UserId,
-                User = user.User,
-                Team = user.Team,
+                TeamUserId = model.TeamUserId,
+                TeamId = model.TeamId,
+                UserId = model.UserId,
+                TenantId = model.TenantId,
+                CreatedOn = model.CreatedOn,
+                UpdatedOn = model.UpdatedOn
             };
         }
-        public static List<TeamUserResponseVM> ToViewModelList(List<MTeamUser> teamUsers)
-        {
-            return teamUsers.Select(t => new TeamUserResponseVM
-            {
-                Id = t.TeamUserId,
-                TenantId = t.TenantId,
-                UserId = t.UserId,
-                TeamId = t.TeamId,
-                // Include any other fields as required
-            }).ToList();
-        }
 
+        public static List<TeamUserResponseVM> ToViewModelList(List<MTeamUser> models)
+        {
+            return models.Select(m => ToViewModel(m)).ToList();
+        }
     }
 }

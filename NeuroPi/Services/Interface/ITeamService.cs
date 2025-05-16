@@ -1,18 +1,20 @@
 ﻿using NeuroPi.UserManagment.Model;
+using NeuroPi.UserManagment.Response;
 using NeuroPi.UserManagment.ViewModel.Team;
 
 namespace NeuroPi.UserManagment.Services.Interface
 {
     public interface ITeamService
     {
-        List<MTeam> GetAllTeams();
-        MTeamVM GetTeamById(int id);
-        MTeam CreateTeam(MTeam team);
-        MTeamVM UpdateTeam(int id,int tenantId, MTeamUpdateVM updatedTeam);
-        bool DeleteTeam(int id,int tenantId);
+        ResponseResult<List<MTeamVM>> GetAllTeamsVM();
+        ResponseResult<MTeamVM> GetTeamVMById(int id);
+        //ResponseResult<object> CreateTeamVM(MTeamInsertVM vm);
 
-        List<MTeamVM> GetAllTeamsByTenantId(int tenantId);
+        ResponseResult<MTeamVM> CreateTeamVM(MTeamInsertVM vm);
 
-        MTeamVM GetByIdAndTenantId(int id,int tenantId);
+        ResponseResult<MTeamVM> UpdateTeamVM(int id, int tenantId, MTeamUpdateVM updatedTeam);
+        ResponseResult<string> DeleteTeamVM(int id, int tenantId);
+        ResponseResult<List<MTeamVM>> GetAllTeamsByTenantIdVM(int tenantId);
+        ResponseResult<MTeamVM> GetByIdAndTenantIdVM(int id, int tenantId);
     }
 }

@@ -8,7 +8,7 @@ namespace NeuroPi.UserManagment.ViewModel.Department
         public int TenantId { get; set; }
         public int? HeadUserId { get; set; }
         public int OrganizationId { get; set; }
-        public int? CreatedBy { get; set; }
+        public int CreatedBy { get; set; }
         public int? UpdatedBy { get; set; }
 
         public static MDepartment ToModel(DepartmentRequestVM vm)
