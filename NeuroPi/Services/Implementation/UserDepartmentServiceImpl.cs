@@ -30,6 +30,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
             };
 
 
+
         }
 
         public List<UserDepartmentResponseVM> GetAllUserDepartments()
