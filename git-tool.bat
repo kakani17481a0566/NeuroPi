@@ -164,30 +164,36 @@ call :progress_line "Staging and committing changes"
 :: Stage all changes (add files)
 git add . || goto error
 
-:: Initialize variables for commit message
-set "msg=Auto commit: "
-setlocal EnableDelayedExpansion
-set fileCount=0
+:: Check if there are any changes to commit
+git diff --cached --quiet
+if %errorlevel% == 0 (
+    echo %YELLOW%No changes detected. Proceeding with push...%RESET%
+) else (
+    :: Initialize variables for commit message
+    set "msg=Auto commit: "
+    setlocal EnableDelayedExpansion
+    set fileCount=0
 
-:: Loop through all staged files and append them to the commit message
-for /f "delims=" %%f in ('git diff --name-only --cached') do (
-    set /a fileCount+=1
-    if !fileCount! leq 5 (
-        set "file=%%~nxf"
-        set "msg=!msg! !file!"
+    :: Loop through all staged files and append them to the commit message
+    for /f "delims=" %%f in ('git diff --name-only --cached') do (
+        set /a fileCount+=1
+        if !fileCount! leq 5 (
+            set "file=%%~nxf"
+            set "msg=!msg! !file!"
+        )
     )
-)
 
-:: If more than 5 files, add "and X more" to the commit message
-if !fileCount! gtr 5 (
-    set /a remaining=fileCount - 5
-    set "msg=!msg! and !remaining! more"
-)
+    :: If more than 5 files, add "and X more" to the commit message
+    if !fileCount! gtr 5 (
+        set /a remaining=fileCount - 5
+        set "msg=!msg! and !remaining! more"
+    )
 
-:: Commit the changes with the generated message
-endlocal & set msg=%msg%
-git commit -m "%msg%" || goto error
-echo %GREEN%Successfully committed changes: %msg%%RESET%
+    :: Commit the changes with the generated message
+    endlocal & set msg=%msg%
+    git commit -m "%msg%" || goto error
+    echo %GREEN%Successfully committed changes: %msg%%RESET%
+)
 
 call :progress_line "Force pushing to all remotes"
 for /f "tokens=*" %%a in ('git branch -r') do (
@@ -210,6 +216,7 @@ for /f "tokens=*" %%a in ('git branch -r') do (
     endlocal
 )
 goto pause_return
+
 
 
 
