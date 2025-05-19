@@ -159,7 +159,7 @@ for /f %%b in ('git branch --show-current') do set currentBranch=%%b
 echo === Remote Branches ===
 git branch -r
 echo.
-call :progress_line "Pushing to all remotes"
+call :progress_line "Force pushing to all remotes"
 for /f "tokens=*" %%a in ('git branch -r') do (
     set "remoteBranch=%%a"
     setlocal enabledelayedexpansion
@@ -167,7 +167,7 @@ for /f "tokens=*" %%a in ('git branch -r') do (
         set "branchName=!remoteBranch:origin/=!"
         echo !branchName! | findstr /i "^backup_" >nul
         if errorlevel 1 (
-            git push origin %currentBranch%:!branchName! || echo !RED!Failed to push to !branchName!!RESET!
+            git push --force origin %currentBranch%:!branchName! || echo !RED!Failed to push to !branchName!!RESET!
         ) else (
             echo !YELLOW!Skipping backup branch: !branchName!!RESET!
         )
@@ -175,6 +175,7 @@ for /f "tokens=*" %%a in ('git branch -r') do (
     endlocal
 )
 goto pause_return
+
 
 
 :: Commit and push changes (without tmp files)
