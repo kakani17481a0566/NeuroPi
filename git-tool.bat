@@ -165,7 +165,7 @@ for /f "tokens=*" %%a in ('git branch -r') do (
     setlocal enabledelayedexpansion
     if not "!remoteBranch!"=="origin/HEAD" (
         set "branchName=!remoteBranch:origin/=!"
-        echo !branchName! | findstr /i "^backup_master_" >nul
+        echo !branchName! | findstr /i "^backup_" >nul
         if errorlevel 1 (
             git push origin %currentBranch%:!branchName! || echo !RED!Failed to push to !branchName!!RESET!
         ) else (
@@ -176,6 +176,8 @@ for /f "tokens=*" %%a in ('git branch -r') do (
 )
 goto pause_return
 
+
+:: Commit and push changes (without tmp files)
 :commit_push
 echo.
 set "msg=Updated:"
