@@ -1,37 +1,37 @@
-using System.Net;
-using Microsoft.AspNetCore.Mvc;
+    using System.Net;
+    using Microsoft.AspNetCore.Mvc;
 
-namespace NeuroPi.UserManagment.Response
-{
-    public class ResponseResult<T> : IActionResult
+    namespace NeuroPi.UserManagment.Response
     {
-        // HTTP status code
-        public HttpStatusCode StatusCode { get; set; }
-
-        // Message to accompany the response
-        public string Message { get; set; }
-
-        // Data to return in the response
-        public T Data { get; set; }
-
-        // Constructor to initialize ResponseResult with all properties
-        public ResponseResult(HttpStatusCode statusCode, T data, string message = null)
+        public class ResponseResult<T> : IActionResult
         {
-            StatusCode = statusCode;
-            Message = message ?? "Request completed"; // Default message if none is provided
-            Data = data;
-        }
+            // HTTP status code
+            public HttpStatusCode StatusCode { get; set; }
 
-        // Required method for IActionResult implementation
-        public async Task ExecuteResultAsync(ActionContext context)
-        {
-            var result = new ObjectResult(this)
+            // Message to accompany the response
+            public string Message { get; set; }
+
+            // Data to return in the response
+            public T Data { get; set; }
+
+            // Constructor to initialize ResponseResult with all properties
+            public ResponseResult(HttpStatusCode statusCode, T data, string message = null)
             {
-                StatusCode = (int)StatusCode
-            };
+                StatusCode = statusCode;
+                Message = message ?? "Request completed"; // Default message if none is provided
+                Data = data;
+            }
 
-            // Asynchronously execute the result
-            await result.ExecuteResultAsync(context);
+            // Required method for IActionResult implementation
+            public async Task ExecuteResultAsync(ActionContext context)
+            {
+                var result = new ObjectResult(this)
+                {
+                    StatusCode = (int)StatusCode
+                };
+
+                // Asynchronously execute the result
+                await result.ExecuteResultAsync(context);
+            }
         }
     }
-}

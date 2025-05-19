@@ -27,7 +27,7 @@ namespace NeuroPi.UserManagment.ViewModel.User
         public int TenantId { get; set; }  // Make TenantId nullable
 
 
-        public int? CreatedBy { get; set; }
+        public int CreatedBy { get; set; }
 
         public static MUser ToModel(UserRequestVM request)
         {

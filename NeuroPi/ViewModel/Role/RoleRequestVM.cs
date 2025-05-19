@@ -1,4 +1,5 @@
-﻿using NeuroPi.UserManagment.Model;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using NeuroPi.UserManagment.Model;
 
 namespace NeuroPi.UserManagment.ViewModel.Role
 {
@@ -7,7 +8,24 @@ namespace NeuroPi.UserManagment.ViewModel.Role
 
         public string Name { get; set; }
 
-        //public int TenantId { get; set; }
+       
+
+     
+        public int CreatedBy { get; set; }
+
+      
+        public int TenantId { get; set; }
+
+
+        //[Column("updated_on")]
+        //public DateTime? UpdatedOn { get; set; } = DateTime.UtcNow;
+
+
+        //[Column("updated_by")]
+        //public int UpdatedBy { get; set; }
+
+
+
 
 
         public static MRole ToModel(RoleRequestVM roleRequestVM)
@@ -15,8 +33,16 @@ namespace NeuroPi.UserManagment.ViewModel.Role
             return new MRole
             {
                 Name = roleRequestVM.Name,
-                //TenantId = roleRequestVM.TenantId,
+                TenantId = roleRequestVM.TenantId,
+                CreatedBy = roleRequestVM.CreatedBy,
+               
+
+                
             };
         }
+
+
+
+       
     }
 }

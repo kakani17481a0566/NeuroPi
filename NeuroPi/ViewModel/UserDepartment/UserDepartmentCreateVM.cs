@@ -2,6 +2,9 @@
 {
     public class UserDepartmentCreateVM
     {
+
+
+        public int UserDeptId { get; set; }
         public int UserId { get; set; }
         
         public int DepartmentId { get; set; }

@@ -19,6 +19,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
             if (rolePermission == null) throw new ArgumentNullException(nameof(rolePermission));
 
             var newPermission = RolePermissionRequestVM.ToModel(rolePermission);
+            newPermission.CreatedOn = DateTime.UtcNow;
             _context.RolePermissions.Add(newPermission);
             _context.SaveChanges();
 
@@ -34,8 +35,13 @@ namespace NeuroPi.UserManagment.Services.Implementation
             }
             result.RoleId = rolePermission.RoleId;
             result.PermissionId = rolePermission.PermissionId;
+            result.CanCreate = rolePermission.CanCreate;
+            result.CanRead = rolePermission.CanRead;
+            result.CanUpdate = rolePermission.CanUpdate;
+            result.CanDelete = rolePermission.CanDelete;
             result.UpdatedBy = rolePermission.UpdatedBy;
-            result.UpdatedOn = rolePermission.UpdatedOn;
+            result.UpdatedOn = DateTime.UtcNow;
+
             _context.SaveChanges();
 
             return RolePermissionResponseVM.ToViewModel(result);

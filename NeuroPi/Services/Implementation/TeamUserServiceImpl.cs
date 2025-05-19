@@ -1,6 +1,10 @@
-﻿using NeuroPi.UserManagment.Data;
-using NeuroPi.UserManagment.Services.Interface;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using NeuroPi.UserManagment.Data;
+using NeuroPi.UserManagment.Model;
 using NeuroPi.UserManagment.ViewModel.TeamUser;
+using Microsoft.EntityFrameworkCore;
 
 namespace NeuroPi.UserManagment.Services.Implementation
 {
@@ -13,25 +17,13 @@ namespace NeuroPi.UserManagment.Services.Implementation
             _context = context;
         }
 
-        public TeamUserResponseVM AddTeamUser(TeamUserRequestVM teamUser)
+        public TeamUserResponseVM AddTeamUser(TeamUserRequestVM teamUserRequest)
         {
-            var teamUserModel = TeamUserRequestVM.ToModel(teamUser);
+            var teamUserModel = TeamUserRequestVM.ToModel(teamUserRequest);
             _context.TeamUsers.Add(teamUserModel);
-            int result = _context.SaveChanges();
+            var result = _context.SaveChanges();
 
-            if (result > 0)
-            {
-                TeamUserResponseVM response = new TeamUserResponseVM()
-                {
-                    Id = teamUserModel.TeamUserId,
-                    TenantId = teamUserModel.TenantId,
-                    UserId = teamUserModel.UserId,
-                    TeamId = teamUserModel.UserId,
-                };
-                return response;
-            }
-
-            return null;
+            return result > 0 ? TeamUserResponseVM.ToViewModel(teamUserModel) : null;
         }
 
         public bool DeleteTeamUserByTenantIdAndId(int tenantId, int id)
@@ -39,12 +31,8 @@ namespace NeuroPi.UserManagment.Services.Implementation
             var teamUser = _context.TeamUsers
                 .FirstOrDefault(t => t.TeamUserId == id && t.TenantId == tenantId && !t.IsDeleted);
 
-            if (teamUser == null)
-            {
-                return false; 
-            }
+            if (teamUser == null) return false;
 
-            
             teamUser.IsDeleted = true;
             teamUser.UpdatedOn = DateTime.UtcNow;
             _context.SaveChanges();
@@ -54,63 +42,53 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
         public TeamUserResponseVM GetTeamUserById(int id)
         {
-            var result = _context.TeamUsers.FirstOrDefault(t => t.TeamUserId == id && !t.IsDeleted);
-            if (result != null)
-            {
-                return TeamUserResponseVM.ToViewModel(result);
-            }
-            return null;
+            var teamUser = _context.TeamUsers
+                .FirstOrDefault(t => t.TeamUserId == id && !t.IsDeleted);
+
+            return teamUser != null ? TeamUserResponseVM.ToViewModel(teamUser) : null;
         }
 
         public List<TeamUserResponseVM> GetTeamUsers()
         {
-            var result = _context.TeamUsers.Where(t => !t.IsDeleted).ToList();
-            if (result != null && result.Count > 0)
-            {
-                return TeamUserResponseVM.ToViewModelList(result);
-            }
-            return null;
+            var teamUsers = _context.TeamUsers
+                .Where(t => !t.IsDeleted)
+                .ToList();
+
+            return teamUsers.Any() ? TeamUserResponseVM.ToViewModelList(teamUsers) : new List<TeamUserResponseVM>();
         }
 
-        public TeamUserResponseVM UpdateTeamUser(int id, TeamUserRequestVM teamUser)
+        public TeamUserResponseVM UpdateTeamUser(int id, int tenantId, TeamUserUpdateVM updateModel)
         {
-            var teamUserModel = _context.TeamUsers.FirstOrDefault(t => t.TeamUserId == id && !t.IsDeleted);
-            if (teamUserModel != null)
-            {
-                teamUserModel.TeamUserId = id;
-                teamUserModel.UserId = teamUser.UserId;
-                teamUserModel.TenantId = teamUser.TenantId;
-                teamUserModel.TeamId = teamUser.TeamId;
-                teamUserModel.UpdatedOn = DateTime.UtcNow;
-                _context.SaveChanges();
-                return TeamUserResponseVM.ToViewModel(teamUserModel);
-            }
-            return null;
-        }
+            var existingTeamUser = _context.TeamUsers
+                .FirstOrDefault(t => t.TeamUserId == id && t.TenantId == tenantId && !t.IsDeleted);
 
+            if (existingTeamUser == null) return null;
+
+            existingTeamUser.TeamId = updateModel.TeamId;
+            existingTeamUser.UserId = updateModel.UserId;
+            existingTeamUser.UpdatedOn = DateTime.UtcNow;
+            existingTeamUser.UpdatedBy = updateModel.UpdatedBy;
+
+            _context.SaveChanges();
+
+            return TeamUserResponseVM.ToViewModel(existingTeamUser);
+        }
 
         public List<TeamUserResponseVM> GetTeamUsersByTenantId(int tenantId)
         {
-            var result = _context.TeamUsers.Where(t => t.TenantId == tenantId && !t.IsDeleted).ToList();
-            if (result != null && result.Count > 0)
-            {
-                return TeamUserResponseVM.ToViewModelList(result);
-            }
-            return null;
+            var teamUsers = _context.TeamUsers
+                .Where(t => t.TenantId == tenantId && !t.IsDeleted)
+                .ToList();
+
+            return teamUsers.Any() ? TeamUserResponseVM.ToViewModelList(teamUsers) : new List<TeamUserResponseVM>();
         }
 
         public TeamUserResponseVM GetTeamUserByTenantIdAndId(int tenantId, int id)
         {
-            var result = _context.TeamUsers
-                                 .FirstOrDefault(t => t.TenantId == tenantId && t.TeamUserId == id && !t.IsDeleted);
+            var teamUser = _context.TeamUsers
+                .FirstOrDefault(t => t.TenantId == tenantId && t.TeamUserId == id && !t.IsDeleted);
 
-            if (result != null)
-            {
-                return TeamUserResponseVM.ToViewModel(result);
-            }
-
-            return null; 
+            return teamUser != null ? TeamUserResponseVM.ToViewModel(teamUser) : null;
         }
-
     }
 }

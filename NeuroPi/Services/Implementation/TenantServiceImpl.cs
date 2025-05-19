@@ -86,7 +86,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
             {
                 TenantId = existingTenant.TenantId,
                 Name = existingTenant.Name,
-                CreatedOn = existingTenant.CreatedOn,
+                UpdatedBy = input.UpdatedBy,
                 UpdatedOn = existingTenant.UpdatedOn
             };
         }

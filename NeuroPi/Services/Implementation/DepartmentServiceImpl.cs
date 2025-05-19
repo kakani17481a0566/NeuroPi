@@ -57,16 +57,12 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 .Where(d => d.TenantId == tenantId && !d.IsDeleted)
                 .ToList();
 
-            return departments.Select(d => DepartmentResponseVM.ToViewModel(d)).ToList();
+            return DepartmentResponseVM.ToViewModelList(departments);
         }
 
         public DepartmentResponseVM AddDepartment(DepartmentCreateVM request)
         {
-            if (!request.CreatedBy.HasValue || request.CreatedBy.Value == 0)
-                throw new ArgumentException("CreatedBy user ID must be provided and valid.");
-
-            if (!_context.Users.Any(u => u.UserId == request.CreatedBy.Value))
-                throw new ArgumentException("Invalid CreatedBy user ID.");
+          
 
             var departmentModel = DepartmentCreateVM.ToModel(request);
             departmentModel.CreatedOn = DateTime.UtcNow;

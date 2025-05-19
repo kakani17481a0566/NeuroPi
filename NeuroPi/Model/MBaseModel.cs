@@ -8,7 +8,7 @@ namespace NeuroPi.UserManagment.Model
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
 
         [Column("created_by")]
-        public int? CreatedBy { get; set; }
+        public int CreatedBy { get; set; }
 
         [Column("updated_on")]
         public DateTime? UpdatedOn { get; set; }

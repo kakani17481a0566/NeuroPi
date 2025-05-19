@@ -14,7 +14,7 @@ namespace NeuroPi.UserManagment.ViewModel.UserDepartment
 
         public int? UpdatedBy { get; set; }
 
-        public DateTime? UpdatedOn { get; set; }
+
 
         public static UserDepartmentResponseVM ToViewModel(MUserDepartment userDepartment)
         {
@@ -27,7 +27,7 @@ namespace NeuroPi.UserManagment.ViewModel.UserDepartment
                 CreatedBy = userDepartment.CreatedBy,
                 CreatedOn = userDepartment.CreatedOn,
                 UpdatedBy = userDepartment.UpdatedBy,
-                UpdatedOn = userDepartment.UpdatedOn
+              
             };
 
             

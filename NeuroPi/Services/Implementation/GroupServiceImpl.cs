@@ -2,7 +2,9 @@
 using NeuroPi.UserManagment.Model;
 using NeuroPi.UserManagment.Services.Interface;
 using NeuroPi.UserManagment.ViewModel.Group;
+using System;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace NeuroPi.UserManagment.Services.Implementation
 {
@@ -40,23 +42,35 @@ namespace NeuroPi.UserManagment.Services.Implementation
             };
         }
 
+        public GroupVM GetByTenantAndGroupId(int tenantId, int groupId)
+        {
+            var group = _context.Groups
+                .FirstOrDefault(g => g.GroupId == groupId && g.TenantId == tenantId && !g.IsDeleted);
+
+            if (group == null) return null;
+
+            return new GroupVM
+            {
+                GroupId = group.GroupId,
+                Name = group.Name,
+                TenantId = group.TenantId
+            };
+        }
+
         public GroupVM Create(GroupInputVM input)
         {
             var tenantExists = _context.Tenants.Any(t => t.TenantId == input.TenantId);
-            if (!tenantExists)
-            {
-                return null;
-            }
+            if (!tenantExists) return null;
 
             var group = new MGroup
             {
                 Name = input.Name,
                 TenantId = input.TenantId,
                 CreatedBy = input.CreatedBy,
-
+                CreatedOn = DateTime.UtcNow,
                 IsDeleted = false
             };
-
+            group.CreatedOn = DateTime.UtcNow;
             _context.Groups.Add(group);
             _context.SaveChanges();
 
@@ -73,35 +87,22 @@ namespace NeuroPi.UserManagment.Services.Implementation
             var group = _context.Groups.FirstOrDefault(g => g.GroupId == groupId && !g.IsDeleted);
             if (group == null) return null;
 
-            // Update the Name, Description and CreatedBy fields if they are provided
-            if (!string.IsNullOrEmpty(input.Name))
-            {
                 group.Name = input.Name;
-                group.UpdatedBy= input.UpdatedBy;  // Update UpdatedBy if provided
-                group.UpdatedOn = DateTime.UtcNow;  // Update UpdatedOn to current time
-            }
+                group.UpdatedBy = input.UpdatedBy;
+                group.UpdatedOn = DateTime.UtcNow;
+                _context.SaveChanges();
 
-
-          
-            // Save changes to the database
-            _context.SaveChanges();
-
-            // Return the updated Group ViewModel
             return new GroupVM
             {
                 GroupId = group.GroupId,
                 Name = group.Name,
                 TenantId = group.TenantId,
-
-                UpdatedBy =group.UpdatedBy,
-
-                CreatedBy = group.CreatedBy,
+                //CreatedBy = group.CreatedBy,
+                UpdatedBy = group.UpdatedBy,
                 IsDeleted = group.IsDeleted
             };
         }
 
-
-        // Soft delete a group
         public bool DeleteById(int groupId, int tenantId)
         {
             var group = _context.Groups
@@ -109,16 +110,12 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
             if (group == null) return false;
 
-            // Perform the soft delete
             group.IsDeleted = true;
             group.UpdatedOn = DateTime.UtcNow;
 
             _context.SaveChanges();
             return true;
         }
-
-
-
 
         public List<GroupVM> GetByTenantId(int tenantId)
         {
@@ -130,20 +127,6 @@ namespace NeuroPi.UserManagment.Services.Implementation
                     Name = g.Name,
                     TenantId = g.TenantId
                 }).ToList();
-        }
-
-        public GroupVM GetByTenantAndGroupId(int tenantId, int groupId)
-        {
-            var group = _context.Groups
-                .FirstOrDefault(g => g.GroupId == groupId && g.TenantId == tenantId && !g.IsDeleted);
-            if (group == null) return null;
-
-            return new GroupVM
-            {
-                GroupId = group.GroupId,
-                Name = group.Name,
-                TenantId = group.TenantId
-            };
         }
     }
 }

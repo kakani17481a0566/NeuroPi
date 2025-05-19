@@ -1,5 +1,7 @@
-﻿using NeuroPi.UserManagment.Data;
+﻿using System.Net;
+using NeuroPi.UserManagment.Data;
 using NeuroPi.UserManagment.Model;
+using NeuroPi.UserManagment.Response;
 using NeuroPi.UserManagment.Services.Interface;
 using NeuroPi.UserManagment.ViewModel.Team;
 
@@ -14,79 +16,111 @@ namespace NeuroPi.UserManagment.Services.Implementation
             _context = context;
         }
 
-      
-        public List<MTeam> GetAllTeams()
+        public ResponseResult<List<MTeamVM>> GetAllTeamsVM()
         {
-            return _context.Teams
-                .Where(t => !t.IsDeleted)
-                .ToList();
+            var teams = _context.Teams.Where(t => !t.IsDeleted).ToList();
+            var result = MTeamVM.ToViewModelList(teams);
+            return new ResponseResult<List<MTeamVM>>(HttpStatusCode.OK, result, "Teams fetched");
         }
 
-      
-        public MTeamVM GetTeamById(int id)
+        public ResponseResult<MTeamVM> GetTeamVMById(int id)
         {
-            var result = _context.Teams.FirstOrDefault(t => t.TeamId == id && !t.IsDeleted);
-            if (result != null)
+            var team = _context.Teams.FirstOrDefault(t => t.TeamId == id && !t.IsDeleted);
+            if (team == null)
             {
-                return MTeamVM.ToViewModel(result);
+                return new ResponseResult<MTeamVM>(HttpStatusCode.NotFound, null, "Team not found");
             }
-            return null;
 
+            var vm = MTeamVM.ToViewModel(team);
+            return new ResponseResult<MTeamVM>(HttpStatusCode.OK, vm, "Team found");
         }
 
-       
-        public MTeam CreateTeam(MTeam team)
+        public ResponseResult<MTeamVM> CreateTeamVM(MTeamInsertVM vm)
         {
-            team.IsDeleted = false;
+            var team = new MTeam
+            {
+                Name = vm.Name,
+                TenantId = vm.TenantId,
+                CreatedBy = vm.CreatedBy,
+                CreatedOn = DateTime.UtcNow,
+                IsDeleted = false
+            };
+
             _context.Teams.Add(team);
             _context.SaveChanges();
-            return team;
+
+            var teamVM = MTeamVM.ToViewModel(team);
+
+            return new ResponseResult<MTeamVM>(
+                HttpStatusCode.Created,
+                teamVM,
+                "Team created successfully");
         }
 
-  
-        public MTeamVM UpdateTeam(int id, int tenantId,MTeamUpdateVM updatedTeam)
+
+        public ResponseResult<MTeamVM> UpdateTeamVM(int id, int tenantId, MTeamUpdateVM updatedTeam)
         {
-            var existing = _context.Teams.FirstOrDefault(t => t.TeamId == id && !t.IsDeleted && t.TenantId==tenantId);
-            if (existing == null) return null;
+            var existing = _context.Teams.FirstOrDefault(t =>
+                t.TeamId == id && t.TenantId == tenantId && !t.IsDeleted);
+
+            if (existing == null)
+            {
+                return new ResponseResult<MTeamVM>(HttpStatusCode.NotFound, null, "Team not found");
+            }
 
             existing.Name = updatedTeam.Name;
-            existing.TenantId = tenantId;
             existing.UpdatedBy = updatedTeam.UpdatedBy;
             existing.UpdatedOn = DateTime.UtcNow;
 
             _context.SaveChanges();
-            return MTeamVM.ToViewModel(existing);
+
+            var vm = MTeamVM.ToViewModel(existing);
+            return new ResponseResult<MTeamVM>(HttpStatusCode.OK, vm, "Team updated successfully");
         }
 
-      
-        public bool DeleteTeam(int id, int tenantId)
+        public ResponseResult<string> DeleteTeamVM(int id, int tenantId)
         {
-            var team = _context.Teams.FirstOrDefault(t => t.TeamId == id && !t.IsDeleted && t.TenantId==tenantId);
-            if (team == null) return false;
+            var team = _context.Teams.FirstOrDefault(t =>
+                t.TeamId == id && t.TenantId == tenantId && !t.IsDeleted);
+
+            if (team == null)
+            {
+                return new ResponseResult<string>(HttpStatusCode.NotFound, null, "Team not found");
+            }
 
             team.IsDeleted = true;
             _context.SaveChanges();
-            return true;
+
+            return new ResponseResult<string>(HttpStatusCode.OK, null, "Team deleted");
         }
 
-        public List<MTeamVM> GetAllTeamsByTenantId(int tenantId)
+        public ResponseResult<List<MTeamVM>> GetAllTeamsByTenantIdVM(int tenantId)
         {
-            var result=_context.Teams.Where(t=>t.TenantId == tenantId && !t.IsDeleted).ToList();
-            if(result!=null &&  result.Count()>0)
+            var teams = _context.Teams
+                .Where(t => t.TenantId == tenantId && !t.IsDeleted)
+                .ToList();
+
+            if (teams == null || teams.Count == 0)
             {
-                return MTeamVM.ToViewModelList(result);
+                return new ResponseResult<List<MTeamVM>>(HttpStatusCode.NotFound, null, "No teams found");
             }
-            return null;
+
+            var result = MTeamVM.ToViewModelList(teams);
+            return new ResponseResult<List<MTeamVM>>(HttpStatusCode.OK, result, "Teams fetched successfully");
         }
 
-        public MTeamVM GetByIdAndTenantId(int id, int tenantId)
+        public ResponseResult<MTeamVM> GetByIdAndTenantIdVM(int id, int tenantId)
         {
-            var result=_context.Teams.FirstOrDefault(t=>t.TeamId==id && t.TenantId==tenantId && !t.IsDeleted);
-            if (result != null)
+            var team = _context.Teams
+                .FirstOrDefault(t => t.TeamId == id && t.TenantId == tenantId && !t.IsDeleted);
+
+            if (team == null)
             {
-                return MTeamVM.ToViewModel(result);
+                return new ResponseResult<MTeamVM>(HttpStatusCode.NotFound, null, "Team not found");
             }
-            return null;
+
+            var vm = MTeamVM.ToViewModel(team);
+            return new ResponseResult<MTeamVM>(HttpStatusCode.OK, vm, "Team found successfully");
         }
     }
 }
