@@ -21,7 +21,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
             return new UserDepartmentCreateVM
             {
 
-                
+                UserDeptId = userDepartment.UserDeptId,
                 UserId = userDepartment.UserId,
                 DepartmentId = userDepartment.DepartmentId,
                 TenantId = userDepartment.TenantId,
@@ -85,7 +85,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
             }
             userDepartment.UserId = input.UserId;
             userDepartment.DepartmentId = input.DepartmentId;
-    
+
             userDepartment.UpdatedBy = input.UpdatedBy;
             userDepartment.UpdatedOn = DateTime.UtcNow;
             _context.SaveChanges();
@@ -97,7 +97,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
         public bool DeleteUserDepartmentByUserDeptIdAndTenantId(int id, int tenantId)
         {
-            var userDepartment = _context.UserDepartments.FirstOrDefault(t => t.UserDeptId == id && t.TenantId==tenantId&&!t.IsDeleted);
+            var userDepartment = _context.UserDepartments.FirstOrDefault(t => t.UserDeptId == id && t.TenantId == tenantId && !t.IsDeleted);
             if (userDepartment == null)
             {
                 return false;
