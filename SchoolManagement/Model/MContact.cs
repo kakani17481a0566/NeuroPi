@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace SchoolManagement.Model
 {
     [Table("contact")]
-    public class Contact
+    public class MContact
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -13,11 +13,11 @@ namespace SchoolManagement.Model
 
         [Required]
         [Column("name", TypeName = "varchar(100)")]
-        public string Name { get; set; } = string.Empty;
+        public string Name { get; set; } 
 
         [Required]
         [Column("pri_number", TypeName = "varchar(20)")]
-        public string PriNumber { get; set; } = string.Empty;
+        public string PriNumber { get; set; } 
 
         [Column("sec_number", TypeName = "varchar(20)")]
         public string? SecNumber { get; set; }
@@ -27,7 +27,7 @@ namespace SchoolManagement.Model
 
         [Required]
         [Column("address_1", TypeName = "varchar(200)")]
-        public string Address1 { get; set; } = string.Empty;
+        public string Address1 { get; set; } 
 
         [Column("address_2", TypeName = "varchar(200)")]
         public string? Address2 { get; set; }
@@ -37,11 +37,11 @@ namespace SchoolManagement.Model
 
         [Required]
         [Column("city", TypeName = "varchar(50)")]
-        public string City { get; set; } = string.Empty;
+        public string City { get; set; } 
 
         [Column("pincode", TypeName = "varchar(20)")]
         public string? Pincode { get; set; }
 
-        public virtual ICollection<Institution> Institutions { get; set; } = new List<Institution>();
+        public virtual ICollection<MInstitution> Institutions { get; set; } = new List<MInstitution>();
     }
 }

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace SchoolManagement.Model
 {
     [Table("institution")]
-    public class Institution
+    public class MInstitution
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -19,6 +19,6 @@ namespace SchoolManagement.Model
         public int? ContactId { get; set; }
 
         [ForeignKey("ContactId")]
-        public virtual Contact? Contact { get; set; }
+        public virtual MContact? Contact { get; set; }
     }
 }

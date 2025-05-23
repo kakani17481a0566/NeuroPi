@@ -7,12 +7,12 @@ namespace NeuroPi.UserManagment.Data
     {
         public SchoolManagementDb(DbContextOptions<SchoolManagementDb> options) : base(options) { }
 
-        public DbSet<Contact> Contacts { get; set; }
-        public DbSet<Institution> Institutions { get; set; }
+        public DbSet<MContact> Contacts { get; set; }
+        public DbSet<MInstitution> Institutions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Contact>(entity =>
+            modelBuilder.Entity<MContact>(entity =>
             {
                 entity.ToTable("contact");
                 entity.HasIndex(e => e.PriNumber).IsUnique();
@@ -20,7 +20,7 @@ namespace NeuroPi.UserManagment.Data
                     @"""pri_number"" <> ""sec_number"" OR ""sec_number"" IS NULL");
             });
 
-            modelBuilder.Entity<Institution>(entity =>
+            modelBuilder.Entity<MInstitution>(entity =>
             {
                 entity.ToTable("institution");
                 entity.HasIndex(e => e.Name).IsUnique();
