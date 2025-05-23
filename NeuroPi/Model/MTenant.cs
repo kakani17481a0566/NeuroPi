@@ -19,14 +19,7 @@ namespace NeuroPi.UserManagment.Model
         [Column("name", TypeName = "varchar(100)")]
         public string Name { get; set; } = string.Empty;
 
-        //[ForeignKey("CreatedBy")]
-        //[NotMapped]
-        //public virtual MUser? Creator { get; set; }
-
-        //[ForeignKey("UpdatedBy")]
-        //[NotMapped]
-
-        //public virtual MUser? Updater { get; set; }
+        
 
         public virtual ICollection<MUser> Users { get; set; } = new List<MUser>();
 
@@ -35,5 +28,5 @@ namespace NeuroPi.UserManagment.Model
 
 
 
-    }
+  }
 }
