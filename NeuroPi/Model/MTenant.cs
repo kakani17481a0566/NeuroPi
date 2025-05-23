@@ -1,34 +1,39 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.OpenApi.Models;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace NeuroPi.UserManagment.Model  // Ensure this is the only namespace with MTenant definition
+
+namespace NeuroPi.UserManagment.Model
 {
     [Table("tenants")]
-    public class MTenant : MBaseModel  // Inheriting audit fields from MBaseModel
+    public class MTenant : MBaseModel
     {
-        // Primary key for the tenant
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]  // Auto-incremented primary key
-        [Column("tenant_id")] // Maps to the 'tenant_id' column in the database
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Column("tenant_id")]
         public int TenantId { get; set; }
 
-        // Name of the tenant, required field with max length constraint
         [Required]
         [MaxLength(100)]
-        [Column("name")]
-        public string Name { get; set; }
+        [Column("name", TypeName = "varchar(100)")]
+        public string Name { get; set; } = string.Empty;
 
-        // Navigation property to the creator user (foreign key to MUser)
-        [ForeignKey("CreatedBy")]  // Explicitly mapping to the 'CreatedBy' column in the MUser table
-        public virtual MUser Creator { get; set; }
+        //[ForeignKey("CreatedBy")]
+        //[NotMapped]
+        //public virtual MUser? Creator { get; set; }
 
-        // Navigation property to the updater user (foreign key to MUser)
-        [ForeignKey("UpdatedBy")]  // Explicitly mapping to the 'UpdatedBy' column in the MUser table
-        public virtual MUser Updater { get; set; }
+        //[ForeignKey("UpdatedBy")]
+        //[NotMapped]
 
-        // Collection of users associated with the tenant (one-to-many relationship)
-        public virtual ICollection<MUser> Users { get; set; } = new List<MUser>();  // Initialize to prevent null reference
+        //public virtual MUser? Updater { get; set; }
 
-        // If needed, other navigation properties or additional business logic can be added here
+        public virtual ICollection<MUser> Users { get; set; } = new List<MUser>();
+
+
+      
+
+
+
     }
 }

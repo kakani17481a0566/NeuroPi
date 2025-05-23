@@ -1,10 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using NeuroPi.UserManagment.Model;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SchoolManagement.Model
 {
     [Table("institution")]
-    public class Institution
+    public class MInstitution : MBaseModel
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -18,7 +19,15 @@ namespace SchoolManagement.Model
         [Column("contact_id")]
         public int? ContactId { get; set; }
 
+        [Required]
+        [Column("tenant_id")]
+        public int TenantId { get; set; }
+
         [ForeignKey("ContactId")]
-        public virtual Contact? Contact { get; set; }
+        public virtual MContact? Contact { get; set; }
+
+
+
+        public virtual MTenant Tenant { get; set; }
     }
 }

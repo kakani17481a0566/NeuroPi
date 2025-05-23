@@ -1,10 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using NeuroPi.UserManagment.Model;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SchoolManagement.Model
 {
     [Table("contact")]
-    public class Contact
+    public class MContact : MBaseModel
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -42,6 +44,14 @@ namespace SchoolManagement.Model
         [Column("pincode", TypeName = "varchar(20)")]
         public string? Pincode { get; set; }
 
-        public virtual ICollection<Institution> Institutions { get; set; } = new List<Institution>();
+        [Required]
+        [Column("tenant_id")]
+        public int TenantId { get; set; }
+
+       
+
+        public virtual ICollection<MInstitution> Institutions { get; set; } = new List<MInstitution>();
+
+        public virtual MTenant Tenant { get; set; }
     }
 }
