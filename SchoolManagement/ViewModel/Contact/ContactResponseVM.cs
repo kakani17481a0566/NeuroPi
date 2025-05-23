@@ -15,6 +15,14 @@ namespace SchoolManagement.ViewModel.Contact
         public string City { get; set; } = string.Empty;
         public string? Pincode { get; set; }
 
+        public int TenantId { get; set; }
+        public int CreatedBy { get; set; }
+
+        public int? UpdatedBy { get; set; }
+        public DateTime CreatedOn { get; set; }
+
+        public DateTime? UpdatedOn { get; set; }
+
         public static ContactResponseVM ToViewModel(MContact contact)
         {
             return new ContactResponseVM
@@ -28,7 +36,13 @@ namespace SchoolManagement.ViewModel.Contact
                 Address2 = contact.Address2,
                 State = contact.State,
                 City = contact.City,
-                Pincode = contact.Pincode
+                Pincode = contact.Pincode,
+                TenantId = contact.TenantId,
+                CreatedBy = contact.CreatedBy,
+                CreatedOn = contact.CreatedOn,
+                UpdatedBy = contact.UpdatedBy,
+                UpdatedOn = contact.UpdatedOn
+
             };
         }
 

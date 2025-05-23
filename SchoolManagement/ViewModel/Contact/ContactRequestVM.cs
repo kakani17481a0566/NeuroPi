@@ -14,6 +14,14 @@ namespace SchoolManagement.ViewModel.Contact
         public string City { get; set; } = string.Empty;
         public string? Pincode { get; set; }
 
+        public int TenantId { get; set; }
+
+        public int createdBy { get; set; }
+
+
+
+
+
 
         public static MContact ToModel(ContactRequestVM requestVM)
         {
@@ -27,7 +35,11 @@ namespace SchoolManagement.ViewModel.Contact
                 Address2 = requestVM.Address2,
                 State = requestVM.State,
                 City = requestVM.City,
-                Pincode = requestVM.Pincode
+                Pincode = requestVM.Pincode,
+                TenantId = requestVM.TenantId,
+                CreatedBy = requestVM.createdBy,
+                CreatedOn = DateTime.UtcNow
+               
             };
         }
     }
