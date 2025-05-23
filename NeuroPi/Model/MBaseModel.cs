@@ -14,6 +14,7 @@ namespace NeuroPi.UserManagment.Model
         [Column("updated_on")]
         public DateTime? UpdatedOn { get; set; }
 
+
         [Column("updated_by")]
 
         public int? UpdatedBy { get; set; }
