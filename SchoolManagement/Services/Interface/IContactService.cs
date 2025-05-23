@@ -1,6 +1,11 @@
-﻿namespace SchoolManagement.Services.Interface
+﻿using SchoolManagement.Model;
+using System.Collections.Generic;
+
+namespace SchoolManagement.Services.Interface
 {
-    public interface IContact
+    public interface IContactService
     {
+        List<MContact> GetAllContacts();
+        List<MContact> GetContactsByTenant(int tenantId);
     }
 }

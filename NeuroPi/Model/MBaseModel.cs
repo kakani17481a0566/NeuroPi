@@ -8,17 +8,22 @@ namespace NeuroPi.UserManagment.Model
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
 
         [Column("created_by")]
+
         public int CreatedBy { get; set; }
 
         [Column("updated_on")]
         public DateTime? UpdatedOn { get; set; }
 
+
         [Column("updated_by")]
+
         public int? UpdatedBy { get; set; }
 
 
 
         [Column("is_deleted")]
-        public bool IsDeleted { get; set; } = false; 
+        public bool IsDeleted { get; set; } = false;
+
+       
     }
 }
