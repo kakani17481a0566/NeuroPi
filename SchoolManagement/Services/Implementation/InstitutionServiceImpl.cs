@@ -20,6 +20,7 @@ namespace SchoolManagement.Services.Implementation
             _context = context;
         }
 
+        // Get list of all institutions (excluding deleted ones)
         public List<InstitutionResponseVM> GetAll()
         {
             return _context.Institutions
@@ -38,6 +39,7 @@ namespace SchoolManagement.Services.Implementation
                 }).ToList();
         }
 
+        // Get institution by ID
         public InstitutionResponseVM GetById(int id)
         {
             var x = _context.Institutions.FirstOrDefault(i => i.Id == id && !i.IsDeleted);
@@ -57,6 +59,7 @@ namespace SchoolManagement.Services.Implementation
             };
         }
 
+        // Create a new institution
         public InstitutionResponseVM Create(InstitutionCreateRequestVM request)
         {
             var entity = new MInstitution
@@ -74,6 +77,7 @@ namespace SchoolManagement.Services.Implementation
             return GetById(entity.Id);
         }
 
+        // Update an institution by ID and Tenant ID
         public InstitutionResponseVM UpdateByIdAndTenantId(int id, int tenantId, InstitutionUpdateRequestVM request)
         {
             var entity = _context.Institutions
@@ -90,23 +94,37 @@ namespace SchoolManagement.Services.Implementation
             return GetById(entity.Id);
         }
 
-        public bool Delete(int id)
+        // Delete institution by ID and Tenant ID
+        // Optionally delete associated contact if deleteContact is true
+        public bool DeleteByIdAndTenantId(int id, int tenantId, bool deleteContact)
         {
-            var entity = _context.Institutions.FirstOrDefault(i => i.Id == id && !i.IsDeleted);
-            if (entity == null) return false;
+            var institution = _context.Institutions
+                .Include(i => i.Contact)
+                .FirstOrDefault(i => i.Id == id && i.TenantId == tenantId && !i.IsDeleted);
 
-            entity.IsDeleted = true;
+            if (institution == null) return false;
+
+            institution.IsDeleted = true;
+
+            if (deleteContact && institution.Contact != null && !institution.Contact.IsDeleted)
+            {
+                institution.Contact.IsDeleted = true;
+            }
+
             _context.SaveChanges();
             return true;
         }
 
-        public InstitutionResponseVM GetByIdAndTenantId(int id, int tenantId)
+        // Get institution and its contact by ID and Tenant ID
+        public InstitutionWithContactResponseVM GetByIdAndTenantId(int id, int tenantId)
         {
             var entity = _context.Institutions
+                .Include(i => i.Contact)  // Eager load contact
                 .FirstOrDefault(i => i.Id == id && i.TenantId == tenantId && !i.IsDeleted);
+
             if (entity == null) return null;
 
-            return new InstitutionResponseVM
+            var institutionVM = new InstitutionResponseVM
             {
                 Id = entity.Id,
                 Name = entity.Name,
@@ -118,15 +136,26 @@ namespace SchoolManagement.Services.Implementation
                 UpdatedBy = entity.UpdatedBy,
                 IsDeleted = entity.IsDeleted
             };
+
+            var contactVM = entity.Contact != null
+                ? ContactResponseVM.ToViewModel(entity.Contact)
+                : null;
+
+            return new InstitutionWithContactResponseVM
+            {
+                Institution = institutionVM,
+                Contact = contactVM
+            };
         }
 
+        // Create institution with a new contact (in a transaction)
         public InstitutionWithContactResponseVM CreateWithContact(InstitutionWithContactRequestVM request)
         {
             using var transaction = _context.Database.BeginTransaction();
 
             try
             {
-                // 1. Create the contact
+                // Step 1: Create contact
                 var contactModel = ContactRequestVM.ToModel(request.Contact);
                 contactModel.CreatedOn = DateTime.UtcNow;
                 _context.Contacts.Add(contactModel);
@@ -134,7 +163,7 @@ namespace SchoolManagement.Services.Implementation
 
                 var contactResponse = ContactResponseVM.ToViewModel(contactModel);
 
-                // 2. Create the institution
+                // Step 2: Create institution using new contact
                 var institution = new MInstitution
                 {
                     Name = request.InstitutionName,
@@ -146,6 +175,8 @@ namespace SchoolManagement.Services.Implementation
 
                 _context.Institutions.Add(institution);
                 _context.SaveChanges();
+
+                // Commit transaction
                 transaction.Commit();
 
                 var institutionResponse = new InstitutionResponseVM
@@ -158,8 +189,6 @@ namespace SchoolManagement.Services.Implementation
                     CreatedOn = institution.CreatedOn,
                     IsDeleted = false
                 };
-
-               // transaction.Commit();
 
                 return new InstitutionWithContactResponseVM
                 {

@@ -43,5 +43,7 @@ namespace NeuroPi.UserManagment.Model
 
         [Column("tenant_id")]
         public int TenantId { get; set; }
+
+        public virtual MTenant Tenant { get; set; }
     }
 }
