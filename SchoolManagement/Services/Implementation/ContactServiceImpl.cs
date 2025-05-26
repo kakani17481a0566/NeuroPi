@@ -44,7 +44,10 @@ namespace SchoolManagement.Services.Implementation
 
         public List<MContact> GetAllContacts()
         {
-            return _dbContext.Contacts.ToList();
+            return _dbContext.Contacts
+       .Where(c => !c.IsDeleted)
+       .ToList();
+
         }
 
         public ContactResponseVM GetContactById(int id)

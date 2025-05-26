@@ -28,6 +28,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddScoped<IContactService, ContactServiceImpl>();
+builder.Services.AddScoped<IInstitutionService, InstitutionServiceImpl>();
+
 
 builder.Services.AddDbContext<NeuroPiDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));

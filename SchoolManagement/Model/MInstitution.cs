@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SchoolManagement.Model
 {
-    [Table("institution")]
+    [Table("Institutions")]
     public class MInstitution : MBaseModel
     {
         [Key]
