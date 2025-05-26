@@ -146,6 +146,7 @@ namespace SchoolManagement.Services.Implementation
 
                 _context.Institutions.Add(institution);
                 _context.SaveChanges();
+                transaction.Commit();
 
                 var institutionResponse = new InstitutionResponseVM
                 {
@@ -158,7 +159,7 @@ namespace SchoolManagement.Services.Implementation
                     IsDeleted = false
                 };
 
-                transaction.Commit();
+               // transaction.Commit();
 
                 return new InstitutionWithContactResponseVM
                 {
