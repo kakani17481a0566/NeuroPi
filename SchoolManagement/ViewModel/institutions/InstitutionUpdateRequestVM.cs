@@ -6,6 +6,6 @@
         public int? ContactId { get; set; }
         //public int TenantId { get; set; }
 
-        public int UpdatedBy { get; set; } // Assuming UpdatedBy is required for updates
+        public int UpdatedBy { get; set; } 
     }
 }
