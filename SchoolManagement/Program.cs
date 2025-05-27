@@ -29,6 +29,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<IContactService, ContactServiceImpl>();
 builder.Services.AddScoped<IInstitutionService, InstitutionServiceImpl>();
+builder.Services.AddScoped<ITransactionService, TransactionServiceImpl>(); 
+
+
 
 
 builder.Services.AddDbContext<NeuroPiDbContext>(options =>
@@ -42,7 +45,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<IContactService, ContactServiceImpl>();
 
 var app = builder.Build();
 
