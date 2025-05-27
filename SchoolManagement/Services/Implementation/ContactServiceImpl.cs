@@ -6,6 +6,8 @@ using SchoolManagement.ViewModel.Contact;
 using System.Collections.Generic;
 using System.Linq;
 
+//Code written by Kiran updated on 2023-05-27
+
 namespace SchoolManagement.Services.Implementation
 {
     public class ContactServiceImpl : IContactService
@@ -42,11 +44,12 @@ namespace SchoolManagement.Services.Implementation
 
         }
 
-        public List<MContact> GetAllContacts()
+        public List<ContactResponseVM> GetAllContacts()
         {
-            return _dbContext.Contacts
-       .Where(c => !c.IsDeleted)
-       .ToList();
+            return ContactResponseVM.ToViewModelList(_dbContext.Contacts
+                .Where(c => !c.IsDeleted)
+                .ToList());
+
 
         }
 
@@ -70,11 +73,11 @@ namespace SchoolManagement.Services.Implementation
             return ContactResponseVM.ToViewModel(contact);
         }
 
-        public List<MContact> GetContactsByTenant(int tenantId)
+        public List<ContactResponseVM> GetContactsByTenant(int tenantId)
         {
-            return _dbContext.Contacts
-                .Where(c => c.TenantId == tenantId)
-                .ToList();
+            return ContactResponseVM.ToViewModelList(_dbContext.Contacts
+                .Where(c => c.TenantId == tenantId && !c.IsDeleted)
+                .ToList());
         }
 
         public ContactResponseVM updateContact(int id, int tenantId, ContactUpdateVM contact)
