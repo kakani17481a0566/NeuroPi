@@ -30,6 +30,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<IContactService, ContactServiceImpl>();
 builder.Services.AddScoped<IInstitutionService, InstitutionServiceImpl>();
 builder.Services.AddScoped<ITransactionService, TransactionServiceImpl>(); 
+builder.Services.AddScoped<IMasterService, MasterServiceImpl>();
+builder.Services.AddScoped<IMasterTypeService, MasterTypeServiceImpl>();
+
 
 
 
