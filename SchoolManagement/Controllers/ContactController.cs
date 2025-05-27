@@ -20,20 +20,28 @@ namespace SchoolManagement.Controllers
             _contactService = contactService;
         }
 
+
+        //Get all Contacts
+
         [HttpGet]
-        public ResponseResult<IEnumerable<MContact>> GetAll()
+        public ResponseResult<IEnumerable<ContactResponseVM>> GetAll()
         {
             var contacts = _contactService.GetAllContacts();
-            return new ResponseResult<IEnumerable<MContact>>(HttpStatusCode.OK, contacts, "All contacts retrieved successfully");
+            return new ResponseResult<IEnumerable<ContactResponseVM>>(HttpStatusCode.OK, contacts, "All contacts retrieved successfully");
         }
+
+        //Get Contacts by Tenant Id
 
         [HttpGet("GetByTenant/{tenantId}")]
-        public ResponseResult<IEnumerable<MContact>> GetByTenant(int tenantId)
+        public ResponseResult<List<ContactResponseVM>> GetByTenant(int tenantId)
         {
             var contacts = _contactService.GetContactsByTenant(tenantId);
-            return new ResponseResult<IEnumerable<MContact>>(HttpStatusCode.OK, contacts, $"Contacts for tenant {tenantId} retrieved successfully");
+            return contacts == null
+                ? new ResponseResult<List<ContactResponseVM>>(HttpStatusCode.NotFound, null, "No contacts found for the specified tenant")
+                : new ResponseResult<List<ContactResponseVM>>(HttpStatusCode.OK, contacts, "Contacts retrieved successfully");
         }
 
+        //Get Contacts by Id
         [HttpGet("{id}")]
         public ResponseResult<ContactResponseVM> GetById(int id)
         {
@@ -42,6 +50,8 @@ namespace SchoolManagement.Controllers
                 ? new ResponseResult<ContactResponseVM>(HttpStatusCode.NotFound, null, "Contact not found")
                 : new ResponseResult<ContactResponseVM>(HttpStatusCode.OK, contact, "Contact retrieved successfully");
         }
+
+        //Get Contacts by Id and Tenant Id
 
         [HttpGet("{id}/{tenantId}")]
         public ResponseResult<ContactResponseVM> GetByIdAndTenantId(int id, int tenantId)
@@ -52,6 +62,7 @@ namespace SchoolManagement.Controllers
                 : new ResponseResult<ContactResponseVM>(HttpStatusCode.OK, contact, "Contact retrieved successfully");
         }
 
+        //Create a new Contact
         [HttpPost]
         public ResponseResult<ContactResponseVM> Create([FromBody] ContactRequestVM contact)
         {
@@ -62,6 +73,8 @@ namespace SchoolManagement.Controllers
             var createdContact = _contactService.createContact(contact);
             return new ResponseResult<ContactResponseVM>(HttpStatusCode.Created, createdContact, "Contact created successfully");
         }
+
+        //Update the exicting Contact by usning Id and Tenanant Id
 
         [HttpPut("{id}/{tenantId}")]
         public ResponseResult<ContactResponseVM> Update(int id, int tenantId, [FromBody] ContactUpdateVM contact)
@@ -75,6 +88,8 @@ namespace SchoolManagement.Controllers
                 ? new ResponseResult<ContactResponseVM>(HttpStatusCode.NotFound, null, "Contact not found")
                 : new ResponseResult<ContactResponseVM>(HttpStatusCode.OK, updatedContact, "Contact updated successfully");
         }
+
+        //Delete by Id and Tenant Id
 
         [HttpDelete("{id}/{tenantId}")]
         public ResponseResult<bool> Delete(int id, int tenantId)

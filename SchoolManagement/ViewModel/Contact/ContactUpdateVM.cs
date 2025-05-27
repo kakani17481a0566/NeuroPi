@@ -12,8 +12,6 @@
         public string City { get; set; } = string.Empty;
         public string? Pincode { get; set; }
 
-        public int TenantId { get; set; }
-
         public int UpdatedBy { get; set; }
     }
 }

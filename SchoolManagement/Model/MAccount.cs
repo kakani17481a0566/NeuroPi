@@ -23,7 +23,7 @@ namespace NeuroPi.UserManagment.Model
         public string AccNumber { get; set; }
 
         [Column("cc_number")]
-        public string CcNumber { get; set; }
+        public string? CcNumber { get; set; }
 
         [Column("acc_type")]
         public string AccType { get; set; }
@@ -41,6 +41,11 @@ namespace NeuroPi.UserManagment.Model
         public string Address { get; set; }
 
         [Column("tenant_id")]
+        [ForeignKey("Tenant")]
         public int TenantId { get; set; }
+
+        public virtual MTenant Tenant { get; set; }
+
+
     }
 }

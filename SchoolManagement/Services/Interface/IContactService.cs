@@ -6,8 +6,8 @@ namespace SchoolManagement.Services.Interface
 {
     public interface IContactService
     {
-        List<MContact> GetAllContacts();
-        List<MContact> GetContactsByTenant(int tenantId);
+        List<ContactResponseVM> GetAllContacts();
+        List<ContactResponseVM> GetContactsByTenant(int tenantId);
 
         ContactResponseVM GetContactById(int id);
 
