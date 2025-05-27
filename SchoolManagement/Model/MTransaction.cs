@@ -35,15 +35,18 @@ namespace NeuroPi.UserManagment.Model
         [Column("ref_trns_id")]
         public string RefTrnsId { get; set; }
 
-        [Column("modifyed_by")]
+        [Column("modified_by")]
         public int? ModifiedBy { get; set; }
 
-        [Column("modifyed_on")]
+        [Column("modified_on")]
         public DateTime? ModifiedOn { get; set; }
+
 
         [Column("tenant_id")]
         public int TenantId { get; set; }
 
         public virtual MTenant Tenant { get; set; }
+
+
     }
 }
