@@ -11,6 +11,8 @@ namespace SchoolManagement.Services.Implementation
         {
             _context = context;
         }
+        // Gets all utilities that are not deleted
+        // Developed by: Sai Vardhan
         public List<UtilitesResponseVM> GetAll(int tenantId)
         {
             var result = _context.UtilitiesList.Where(u => !u.IsDeleted).ToList();

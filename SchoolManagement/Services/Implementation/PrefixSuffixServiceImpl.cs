@@ -15,6 +15,8 @@ namespace SchoolManagement.Services.Implementation
             _dbContext = dbContext;
         }
 
+        // Adds a new prefix/suffix to the database
+        // Developed by: Kiran
         public PrefixSuffixResponseVM AddPrefixSuffix(PrefixSuffixRequestVM prefixSuffixAddVM)
         {
             var newPrefixSuffix = PrefixSuffixRequestVM.ToModel(prefixSuffixAddVM);
@@ -25,6 +27,8 @@ namespace SchoolManagement.Services.Implementation
 
         }
 
+        // Adds a new prefix/suffix to the database for a specific tenant
+        // Developed by: Kiran
         public bool DeletePrefixSuffix(int id, int tenantId)
         {
             var prefixSuffix = _dbContext.PrefixSuffix
@@ -40,6 +44,8 @@ namespace SchoolManagement.Services.Implementation
 
         }
 
+        // Gets all prefix/suffix entries that are not deleted
+        // Developed by: Kiran
         public List<PrefixSuffixResponseVM> GetAllPrefixSuffix()
         {
             return PrefixSuffixResponseVM.ToViewModelList(_dbContext.PrefixSuffix
@@ -49,6 +55,8 @@ namespace SchoolManagement.Services.Implementation
 
         }
 
+        // Gets all prefix/suffix entries for a specific tenant that are not deleted
+        // Developed by: Kiran
         public List<PrefixSuffixResponseVM> GetAllPrefixSuffixByTenantId(int tenantId)
         {
             return PrefixSuffixResponseVM.ToViewModelList(_dbContext.PrefixSuffix
@@ -56,6 +64,8 @@ namespace SchoolManagement.Services.Implementation
                 .ToList());
         }
 
+        // Gets a prefix/suffix entry by its ID that is not deleted
+        // Developed by: Kiran
         public PrefixSuffixResponseVM GetPrefixSuffixById(int id)
         {
             var prefixSufffix = _dbContext.PrefixSuffix
@@ -67,6 +77,8 @@ namespace SchoolManagement.Services.Implementation
             return PrefixSuffixResponseVM.ToViewModel(prefixSufffix);
         }
 
+        // Gets a prefix/suffix entry by its ID and tenant ID that is not deleted
+        // Developed by: Kiran
         public PrefixSuffixResponseVM GetPrefixSuffixByIdAndTenantId(int id, int tenantId)
         {
             var prefixSuffix = _dbContext.PrefixSuffix
@@ -79,6 +91,8 @@ namespace SchoolManagement.Services.Implementation
 
         }
 
+        // Updates an existing prefix/suffix entry by its ID and tenant ID
+        //  Developed by: Kiran
         public PrefixSuffixResponseVM UpdatePrefixSuffix(int id, int tenantId, PrefixSuffixUpdateVM prefixSuffix)
         {
             var ExistingPrefixSuffix = _dbContext.PrefixSuffix
