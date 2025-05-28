@@ -39,6 +39,8 @@ builder.Services.AddScoped<IBooksService, BooksServiceImpl>();
 //builder.Services.AddScoped<IBooksService, BooksServiceImpl>();
 
 
+builder.Services.AddScoped<IPrefixSuffixService, PrefixSuffixServiceImpl>();
+
 
 
 
