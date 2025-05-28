@@ -10,7 +10,8 @@
         public int TrxStatus { get; set; }
         public int TenantId { get; set; }
         public int CreatedBy { get; set; }
-
+        public string TrxDesc { get; set; } = ""; // New parameter
+        public int? DebitAccHeadId { get; set; } = null; // New parameter
+        public int? CreditAccHeadId { get; set; } = null; // New parameter
     }
-
 }

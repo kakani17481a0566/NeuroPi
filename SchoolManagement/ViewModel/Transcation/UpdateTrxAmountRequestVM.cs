@@ -7,5 +7,4 @@
         public double NewAmount { get; set; }
         public int ModifiedBy { get; set; }
     }
-
 }

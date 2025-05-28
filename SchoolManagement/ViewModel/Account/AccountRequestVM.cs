@@ -28,6 +28,11 @@ namespace SchoolManagement.ViewModel.Account
 
         public int createdBy { get; set; }
 
+        public string Code { get; set; }
+
+        public int PrefixSufixId { get; set; }
+
+
         public static MAccount ToModel(AccountRequestVM requestVm)
         {
             return new MAccount()

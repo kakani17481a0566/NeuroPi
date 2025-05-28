@@ -20,5 +20,8 @@ namespace SchoolManagement.Data
         public DbSet<MAccount> Accounts { get; set; }
         public DbSet<MTransaction> Transactions { get; set; }
 
+        public DbSet<MPrefixSuffix> PrefixSuffix { get; set; }
+
+
     }
 }
