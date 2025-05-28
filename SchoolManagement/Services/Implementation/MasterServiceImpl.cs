@@ -18,6 +18,8 @@ namespace SchoolManagement.Services.Implementation
             
         }
 
+        // Gets all master types that are not deleted
+        // Developed by: Vardhan
         public List<MasterResponseVM> GetAll()
 
         {
@@ -29,7 +31,8 @@ namespace SchoolManagement.Services.Implementation
             return null;
         }
 
-
+        // Gets a master type by its ID
+        // Developed by: Vardhan
         public MasterResponseVM GetById(int id)
         {
             var result = _context.Masters.Include(m=>m.MasterType).FirstOrDefault(m => m.Id == id && !m.IsDeleted);
@@ -39,6 +42,8 @@ namespace SchoolManagement.Services.Implementation
             }
             return null;
         }
+        // Gets all master types for a specific tenant that are not deleted
+        // Developed by: Vardhan
         public List<MasterResponseVM> GetAllByTenantId(int tenantId)
         {
             var result = _context.Masters.Where(m => m.TenantId == tenantId && !m.IsDeleted).Include(m=>m.MasterType).ToList();
@@ -49,7 +54,8 @@ namespace SchoolManagement.Services.Implementation
             return null;
 
         }
-
+        // Gets a master type by its ID and tenant ID
+        // Developed by: Vardhan
         public MasterResponseVM GetByIdAndTenantId(int id, int tenantId)
         {
             var result = _context.Masters.Include(m=>m.MasterType).FirstOrDefault(m => m.Id == id && m.TenantId == tenantId && !m.IsDeleted);
@@ -59,6 +65,8 @@ namespace SchoolManagement.Services.Implementation
             }
             return null;
         }
+        // Creates a new master type and saves it to the database
+        // Developed by: Vardhan
         public MasterResponseVM CreateMasterType(MasterRequestVM masterType)
         {
             var masterTypeModel = MasterRequestVM.ToModel(masterType);
@@ -68,6 +76,8 @@ namespace SchoolManagement.Services.Implementation
             return MasterResponseVM.ToViewModel(masterTypeModel);
 
         }
+        // Updates an existing master type by its ID and tenant ID
+        // Developed by: Vardhan
         public MasterResponseVM UpdateMasterType(int id, int tenantId, MasterUpdateVM request)
         {
             var masterType = _context.Masters.FirstOrDefault(m => m.Id == id && m.TenantId == tenantId && !m.IsDeleted);
@@ -82,6 +92,8 @@ namespace SchoolManagement.Services.Implementation
             }
             return null;
         }
+        // Deletes a master type by marking it as deleted
+        // Developed by: Vardhan
         public MasterResponseVM DeleteById(int id, int tenantId)
         {
             var masterType = _context.Masters.FirstOrDefault(m => m.Id == id && m.TenantId == tenantId && !m.IsDeleted);
@@ -95,6 +107,8 @@ namespace SchoolManagement.Services.Implementation
 
         }
 
+        // Gets all master types by their master type ID for a specific tenant that are not deleted
+        // Developed by: Vardhan
         public List<MasterResponseVM> GetAllByMasterTypeId(int id,int tenantId)
         {
             var result=_context.Masters.Where(m=>m.MasterTypeId == id && !m.IsDeleted && m.TenantId==tenantId).ToList();

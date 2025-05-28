@@ -20,7 +20,9 @@ namespace SchoolManagement.Controllers
             masterService = _masterService;
             
         }
-
+        // Get all master types
+        // GET: api/master
+        // Developed by: Vardhan
         [HttpGet]
         public ResponseResult<List<MasterResponseVM>> GetAllMasterTypes()
         {
@@ -31,6 +33,9 @@ namespace SchoolManagement.Controllers
             }
             return new ResponseResult<List<MasterResponseVM>>(HttpStatusCode.OK, response, "Master types fetched successfully");
         }
+        // Get master type by ID
+        // GET: api/master/{id}
+        // Developed by: Vardhan
         [HttpGet("{id}")]
         public ResponseResult<MasterResponseVM> GetById([FromRoute] int id)
         {
@@ -42,6 +47,9 @@ namespace SchoolManagement.Controllers
             return new ResponseResult<MasterResponseVM>(HttpStatusCode.BadGateway, response, $" MasterType not found with id {id}");
         }
 
+        // Get master type by ID and Tenant ID
+        // GET: api/master/tenantId?id={id}&tenantId={tenantId}
+        // Developed by: Vardhan
         [HttpGet("master/tenantId")]
         public ResponseResult<MasterResponseVM> GetByIdAndTenantId([FromQuery(Name = "id")] int id, [FromQuery(Name = "tenantId")] int tenantId)
         {
@@ -53,6 +61,9 @@ namespace SchoolManagement.Controllers
             return new ResponseResult<MasterResponseVM>(HttpStatusCode.NotFound, response, $" master type not found with id {id} and tenantid {tenantId}");
         }
 
+        // Get all master types by Tenant ID
+        // GET: api/master/master/tenant/{id}
+        // Developed by: Vardhan
         [HttpGet("master/tenant/{id}")]
         public ResponseResult<List<MasterResponseVM>> GetAllMasters([FromRoute] int id)
         {
@@ -64,6 +75,9 @@ namespace SchoolManagement.Controllers
             }
             return new ResponseResult<List<MasterResponseVM>>(HttpStatusCode.OK, response, "Master types fetched successfully");
         }
+        // Delete master type by ID and Tenant ID
+        // DELETE: api/master/{id}/{tenantId}
+        // Developed by: Vardhan
         [HttpDelete("/master/{id}/{tenantId}")]
         public ResponseResult<MasterResponseVM> DeleteByIdAndTenantId([FromRoute] int id, [FromRoute] int tenantId)
         {
@@ -75,6 +89,9 @@ namespace SchoolManagement.Controllers
             return new ResponseResult<MasterResponseVM>(HttpStatusCode.NoContent, response, $"No Data found with Id {id}");
 
         }
+        // Add a new master type
+        // POST: api/master
+        // Developed by: Vardhan
         [HttpPost]
         public ResponseResult<MasterResponseVM> AddMaster([FromBody] MasterRequestVM request)
         {
@@ -85,6 +102,9 @@ namespace SchoolManagement.Controllers
             }
             return new ResponseResult<MasterResponseVM>(HttpStatusCode.BadRequest, response, "master type not created");
         }
+        // Update master type by ID and Tenant ID
+        // PUT: api/master/{id}/tenant/{tenantId}
+        // Developed by: Vardhan    
         [HttpPut("/master/{id}/tenant/{tenantId}")]
         public ResponseResult<MasterResponseVM> UpdateMaster(int id, int tenantId, [FromBody] MasterUpdateVM request)
         {
@@ -96,6 +116,9 @@ namespace SchoolManagement.Controllers
             return new ResponseResult<MasterResponseVM>(HttpStatusCode.BadRequest, response, "master type not updated");
         }
 
+        // Get all master types by MasterTypeId and TenantId
+        // GET: api/master/getByMasterTypeId/{masterTypeId}/{tenantId}
+        // Developed by: Vardhan
         [HttpGet("/getByMasterTypeId/{masterTypeId}/{tenantId}")]
         public ResponseResult<List<MasterResponseVM>> GetAllMastersByMasterTypeId([FromRoute] int masterTypeId, [FromRoute] int tenantId)
         {

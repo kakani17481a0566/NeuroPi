@@ -19,6 +19,8 @@ namespace SchoolManagement.Services.Implementation
             _dbContext = dbContext;
         }
 
+        // Creates a new contact and saves it to the database
+        // Developed by: Kiran
         public ContactResponseVM createContact(ContactRequestVM contact)
         {
             var newContact = ContactRequestVM.ToModel(contact);
@@ -28,6 +30,8 @@ namespace SchoolManagement.Services.Implementation
             return ContactResponseVM.ToViewModel(newContact);
         }
 
+        // Deletes a contact by ID and marks it as deleted
+        // Developed by: Kiran
         public bool deleteContactByIdAndTenantId(int id, int tenantId)
         {
             var contact = _dbContext.Contacts
@@ -44,6 +48,8 @@ namespace SchoolManagement.Services.Implementation
 
         }
 
+        // Retrieves all contacts that are not deleted
+        // Developed by: Kiran
         public List<ContactResponseVM> GetAllContacts()
         {
             return ContactResponseVM.ToViewModelList(_dbContext.Contacts
@@ -53,6 +59,8 @@ namespace SchoolManagement.Services.Implementation
 
         }
 
+        // Retrieves a contact by its ID
+        // Developed by: Kiran
         public ContactResponseVM GetContactById(int id)
         {
             var contact = _dbContext.Contacts.FirstOrDefault(c => c.Id == id && !c.IsDeleted);
@@ -63,6 +71,8 @@ namespace SchoolManagement.Services.Implementation
             return ContactResponseVM.ToViewModel(contact);
         }
 
+        // Retrieves a contact by its ID and Tenant ID
+        // Developed by: Kiran
         public ContactResponseVM GetContactByIdAndTenantId(int id, int tenantId)
         {
             var contact = _dbContext.Contacts.FirstOrDefault(c => c.Id == id && c.TenantId == tenantId &&!c.IsDeleted);
@@ -73,6 +83,8 @@ namespace SchoolManagement.Services.Implementation
             return ContactResponseVM.ToViewModel(contact);
         }
 
+        // Retrieves all contacts for a specific tenant that are not deleted
+        // Developed by: Kiran
         public List<ContactResponseVM> GetContactsByTenant(int tenantId)
         {
             return ContactResponseVM.ToViewModelList(_dbContext.Contacts
@@ -80,6 +92,8 @@ namespace SchoolManagement.Services.Implementation
                 .ToList());
         }
 
+        // Updates an existing contact by its ID and Tenant ID
+        // Developed by: Kiran
         public ContactResponseVM updateContact(int id, int tenantId, ContactUpdateVM contact)
         {
             var existingContact = _dbContext.Contacts.FirstOrDefault(c => c.Id == id && c.TenantId == tenantId);
