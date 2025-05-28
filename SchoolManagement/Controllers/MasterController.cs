@@ -86,7 +86,7 @@ namespace SchoolManagement.Controllers
             return new ResponseResult<MasterResponseVM>(HttpStatusCode.BadRequest, response, "master type not created");
         }
         [HttpPut("/master/{id}/tenant/{tenantId}")]
-        public ResponseResult<MasterResponseVM> UpdateMaster(int id, int tenantId, [FromBody] MasterRequestVM request)
+        public ResponseResult<MasterResponseVM> UpdateMaster(int id, int tenantId, [FromBody] MasterUpdateVM request)
         {
             var response = masterService.UpdateMasterType(id, tenantId, request);
             if (response != null)
@@ -96,6 +96,17 @@ namespace SchoolManagement.Controllers
             return new ResponseResult<MasterResponseVM>(HttpStatusCode.BadRequest, response, "master type not updated");
         }
 
+        [HttpGet("/getByMasterTypeId/{masterTypeId}/{tenantId}")]
+        public ResponseResult<List<MasterResponseVM>> GetAllMastersByMasterTypeId([FromRoute] int masterTypeId, [FromRoute] int tenantId)
+        {
+            var response = masterService.GetAllByMasterTypeId(masterTypeId, tenantId);
+
+            if (response == null)
+            {
+                return new ResponseResult<List<MasterResponseVM>>(HttpStatusCode.NotFound, response, "No data Found");
+            }
+            return new ResponseResult<List<MasterResponseVM>>(HttpStatusCode.OK, response, "Master types fetched successfully");
+        }
 
     }
 }

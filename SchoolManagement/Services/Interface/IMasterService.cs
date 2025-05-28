@@ -16,9 +16,11 @@ namespace SchoolManagement.Services.Interface
         MasterResponseVM CreateMasterType(MasterRequestVM masterType);
 
 
-        MasterResponseVM UpdateMasterType(int id, int tenantId, MasterRequestVM masterType);
+        MasterResponseVM UpdateMasterType(int id, int tenantId, MasterUpdateVM masterType);
 
         MasterResponseVM DeleteById(int id, int tenantId);
+
+        List<MasterResponseVM> GetAllByMasterTypeId(int id,int tenantId);
 
     }
 }

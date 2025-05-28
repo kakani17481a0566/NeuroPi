@@ -1,4 +1,6 @@
 ﻿using SchoolManagement.Model;
+using System.Runtime.InteropServices;
+using System.Text.Json.Serialization;
 
 namespace SchoolManagement.ViewModel.Master
 {
@@ -11,7 +13,10 @@ namespace SchoolManagement.ViewModel.Master
 
         public int TenantId { get; set; }
 
-        public string MasterTypeName { get; set; }
+        public string? MasterTypeName { get; set; }
+
+        public int? MasterTypeId { get; set; }
+
 
         public static MasterResponseVM ToViewModel(MMaster master) =>
              new MasterResponseVM
@@ -19,7 +24,8 @@ namespace SchoolManagement.ViewModel.Master
                 Id = master.Id,
                 Name = master.Name,
                 TenantId = master.TenantId,
-                MasterTypeName=master.MasterType.Name,
+                MasterTypeName=master.MasterType?.Name,
+                MasterTypeId=master.MasterTypeId,
              };
         public static List<MasterResponseVM> ToViewModelList(List<MMaster> masters)
         {
