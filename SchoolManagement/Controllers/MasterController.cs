@@ -5,6 +5,7 @@ using SchoolManagement.Services.Interface;
 using NeuroPi.UserManagment.Response;
 using SchoolManagement.ViewModel;
 using SchoolManagement.ViewModel.Master;
+using System.ComponentModel;
 
 
 
@@ -15,9 +16,12 @@ namespace SchoolManagement.Controllers
     public class MasterController : ControllerBase
     {
         private readonly IMasterService masterService;
-        public MasterController(IMasterService _masterService)
+        private readonly IUtilitesService _utilitesService;
+
+        public MasterController(IMasterService _masterService, IUtilitesService utilitesService)
         {
             masterService = _masterService;
+            _utilitesService = utilitesService;
             
         }
 
@@ -97,15 +101,25 @@ namespace SchoolManagement.Controllers
         }
 
         [HttpGet("/getByMasterTypeId/{masterTypeId}/{tenantId}")]
-        public ResponseResult<List<MasterResponseVM>> GetAllMastersByMasterTypeId([FromRoute] int masterTypeId, [FromRoute] int tenantId)
+        public ResponseResult<List<Object>> GetAllMastersByMasterTypeId([FromRoute] int masterTypeId, [FromRoute] int tenantId, bool isUtilites=false)
         {
-            var response = masterService.GetAllByMasterTypeId(masterTypeId, tenantId);
+            List<object> response;
+            if (isUtilites)
+            {
+                var utilitesList = _utilitesService.GetAll(tenantId); 
+                response = utilitesList?.Cast<object>().ToList() ?? new List<object>();
+            }
+            else
+            {
 
+                var masterList = masterService.GetAllByMasterTypeId(masterTypeId, tenantId); 
+                response = masterList?.Cast<object>().ToList() ?? new List<object>();
+            }
             if (response == null)
             {
-                return new ResponseResult<List<MasterResponseVM>>(HttpStatusCode.NotFound, response, "No data Found");
+                return new ResponseResult<List<Object>>(HttpStatusCode.NotFound, response, "No data Found");
             }
-            return new ResponseResult<List<MasterResponseVM>>(HttpStatusCode.OK, response, "Master types fetched successfully");
+            return new ResponseResult<List<Object>>(HttpStatusCode.OK, response, "Master types fetched successfully");
         }
 
     }
