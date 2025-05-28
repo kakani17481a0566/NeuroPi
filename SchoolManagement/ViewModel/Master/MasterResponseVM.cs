@@ -11,12 +11,15 @@ namespace SchoolManagement.ViewModel.Master
 
         public int TenantId { get; set; }
 
+        public string MasterTypeName { get; set; }
+
         public static MasterResponseVM ToViewModel(MMaster master) =>
              new MasterResponseVM
              {
                 Id = master.Id,
                 Name = master.Name,
                 TenantId = master.TenantId,
+                MasterTypeName=master.MasterType.Name,
              };
         public static List<MasterResponseVM> ToViewModelList(List<MMaster> masters)
         {

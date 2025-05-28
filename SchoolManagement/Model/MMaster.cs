@@ -15,8 +15,12 @@ namespace SchoolManagement.Model
         [Column("name")]
         public string Name { get; set; }
 
-        [Column("masters_type")]
-        public int MastersType { get; set; }
+        [Column("masters_type_id")]
+        public int MasterTypeId { get; set; }
+
+
+        [ForeignKey("MasterTypeId")]
+        public MMasterType MasterType { get; set; }
 
         [Column("tenant_id")]
         public int TenantId { get; set; }

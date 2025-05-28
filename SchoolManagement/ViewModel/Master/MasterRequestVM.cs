@@ -21,7 +21,7 @@ namespace SchoolManagement.ViewModel.Master
                 Id = masterRequestVM.Id,
                 Name = masterRequestVM.Name,
                 TenantId = masterRequestVM.TenantId,
-                MastersType=masterRequestVM.MasterTypeId
+                MasterTypeId = masterRequestVM.MasterTypeId
             };
         }
     }

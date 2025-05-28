@@ -1,4 +1,5 @@
-﻿using SchoolManagement.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using SchoolManagement.Data;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.Master;
 
@@ -20,7 +21,7 @@ namespace SchoolManagement.Services.Implementation
         public List<MasterResponseVM> GetAll()
 
         {
-            var result = _context.Masters.Where(m => !m.IsDeleted).ToList();
+            var result = _context.Masters.Include(m => m.MasterType).Where(m => !m.IsDeleted).ToList();
             if (result != null && result.Count() > 0)
             {
                 return MasterResponseVM.ToViewModelList(result);
