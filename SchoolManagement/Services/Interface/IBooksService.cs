@@ -11,5 +11,9 @@ namespace SchoolManagement.Services.Interface
         BookResponseVM UpdateBook(int id, int tenantId, BookUpdateVM book);
 
         bool DeleteBook(int id, int tenantId);
+
+        List<BookResponseVM> GetAllBooks();
+        BookResponseVM GetBookById(int id);
+
     }
 }
