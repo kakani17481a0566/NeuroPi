@@ -25,6 +25,7 @@ namespace SchoolManagement.Services.Implementation
         }
 
         // Transfer money between accounts
+        // Developed by: Mohith
         public TransactionResultVM Transfer(TransactionRequestVM req)
         {
             if (req.Amount <= 0)
@@ -75,6 +76,7 @@ namespace SchoolManagement.Services.Implementation
                 ";
 
                 // Open the connection and execute the stored procedure
+                
                 var result = connection.QueryFirstOrDefault<SpTransferResult>(sql, parameters);
 
                 if (result == null)
@@ -105,6 +107,7 @@ namespace SchoolManagement.Services.Implementation
         }
 
         // Get transaction by transaction ID
+        // Developed by: Mohith
         public TransactionResponseVM GetByTrxId(int trxId)
         {
             var trx = _context.Transactions
@@ -118,6 +121,7 @@ namespace SchoolManagement.Services.Implementation
         }
 
         // Get transaction by transaction ID and tenant ID
+        // Developed by: Mohith
         public TransactionResponseVM GetByTrxIdAndTenantId(int trxId, int tenantId)
         {
             var trx = _context.Transactions
@@ -145,6 +149,7 @@ namespace SchoolManagement.Services.Implementation
         }
 
         // Update transaction amount by reference transaction ID and tenant ID
+        // Developed by: Mohith
         public bool UpdateAmountByRefTrnsIdAndTenant(string refTrnsId, int tenantId, double newAmount, int modifiedBy)
         {
             var transactions = _context.Transactions
@@ -167,6 +172,7 @@ namespace SchoolManagement.Services.Implementation
 
 
         // Helper method to map dynamic transaction object to TransactionResponseVM
+        // Developed by: Mohith
         private TransactionResponseVM MapToVM(dynamic trx)
         {
             return new TransactionResponseVM
