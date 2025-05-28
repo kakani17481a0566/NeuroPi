@@ -15,6 +15,8 @@ namespace SchoolManagement.Services.Implementation
         {
             _context = context;
         }
+        // Creates a new account and saves it to the database
+        // Developed by: Kiran
         public AccountResponseVM CreateAccount(AccountRequestVM account)
         {
             var newAccount = AccountRequestVM.ToModel(account);
@@ -24,6 +26,8 @@ namespace SchoolManagement.Services.Implementation
             return AccountResponseVM.ToViewModel(newAccount);
         }
 
+        // Deletes an account by ID and marks it as deleted
+        // Developed by: Kiran
         public bool DeleteAccountByIdAndTenantId(int id, int tenantId)
         {
             var account = _context.Accounts
@@ -39,6 +43,8 @@ namespace SchoolManagement.Services.Implementation
             return true;
         }
 
+        // Retrieves an account by ID
+        // Developed by: Kiran
         public AccountResponseVM GetAccountByID(int id)
         {
             var account = _context.Accounts.FirstOrDefault(a => a.Id == id&&!a.IsDeleted);
@@ -50,6 +56,8 @@ namespace SchoolManagement.Services.Implementation
 
         }
 
+        // Retrieves an account by ID and Tenant ID 
+        // Developed by: Kiran
         public AccountResponseVM GetAccountByIdAndTenantId(int id, int TenantId)
         {
             var account = _context.Accounts
@@ -61,6 +69,8 @@ namespace SchoolManagement.Services.Implementation
             return AccountResponseVM.ToViewModel(account);
         }
 
+        // Retrieves all accounts for a specific tenant
+        // Developed by: Kiran
         public List<AccountResponseVM> GetAccountByTenantId(int tenantId)
         {
             return _context.Accounts
@@ -69,6 +79,8 @@ namespace SchoolManagement.Services.Implementation
                 .ToList();
         }
 
+        // Retrieves all accounts in the system
+        // Developed by: Kiran
         public List<AccountResponseVM> GetAccountDetails()
         {
             var accounts = _context.Accounts.ToList();
@@ -76,6 +88,8 @@ namespace SchoolManagement.Services.Implementation
 
         }
 
+        // Updates an existing account by ID and Tenant ID
+        // Developed by: Kiran
         public AccountResponseVM UpdateAccount(int id, int tenantId, AccountUpdateVM account)
         {
             var ExistingAccount = _context.Accounts

@@ -17,6 +17,10 @@ namespace SchoolManagement.Controllers
             _accountService = accountService;
         }
 
+
+        // GET: api/account
+        // Get all accounts
+        // Developed by: Kiran
         [HttpGet]
         public ResponseResult<List<AccountResponseVM>> GetAllAccounts()
         {
@@ -24,6 +28,9 @@ namespace SchoolManagement.Controllers
             return new ResponseResult<List<AccountResponseVM>>(HttpStatusCode.OK, accounts, "All accounts retrieved successfully");
         }
 
+        // GET: api/account/{id}
+        // Get account by ID
+        // Developed by: Kiran
         [HttpGet("{id}")]
         public ResponseResult<AccountResponseVM> GetAccountById(int id)
         {
@@ -33,6 +40,9 @@ namespace SchoolManagement.Controllers
                 : new ResponseResult<AccountResponseVM>(HttpStatusCode.OK, account, "Account retrieved successfully");
         }
 
+        // GET: api/account/tenant/{tenantId}
+        // Get accounts by Tenant ID
+        // Developed by: Kiran
         [HttpGet("tenant/{tenantId}")]
         public ResponseResult<List<AccountResponseVM>> GetAccountByTenantId(int tenantId)
         {
@@ -42,6 +52,9 @@ namespace SchoolManagement.Controllers
                 : new ResponseResult<List<AccountResponseVM>>(HttpStatusCode.OK, account, "Account retrieved successfully");
         }
 
+        // GET: api/account/{id}/{tenantId}
+        // Get account by ID and Tenant ID
+        //Developed by: Kiran
         [HttpGet("{id}/{tenantId}")]
         public ResponseResult<AccountResponseVM> GetAccountByIdAndTenantId(int id, int tenantId)
         {
@@ -51,6 +64,9 @@ namespace SchoolManagement.Controllers
                 : new ResponseResult<AccountResponseVM>(HttpStatusCode.OK, account, "Account retrieved successfully");
         }
 
+        // POST: api/account
+        // Create a new account
+        // Developed by: Kiran
         [HttpPost]
         public ResponseResult<AccountResponseVM> CreateAccount([FromBody] AccountRequestVM account)
         {
@@ -62,6 +78,10 @@ namespace SchoolManagement.Controllers
             return new ResponseResult<AccountResponseVM>(HttpStatusCode.Created, createdAccount, "Account created successfully");
         }
 
+
+        // PUT: api/account/{id}/{tenantId}
+        // Update account by ID and Tenant ID
+        // Developed by: Kiran
         [HttpPut("{id}/{tenantId}")]
         public ResponseResult<AccountResponseVM> UpdateAccount(int id, int tenantId, [FromBody] AccountUpdateVM account)
         {
@@ -75,6 +95,10 @@ namespace SchoolManagement.Controllers
                 : new ResponseResult<AccountResponseVM>(HttpStatusCode.OK, updatedAccount, "Account updated successfully");
         }
 
+
+        // DELETE: api/account/{id}/{tenantId}
+        // Delete account by ID and Tenant ID
+        // Developed by: Kiran
         [HttpDelete("{id}/{tenantId}")]
         public ResponseResult<bool> DeleteAccount(int id, int tenantId)
         {
