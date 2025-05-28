@@ -7,7 +7,7 @@
         public string? Suffix { get; set; }
         public int Length { get; set; }
 
-        public int TenantId { get; set; }
+        
         public int UpdatedBy { get; set; }
 
     }
