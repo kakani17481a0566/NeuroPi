@@ -32,7 +32,7 @@ namespace SchoolManagement.Services.Implementation
 
         public MasterResponseVM GetById(int id)
         {
-            var result = _context.Masters.Where(m => m.Id == id && !m.IsDeleted).FirstOrDefault();
+            var result = _context.Masters.Include(m=>m.MasterType).FirstOrDefault(m => m.Id == id && !m.IsDeleted);
             if (result != null)
             {
                 return MasterResponseVM.ToViewModel(result);
@@ -41,7 +41,7 @@ namespace SchoolManagement.Services.Implementation
         }
         public List<MasterResponseVM> GetAllByTenantId(int tenantId)
         {
-            var result = _context.Masters.Where(m => m.TenantId == tenantId && !m.IsDeleted).ToList();
+            var result = _context.Masters.Where(m => m.TenantId == tenantId && !m.IsDeleted).Include(m=>m.MasterType).ToList();
             if (result != null)
             {
                 return MasterResponseVM.ToViewModelList(result);
@@ -52,7 +52,7 @@ namespace SchoolManagement.Services.Implementation
 
         public MasterResponseVM GetByIdAndTenantId(int id, int tenantId)
         {
-            var result = _context.Masters.FirstOrDefault(m => m.Id == id && m.TenantId == tenantId && !m.IsDeleted);
+            var result = _context.Masters.Include(m=>m.MasterType).FirstOrDefault(m => m.Id == id && m.TenantId == tenantId && !m.IsDeleted);
             if (result != null)
             {
                 return MasterResponseVM.ToViewModel(result);
@@ -68,13 +68,14 @@ namespace SchoolManagement.Services.Implementation
             return MasterResponseVM.ToViewModel(masterTypeModel);
 
         }
-        public MasterResponseVM UpdateMasterType(int id, int tenantId, MasterRequestVM request)
+        public MasterResponseVM UpdateMasterType(int id, int tenantId, MasterUpdateVM request)
         {
             var masterType = _context.Masters.FirstOrDefault(m => m.Id == id && m.TenantId == tenantId && !m.IsDeleted);
             if (masterType != null)
             {
                 masterType.Name = request.Name;
-                //masterType.UpdatedBy = request.UpdatedBy;
+                masterType.MasterTypeId = request.MasterTypeId;
+                masterType.UpdatedBy = request.UpdatedBy;
                 masterType.UpdatedOn = DateTime.UtcNow;
                 _context.SaveChanges();
                 return MasterResponseVM.ToViewModel(masterType);
@@ -94,6 +95,14 @@ namespace SchoolManagement.Services.Implementation
 
         }
 
-
+        public List<MasterResponseVM> GetAllByMasterTypeId(int id,int tenantId)
+        {
+            var result=_context.Masters.Where(m=>m.MasterTypeId == id && !m.IsDeleted && m.TenantId==tenantId).ToList();
+            if(result!=null && result.Count>0)
+            {
+                return MasterResponseVM.ToViewModelList(result);
+            }
+            return null;
+        }
     }
 }
