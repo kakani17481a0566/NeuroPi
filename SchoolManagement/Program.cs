@@ -35,6 +35,8 @@ builder.Services.AddScoped<ITransactionService, TransactionServiceImpl>();
 builder.Services.AddScoped<IMasterService, MasterServiceImpl>();
 builder.Services.AddScoped<IMasterTypeService, MasterTypeServiceImpl>();
 
+builder.Services.AddScoped<IPrefixSuffixService, PrefixSuffixServiceImpl>();
+
 
 
 

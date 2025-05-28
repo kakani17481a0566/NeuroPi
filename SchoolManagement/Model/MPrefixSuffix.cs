@@ -11,7 +11,7 @@ namespace NeuroPi.UserManagment.Model
         public int Id { get; set; }
 
         [Column("prefix")]
-        public string Prefix { get; set; } = null!;
+        public string? Prefix { get; set; } = null!;
 
         [Column("suffix")]
         public string? Suffix { get; set; }
