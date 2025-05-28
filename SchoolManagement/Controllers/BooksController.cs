@@ -18,6 +18,31 @@ namespace SchoolManagement.Controllers
             _booksService = booksService;
         }
 
+
+        // GET: api/books
+        // Get all books (global, no tenant filter)
+        // Developed by: Mohith
+        [HttpGet]
+        public IActionResult GetAllBooksGlobal()
+        {
+            var books = _booksService.GetAllBooks();
+            return new ResponseResult<List<BookResponseVM>>(HttpStatusCode.OK, books);
+        }
+
+        // GET: api/books/book/{id}
+        // Get book by ID globally (without tenant validation)
+        // Developed by: Mohith
+        [HttpGet("book/{id}")]
+        public IActionResult GetBookByIdGlobal(int id)
+        {
+            var book = _booksService.GetBookById(id);
+            if (book == null)
+                return new ResponseResult<BookResponseVM>(HttpStatusCode.NotFound, null, "Book not found");
+
+            return new ResponseResult<BookResponseVM>(HttpStatusCode.OK, book);
+        }
+
+
         // GET: api/books/{tenantId}
         // Get all books for a specific tenant
         // Developed by: Mohith

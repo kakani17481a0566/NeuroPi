@@ -19,6 +19,27 @@ namespace SchoolManagement.Services.Implementation
 
         // Retrieves all books for a specific tenant
         // Developed by: Mohith
+        public List<BookResponseVM> GetAllBooks()
+        {
+            return _dbContext.Books
+                .Where(b => !b.IsDeleted)
+                .Select(BookResponseVM.FromModel)
+                .ToList();
+        }
+
+        // Retrieves a book by its ID
+        // Developed by: Mohith
+        public BookResponseVM GetBookById(int id)
+        {
+            var book = _dbContext.Books
+                .FirstOrDefault(b => b.Id == id && !b.IsDeleted);
+
+            return BookResponseVM.FromModel(book);
+        }
+
+
+        // Retrieves all books for a specific tenant
+        // Developed by: Mohith
         public List<BookResponseVM> GetAllBooks(int tenantId)
         {
             return _dbContext.Books
