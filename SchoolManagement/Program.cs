@@ -34,12 +34,6 @@ builder.Services.AddScoped<IAccountService, AccountServiceImpl>();
 builder.Services.AddScoped<ITransactionService, TransactionServiceImpl>(); 
 builder.Services.AddScoped<IMasterService, MasterServiceImpl>();
 builder.Services.AddScoped<IMasterTypeService, MasterTypeServiceImpl>();
-builder.Services.AddScoped<IBooksService, BooksServiceImpl>();
-
-//builder.Services.AddScoped<IBooksService, BooksServiceImpl>();
-
-
-builder.Services.AddScoped<IPrefixSuffixService, PrefixSuffixServiceImpl>();
 
 
 
