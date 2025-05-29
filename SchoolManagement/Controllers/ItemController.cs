@@ -10,6 +10,9 @@ using SchoolManagement.ViewModel.Item;
 
 
 namespace SchoolManagement.Controllers
+
+// Developed by: Lekhan
+
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -22,6 +25,8 @@ namespace SchoolManagement.Controllers
 
         }
 
+        //Get all Items
+        //GET: api/item
         [HttpGet]
         public ResponseResult<List<ItemVM>> GetAll()
         {

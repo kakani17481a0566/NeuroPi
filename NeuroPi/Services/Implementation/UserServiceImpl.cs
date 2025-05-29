@@ -30,6 +30,11 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 return new UserLogInSucessVM()
                 {
                     UserName = username,
+
+                    TenantId = user.TenantId,
+
+                    UserId =    user.UserId,
+                    
                     token = token,
                 };
 
