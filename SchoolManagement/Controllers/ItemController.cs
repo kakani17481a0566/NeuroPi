@@ -65,6 +65,8 @@ namespace SchoolManagement.Controllers
             }
             return new ResponseResult<List<ItemVM>>(HttpStatusCode.OK, response, "items fetched successfully");
         }
+
+
         [HttpDelete("/Item/{id}/{tenantId}")]
         public ResponseResult<ItemVM> DeleteByIdAndTenantId([FromRoute] int id, [FromRoute] int tenantId)
         {
@@ -73,7 +75,7 @@ namespace SchoolManagement.Controllers
             {
                 return new ResponseResult<ItemVM>(HttpStatusCode.OK, response, "Deleted Successfully");
             }
-            return new ResponseResult<ItemVM>(HttpStatusCode.NoContent, response, $"No Data found with Id {id}");
+            return new ResponseResult<ItemVM>(HttpStatusCode.BadRequest, response, $"No Data found with Id {id}");
 
         }
         [HttpPost]

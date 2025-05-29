@@ -1,29 +1,28 @@
-﻿using System.Security.Cryptography.X509Certificates;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
-using NeuroPi.UserManagment.Services.Interface;
-using SchoolManagement.Data;
+﻿using SchoolManagement.Data;
 using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.Item;
-using SchoolManagement.ViewModel.Master;
+using System.Collections.Generic;
+using System.Linq;
 
+// Deloped by: Lekhan
 namespace SchoolManagement.Services.Implementation
 {
     public class ItemServiceImpl : IItemService
     {
-        public SchoolManagementDb _context;
-
-        public object ItemMV { get; private set; }
+        private readonly SchoolManagementDb _context;
 
         public ItemServiceImpl(SchoolManagementDb context)
         {
             _context = context;
         }
+
+        // Get all items that are not deleted
+        // HttpGet: api/item
         public List<ItemVM> GetAll()
         {
             return _context.Items
-                .Where(i => i!.IsDeleted)
+                .Where(i => !i.IsDeleted)
                 .Select(i => new ItemVM
                 {
                     Id = i.Id,
@@ -31,15 +30,16 @@ namespace SchoolManagement.Services.Implementation
                     BookCondition = i.BookCondition,
                     Status = i.Status,
                     PurchasedOn = i.PurchasedOn,
-                    TenantId = i.TenantId,
-
-
+                    TenantId = i.TenantId
                 }).ToList();
         }
-        public List<ItemVM> GetAllByTenantId(int TenantId)
+
+        // Get all items by tenant ID that are not deleted
+        // HttpGet: api/item/tenant/{tenantId}
+        public List<ItemVM> GetAllByTenantId(int tenantId)
         {
             return _context.Items
-                .Where(i => i!.IsDeleted && i.TenantId == TenantId)
+                .Where(i => !i.IsDeleted && i.TenantId == tenantId)
                 .Select(i => new ItemVM
                 {
                     Id = i.Id,
@@ -47,99 +47,97 @@ namespace SchoolManagement.Services.Implementation
                     BookCondition = i.BookCondition,
                     Status = i.Status,
                     PurchasedOn = i.PurchasedOn,
-                    TenantId = i.TenantId,
-
-
+                    TenantId = i.TenantId
                 }).ToList();
         }
-        public ItemVM GetById(int Id)
 
+        // Get all items by tenant ID and item header ID that are not deleted
+        // HttpGet: api/item/tenant/{tenantId}/header/{itemHeaderId}
+        public ItemVM GetById(int id)
         {
-            var i = _context.Items.FirstOrDefault(i => i!.IsDeleted && i.Id == Id);
-            if (i == null) return null;
+            var item = _context.Items.FirstOrDefault(i => !i.IsDeleted && i.Id == id);
+            if (item == null) return null;
+
             return new ItemVM
             {
-                Id = i.Id,
-                ItemHeaderId = i.ItemHeaderId,
-                BookCondition = i.BookCondition,
-                Status = i.Status,
-                PurchasedOn = i.PurchasedOn,
-                TenantId = i.TenantId,
+                Id = item.Id,
+                ItemHeaderId = item.ItemHeaderId,
+                BookCondition = item.BookCondition,
+                Status = item.Status,
+                PurchasedOn = item.PurchasedOn,
+                TenantId = item.TenantId
             };
-
-
         }
-        public ItemVM GetByIdAndTenantId(int Id, int TenantId)
-
+        // Get item by ID and tenant ID that are not deleted
+        // HttpGet: api/item/{id}/tenant/{tenantId}
+        public ItemVM GetByIdAndTenantId(int id, int tenantId)
         {
-            var i = _context.Items.FirstOrDefault(i => i!.IsDeleted && i.Id == Id && i.TenantId == TenantId);
+            var item = _context.Items.FirstOrDefault(i => !i.IsDeleted && i.Id == id && i.TenantId == tenantId);
+            if (item == null) return null;
 
-            if (i == null) return null;
             return new ItemVM
             {
-                Id = i.Id,
-                ItemHeaderId = i.ItemHeaderId,
-                BookCondition = i.BookCondition,
-                Status = i.Status,
-                PurchasedOn = i.PurchasedOn,
-                TenantId = i.TenantId,
+                Id = item.Id,
+                ItemHeaderId = item.ItemHeaderId,
+                BookCondition = item.BookCondition,
+                Status = item.Status,
+                PurchasedOn = item.PurchasedOn,
+                TenantId = item.TenantId
+            };
+        }
+
+        // Update item by ID and tenant ID
+        // HttpPut: api/item/{id}/tenant/{tenantId}
+        public ItemVM UpdateByIdAndTenantId(int id, int tenantId, UpdateItemVM request)
+        {
+            var item = _context.Items.FirstOrDefault(i => i.Id == id && i.TenantId == tenantId && !i.IsDeleted);
+            if (item == null) return null;
+
+            item.BookCondition = request.BookCondition;
+            item.Status = request.Status;
+            item.ItemHeaderId = request.ItemHeaderId;
+            _context.SaveChanges();
+
+            return GetById(id);
+        }
+
+        // Delete item by ID and tenant ID (soft delete)
+        // HttpDelete: api/item/{id}/tenant/{tenantId}
+        public ItemVM DeleteByIdAndTenantId(int id, int tenantId)
+        {
+            var item = _context.Items.FirstOrDefault(i => i.Id == id && i.TenantId == tenantId && !i.IsDeleted);
+            if (item == null) return null;
+
+            item.IsDeleted = true;
+            _context.SaveChanges();
+
+            return new ItemVM()
+            {
+                Id= item.Id,
+                BookCondition = item.BookCondition,
+                Status = item.Status,
+            };
+        }
+
+        // Create a new item
+        // HttpPost: api/item/create
+        public ItemVM CreateItem(ItemRequestVM request)
+        {
+            var item = new MItem
+            {
+                ItemHeaderId = request.ItemHeaderId,
+                BookCondition = request.BookCondition,
+                Status = request.Status,
+                PurchasedOn = request.PurchasedOn,
+                TenantId = request.TenantId,
+                CreatedBy = request.CreatedBy,
+                CreatedOn = DateTime.UtcNow
             };
 
-
-        }
-        public ItemVM UpdateByIdAndTenantId(int Id, int TenantId, UpdateItemVM request)
-        {
-            var entity = _context.Items.FirstOrDefault(i => i.Id == Id && i.TenantId == TenantId && !i.IsDeleted);
-            if (entity != null) return null;
-            entity.BookCondition = request.BookCondition;
-            entity.Status = request.Status;
-            entity.ItemHeaderId = request.ItemHeaderId;
-
+            _context.Items.Add(item);
             _context.SaveChanges();
-            return new ItemVM { Id = Id, ItemHeaderId = request.ItemHeaderId, BookCondition = request.BookCondition, Status = request.Status };
+
+            return GetById(item.Id);
         }
-
-        public ItemVM DeleteByIdAndTenantId(int Id, int TenantId)
-        {
-            var Item = _context.Items.FirstOrDefault(i => i.Id == Id && i.TenantId == TenantId && !i.IsDeleted);
-            if (Item == null) return null;
-            Item.IsDeleted = true;
-            _context.Items.Update(Item);
-            _context.SaveChanges();
-            return true;
-
-            
-        }
-        
-        public ItemVM createwithItem(ItemRequestVM Item)
-        {
-            var ItemModel = new MItem() { ItemHeaderId=Item.ItemHeaderId,TenantId=Item.TenantId,BookCondition=Item.BookCondition, Status=Item.Status,PurchasedOn=Item.PurchasedOn,CreatedBy=Item.CreatedBy};
-            ItemModel.CreatedOn = DateTime.UtcNow;
-            _context.Items.Add(ItemModel);
-            _context.SaveChanges();
-            return new ItemVM() {Id=ItemModel.Id, ItemHeaderId = ItemModel.ItemHeaderId, TenantId = ItemModel.TenantId, BookCondition = ItemModel.BookCondition, Status = ItemModel.Status, PurchasedOn = ItemModel.PurchasedOn  };
-        }
-
-
-        private ItemVM GetById(object id)
-        {
-            throw new NotImplementedException();
-        }
-
-
-        List<ItemVM> IItemService.GetAll()
-        {
-            throw new NotImplementedException();
-        }
-
-
-
-
-    }
-
-    public interface IItemService
-    {
-        List<ItemVM> GetAll();
     }
 }
-
