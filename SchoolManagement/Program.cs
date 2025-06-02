@@ -36,6 +36,9 @@ builder.Services.AddScoped<IBooksService, BooksServiceImpl>();
 builder.Services.AddScoped<IUtilitesService, UtilitiesServiceImpl>();
 builder.Services.AddScoped<IItemService, ItemServiceImpl>();
 
+builder.Services.AddScoped<ISubjectService, SubjectServiceImpl>();
+
+
 //builder.Services.AddScoped<IBooksService, BooksServiceImpl>();
 
 builder.Services.AddScoped<IPrefixSuffixService, PrefixSuffixServiceImpl>();
