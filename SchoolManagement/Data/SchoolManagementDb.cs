@@ -25,7 +25,7 @@ namespace SchoolManagement.Data
         // New School Management DbSets
         public DbSet<MSubject> subjects { get; set; }
         public DbSet<MCourse> Courses { get; set; }
-        public DbSet<MCourseSubject> CourseSubjects { get; set; }
+        public DbSet<MCourseSubject> course_subject { get; set; }
         public DbSet<MTopic> Topics { get; set; }
         public DbSet<MWeek> Weeks { get; set; }
         public DbSet<MPublicHoliday> PublicHolidays { get; set; }
@@ -43,6 +43,9 @@ namespace SchoolManagement.Data
         public DbSet<MTimeTableWorksheet> TimeTableWorksheets { get; set; }
         public DbSet<MDailyAssessment> DailyAssessments { get; set; }
 
-     
+        public DbSet<MTerm> Terms { get; set; }
+
+
+
     }
 }

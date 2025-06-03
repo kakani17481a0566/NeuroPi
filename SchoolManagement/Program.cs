@@ -37,6 +37,12 @@ builder.Services.AddScoped<IUtilitesService, UtilitiesServiceImpl>();
 builder.Services.AddScoped<IItemService, ItemServiceImpl>();
 
 builder.Services.AddScoped<ISubjectService, SubjectServiceImpl>();
+builder.Services.AddScoped<ICourseService, CourseServiceImpl>();
+builder.Services.AddScoped<ICourseSubjectService, CourseSubjectServiceImpl>();
+builder.Services.AddScoped<ITopicService, TopicServiceImpl>();
+builder.Services.AddScoped<IWeekService, WeekServiceImpl>();
+
+
 
 
 //builder.Services.AddScoped<IBooksService, BooksServiceImpl>();

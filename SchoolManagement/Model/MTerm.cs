@@ -1,11 +1,12 @@
 ﻿using NeuroPi.UserManagment.Model;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SchoolManagement.Model
 {
-    [Table("topics")]
-    public class MTopic : MBaseModel
+    [Table("term")]  // Specify the exact table name
+    public class MTerm : MBaseModel
     {
         [Key]
         [Column("id")]
@@ -13,25 +14,22 @@ namespace SchoolManagement.Model
 
         [Required]
         [Column("name")]
+        [StringLength(100)]
         public string Name { get; set; }
 
-        [Column("code")]
-        public string Code { get; set; }
+        [Required]
+        [Column("start_date")]
+        public DateTime StartDate { get; set; }
 
-        [Column("description")]
-        public string Description { get; set; }
+        [Required]
+        [Column("end_date")]
+        public DateTime EndDate { get; set; }
 
-        [ForeignKey("Subject")]
-        [Column("sub_id")]
-        public int SubjectId { get; set; }
-        public virtual MSubject Subject { get; set; }
-
-        [Column("topic_type_id")]
-        public int TopicTypeId { get; set; }
-
+        [Required]
         [ForeignKey("Tenant")]
         [Column("tenant_id")]
         public int TenantId { get; set; }
         public virtual MTenant Tenant { get; set; }
+
     }
 }
