@@ -41,6 +41,7 @@ builder.Services.AddScoped<ICourseService, CourseServiceImpl>();
 builder.Services.AddScoped<ICourseSubjectService, CourseSubjectServiceImpl>();
 builder.Services.AddScoped<ITopicService, TopicServiceImpl>();
 builder.Services.AddScoped<IWeekService, WeekServiceImpl>();
+builder.Services.AddScoped<IParentStudentsService, ParentStudentsServiceImpl>();
 
 
 

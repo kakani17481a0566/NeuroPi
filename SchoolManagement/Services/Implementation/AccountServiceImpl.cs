@@ -1,10 +1,11 @@
 ﻿using NeuroPi.UserManagment.Model;
 using SchoolManagement.Data;
+using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.Account;
 
 //code written by Kiran on 27-05-2025
 
-namespace SchoolManagement.Services.Interface
+namespace SchoolManagement.Services.Implementation
 {
     public class AccountServiceImpl : IAccountService
     {
