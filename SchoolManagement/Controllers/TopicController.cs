@@ -5,59 +5,99 @@ using SchoolManagement.ViewModel.Topic;
 using System.Collections.Generic;
 using System.Net;
 
+// Developed by Mohith
+
 namespace SchoolManagement.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class TopicController : ControllerBase
     {
-        private readonly ITopicService _topicService;
+        private readonly ITopicService _service;
 
-        public TopicController(ITopicService topicService)
+        public TopicController(ITopicService service)
         {
-            _topicService = topicService;
+            _service = service;
         }
 
-        [HttpGet("{tenantId}")]
-        public ResponseResult<List<TopicResponseVM>> GetAll(int tenantId)
+
+        // GET: api/topic
+        // Get all topics without tenant filter
+        [HttpGet]
+        public ResponseResult<List<TopicResponseVM>> GetAll()
         {
-            var topics = _topicService.GetAll(tenantId);
-            return new ResponseResult<List<TopicResponseVM>>(HttpStatusCode.OK, topics, "Topics fetched successfully");
+            var result = _service.GetAll();
+            return new ResponseResult<List<TopicResponseVM>>(HttpStatusCode.OK, result, "All topics fetched successfully");
         }
 
-        [HttpGet("{tenantId}/{id}")]
-        public ResponseResult<TopicResponseVM> GetById(int tenantId, int id)
+        // GET: api/topic/{id}
+        // Get topic by ID only (no tenant)
+        [HttpGet("{id}")]
+        public ResponseResult<TopicResponseVM> GetById(int id)
         {
-            var topic = _topicService.GetById(id, tenantId);
-            if (topic == null)
+            var result = _service.GetById(id);
+            if (result == null)
                 return new ResponseResult<TopicResponseVM>(HttpStatusCode.NotFound, null, "Topic not found");
 
-            return new ResponseResult<TopicResponseVM>(HttpStatusCode.OK, topic, "Topic fetched successfully");
+            return new ResponseResult<TopicResponseVM>(HttpStatusCode.OK, result, "Topic fetched successfully");
         }
 
+        // Get all topics by tenant
+        // GET: api/topic/tenant/{tenantId}
+        [HttpGet("tenant/{tenantId}")]
+        public ResponseResult<List<TopicResponseVM>> GetAll(int tenantId)
+        {
+            var result = _service.GetAll(tenantId);
+            return new ResponseResult<List<TopicResponseVM>>(HttpStatusCode.OK, result, "Topics fetched successfully");
+        }
+
+        // Get topic by ID and tenant
+        // GET: api/topic/{id}/tenant/{tenantId}
+        [HttpGet("{id}/tenant/{tenantId}")]
+        public ResponseResult<TopicResponseVM> GetById(int id, int tenantId)
+        {
+            var result = _service.GetById(id, tenantId);
+            if (result == null)
+                return new ResponseResult<TopicResponseVM>(HttpStatusCode.NotFound, null, "Topic not found");
+
+            return new ResponseResult<TopicResponseVM>(HttpStatusCode.OK, result, "Topic fetched successfully");
+        }
+
+        // Create a new topic
+        // POST: api/topic
         [HttpPost]
         public ResponseResult<TopicResponseVM> Create([FromBody] TopicRequestVM request)
         {
-            var created = _topicService.Create(request);
-            return new ResponseResult<TopicResponseVM>(HttpStatusCode.Created, created, "Topic created successfully");
+            if (request == null)
+                return new ResponseResult<TopicResponseVM>(HttpStatusCode.BadRequest, null, "Invalid topic data");
+
+            var result = _service.Create(request);
+            return new ResponseResult<TopicResponseVM>(HttpStatusCode.Created, result, "Topic created successfully");
         }
 
-        [HttpPut("{tenantId}/{id}")]
-        public ResponseResult<TopicResponseVM> Update(int tenantId, int id, [FromBody] TopicUpdateVM request)
+        // Update topic
+        // PUT: api/topic/{id}/tenant/{tenantId}
+        [HttpPut("{id}/tenant/{tenantId}")]
+        public ResponseResult<TopicResponseVM> Update(int id, int tenantId, [FromBody] TopicUpdateVM request)
         {
-            var updated = _topicService.Update(id, tenantId, request);
-            if (updated == null)
-                return new ResponseResult<TopicResponseVM>(HttpStatusCode.NotFound, null, "Topic not found or not updated");
+            if (request == null)
+                return new ResponseResult<TopicResponseVM>(HttpStatusCode.BadRequest, null, "Invalid topic data");
 
-            return new ResponseResult<TopicResponseVM>(HttpStatusCode.OK, updated, "Topic updated successfully");
+            var result = _service.Update(id, tenantId, request);
+            if (result == null)
+                return new ResponseResult<TopicResponseVM>(HttpStatusCode.NotFound, null, "Topic not found");
+
+            return new ResponseResult<TopicResponseVM>(HttpStatusCode.OK, result, "Topic updated successfully");
         }
 
-        [HttpDelete("{tenantId}/{id}")]
-        public ResponseResult<string> Delete(int tenantId, int id)
+        // Delete topic (soft delete)
+        // DELETE: api/topic/{id}/tenant/{tenantId}
+        [HttpDelete("{id}/tenant/{tenantId}")]
+        public ResponseResult<string> Delete(int id, int tenantId)
         {
-            var deleted = _topicService.Delete(id, tenantId);
-            if (!deleted)
-                return new ResponseResult<string>(HttpStatusCode.NotFound, null, "Topic not found or already deleted");
+            var success = _service.Delete(id, tenantId);
+            if (!success)
+                return new ResponseResult<string>(HttpStatusCode.NotFound, null, "Topic not found");
 
             return new ResponseResult<string>(HttpStatusCode.OK, "Deleted", "Topic deleted successfully");
         }

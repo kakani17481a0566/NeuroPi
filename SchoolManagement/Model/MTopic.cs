@@ -22,12 +22,12 @@ namespace SchoolManagement.Model
         public string Description { get; set; }
 
         [ForeignKey("Subject")]
-        [Column("sub_id")]
+        [Column("subject_id")]
         public int SubjectId { get; set; }
         public virtual MSubject Subject { get; set; }
 
         [Column("topic_type_id")]
-        public int TopicTypeId { get; set; }
+        public int? TopicTypeId { get; set; }
 
         [ForeignKey("Tenant")]
         [Column("tenant_id")]

@@ -20,6 +20,18 @@ namespace SchoolManagement.Controllers
             _service = service;
         }
 
+
+        // Get all CourseSubjects (no tenant filter)
+        // HTTP GET: api/coursesubject
+        // No parameters
+        [HttpGet]
+        public ResponseResult<List<CourseSubjectResponseVM>> GetAll()
+        {
+            var result = _service.GetAll();
+            return new ResponseResult<List<CourseSubjectResponseVM>>(HttpStatusCode.OK, result, "All course subjects fetched successfully");
+        }
+
+
         // Get By Tenant ID
         // HTTP GET: api/coursesubject/tenant/{tenantId}
         // Parameter: int tenantId
