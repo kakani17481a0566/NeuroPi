@@ -4,24 +4,33 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SchoolManagement.Model
 {
+    [Table("topics")]
     public class MTopic : MBaseModel
     {
         [Key]
+        [Column("id")]
         public int Id { get; set; }
 
         [Required]
+        [Column("name")]
         public string Name { get; set; }
 
+        [Column("code")]
         public string Code { get; set; }
+
+        [Column("description")]
         public string Description { get; set; }
 
         [ForeignKey("Subject")]
+        [Column("sub_id")]
         public int SubjectId { get; set; }
         public virtual MSubject Subject { get; set; }
 
+        [Column("topic_type_id")]
         public int TopicTypeId { get; set; }
 
         [ForeignKey("Tenant")]
+        [Column("tenant_id")]
         public int TenantId { get; set; }
         public virtual MTenant Tenant { get; set; }
     }
