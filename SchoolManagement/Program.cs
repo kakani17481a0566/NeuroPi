@@ -47,6 +47,7 @@ builder.Services.AddScoped<ITimeTableWorksheetService, TimeTableWorksheetService
 
 
 
+builder.Services.AddScoped<IPublicHolidayService, PublicHolidayServiceImpl>();
 
 
 //builder.Services.AddScoped<IBooksService, BooksServiceImpl>();

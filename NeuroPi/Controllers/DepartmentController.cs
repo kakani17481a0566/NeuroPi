@@ -57,6 +57,8 @@ namespace NeuroPi.UserManagment.Controllers
         }
 
         // GET api/departments/tenant/{tenantId}
+        [Authorize]
+
         [HttpGet("tenant/{tenantId}")]
         public ResponseResult<List<DepartmentResponseVM>> GetByTenantId(int tenantId)
         {
@@ -70,6 +72,8 @@ namespace NeuroPi.UserManagment.Controllers
 
         // POST api/departments
         [HttpPost]
+        [Authorize]
+
         public ResponseResult<DepartmentResponseVM> Add([FromBody] DepartmentCreateVM vm)
         {
             if (vm.CreatedBy <= 0)
@@ -85,6 +89,8 @@ namespace NeuroPi.UserManagment.Controllers
 
         // PUT api/departments/{id}/tenant/{tenantId}
         [HttpPut("{id}/tenant/{tenantId}")]
+        [Authorize]
+
         public ResponseResult<DepartmentResponseVM> Update(int id, int tenantId, [FromBody] DepartmentUpdateVM vm)
         {
             if (vm.UpdatedBy <= 0)
@@ -100,6 +106,7 @@ namespace NeuroPi.UserManagment.Controllers
 
         // DELETE api/departments/{id}/tenant/{tenantId}
         [HttpDelete("{id}/tenant/{tenantId}")]
+        [Authorize]
         public ResponseResult<bool> Delete(int id, int tenantId)
         {
             var success = _service.DeleteById(id, tenantId, 0);
