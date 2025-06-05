@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NeuroPi.UserManagment.Response;
 using SchoolManagement.Services.Interface;
-using SchoolManagement.ViewModel.Institutions;
+using SchoolManagement.ViewModel.institutions;
 using System.Collections.Generic;
 using System.Net;
 

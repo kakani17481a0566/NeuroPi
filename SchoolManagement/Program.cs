@@ -41,7 +41,13 @@ builder.Services.AddScoped<ICourseService, CourseServiceImpl>();
 builder.Services.AddScoped<ICourseSubjectService, CourseSubjectServiceImpl>();
 builder.Services.AddScoped<ITopicService, TopicServiceImpl>();
 builder.Services.AddScoped<IWeekService, WeekServiceImpl>();
-
+builder.Services.AddScoped<IParentStudentsService, ParentStudentsServiceImpl>();
+builder.Services.AddScoped<IWorkSheetService, WorkSheetServiceImpl>();
+builder.Services.AddScoped<IAssessmentService, AssessmentServiceImpl>();
+builder.Services.AddScoped<IGradeService, GradeServiceImpl>();
+builder.Services.AddScoped<IParentService, ParentServiceImpl>();
+builder.Services.AddScoped<IStudentService, StudentServiceImpl>();
+builder.Services.AddScoped<IAssessmentSkillService, AssessmentSkillsServiceImpl>();
 
 
 

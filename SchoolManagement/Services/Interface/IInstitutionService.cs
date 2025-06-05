@@ -1,4 +1,4 @@
-﻿using SchoolManagement.ViewModel.Institutions;
+﻿using SchoolManagement.ViewModel.institutions;
 using System.Collections.Generic;
 
 namespace SchoolManagement.Services.Interface

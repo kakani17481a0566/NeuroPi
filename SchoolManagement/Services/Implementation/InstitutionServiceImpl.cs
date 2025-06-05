@@ -4,7 +4,7 @@ using SchoolManagement.Data;
 using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.Contact;
-using SchoolManagement.ViewModel.Institutions;
+using SchoolManagement.ViewModel.institutions;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,7 +1,6 @@
 ﻿using SchoolManagement.ViewModel.Contact;
-using SchoolManagement.ViewModel.Institutions;
-
-namespace SchoolManagement.ViewModel.institutions
+using SchoolManagement.ViewModel.institutions;
+namespace SchoolManagement.ViewModel.Institutions
 {
     public class InstitutionWithContactResponseVM
     {

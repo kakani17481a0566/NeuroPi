@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SchoolManagement.ViewModel.Institutions
+namespace SchoolManagement.ViewModel.institutions
 {
     public class InstitutionResponseVM
     {
