@@ -3,35 +3,35 @@
 
     namespace NeuroPi.UserManagment.Response
     {
-        public class ResponseResult<T> : IActionResult
+    public class ResponseResult<T> : IActionResult
+    {
+        // HTTP status code
+        public HttpStatusCode StatusCode { get; set; }
+
+        // Message to accompany the response
+        public string Message { get; set; }
+
+        // Data to return in the response
+        public T Data { get; set; }
+
+        // Constructor to initialize ResponseResult with all properties
+        public ResponseResult(HttpStatusCode statusCode, T data, string message = null)
         {
-            // HTTP status code
-            public HttpStatusCode StatusCode { get; set; }
+            StatusCode = statusCode;
+            Message = message ?? "Request completed"; // Default message if none is provided
+            Data = data;
+        }
 
-            // Message to accompany the response
-            public string Message { get; set; }
-
-            // Data to return in the response
-            public T Data { get; set; }
-
-            // Constructor to initialize ResponseResult with all properties
-            public ResponseResult(HttpStatusCode statusCode, T data, string message = null)
+        // Required method for IActionResult implementation
+        public async Task ExecuteResultAsync(ActionContext context)
+        {
+            var result = new ObjectResult(this)
             {
-                StatusCode = statusCode;
-                Message = message ?? "Request completed"; // Default message if none is provided
-                Data = data;
-            }
+                StatusCode = (int)StatusCode
+            };
 
-            // Required method for IActionResult implementation
-            public async Task ExecuteResultAsync(ActionContext context)
-            {
-                var result = new ObjectResult(this)
-                {
-                    StatusCode = (int)StatusCode
-                };
-
-                // Asynchronously execute the result
-                await result.ExecuteResultAsync(context);
-            }
+            // Asynchronously execute the result
+            await result.ExecuteResultAsync(context);
         }
     }
+}

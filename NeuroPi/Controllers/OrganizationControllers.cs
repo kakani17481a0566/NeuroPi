@@ -1,8 +1,9 @@
-﻿using System.Net;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NeuroPi.UserManagment.Response;
 using NeuroPi.UserManagment.Services.Interface;
 using NeuroPi.UserManagment.ViewModel.Organization;
+using System.Net;
 
 namespace NeuroPi.UserManagment.Controllers
 {
@@ -132,6 +133,7 @@ namespace NeuroPi.UserManagment.Controllers
         }
 
         [HttpGet("tenant/{tenantId}")]
+        [Authorize]
         public ResponseResult<object> GetByTenantId(int tenantId)
         {
             try

@@ -3,6 +3,7 @@ using SchoolManagement.Response;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.Transaction;
 using System.Net;
+using System.Collections.Generic;
 
 namespace SchoolManagement.Controllers
 {
@@ -17,6 +18,9 @@ namespace SchoolManagement.Controllers
             _transactionService = transactionService;
         }
 
+        // transfer money between accounts 
+        // POST api/transaction/transfer
+        // Developed by : Mohith
         [HttpPost("transfer")]
         public IActionResult Transfer([FromBody] TransactionRequestVM request)
         {
@@ -24,51 +28,61 @@ namespace SchoolManagement.Controllers
 
             if (!result.IsSuccess)
             {
-                return BadRequest(new ResponseResult<string>(HttpStatusCode.BadRequest, null, result.ErrorMessage));
+                return new ResponseResult<string>(HttpStatusCode.BadRequest, null, result.ErrorMessage);
             }
 
-            return new ResponseResult<object>(
-                HttpStatusCode.OK,
-                new
-                {
-                    DebitTrxId = result.DebitTrxId,
-                    CreditTrxId = result.CreditTrxId,
-                    RefTransactionId = result.RefTrnsId
-                },
-                "Transaction successful"
-            );
+            var responseData = new
+            {
+                DebitTrxId = result.DebitTrxId,
+                CreditTrxId = result.CreditTrxId,
+                RefTransactionId = result.RefTrnsId
+            };
+
+            return new ResponseResult<object>(HttpStatusCode.OK, responseData, "Transaction successful");
         }
 
+        // Get transaction by transaction ID
+        // GET api/transaction/get-by-trxid
+        // Developed by : Mohith
         [HttpGet("get-by-trxid")]
         public IActionResult GetByTrxId([FromQuery] int trxId)
         {
             var result = _transactionService.GetByTrxId(trxId);
             if (result == null)
-                return NotFound(new { message = "Transaction not found." });
+                return new ResponseResult<string>(HttpStatusCode.NotFound, null, "Transaction not found.");
 
-            return Ok(result);
+            return new ResponseResult<TransactionResponseVM>(HttpStatusCode.OK, result);
         }
 
+        // Get transaction by transaction ID and tenant ID
+        // GET api/transaction/get-by-trxid-tenant
+        // Developed by : Mohith
         [HttpGet("get-by-trxid-tenant")]
         public IActionResult GetByTrxIdAndTenantId([FromQuery] int trxId, [FromQuery] int tenantId)
         {
             var result = _transactionService.GetByTrxIdAndTenantId(trxId, tenantId);
             if (result == null)
-                return NotFound(new { message = "Transaction not found." });
+                return new ResponseResult<string>(HttpStatusCode.NotFound, null, "Transaction not found.");
 
-            return Ok(result);
+            return new ResponseResult<TransactionResponseVM>(HttpStatusCode.OK, result);
         }
 
+        // Get transactions by reference transaction ID
+        // GET api/transaction/get-by-reftrnsid
+        // Developed by : Mohith
         [HttpGet("get-by-reftrnsid")]
         public IActionResult GetByRefTrnsId([FromQuery] string refTrnsId)
         {
             var result = _transactionService.GetByRefTrnsId(refTrnsId);
             if (result == null || result.Count == 0)
-                return NotFound(new { message = "Transaction not found." });
+                return new ResponseResult<string>(HttpStatusCode.NotFound, null, "Transaction not found.");
 
-            return Ok(result);
+            return new ResponseResult<List<TransactionResponseVM>>(HttpStatusCode.OK, result);
         }
 
+        // Update transaction amount by reference transaction ID and tenant ID
+        // PUT api/transaction/update-amount-by-ref
+        // Developed by : Mohith
         [HttpPut("update-amount-by-ref")]
         public IActionResult UpdateTrxAmountByRefAndTenant([FromBody] UpdateTrxAmountRequestVM request)
         {
@@ -77,18 +91,10 @@ namespace SchoolManagement.Controllers
 
             if (!isSuccess)
             {
-                return new ResponseResult<string>(
-                    HttpStatusCode.NotFound,
-                    null,
-                    "No transactions found or update failed."
-                );
+                return new ResponseResult<string>(HttpStatusCode.NotFound, null, "No transactions found or update failed.");
             }
 
-            return new ResponseResult<string>(
-                HttpStatusCode.OK,
-                "Transaction amounts updated successfully.",
-                "Success"
-            );
+            return new ResponseResult<string>(HttpStatusCode.OK, null, "Transaction amounts updated successfully.");
         }
     }
 }

@@ -9,6 +9,15 @@ namespace NeuroPi.UserManagment.ViewModel.User
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
+
+        public string? MobileNumber { get; set; }
+
+        public string? AlternateNumber { get; set; }
+
+        public string? Address { get; set; }
+
+
+        public string? MiddleName { get; set; }
         public int TenantId { get; set; } // Keep as int to match MUser
         public DateTime CreatedOn { get; set; }
         public int? CreatedBy { get; set; } // Keep as int? to match MBaseModel
@@ -22,8 +31,13 @@ namespace NeuroPi.UserManagment.ViewModel.User
                 UserId = user.UserId,
                 Username = user.Username,
                 FirstName = user.FirstName,
+                MiddleName = user.MiddleName,
                 LastName = user.LastName,
                 Email = user.Email,
+                MobileNumber = user.MobileNumber,
+                AlternateNumber = user.AlternateNumber,
+                Address = user.Address,
+
                 TenantId = user.TenantId,
                 CreatedOn = user.CreatedOn,
                 CreatedBy = user.CreatedBy,
@@ -34,7 +48,15 @@ namespace NeuroPi.UserManagment.ViewModel.User
 
         public static List<UserResponseVM> ToViewModelList(List<MUser> users)
         {
-            return users.Select(user => ToViewModel(user)).ToList();
+            if (users == null)
+                return new List<UserResponseVM>();
+
+            return users
+                .Where(user => user != null)
+                .Select(user => ToViewModel(user)!)
+                .Where(vm => vm != null)
+                .ToList();
         }
+
     }
 }

@@ -22,6 +22,8 @@ namespace SchoolManagement.Controllers
 
 
         //Get all Contacts
+        //GET: api/contact
+        // Developed by: Kiran
 
         [HttpGet]
         public ResponseResult<IEnumerable<ContactResponseVM>> GetAll()
@@ -31,7 +33,8 @@ namespace SchoolManagement.Controllers
         }
 
         //Get Contacts by Tenant Id
-
+        //GET: api/contact/GetByTenant/{tenantId}
+        // Developed by: Kiran
         [HttpGet("GetByTenant/{tenantId}")]
         public ResponseResult<List<ContactResponseVM>> GetByTenant(int tenantId)
         {
@@ -42,6 +45,8 @@ namespace SchoolManagement.Controllers
         }
 
         //Get Contacts by Id
+        //GET: api/contact/{id}
+        // Developed by: Kiran
         [HttpGet("{id}")]
         public ResponseResult<ContactResponseVM> GetById(int id)
         {
@@ -52,6 +57,8 @@ namespace SchoolManagement.Controllers
         }
 
         //Get Contacts by Id and Tenant Id
+        //GET: api/contact/{id}/{tenantId}
+        // Developed by: Kiran
 
         [HttpGet("{id}/{tenantId}")]
         public ResponseResult<ContactResponseVM> GetByIdAndTenantId(int id, int tenantId)
@@ -63,6 +70,8 @@ namespace SchoolManagement.Controllers
         }
 
         //Create a new Contact
+        //POST: api/contact
+        // Developed by: Kiran
         [HttpPost]
         public ResponseResult<ContactResponseVM> Create([FromBody] ContactRequestVM contact)
         {
@@ -75,6 +84,8 @@ namespace SchoolManagement.Controllers
         }
 
         //Update the exicting Contact by usning Id and Tenanant Id
+        //PUT: api/contact/{id}/{tenantId}
+        // Developed by: Kiran
 
         [HttpPut("{id}/{tenantId}")]
         public ResponseResult<ContactResponseVM> Update(int id, int tenantId, [FromBody] ContactUpdateVM contact)
@@ -90,7 +101,8 @@ namespace SchoolManagement.Controllers
         }
 
         //Delete by Id and Tenant Id
-
+        // DELETE: api/contact/{id}/{tenantId}
+        // Developed by: Kiran
         [HttpDelete("{id}/{tenantId}")]
         public ResponseResult<bool> Delete(int id, int tenantId)
         {

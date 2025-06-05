@@ -21,6 +21,7 @@ namespace SchoolManagement.Services.Implementation
         }
 
         // Get list of all institutions (excluding deleted ones)
+        // Developed by: Mohith
         public List<InstitutionResponseVM> GetAll()
         {
             return _context.Institutions
@@ -40,6 +41,7 @@ namespace SchoolManagement.Services.Implementation
         }
 
         // Get institution by ID
+        // Developed by: Mohith
         public InstitutionResponseVM GetById(int id)
         {
             var x = _context.Institutions.FirstOrDefault(i => i.Id == id && !i.IsDeleted);
@@ -60,6 +62,7 @@ namespace SchoolManagement.Services.Implementation
         }
 
         // Create a new institution
+        // Developed by: Mohith
         public InstitutionResponseVM Create(InstitutionCreateRequestVM request)
         {
             var entity = new MInstitution
@@ -78,6 +81,7 @@ namespace SchoolManagement.Services.Implementation
         }
 
         // Update an institution by ID and Tenant ID
+        // Developed by: Mohith
         public InstitutionResponseVM UpdateByIdAndTenantId(int id, int tenantId, InstitutionUpdateRequestVM request)
         {
             var entity = _context.Institutions
@@ -96,6 +100,7 @@ namespace SchoolManagement.Services.Implementation
 
         // Delete institution by ID and Tenant ID
         // Optionally delete associated contact if deleteContact is true
+        // Developed by: Mohith
         public bool DeleteByIdAndTenantId(int id, int tenantId, bool deleteContact)
         {
             var institution = _context.Institutions
@@ -116,6 +121,7 @@ namespace SchoolManagement.Services.Implementation
         }
 
         // Get institution and its contact by ID and Tenant ID
+        // Developed by: Mohith
         public InstitutionWithContactResponseVM GetByIdAndTenantId(int id, int tenantId)
         {
             var entity = _context.Institutions
@@ -149,6 +155,7 @@ namespace SchoolManagement.Services.Implementation
         }
 
         // Create institution with a new contact (in a transaction)
+        // Developed by: Mohith
         public InstitutionWithContactResponseVM CreateWithContact(InstitutionWithContactRequestVM request)
         {
             using var transaction = _context.Database.BeginTransaction();

@@ -6,7 +6,6 @@ namespace SchoolManagement.ViewModel.Master
     //sai vardhan
     public class MasterRequestVM
     {
-        public int Id { get; set; }
 
         public string Name { get; set; }
 
@@ -14,14 +13,17 @@ namespace SchoolManagement.ViewModel.Master
 
         public int TenantId { get; set; }
 
+        public int CreatedBy { get; set; }
+
+
         public static MMaster ToModel(MasterRequestVM masterRequestVM)
         {
             return new MMaster
             {
-                Id = masterRequestVM.Id,
                 Name = masterRequestVM.Name,
                 TenantId = masterRequestVM.TenantId,
-                MastersType=masterRequestVM.MasterTypeId
+                MasterTypeId = masterRequestVM.MasterTypeId,
+                CreatedBy = masterRequestVM.CreatedBy,
             };
         }
     }

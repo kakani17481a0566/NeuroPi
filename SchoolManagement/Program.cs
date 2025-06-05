@@ -25,19 +25,39 @@ var builder = WebApplication.CreateBuilder(args);
 //builder.Services.AddScoped<IUserRolesService, UserRolesServiceImpl>();
 //builder.Services.AddScoped<IUserService, UserServiceImpl>();
 
-
-
 builder.Services.AddScoped<IContactService, ContactServiceImpl>();
 builder.Services.AddScoped<IInstitutionService, InstitutionServiceImpl>();
 
 builder.Services.AddScoped<IAccountService, AccountServiceImpl>();
-builder.Services.AddScoped<ITransactionService, TransactionServiceImpl>(); 
+builder.Services.AddScoped<ITransactionService, TransactionServiceImpl>();
 builder.Services.AddScoped<IMasterService, MasterServiceImpl>();
 builder.Services.AddScoped<IMasterTypeService, MasterTypeServiceImpl>();
+builder.Services.AddScoped<IBooksService, BooksServiceImpl>();
+builder.Services.AddScoped<IUtilitesService, UtilitiesServiceImpl>();
+builder.Services.AddScoped<IItemService, ItemServiceImpl>();
+
+builder.Services.AddScoped<ISubjectService, SubjectServiceImpl>();
+builder.Services.AddScoped<ICourseService, CourseServiceImpl>();
+builder.Services.AddScoped<ICourseSubjectService, CourseSubjectServiceImpl>();
+builder.Services.AddScoped<ITopicService, TopicServiceImpl>();
+builder.Services.AddScoped<IWeekService, WeekServiceImpl>();
+builder.Services.AddScoped<IParentStudentsService, ParentStudentsServiceImpl>();
+builder.Services.AddScoped<ITimeTableTopicsService, TimeTableTopicsServiceImpl>();
+builder.Services.AddScoped<ITimeTableWorksheetService, TimeTableWorksheetServiceImpl>();    
+builder.Services.AddScoped<IDailyAssessmentService, DailyAssessmentServiceImpl>();
+builder.Services.AddScoped<IPeriodService, PeriodServiceImpl>();
+builder.Services.AddScoped<ITermService, TermServiceImpl>();
+builder.Services.AddScoped<ITimeTableDetailService, TimeTableDetailServiceImpl>();
+builder.Services.AddScoped<ITimeTableServices, TimeTableServiceImpl>();
 
 
 
+builder.Services.AddScoped<IPublicHolidayService, PublicHolidayServiceImpl>();
 
+
+//builder.Services.AddScoped<IBooksService, BooksServiceImpl>();
+
+builder.Services.AddScoped<IPrefixSuffixService, PrefixSuffixServiceImpl>();
 
 builder.Services.AddDbContext<NeuroPiDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -45,11 +65,20 @@ builder.Services.AddDbContext<NeuroPiDbContext>(options =>
 builder.Services.AddDbContext<SchoolManagementDb>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Add CORS policy to allow all origins, methods, headers
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
 
 var app = builder.Build();
 
@@ -60,6 +89,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Enable CORS middleware with your policy globally
+app.UseCors("AllowAll");
+
 app.UseAuthorization();
 app.MapControllers();
+
 app.Run();

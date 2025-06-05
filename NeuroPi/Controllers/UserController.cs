@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using NeuroPi.UserManagment.Response;
 using NeuroPi.UserManagment.Services.Interface;
 using NeuroPi.UserManagment.ViewModel.User;
@@ -13,86 +11,97 @@ namespace NeuroPi.UserManagment.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+
         public UserController(IUserService userService)
         {
             _userService = userService;
-
         }
 
-        [HttpGet]
-        public ResponseResult<UserLogInSucessVM> Get(string username, string password)
+        // GET api/user/login?username=...&password=...
+        [HttpGet("login")]
+        public ResponseResult<UserLogInSucessVM> Login([FromQuery] string username, [FromQuery] string password)
         {
-            var result = _userService.LogIn(username, password);
-            if (result != null)
-            {
-                return new ResponseResult<UserLogInSucessVM>(HttpStatusCode.OK, result, "Logged in successfull");
-            }
-            return new ResponseResult<UserLogInSucessVM>(HttpStatusCode.NoContent, null, "Logged in failed");
-        }
-        [HttpGet("/tenantId")]
-        public ResponseResult<List<UserResponseVM>> GetAllByTenantId([FromQuery] int tenantId)
-        {
-            var result = _userService.GetAllUsersByTenantId(tenantId);
-            if (result != null)
-            {
-                return new ResponseResult<List<UserResponseVM>>(HttpStatusCode.OK, result, "Users fetched successfully By Tenant Id");
-            }
-            return new ResponseResult<List<UserResponseVM>>(HttpStatusCode.NotFound, null, $"Users not found with {tenantId}");
+            var loginResult = _userService.LogIn(username, password);
+
+            if (loginResult != null)
+                return new ResponseResult<UserLogInSucessVM>(HttpStatusCode.OK, loginResult, "Logged in successfully");
+
+            return new ResponseResult<UserLogInSucessVM>(HttpStatusCode.Unauthorized, null, "Login failed");
         }
 
-        [HttpGet("/get")]
-        public ResponseResult<List<UserResponseVM>> GetAllUsers()
+        // GET api/user/by-tenant?tenantId=...
+        [HttpGet("by-tenant")]
+        public ResponseResult<List<UserResponseVM>> GetUsersByTenantId([FromQuery] int tenantId)
         {
-            var result = _userService.GetAllUsers();
-            if (result != null)
-            {
-                return new ResponseResult<List<UserResponseVM>>(HttpStatusCode.OK, result, "Users fetched successfully");
-            }
+            var users = _userService.GetAllUsersByTenantId(tenantId);
+
+            if (users != null && users.Count > 0)
+                return new ResponseResult<List<UserResponseVM>>(HttpStatusCode.OK, users, "Users fetched successfully");
+
             return new ResponseResult<List<UserResponseVM>>(HttpStatusCode.NotFound, null, "No users found");
         }
 
-        [HttpGet("id")]
-        
-        public ResponseResult<UserResponseVM> GetUserById(int id)
+        // GET api/user
+        [HttpGet]
+        public ResponseResult<List<UserResponseVM>> GetAllUsers()
         {
-            var result = _userService.GetUser(id);
-            if (result != null)
-            {
-                return new ResponseResult<UserResponseVM>(HttpStatusCode.OK, result, "User fetched successfully");
-            }
-            return new ResponseResult<UserResponseVM>(HttpStatusCode.NotFound, null, "No user found");
-        }
-        [HttpPut]
+            var users = _userService.GetAllUsers();
 
-        public ResponseResult<UserResponseVM> UpdateUser(int id,int tenantId,UserUpdateRequestVM updateUser)
-        {
-            var result = _userService.UpdateUser(id,tenantId,updateUser);
-            if (result != null)
-            {
-                return new ResponseResult<UserResponseVM>(HttpStatusCode.OK, result, "User updated  successfully");
-            }
-            return new ResponseResult<UserResponseVM>(HttpStatusCode.NotFound, null, "No user found");
+            if (users != null && users.Count > 0)
+                return new ResponseResult<List<UserResponseVM>>(HttpStatusCode.OK, users, "Users fetched successfully");
+
+            return new ResponseResult<List<UserResponseVM>>(HttpStatusCode.NotFound, null, "No users found");
         }
 
-        [HttpDelete]
-        public ResponseResult<Object> DeleteUserById(int id,int tenantId)
+        // GET api/user/{id}?tenantId=...
+        [HttpGet("{id}")]
+        public ResponseResult<UserResponseVM> GetUserById(int id, [FromQuery] int tenantId)
         {
-            var result = _userService.DeleteUser(id,tenantId);
-            if (result != null)
-            {
-                return new ResponseResult<Object>(HttpStatusCode.OK, null, "User Deleted successfully");
-            }
-            return new ResponseResult<Object>(HttpStatusCode.NotFound, null, "No user found");
+            Console.WriteLine($"GetUserById called with id={id}, tenantId={tenantId}");
+            var user = _userService.GetUser(id, tenantId);
+            Console.WriteLine(user == null ? "User not found" : "User found");
+
+            if (user != null)
+                return new ResponseResult<UserResponseVM>(HttpStatusCode.OK, user, "User fetched successfully");
+
+            return new ResponseResult<UserResponseVM>(HttpStatusCode.NotFound, null, "User not found");
         }
+
+
+        // PUT api/user/{id}?tenantId=...
+        [HttpPut("{id}")]
+        public ResponseResult<UserResponseVM> UpdateUser(int id, [FromQuery] int tenantId, [FromBody] UserUpdateRequestVM updateUser)
+        {
+            var updatedUser = _userService.UpdateUser(id, tenantId, updateUser);
+
+            if (updatedUser != null)
+                return new ResponseResult<UserResponseVM>(HttpStatusCode.OK, updatedUser, "User updated successfully");
+
+            return new ResponseResult<UserResponseVM>(HttpStatusCode.NotFound, null, "User not found");
+        }
+
+        // DELETE api/user/{id}?tenantId=...
+        [HttpDelete("{id}")]
+        public ResponseResult<object> DeleteUser(int id, [FromQuery] int tenantId)
+        {
+            var deletedUser = _userService.DeleteUser(id, tenantId);
+
+            if (deletedUser != null)
+                return new ResponseResult<object>(HttpStatusCode.OK, null, "User deleted successfully");
+
+            return new ResponseResult<object>(HttpStatusCode.NotFound, null, "User not found");
+        }
+
+        // POST api/user
         [HttpPost]
-        public ResponseResult<UserResponseVM> AddUser(UserRequestVM requestVm)
+        public ResponseResult<UserResponseVM> AddUser([FromBody] UserRequestVM newUser)
         {
-            var result = _userService.AddUser(requestVm);
-            if (result != null)
-            {
-                return new ResponseResult<UserResponseVM>(HttpStatusCode.OK, result, "User Deleted successfully");
-            }
-            return new ResponseResult<UserResponseVM>(HttpStatusCode.NotFound, null, "No user found");
+            var createdUser = _userService.AddUser(newUser);
+
+            if (createdUser != null)
+                return new ResponseResult<UserResponseVM>(HttpStatusCode.Created, createdUser, "User added successfully");
+
+            return new ResponseResult<UserResponseVM>(HttpStatusCode.BadRequest, null, "Failed to add user");
         }
     }
 }

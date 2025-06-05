@@ -2,7 +2,6 @@
 using NeuroPi.UserManagment.Response;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.Institutions;
-using System;
 using System.Collections.Generic;
 using System.Net;
 
@@ -19,26 +18,57 @@ namespace SchoolManagement.Controllers
             _service = service;
         }
 
-        // Get all institutions
+        // get: api/institution
+        // get all institutions
+        // Developer: Mohith
         [HttpGet]
-        public List<InstitutionResponseVM> GetAll() => _service.GetAll();
+        public ResponseResult<List<InstitutionResponseVM>> GetAll()
+        {
+            var institutions = _service.GetAll();
+            return new ResponseResult<List<InstitutionResponseVM>>(HttpStatusCode.OK, institutions);
+        }
 
-        // Get a single institution by ID
+        // get: api/institution/{id}
+        // get institution by id
+        // Developer: Mohith
         [HttpGet("{id}")]
-        public InstitutionResponseVM GetById(int id) => _service.GetById(id);
+        public ResponseResult<InstitutionResponseVM> GetById(int id)
+        {
+            var institution = _service.GetById(id);
+            if (institution == null)
+                return new ResponseResult<InstitutionResponseVM>(HttpStatusCode.NotFound, null, $"Institution with id {id} not found");
 
-        // Create a new institution
+            return new ResponseResult<InstitutionResponseVM>(HttpStatusCode.OK, institution);
+        }
+
+        // post: api/institution
+        // create a new institution
+        // Developer: Mohith
         [HttpPost]
-        public InstitutionResponseVM Create([FromBody] InstitutionCreateRequestVM request) => _service.Create(request);
+        public ResponseResult<InstitutionResponseVM> Create([FromBody] InstitutionCreateRequestVM request)
+        {
+            var createdInstitution = _service.Create(request);
+            return new ResponseResult<InstitutionResponseVM>(HttpStatusCode.Created, createdInstitution, "Institution created successfully");
+        }
 
-        // Update an institution using its ID and tenant ID
+        // put: api/institution/{id}/tenant/{tenantId}
+        // update institution by id and tenant id
+        // Developer: Mohith
         [HttpPut("{id}/tenant/{tenantId}")]
-        public InstitutionResponseVM UpdateByIdAndTenantId(int id, int tenantId, [FromBody] InstitutionUpdateRequestVM request)
-            => _service.UpdateByIdAndTenantId(id, tenantId, request);
+        public ResponseResult<InstitutionResponseVM> UpdateByIdAndTenantId(int id, int tenantId, [FromBody] InstitutionUpdateRequestVM request)
+        {
+            var updatedInstitution = _service.UpdateByIdAndTenantId(id, tenantId, request);
+            if (updatedInstitution == null)
+                return new ResponseResult<InstitutionResponseVM>(HttpStatusCode.NotFound, null, $"Institution with id {id} and tenant {tenantId} not found");
 
-        // Delete an institution by ID and tenant ID, with optional contact deletion
+            return new ResponseResult<InstitutionResponseVM>(HttpStatusCode.OK, updatedInstitution, "Institution updated successfully");
+        }
+
+        // delete: api/institution/{id}/tenant/{tenantId}
+        // delete institution by id and tenant id
+        // Developer: Mohith
         [HttpDelete("{id}/tenant/{tenantId}")]
-        public async Task<IActionResult> DeleteByIdAndTenantId(int id, int tenantId, [FromQuery] bool deleteContact = false)
+        public ResponseResult<bool> DeleteByIdAndTenantId(int id, int tenantId, [FromQuery] bool deleteContact = false)
         {
             var success = _service.DeleteByIdAndTenantId(id, tenantId, deleteContact);
             if (!success)
@@ -51,32 +81,39 @@ namespace SchoolManagement.Controllers
             return new ResponseResult<bool>(HttpStatusCode.OK, true, message);
         }
 
-        // Get an institution by ID and tenant ID, including contact info
+        // get: api/institution/{id}/tenant/{tenantId}
+        // get institution and contact details by id and tenant id
+        // Developer: Mohith
         [HttpGet("{id}/tenant/{tenantId}")]
-        public IActionResult GetByIdAndTenantId(int id, int tenantId)
+        public ResponseResult<InstitutionWithContactResponseVM> GetByIdAndTenantId(int id, int tenantId)
         {
             var result = _service.GetByIdAndTenantId(id, tenantId);
             if (result == null)
-                return NotFound($"Institution with id {id} and tenant {tenantId} not found.");
+                return new ResponseResult<InstitutionWithContactResponseVM>(HttpStatusCode.NotFound, null, $"Institution with id {id} and tenant {tenantId} not found.");
 
-            return Ok(result);
+            return new ResponseResult<InstitutionWithContactResponseVM>(HttpStatusCode.OK, result);
         }
 
-        // Create an institution along with its contact information
+
+        // post: api/institution/with-contact
+        // Create a new institution with contact details
+        // Developer: Mohith
         [HttpPost("with-contact")]
-        public IActionResult CreateWithContact([FromBody] InstitutionWithContactRequestVM request)
+        public ResponseResult<InstitutionWithContactResponseVM> CreateWithContact([FromBody] InstitutionWithContactRequestVM request)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            {
+                return new ResponseResult<InstitutionWithContactResponseVM>(HttpStatusCode.BadRequest, null, "Invalid request data");
+            }
 
             try
             {
                 var response = _service.CreateWithContact(request);
-                return CreatedAtAction(nameof(GetById), new { id = response.Institution.Id }, response);
+                return new ResponseResult<InstitutionWithContactResponseVM>(HttpStatusCode.Created, response, "Institution with contact created successfully");
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return new ResponseResult<InstitutionWithContactResponseVM>(HttpStatusCode.InternalServerError, null, $"Internal server error: {ex.Message}");
             }
         }
     }

@@ -24,6 +24,11 @@ namespace SchoolManagement.ViewModel.Account
         public int? UpdatedBy { get; set; }
         public DateTime? UpdatedOn { get; set; }
 
+
+        public string Code { get; set; }
+
+        public int PrefixSufixId { get; set; }
+
         public static AccountResponseVM ToViewModel(MAccount account)
         {
             return new AccountResponseVM
@@ -43,7 +48,9 @@ namespace SchoolManagement.ViewModel.Account
                 CreatedBy = account.CreatedBy,
                 CreatedOn = account.CreatedOn,
                 UpdatedBy = account.UpdatedBy,
-                UpdatedOn = account.UpdatedOn
+                UpdatedOn = account.UpdatedOn,
+                Code = account.Code,
+                PrefixSufixId = account.PrefixSuffixId 
             };
 
         }
