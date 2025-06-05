@@ -61,10 +61,10 @@ namespace SchoolManagement.Controllers
         //  Get all master types by Tenant ID
         // GET: api/mastertype/tenant/{id}
         //  Developed by: Sai Vardhan
-        [HttpGet("/tenant/{id}")]
-        public ResponseResult<List<MasterTypeResponseVM>> GetAllMasterTypes([FromRoute]int id)
+        [HttpGet("/tenant/{tenantId}")]
+        public ResponseResult<List<MasterTypeResponseVM>> GetAllMasterTypesByTenantId([FromRoute]int tenantId)
         {
-            var response = masterTypeService.GetAllByTenantId(id);
+            var response = masterTypeService.GetAllByTenantId(tenantId);
 
             if (response == null)
             {

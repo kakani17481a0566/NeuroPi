@@ -17,6 +17,15 @@ namespace SchoolManagement.Services.Implementation
             _dbContext = dbContext;
         }
 
+
+        public List<CourseSubjectResponseVM> GetAll()
+        {
+            return _dbContext.course_subject
+                .Where(cs => !cs.IsDeleted)
+                .Select(CourseSubjectResponseVM.FromModel)
+                .ToList();
+        }
+
         // Get all CourseSubjects by tenant
         public List<CourseSubjectResponseVM> GetAll(int tenantId)
         {

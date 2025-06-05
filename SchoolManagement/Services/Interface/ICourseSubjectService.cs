@@ -5,6 +5,9 @@ namespace SchoolManagement.Services.Interface
 {
     public interface ICourseSubjectService
     {
+
+        List<CourseSubjectResponseVM> GetAll();
+
         List<CourseSubjectResponseVM> GetAll(int tenantId);
 
       

@@ -42,6 +42,15 @@ builder.Services.AddScoped<ICourseSubjectService, CourseSubjectServiceImpl>();
 builder.Services.AddScoped<ITopicService, TopicServiceImpl>();
 builder.Services.AddScoped<IWeekService, WeekServiceImpl>();
 builder.Services.AddScoped<IParentStudentsService, ParentStudentsServiceImpl>();
+builder.Services.AddScoped<ITimeTableTopicsService, TimeTableTopicsServiceImpl>();
+builder.Services.AddScoped<ITimeTableWorksheetService, TimeTableWorksheetServiceImpl>();    
+builder.Services.AddScoped<IDailyAssessmentService, DailyAssessmentServiceImpl>();
+builder.Services.AddScoped<IPeriodService, PeriodServiceImpl>();
+builder.Services.AddScoped<ITermService, TermServiceImpl>();
+builder.Services.AddScoped<ITimeTableDetailService, TimeTableDetailServiceImpl>();
+builder.Services.AddScoped<ITimeTableServices, TimeTableServiceImpl>();
+
+
 builder.Services.AddScoped<IWorkSheetService, WorkSheetServiceImpl>();
 builder.Services.AddScoped<IAssessmentService, AssessmentServiceImpl>();
 builder.Services.AddScoped<IGradeService, GradeServiceImpl>();
@@ -49,6 +58,7 @@ builder.Services.AddScoped<IParentService, ParentServiceImpl>();
 builder.Services.AddScoped<IStudentService, StudentServiceImpl>();
 builder.Services.AddScoped<IAssessmentSkillService, AssessmentSkillsServiceImpl>();
 
+builder.Services.AddScoped<IPublicHolidayService, PublicHolidayServiceImpl>();
 
 
 //builder.Services.AddScoped<IBooksService, BooksServiceImpl>();
