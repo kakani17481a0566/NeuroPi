@@ -1,4 +1,6 @@
-﻿using SchoolManagement.Data;
+﻿
+using Microsoft.EntityFrameworkCore;
+using SchoolManagement.Data;
 using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.PublicHoliday;
