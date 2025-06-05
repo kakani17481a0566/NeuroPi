@@ -52,10 +52,10 @@ namespace SchoolManagement.Services.Implementation
         // Developed by: Kiran
         public List<ContactResponseVM> GetAllContacts()
         {
-            return ContactResponseVM.ToViewModelList(_dbContext.Contacts
+            var contacts = _dbContext.Contacts
                 .Where(c => !c.IsDeleted)
-                .ToList());
-
+                .ToList();
+            return contacts.Count > 0 ? ContactResponseVM.ToViewModelList(contacts) : null;
 
         }
 

@@ -21,10 +21,10 @@ namespace SchoolManagement.Services.Implementation
         // Developed by: Mohith
         public List<BookResponseVM> GetAllBooks()
         {
-            return _dbContext.Books
+            var books = _dbContext.Books
                 .Where(b => !b.IsDeleted)
-                .Select(BookResponseVM.FromModel)
                 .ToList();
+            return books.Count > 0 ? BookResponseVM.FromModelList(books) : null;
         }
 
         // Retrieves a book by its ID
@@ -42,10 +42,9 @@ namespace SchoolManagement.Services.Implementation
         // Developed by: Mohith
         public List<BookResponseVM> GetAllBooks(int tenantId)
         {
-            return _dbContext.Books
-                .Where(b => !b.IsDeleted && b.TenantId == tenantId)
-                .Select(BookResponseVM.FromModel)
-                .ToList();
+           var books = _dbContext.Books.Where(b=>!b.IsDeleted && b.TenantId == tenantId).ToList();
+            return books.Count>0 ? 
+                books.Select(BookResponseVM.FromModel).ToList() : null;
         }
 
         // Retrieves a book by its ID for a specific tenant

@@ -48,10 +48,14 @@ namespace SchoolManagement.Services.Implementation
         // Developed by: Kiran
         public List<PrefixSuffixResponseVM> GetAllPrefixSuffix()
         {
-            return PrefixSuffixResponseVM.ToViewModelList(_dbContext.PrefixSuffix
+           var prefixSuffixList = _dbContext.PrefixSuffix
                 .Where(p => !p.IsDeleted)
-                .ToList()
-                );
+                .ToList();
+            if (prefixSuffixList != null && prefixSuffixList.Count > 0)
+            {
+                return PrefixSuffixResponseVM.ToViewModelList(prefixSuffixList);
+            }
+            return null;
 
         }
 

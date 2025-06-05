@@ -37,10 +37,12 @@ namespace SchoolManagement.Services.Implementation
         public List<WorkSheetResponseVM> GetAllWorkSheets()
         {
             var workSheet = _context.Worksheets
-                .Where(ws => !ws.IsDeleted)
-                .Select(ws => WorkSheetResponseVM.ToViewModel(ws))
-                .ToList();
-            return workSheet;
+                .Where(ws => !ws.IsDeleted).ToList();
+            if(workSheet!=null && workSheet.Count() > 0)
+            {
+                return WorkSheetResponseVM.ToViewModelList(workSheet);
+            }
+            return null;
         }
 
         public WorkSheetResponseVM GetWorkSheetByTenantIdAndId(int tenantId, int id)

@@ -73,18 +73,18 @@ namespace SchoolManagement.Services.Implementation
         // Developed by: Kiran
         public List<AccountResponseVM> GetAccountByTenantId(int tenantId)
         {
-            return _context.Accounts
+           var accounts = _context.Accounts
                 .Where(a => a.TenantId == tenantId && !a.IsDeleted)
-                .Select(AccountResponseVM.ToViewModel)
                 .ToList();
+            return accounts.Count > 0 ? AccountResponseVM.ToViewModelList(accounts) : null;
         }
 
         // Retrieves all accounts in the system
         // Developed by: Kiran
         public List<AccountResponseVM> GetAccountDetails()
         {
-            var accounts = _context.Accounts.ToList();
-            return AccountResponseVM.ToViewModelList(accounts);
+            var accounts = _context.Accounts.Where(a=>!a.IsDeleted).ToList();
+            return accounts.Count>0 ? AccountResponseVM.ToViewModelList(accounts):null;
 
         }
 

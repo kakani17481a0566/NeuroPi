@@ -38,5 +38,10 @@ namespace SchoolManagement.ViewModel.Book
                 IsDeleted = book.IsDeleted
             };
         }
+        public static List<BookResponseVM> FromModelList(List<MBook> books)
+        {
+            if (books == null || books.Count == 0) return new List<BookResponseVM>();
+            return books.Select(FromModel).ToList();
+        }
     }
 }

@@ -39,10 +39,13 @@ namespace SchoolManagement.Services.Implementation
 
         public List<AssessmentResponseVM> GetAllAssessments()
         {
-            var assessments = _context.Assessments.ToList();
-            return assessments.Select(AssessmentResponseVM.ToViewModel).ToList();
-        }
+            var assessments = _context.Assessments
+                .Where(a => !a.IsDeleted)
+                .ToList();
+            return assessments.Count > 0 ? AssessmentResponseVM.ToViewModelList(assessments) : null;
 
+
+        }
         public AssessmentResponseVM GetAssessmentById(int id)
         {
             var assessment = _context.Assessments.FirstOrDefault(a => a.Id == id && !a.IsDeleted);

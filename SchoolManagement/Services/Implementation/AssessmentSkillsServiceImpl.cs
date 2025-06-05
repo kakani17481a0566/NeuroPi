@@ -40,7 +40,9 @@ namespace SchoolManagement.Services.Implementation
             var assessmentSkills = _context.AssessmentSkills
                 .Where(s => !s.IsDeleted)
                 .ToList();
-            return assessmentSkills.Select(AssessmentSkillsResponseVM.ToViewModel).ToList();
+            return assessmentSkills.Count> 0 ? AssessmentSkillsResponseVM.ToViewModelList(assessmentSkills) : null;
+
+
         }
 
         public AssessmentSkillsResponseVM GetSkillById(int id)
@@ -70,7 +72,7 @@ namespace SchoolManagement.Services.Implementation
             var assessmentSkills = _context.AssessmentSkills
                 .Where(s => s.TenantId == tenantId && !s.IsDeleted)
                 .ToList();
-            return assessmentSkills.Select(AssessmentSkillsResponseVM.ToViewModel).ToList();
+            return assessmentSkills.Count> 0 ? AssessmentSkillsResponseVM.ToViewModelList(assessmentSkills) : null;
         }
 
         public AssessmentSkillsResponseVM UpdateAssessmentSkill(int id, int tenantId, AssessmentSkillsUpdateVM skill)
