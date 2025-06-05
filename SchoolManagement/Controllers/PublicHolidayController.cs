@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NeuroPi.UserManagment.Response;
+using SchoolManagement.Response;
 using SchoolManagement.Services.Interface;
-using SchoolManagement.ViewModel.Master;
 using SchoolManagement.ViewModel.PublicHoliday;
+using System.Collections.Generic;
 using System.Net;
 
 namespace SchoolManagement.Controllers
@@ -11,68 +11,81 @@ namespace SchoolManagement.Controllers
     [ApiController]
     public class PublicHolidayController : ControllerBase
     {
-        private readonly IPublicHolidayService publicHolidayService;
-        public PublicHolidayController(IPublicHolidayService publicHolidayService)
+        private readonly IPublicHolidayService _service;
+
+        public PublicHolidayController(IPublicHolidayService service)
         {
-            this.publicHolidayService = publicHolidayService;
+            _service = service;
         }
 
         [HttpGet]
-        public ResponseResult<List<PublicHolidayResponseVM>> GetAllMasterTypes()
+        public ResponseResult<List<PublicHolidayResponseVM>> GetAll()
         {
-            var response = publicHolidayService.GetAll();
-            if (response == null)
-            {
-                return new ResponseResult<List<PublicHolidayResponseVM>>(HttpStatusCode.NotFound, response, "No data Found");
-            }
-            return new ResponseResult<List<PublicHolidayResponseVM>>(HttpStatusCode.OK, response, "Master types fetched successfully");
+            var result = _service.GetAll();
+            if (result == null || result.Count == 0)
+                return new ResponseResult<List<PublicHolidayResponseVM>>(HttpStatusCode.NotFound, null, "No public holidays found.");
+
+            return new ResponseResult<List<PublicHolidayResponseVM>>(HttpStatusCode.OK, result, "Public holidays fetched successfully.");
         }
 
-        [HttpGet("/holiday/{tenantId}")]
-        public ResponseResult<List<PublicHolidayResponseVM>> GetAllMasterTypesByTenantId([FromRoute] int tenantId)
+        [HttpGet("tenant/{tenantId}")]
+        public ResponseResult<List<PublicHolidayResponseVM>> GetByTenant(int tenantId)
         {
-            var response = publicHolidayService.GetAllByTenantId(tenantId);
+            var result = _service.GetAllByTenantId(tenantId);
+            if (result == null || result.Count == 0)
+                return new ResponseResult<List<PublicHolidayResponseVM>>(HttpStatusCode.NotFound, null, $"No public holidays for tenant {tenantId}.");
 
-            if (response == null)
-            {
-                return new ResponseResult<List<PublicHolidayResponseVM>>(HttpStatusCode.NotFound, response, "No data Found");
-            }
-            return new ResponseResult<List<PublicHolidayResponseVM>>(HttpStatusCode.OK, response, "Master types fetched successfully");
+            return new ResponseResult<List<PublicHolidayResponseVM>>(HttpStatusCode.OK, result, "Public holidays fetched successfully.");
         }
 
+        [HttpGet("{id}")]
+        public ResponseResult<PublicHolidayResponseVM> GetById(int id)
+        {
+            var result = _service.GetById(id);
+            if (result == null)
+                return new ResponseResult<PublicHolidayResponseVM>(HttpStatusCode.NotFound, null, $"Public holiday with ID {id} not found.");
+
+            return new ResponseResult<PublicHolidayResponseVM>(HttpStatusCode.OK, result, "Public holiday fetched successfully.");
+        }
+
+        [HttpGet("{id}/tenant/{tenantId}")]
+        public ResponseResult<PublicHolidayResponseVM> GetByIdAndTenant(int id, int tenantId)
+        {
+            var result = _service.GetByIdAndTenantId(id, tenantId);
+            if (result == null)
+                return new ResponseResult<PublicHolidayResponseVM>(HttpStatusCode.NotFound, null, $"No public holiday with ID {id} and tenant {tenantId}.");
+
+            return new ResponseResult<PublicHolidayResponseVM>(HttpStatusCode.OK, result, "Public holiday fetched successfully.");
+        }
 
         [HttpPost]
-        public ResponseResult<PublicHolidayResponseVM> AddMaster([FromBody] PublicHolidayRequestVM request)
+        public ResponseResult<PublicHolidayResponseVM> Create([FromBody] PublicHolidayRequestVM request)
         {
-            var response = publicHolidayService.CreatePublicHoliday(request);
-            if (response != null)
-            {
-                return new ResponseResult<PublicHolidayResponseVM>(HttpStatusCode.OK, response, "master type created  successfully");
-            }
-            return new ResponseResult<PublicHolidayResponseVM>(HttpStatusCode.BadRequest, response, "master type not created");
+            var result = _service.CreatePublicHoliday(request);
+            if (result == null)
+                return new ResponseResult<PublicHolidayResponseVM>(HttpStatusCode.BadRequest, null, "Public holiday creation failed.");
+
+            return new ResponseResult<PublicHolidayResponseVM>(HttpStatusCode.OK, result, "Public holiday created successfully.");
         }
 
-        [HttpPut("/holiday/{id}/tenant/{tenantId}")]
-        public ResponseResult<PublicHolidayResponseVM> UpdateMaster(int id, int tenantId, [FromBody] PublicHolidayRequestVM request)
+        [HttpPut("{id}/tenant/{tenantId}")]
+        public ResponseResult<PublicHolidayResponseVM> Update(int id, int tenantId, [FromBody] PublicHolidayRequestVM request)
         {
-            var response = publicHolidayService.UpdatePublicHoliday(id, tenantId, request);
-            if (response != null)
-            {
-                return new ResponseResult<PublicHolidayResponseVM>(HttpStatusCode.OK, response, "master type updated successfully");
-            }
-            return new ResponseResult<PublicHolidayResponseVM>(HttpStatusCode.BadRequest, response, "master type not updated");
+            var result = _service.UpdatePublicHoliday(id, tenantId, request);
+            if (result == null)
+                return new ResponseResult<PublicHolidayResponseVM>(HttpStatusCode.BadRequest, null, "Public holiday update failed.");
+
+            return new ResponseResult<PublicHolidayResponseVM>(HttpStatusCode.OK, result, "Public holiday updated successfully.");
         }
 
-        [HttpDelete("/holiday/{id}/{tenantId}")]
-        public ResponseResult<PublicHolidayResponseVM> DeleteByIdAndTenantId([FromRoute] int id, [FromRoute] int tenantId)
+        [HttpDelete("{id}/tenant/{tenantId}")]
+        public ResponseResult<string> Delete(int id, int tenantId)
         {
-            var response = publicHolidayService.DeleteById(id, tenantId);
-            if (response != null)
-            {
-                return new ResponseResult<PublicHolidayResponseVM>(HttpStatusCode.OK, response, "Deleted Successfully");
-            }
-            return new ResponseResult<PublicHolidayResponseVM>(HttpStatusCode.NoContent, response, $"No Data found with Id {id}");
+            var result = _service.DeleteById(id, tenantId);
+            if (result == null)
+                return new ResponseResult<string>(HttpStatusCode.NotFound, null, $"No public holiday found with ID {id}.");
 
+            return new ResponseResult<string>(HttpStatusCode.OK, $"Public holiday with ID {id} deleted successfully.");
         }
     }
 }

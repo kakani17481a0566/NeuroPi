@@ -49,7 +49,7 @@ namespace SchoolManagement.Data
 
         // views
 
-        public DbSet<DailyTeachingSchedule> DailyTeachingSchedules { get; set; }
+        //public DbSet<DailyTeachingSchedule> DailyTeachingSchedules { get; set; }
 
 
 

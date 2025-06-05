@@ -48,7 +48,15 @@ namespace NeuroPi.UserManagment.ViewModel.User
 
         public static List<UserResponseVM> ToViewModelList(List<MUser> users)
         {
-            return users.Select(user => ToViewModel(user)).ToList();
+            if (users == null)
+                return new List<UserResponseVM>();
+
+            return users
+                .Where(user => user != null)
+                .Select(user => ToViewModel(user)!)
+                .Where(vm => vm != null)
+                .ToList();
         }
+
     }
 }

@@ -1,6 +1,5 @@
 ﻿using SchoolManagement.Model;
-using SchoolManagement.ViewModel.Master;
-using System.ComponentModel.DataAnnotations;
+using System;
 
 namespace SchoolManagement.ViewModel.PublicHoliday
 {
@@ -8,19 +7,17 @@ namespace SchoolManagement.ViewModel.PublicHoliday
     {
         public string Name { get; set; }
         public DateOnly Date { get; set; }
-
-        public int tenantId { get; set; }
-
+        public int TenantId { get; set; }
         public int CreatedBy { get; set; }
 
-        public static MPublicHoliday ToModel(PublicHolidayRequestVM publicHolidayRequestVM)
+        public static MPublicHoliday ToModel(PublicHolidayRequestVM vm)
         {
             return new MPublicHoliday
             {
-               Name= publicHolidayRequestVM.Name,
-               Date= publicHolidayRequestVM.Date,
-               TenantId=publicHolidayRequestVM.tenantId,
-
+                Name = vm.Name,
+                Date = vm.Date,
+                TenantId = vm.TenantId,
+                CreatedBy = vm.CreatedBy
             };
         }
     }

@@ -44,6 +44,11 @@ builder.Services.AddScoped<IWeekService, WeekServiceImpl>();
 builder.Services.AddScoped<IParentStudentsService, ParentStudentsServiceImpl>();
 builder.Services.AddScoped<ITimeTableTopicsService, TimeTableTopicsServiceImpl>();
 builder.Services.AddScoped<ITimeTableWorksheetService, TimeTableWorksheetServiceImpl>();    
+builder.Services.AddScoped<IDailyAssessmentService, DailyAssessmentServiceImpl>();
+builder.Services.AddScoped<IPeriodService, PeriodServiceImpl>();
+builder.Services.AddScoped<ITermService, TermServiceImpl>();
+builder.Services.AddScoped<ITimeTableDetailService, TimeTableDetailServiceImpl>();
+builder.Services.AddScoped<ITimeTableServices, TimeTableServiceImpl>();
 
 
 

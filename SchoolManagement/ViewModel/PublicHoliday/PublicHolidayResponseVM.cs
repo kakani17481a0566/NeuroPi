@@ -1,30 +1,34 @@
 ﻿using SchoolManagement.Model;
-using SchoolManagement.ViewModel.Master;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SchoolManagement.ViewModel.PublicHoliday
 {
     public class PublicHolidayResponseVM
     {
-
         public int Id { get; set; }
-
         public string Name { get; set; }
         public DateOnly Date { get; set; }
-
         public int TenantId { get; set; }
 
-        public static PublicHolidayResponseVM ToViewModel(MPublicHoliday publicHoliday) =>
-            new PublicHolidayResponseVM
-            {
-                Id=publicHoliday.Id,
-                Name=publicHoliday.Name,
-                Date=publicHoliday.Date,
-                TenantId=publicHoliday.TenantId,
-                
-            };
-        public static List<PublicHolidayResponseVM> ToViewModelList(List<MPublicHoliday> masters)
+        public static PublicHolidayResponseVM ToViewModel(MPublicHoliday model)
         {
-            return masters.Select(ToViewModel).ToList();
+            if (model == null) return null;
+
+            return new PublicHolidayResponseVM
+            {
+                Id = model.Id,
+                Name = model.Name,
+                Date = model.Date,
+                TenantId = model.TenantId
+            };
+        }
+
+        public static List<PublicHolidayResponseVM> ToViewModelList(List<MPublicHoliday> models)
+        {
+            if (models == null || models.Count == 0) return null;
+
+            return models.Select(m => ToViewModel(m)).ToList();
         }
     }
 }

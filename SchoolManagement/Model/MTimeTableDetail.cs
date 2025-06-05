@@ -1,31 +1,33 @@
 ﻿using NeuroPi.UserManagment.Model;
+using NodaTime;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SchoolManagement.Model
 {
+    [Table("time_table_detail")]
     public class MTimeTableDetail : MBaseModel
     {
         [Key]
+        [Column("id")]
         public int Id { get; set; }
 
-        [ForeignKey("Period")]
+        [Column("period_id")]
         public int PeriodId { get; set; }
-        public virtual MPeriod Period { get; set; }
+    
 
-        [ForeignKey("Subject")]
+        [Column("subject_id")]
         public int SubjectId { get; set; }
-        public virtual MSubject Subject { get; set; }
+     
 
-        [ForeignKey("TimeTable")]
+        [Column("time_table_id")]
         public int TimeTableId { get; set; }
-        public virtual MTimeTable TimeTable { get; set; }
-
-        [ForeignKey("Teacher")]
+        
+        [Column("teacher_id")]
         public int TeacherId { get; set; }
-        public virtual MUser Teacher { get; set; }
 
-        [ForeignKey("Tenant")]
+        [Column("tenant_id")]
         public int TenantId { get; set; }
         public virtual MTenant Tenant { get; set; }
     }
