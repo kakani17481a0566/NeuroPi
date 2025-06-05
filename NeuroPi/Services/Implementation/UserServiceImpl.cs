@@ -65,8 +65,16 @@ namespace NeuroPi.UserManagment.Services.Implementation
         public List<UserResponseVM> GetAllUsersByTenantId(int tenantId) =>
             UserResponseVM.ToViewModelList(_context.Users.Where(u => u.TenantId == tenantId && !u.IsDeleted).ToList());
 
-        public UserResponseVM GetUser(int id, int tenantId) =>
-            UserResponseVM.ToViewModel(_context.Users.FirstOrDefault(u => u.UserId == id && u.TenantId == tenantId && !u.IsDeleted));
+        public UserResponseVM GetUser(int id, int tenantId)
+        {
+            var user=_context.Users.FirstOrDefault(u=>u.UserId==id && u.TenantId==tenantId && !u.IsDeleted);
+            if(user != null)
+            {
+                return UserResponseVM.ToViewModel(user);
+            }
+            return null;
+        }
+
 
         public UserResponseVM AddUser(UserRequestVM request)
         {
