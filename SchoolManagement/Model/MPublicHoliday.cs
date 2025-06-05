@@ -1,4 +1,5 @@
 ﻿using NeuroPi.UserManagment.Model;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -22,6 +23,7 @@ namespace SchoolManagement.Model
         [ForeignKey("Tenant")]
         [Column("tenant_id")]
         public int TenantId { get; set; }
+
         public virtual MTenant Tenant { get; set; }
     }
 }

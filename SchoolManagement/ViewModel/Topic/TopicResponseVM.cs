@@ -9,7 +9,7 @@ namespace SchoolManagement.ViewModel.Topic
         public string Code { get; set; }
         public string Description { get; set; }
         public int SubjectId { get; set; }
-        public int TopicTypeId { get; set; }
+        public int? TopicTypeId { get; set; }
         public int TenantId { get; set; }
 
         public static TopicResponseVM FromModel(MTopic model)
@@ -24,7 +24,7 @@ namespace SchoolManagement.ViewModel.Topic
                 Description = model.Description,
                 SubjectId = model.SubjectId,
                 TopicTypeId = model.TopicTypeId,
-                TenantId = model.TenantId
+                TenantId = model.TenantId   
             };
         }
     }

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+// Developed by Mohith  
 namespace SchoolManagement.Services.Implementation
 {
     public class TopicServiceImpl : ITopicService
@@ -15,6 +16,22 @@ namespace SchoolManagement.Services.Implementation
         public TopicServiceImpl(SchoolManagementDb dbContext)
         {
             _dbContext = dbContext;
+        }
+
+
+        public List<TopicResponseVM> GetAll()
+        {
+            return _dbContext.Topics
+                .Where(t => !t.IsDeleted)
+                .Select(TopicResponseVM.FromModel)
+                .ToList();
+        }
+
+        public TopicResponseVM GetById(int id)
+        {
+            var topic = _dbContext.Topics
+                .FirstOrDefault(t => t.Id == id && !t.IsDeleted);
+            return TopicResponseVM.FromModel(topic);
         }
 
         public List<TopicResponseVM> GetAll(int tenantId)

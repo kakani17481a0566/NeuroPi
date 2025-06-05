@@ -49,7 +49,7 @@ namespace SchoolManagement.Services.Implementation
         {
             var subject = subjectVM.ToModel();
             _dbContext.subjects.Add(subject);
-            _dbContext.SaveChanges();
+             _dbContext.SaveChanges();
             return SubjectResponseVM.FromModel(subject);
         }
 

@@ -41,9 +41,20 @@ namespace SchoolManagement.Data
         public DbSet<MParentStudent> ParentStudents { get; set; }
         public DbSet<MTimeTableTopic> TimeTableTopics { get; set; }
         public DbSet<MTimeTableWorksheet> TimeTableWorksheets { get; set; }
+
         public DbSet<MDailyAssessment> DailyAssessments { get; set; }
 
         public DbSet<MTerm> Terms { get; set; }
+
+
+        // views
+
+        public DbSet<DailyTeachingSchedule> DailyTeachingSchedules { get; set; }
+
+
+
+
+
 
 
 
