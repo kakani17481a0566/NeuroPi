@@ -51,7 +51,23 @@ namespace SchoolManagement.Data
 
         //public DbSet<DailyTeachingSchedule> DailyTeachingSchedules { get; set; }
 
+        public DbSet<MVwComprehensiveTimeTable> VwComprehensiveTimeTables { get; set; }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // Configure the MVwComprehensiveTimeTable as a database view
+            // and specify that it has no primary key.
+            modelBuilder.Entity<MVwComprehensiveTimeTable>().HasNoKey().ToView("vw_comprehensive_time_table");
+
+            // You would add other model configurations here if needed,
+            // for example, fluent API configurations for relationships or table mappings
+            // if not using conventions.
+
+            // Example for MContact if it requires configuration (assuming NeuroPi models don't auto-configure)
+            // modelBuilder.Entity<MContact>().ToTable("contact"); // If table name is different from DbSet name
+        }
 
 
 
