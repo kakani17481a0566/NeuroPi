@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Model;
 using NeuroPi.UserManagment.Model;
+using SchoolManagement.ViewModel.VwTermPlanDetails;
 
 namespace SchoolManagement.Data
 {
@@ -41,38 +42,22 @@ namespace SchoolManagement.Data
         public DbSet<MParentStudent> ParentStudents { get; set; }
         public DbSet<MTimeTableTopic> TimeTableTopics { get; set; }
         public DbSet<MTimeTableWorksheet> TimeTableWorksheets { get; set; }
-
         public DbSet<MDailyAssessment> DailyAssessments { get; set; }
-
         public DbSet<MTerm> Terms { get; set; }
 
 
         // views
-
-        //public DbSet<DailyTeachingSchedule> DailyTeachingSchedules { get; set; }
-
         public DbSet<MVwComprehensiveTimeTable> VwComprehensiveTimeTables { get; set; }
+        public DbSet<MVwTermPlanDetails> VwTermPlanDetails { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // Configure the MVwComprehensiveTimeTable as a database view
-            // and specify that it has no primary key.
             modelBuilder.Entity<MVwComprehensiveTimeTable>().HasNoKey().ToView("vw_comprehensive_time_table");
 
-            // You would add other model configurations here if needed,
-            // for example, fluent API configurations for relationships or table mappings
-            // if not using conventions.
-
-            // Example for MContact if it requires configuration (assuming NeuroPi models don't auto-configure)
-            // modelBuilder.Entity<MContact>().ToTable("contact"); // If table name is different from DbSet name
+            modelBuilder.Entity<MVwTermPlanDetails>().HasNoKey().ToView("vw_term_plan_details");
         }
-
-
-
-
-
-
     }
 }

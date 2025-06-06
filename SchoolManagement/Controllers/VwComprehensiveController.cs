@@ -22,8 +22,22 @@ namespace SchoolManagement.Controllers
         [HttpGet("all")]
         public ResponseResult<List<VwComprehensiveTimeTableVM>> GetAll()
         {
-            var result = _service.GetAll();
-            return new ResponseResult<List<VwComprehensiveTimeTableVM>>(HttpStatusCode.OK, result, "Data fetched successfully");
+            var data = _service.GetAll();
+
+            if (data == null || data.Count == 0)
+            {
+                return new ResponseResult<List<VwComprehensiveTimeTableVM>>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    "No comprehensive timetable data found."
+                );
+            }
+
+            return new ResponseResult<List<VwComprehensiveTimeTableVM>>(
+                HttpStatusCode.OK,
+                data,
+                "Comprehensive timetable data fetched successfully."
+            );
         }
     }
 }
