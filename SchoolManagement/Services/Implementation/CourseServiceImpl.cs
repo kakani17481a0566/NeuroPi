@@ -82,15 +82,13 @@ namespace SchoolManagement.Services.Implementation
         // Get all courses
         public List<CourseVm> GetAllCourses()
         {
-            return _dbContext.Courses
-                .Where(c => !c.IsDeleted)
-                .Select(c => new CourseVm
-                {
-                    Id = c.Id,
-                    Name = c.Name,
-                    Description = c.Description,
-                    TenantId = c.TenantId
-                }).ToList();
+            var result= _dbContext.Courses.Where(c => !c.IsDeleted).ToList();
+            if(result==null || result.Count == 0)
+            {
+                return null;
+            }
+            return CourseVm.ToViewModelList(result);
+
         }
 
         // Get a course by ID
