@@ -63,6 +63,10 @@ namespace NeuroPi.UserManagment.Model
         [ForeignKey("TenantId")]
         public virtual MTenant Tenant { get; set; }
 
+        [Column("created_by")]
+
+        public int? CreatedBy { get; set; }
+
         // Related Entities
         public virtual ICollection<MUserRole> UserRoles { get; set; } = new List<MUserRole>();
         public virtual ICollection<MTeamUser> TeamUsers { get; set; } = new List<MTeamUser>();
