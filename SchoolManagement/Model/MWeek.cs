@@ -13,7 +13,9 @@ namespace SchoolManagement.Model
         public int Id { get; set; }
 
         [Column("term_id")]
-        public int TermId { get; set; }
+        [ForeignKey("Term")]
+        public int TermId { get; set; } 
+        public virtual MTerm Term { get; set; }
 
         [Required]
         [Column("name")]
@@ -27,11 +29,11 @@ namespace SchoolManagement.Model
         [Column("end_date")]
         public DateTime EndDate { get; set; }
 
-        [ForeignKey("Tenant")]
+        [Required]
         [Column("tenant_id")]
+        [ForeignKey("Tenant")]
         public int TenantId { get; set; }
-        public virtual MTenant Tenant { get; set; }
 
-       
+        public virtual MTenant Tenant { get; set; }
     }
 }

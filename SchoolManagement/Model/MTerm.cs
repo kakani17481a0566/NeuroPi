@@ -5,26 +5,26 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SchoolManagement.Model
 {
-    [Table("term")] 
+    [Table("term")]
     public class MTerm : MBaseModel
     {
         [Key]
         [Column("id")]
         public int Id { get; set; }
 
-
+        [Required]
         [Column("name")]
         public string Name { get; set; }
 
-
+        [Required]
         [Column("start_date")]
-        [DataType(DataType.Date)]
         public DateTime StartDate { get; set; }
 
+        [Required]
         [Column("end_date")]
-        [DataType(DataType.Date)]
         public DateTime EndDate { get; set; }
 
+        [Required]
         [Column("tenant_id")]
         [ForeignKey("Tenant")]
         public int TenantId { get; set; }

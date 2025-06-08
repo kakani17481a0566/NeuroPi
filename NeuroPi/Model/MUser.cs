@@ -6,12 +6,10 @@ namespace NeuroPi.UserManagment.Model
     [Table("users")]
     public class MUser : MBaseModel
     {
-        // Primary Key
         [Key]
         [Column("user_id")]
         public int UserId { get; set; }
 
-        // Basic Information
         [Required]
         [MaxLength(50)]
         [Column("username")]
@@ -49,14 +47,13 @@ namespace NeuroPi.UserManagment.Model
         [Column("alternate_number")]
         public string? AlternateNumber { get; set; }
 
-        // Personal Information
         [Column("dob")]
         public DateOnly DateOfBirth { get; set; }
 
         [Column("address", TypeName = "text")]
         public string? Address { get; set; }
 
-        // Tenant Information
+        [Required]
         [Column("tenant_id")]
         public int TenantId { get; set; }
 
@@ -64,10 +61,8 @@ namespace NeuroPi.UserManagment.Model
         public virtual MTenant Tenant { get; set; }
 
         [Column("created_by")]
-
         public int? CreatedBy { get; set; }
 
-        // Related Entities
         public virtual ICollection<MUserRole> UserRoles { get; set; } = new List<MUserRole>();
         public virtual ICollection<MTeamUser> TeamUsers { get; set; } = new List<MTeamUser>();
         public virtual ICollection<MGroupUser> GroupUsers { get; set; } = new List<MGroupUser>();

@@ -21,16 +21,18 @@ namespace SchoolManagement.Model
         [Column("description")]
         public string Description { get; set; }
 
-        [ForeignKey("Subject")]
+        [Required]
         [Column("subject_id")]
+        [ForeignKey("Subject")]
         public int SubjectId { get; set; }
         public virtual MSubject Subject { get; set; }
 
         [Column("topic_type_id")]
         public int? TopicTypeId { get; set; }
 
-        [ForeignKey("Tenant")]
+        [Required]
         [Column("tenant_id")]
+        [ForeignKey("Tenant")]
         public int TenantId { get; set; }
         public virtual MTenant Tenant { get; set; }
     }

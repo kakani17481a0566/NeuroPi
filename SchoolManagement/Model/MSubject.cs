@@ -4,20 +4,20 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SchoolManagement.Model
 {
-    [Table("subjects")] // Optional, but useful if your table name differs from class name
+    [Table("subjects")]
     public class MSubject : MBaseModel
     {
         [Key]
         [Column("id")]
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "Subject name is required.")]
-        [StringLength(100, ErrorMessage = "Name cannot exceed 100 characters.")]
+        [Required]
+        [StringLength(100)]
         [Column("name")]
         public string Name { get; set; }
 
-        [Required(ErrorMessage = "Subject code is required.")]
-        [StringLength(20, ErrorMessage = "Code cannot exceed 20 characters.")]
+        [Required]
+        [StringLength(20)]
         [Column("code")]
         public string Code { get; set; }
 
@@ -25,10 +25,9 @@ namespace SchoolManagement.Model
         public string Description { get; set; }
 
         [Required]
-        [ForeignKey("Tenant")]
         [Column("tenant_id")]
+        [ForeignKey(nameof(Tenant))]
         public int TenantId { get; set; }
-
         public virtual MTenant Tenant { get; set; }
     }
 }

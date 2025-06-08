@@ -72,11 +72,11 @@ namespace SchoolManagement.Controllers
         [HttpDelete("{id}/tenant/{tenantId}")]
         public ResponseResult<TimeTableTopicResponseVM> Delete(int id, int tenantId)
         {
-            var deleted = _service.DeleteByIdAndTenantId(id, tenantId);
-            if (deleted == null)
+            var result = _service.Delete(id, tenantId);
+            if (!result)
                 return new ResponseResult<TimeTableTopicResponseVM>(HttpStatusCode.NotFound, null, "TimeTableTopic not found");
 
-            return new ResponseResult<TimeTableTopicResponseVM>(HttpStatusCode.OK, deleted, "Deleted successfully");
+            return new ResponseResult<TimeTableTopicResponseVM>(HttpStatusCode.OK, null, "Deleted successfully");
         }
     }
 }

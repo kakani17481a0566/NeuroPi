@@ -1,4 +1,7 @@
-﻿namespace SchoolManagement.ViewModel.TimeTable
+﻿using SchoolManagement.Model;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace SchoolManagement.ViewModel.TimeTable
 {
     public class TimeTableResponseVM
     {
@@ -9,6 +12,10 @@
         public int? HolidayId { get; set; }
         public string Status { get; set; }
         public int TenantId { get; set; }
+
+        public int? CourseId { get; set; }
+   
+
 
         public static TimeTableResponseVM FromModel(Model.MTimeTable model)
         {
@@ -22,7 +29,9 @@
                 WeekId = model.WeekId,
                 HolidayId = model.HolidayId,
                 Status = model.Status,
+                CourseId = model.CourseId,
                 TenantId = model.TenantId
+                
             };
         }
     }
