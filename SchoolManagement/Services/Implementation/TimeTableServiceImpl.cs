@@ -1,10 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using SchoolManagement.Data;
+﻿using SchoolManagement.Data;
 using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
+using SchoolManagement.ViewModel.Course;
 using SchoolManagement.ViewModel.TimeTable;
+using SchoolManagement.ViewModel.VTimeTable;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SchoolManagement.Services.Implementation
 {
@@ -46,6 +48,13 @@ namespace SchoolManagement.Services.Implementation
 
             return TimeTableResponseVM.FromModel(model);
         }
+
+
+
+
+
+
+
 
         public TimeTableResponseVM Create(TimeTableRequestVM vm)
         {
@@ -89,5 +98,17 @@ namespace SchoolManagement.Services.Implementation
             _dbContext.SaveChanges();
             return true;
         }
+
+        public List<MVTimeTable> GetWeeklyTimeTable(int weekId, int tenantId, int courseId)
+        {
+            var records = _dbContext.VTimeTable
+                .Where(x => x.WeekId == weekId && x.TenantId == tenantId && x.CourseId == courseId)
+                .ToList();
+
+            return records;
+        }
+
     }
+
 }
+

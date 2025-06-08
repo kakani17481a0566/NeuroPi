@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SchoolManagement.Model;
 using SchoolManagement.Response;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.TimeTable;
@@ -78,5 +79,20 @@ namespace SchoolManagement.Controllers
 
             return new ResponseResult<string>(HttpStatusCode.OK, "Deleted successfully");
         }
+
+
+        [HttpGet("weekId/{weekId}/tenantId/{tenantId}/CourseId/{CourseId}")]
+        public ResponseResult<List<MVTimeTable>> GetWeeklyTimeTable(int weekId, int tenantId , int CourseId)
+        {
+            var data = _service.GetWeeklyTimeTable(weekId, tenantId, CourseId);
+            if (data == null)
+                return new ResponseResult<List<MVTimeTable>>(HttpStatusCode.NotFound, null, "Not Found");
+
+            return new ResponseResult<List<MVTimeTable>>(HttpStatusCode.OK, data);
+        }
+
+
+       
+
     }
 }

@@ -44,4 +44,7 @@ namespace SchoolManagement.Model
         public int TenantId { get; set; }
         public virtual MTenant Tenant { get; set; }
     }
+
+
+
 }
