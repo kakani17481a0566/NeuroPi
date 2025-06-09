@@ -126,7 +126,8 @@ namespace SchoolManagement.Services.Implementation
                 for (int i = 1; i <= 6; i++)
                 {
                     var periodItems = group
-                        .Where(x => x.PeriodId == i && !new[] { "FT", "AS", "NR", "ET" }.Contains(x.TopicTypeCode))
+                        //.Where(x => x.PeriodId == i && !new[] { "FT", "AS", "NR", "ET" }.Contains(x.TopicTypeCode))
+                             .Where(x => x.PeriodId == i )
                         .Select(x => string.IsNullOrWhiteSpace(x.Description) ? x.TopicName : x.Description)
                         .ToList();
 
