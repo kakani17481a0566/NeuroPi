@@ -9,7 +9,7 @@
         public string? COLUM5 { get; set; }  // Wednesday
         public string? COLUM6 { get; set; }  // Thursday
         public string? COLUM7 { get; set; }  // Friday
-        public string? COLUM8 { get; set; }  // Saturday
-        public string? COLUM9 { get; set; }  // Sunday
+        //public string? COLUM8 { get; set; }  // Saturday
+        //public string? COLUM9 { get; set; }  // Sunday
     }
 }

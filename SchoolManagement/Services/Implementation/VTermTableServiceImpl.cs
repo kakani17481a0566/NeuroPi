@@ -85,7 +85,8 @@ namespace SchoolManagement.Services.Implementation
         {
             "WEEK",
             "Fairytale/ActionSong/NurseryRhyme/Event",
-            "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
+            "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"
+                    //--"Saturday", "Sunday"
         },
                 DataTerm = new List<WeeklyTopicMatrixRow>()
             };
@@ -104,9 +105,9 @@ namespace SchoolManagement.Services.Implementation
                     COLUM4 = "",
                     COLUM5 = "",
                     COLUM6 = "",
-                    COLUM7 = "",
-                    COLUM8 = "",
-                    COLUM9 = ""
+                    COLUM7 = ""
+                    //COLUM8 = "",
+                    //COLUM9 = ""
                 };
 
                 // Fill COLUM2 ONLY with FT, AS, NR, ET Topic Names grouped by TopicTypeCode
@@ -147,8 +148,8 @@ namespace SchoolManagement.Services.Implementation
                         case "wednesday": row.COLUM5 = joined; break;
                         case "thursday": row.COLUM6 = joined; break;
                         case "friday": row.COLUM7 = joined; break;
-                        case "saturday": row.COLUM8 = joined; break;
-                        case "sunday": row.COLUM9 = joined; break;
+                        //case "saturday": row.COLUM8 = joined; break;
+                        //case "sunday": row.COLUM9 = joined; break;
                     }
                 }
 
