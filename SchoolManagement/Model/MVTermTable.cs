@@ -3,14 +3,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SchoolManagement.Model
 {
-    [Table("v_time_table")]
-    public class MVTimeTable
+    [Table("v_term_table")]
+    public class MVTermTable
     {
-        [Column("week_id")]
-        public int? WeekId { get; set; }
+        [Column("term_id")]
+        public int? TermId { get; set; }
 
-        [Column("week_name")]
-        public string? WeekName { get; set; }
+        [Column("term_name")]
+        public string? TermName { get; set; }
 
         [Column("start_date")]
         public DateTime? StartDate { get; set; }
@@ -23,6 +23,9 @@ namespace SchoolManagement.Model
 
         [Column("date")]
         public DateTime? Date { get; set; }
+
+        [Column("day_name")]
+        public string? DayName { get; set; }
 
         [Column("time_table_id")]
         public int? TimeTableId { get; set; }
@@ -54,6 +57,9 @@ namespace SchoolManagement.Model
         [Column("subject_name")]
         public string? SubjectName { get; set; }
 
+        [Column("subject_code")]
+        public string? SubjectCode { get; set; }
+
         [Column("time_table_topic_id")]
         public int? TimeTableTopicId { get; set; }
 
@@ -64,22 +70,25 @@ namespace SchoolManagement.Model
         public string? TopicName { get; set; }
 
         [Column("topic_description")]
-        public string? Description { get; set; }
+        public string? TopicDescription { get; set; }
 
         [Column("topic_type_name")]
         public string? TopicTypeName { get; set; }
 
-        [Column("day_name")]
-        public string? DayName { get; set; }
-
-        [Column("subject_code")]
-        public string? SubjectCode { get; set; }
-
         [Column("topic_type_code")]
         public string? TopicTypeCode { get; set; }
 
-        
 
+        [Column("week_id")]
+        public int? WeekId { get; set; }
 
+        [Column("week_name")]
+        public string? WeekName { get; set; }
+
+        [Column("week_start")]
+        public DateTime? WeekStart { get; set; }
+
+        [Column("week_end")]
+        public DateTime? WeekEnd { get; set; }
     }
 }

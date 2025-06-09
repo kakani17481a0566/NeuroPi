@@ -59,9 +59,10 @@ builder.Services.AddScoped<IPublicHolidayService, PublicHolidayServiceImpl>();
 //view
 builder.Services.AddScoped<IVwComprehensiveTimeTablesService, VwComprehensiveTimeTablesService>();
 builder.Services.AddScoped<IVwTermPlanDetailsService, VwTermPlanDetailsViewServiceImpl>();
-
+builder.Services.AddScoped<IMVTermTableService,VTermTableServiceImpl>();
 
 //builder.Services.AddScoped<IBooksService, BooksServiceImpl>();
+
 
 builder.Services.AddScoped<IPrefixSuffixService, PrefixSuffixServiceImpl>();
 

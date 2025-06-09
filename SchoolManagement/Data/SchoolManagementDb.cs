@@ -52,6 +52,9 @@ namespace SchoolManagement.Data
 
         public DbSet<MVTimeTable> VTimeTable { get; set; }
 
+        public DbSet<MVTermTable> VTermTable { get; set; }
+
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -62,6 +65,8 @@ namespace SchoolManagement.Data
             modelBuilder.Entity<MVwTermPlanDetails>().HasNoKey().ToView("vw_term_plan_details");
 
             modelBuilder.Entity<MVTimeTable>().HasNoKey().ToView("v_time_table");
+
+            modelBuilder.Entity<MVTermTable>().HasNoKey().ToView("v_term_table");
         }
     }
 }
