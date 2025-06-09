@@ -1,38 +1,34 @@
-﻿namespace SchoolManagement.ViewModel.VTimeTable
+﻿using System.Collections.Generic;
+
+namespace SchoolManagement.ViewModel.VTimeTable
 {
     public class TData
     {
-        public String Column1 { get; set; }
-
-
-        public String Column2 { get; set; }
-
-        public String Column3 { get; set; }
-
-        public String Column4 { get; set; }
-
-        public String Column5 { get; set; }
-        public String Column6 { get; set; }
-
-        public String Column7 { get; set; }
-
-        public String Column8 { get; set; }
-
+        public string Column1 { get; set; } // Day
+        public string Column2 { get; set; } // Period 1
+        public string Column3 { get; set; } // Period 2
+        public string Column4 { get; set; } // Period 3
+        public string Column5 { get; set; } // Period 4
+        public string Column6 { get; set; } // Period 5
+        public string Column7 { get; set; } // Period 6
+        public string Column8 { get; set; } 
     }
 
+    public class EventInfo
+    {
+        public string Name { get; set; }
+        public string Date { get; set; } // Format: yyyy-MM-dd
+    }
 
     public class WeekTimeTableData
     {
         public string Month { get; set; }
         public string WeekName { get; set; }
-
         public string Course { get; set; }
 
-        public string Event { get; set; }
+        public List<EventInfo> Events { get; set; }
 
-        public string EventDate { get; set; }
-
+        public List<string> Headers { get; set; }
         public List<TData> TimeTableData { get; set; }
     }
-
 }

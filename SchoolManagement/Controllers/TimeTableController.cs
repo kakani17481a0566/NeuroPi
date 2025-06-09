@@ -3,6 +3,7 @@ using SchoolManagement.Model;
 using SchoolManagement.Response;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.TimeTable;
+using SchoolManagement.ViewModel.VTimeTable;
 using System.Collections.Generic;
 using System.Net;
 
@@ -80,19 +81,17 @@ namespace SchoolManagement.Controllers
             return new ResponseResult<string>(HttpStatusCode.OK, "Deleted successfully");
         }
 
-
-        [HttpGet("weekId/{weekId}/tenantId/{tenantId}/CourseId/{CourseId}")]
-        public ResponseResult<List<MVTimeTable>> GetWeeklyTimeTable(int weekId, int tenantId , int CourseId)
+        [HttpGet("weekId/{weekId}/tenantId/{tenantId}/courseId/{courseId}")]
+        public ResponseResult<WeekTimeTableData> GetWeeklyTimeTable(int weekId, int tenantId, int courseId)
         {
-            var data = _service.GetWeeklyTimeTable(weekId, tenantId, CourseId);
-            if (data == null)
-                return new ResponseResult<List<MVTimeTable>>(HttpStatusCode.NotFound, null, "Not Found");
+            var data = _service.GetWeeklyTimeTable(weekId, tenantId, courseId);
 
-            return new ResponseResult<List<MVTimeTable>>(HttpStatusCode.OK, data);
+            if (data == null)
+                return new ResponseResult<WeekTimeTableData>(HttpStatusCode.NotFound, null, "Not Found");
+
+            return new ResponseResult<WeekTimeTableData>(HttpStatusCode.OK, data);
         }
 
-
-       
 
     }
 }

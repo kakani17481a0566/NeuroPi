@@ -68,5 +68,15 @@ namespace SchoolManagement.Model
 
         [Column("topic_type_name")]
         public string? TopicTypeName { get; set; }
+
+        [Column("day_name")]
+        public string? DayName { get; set; }
+
+        [Column("subject_code")]
+        public string? SubjectCode { get; set; }
+
+        [Column("topic_type_code")]
+        public string? TopicTypeCode { get; set; }
+
     }
 }

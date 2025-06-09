@@ -1,5 +1,6 @@
 ﻿using SchoolManagement.Model;
 using SchoolManagement.ViewModel.TimeTable;
+using SchoolManagement.ViewModel.VTimeTable;
 using System.Collections.Generic;
 
 namespace SchoolManagement.Services.Interface
@@ -13,7 +14,8 @@ namespace SchoolManagement.Services.Interface
         TimeTableResponseVM Create(TimeTableRequestVM vm);
         TimeTableResponseVM Update(int id, int tenantId, TimeTableUpdateVM vm);
 
-        List<MVTimeTable> GetWeeklyTimeTable(int weekId, int tenantId, int courseId);
+
+        WeekTimeTableData GetWeeklyTimeTable(int weekId, int tenantId, int courseId);
 
 
         bool Delete(int id, int tenantId);
