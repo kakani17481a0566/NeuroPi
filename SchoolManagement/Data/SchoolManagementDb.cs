@@ -1,7 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SchoolManagement.Model;
 using NeuroPi.UserManagment.Model;
+using SchoolManagement.Model;
 using SchoolManagement.ViewModel.VwTermPlanDetails;
+using static SchoolManagement.Model.MTableFles;
 
 namespace SchoolManagement.Data
 {
@@ -45,6 +46,9 @@ namespace SchoolManagement.Data
         public DbSet<MDailyAssessment> DailyAssessments { get; set; }
         public DbSet<MTerm> Terms { get; set; }
 
+        public DbSet<MTableFles> TableFiles { get; set; }
+
+
 
         // views
         public DbSet<MVwComprehensiveTimeTable> VwComprehensiveTimeTables { get; set; }
@@ -53,6 +57,8 @@ namespace SchoolManagement.Data
         public DbSet<MVTimeTable> VTimeTable { get; set; }
 
         public DbSet<MVTermTable> VTermTable { get; set; }
+
+
 
 
 
