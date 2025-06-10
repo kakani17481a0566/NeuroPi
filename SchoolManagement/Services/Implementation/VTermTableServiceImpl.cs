@@ -87,7 +87,7 @@ namespace SchoolManagement.Services.Implementation
                 Course = term.CourseName,
                 Headers = new List<string>
         {
-            "TERM",
+            "Week",
             "Fairytale/ActionSong/NurseryRhyme/Event",
             "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"
                     //--"Saturday", "Sunday"
