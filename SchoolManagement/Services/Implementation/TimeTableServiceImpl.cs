@@ -104,7 +104,7 @@ namespace SchoolManagement.Services.Implementation
                 var today = DateTime.UtcNow.Date;
                 query = query.Where(x => x.Date.Value.Date == today);
             }
-            // weekId == 0 => get all weeks, no need to filter
+            // weekId == 0 means no filtering on week
 
             var records = query.ToList();
             if (!records.Any()) return null;
@@ -112,7 +112,7 @@ namespace SchoolManagement.Services.Implementation
             var first = records.First();
             var timetableData = new List<TData>();
 
-            var groupedByDate = records.GroupBy(x => x.Date.Value.Date).ToList();
+            var groupedByDate = records.GroupBy(x => x.Date.Value.Date);
 
             foreach (var group in groupedByDate)
             {
@@ -126,9 +126,16 @@ namespace SchoolManagement.Services.Implementation
                 for (int i = 1; i <= 6; i++)
                 {
                     var periodItems = group
-                        //.Where(x => x.PeriodId == i && !new[] { "FT", "AS", "NR", "ET" }.Contains(x.TopicTypeCode))
-                             .Where(x => x.PeriodId == i )
-                        .Select(x => string.IsNullOrWhiteSpace(x.Description) ? x.TopicName : x.Description)
+                        .Where(x => x.PeriodId == i)
+                        .Select(x =>
+                        {
+                            if (string.IsNullOrWhiteSpace(x.TopicTypeCode))
+                                return x.TopicName;
+
+                            return string.IsNullOrWhiteSpace(x.Description)
+                                ? $"{x.TopicTypeCode}:{x.TopicName}"
+                                : $"{x.TopicTypeCode}:{x.Description}";
+                        })
                         .ToList();
 
                     periods[i - 1] = string.Join("\n", periodItems);
@@ -144,7 +151,7 @@ namespace SchoolManagement.Services.Implementation
                 timetableData.Add(tData);
             }
 
-            // Event Info
+            // Events
             var eventList = records
                 .Where(x => x.TopicTypeName == "Event")
                 .GroupBy(x => new { x.TopicName, x.Date })
@@ -183,6 +190,7 @@ namespace SchoolManagement.Services.Implementation
                 TimeTableData = timetableData
             };
         }
+
 
 
 
