@@ -22,6 +22,6 @@ namespace SchoolManagement.Services.Interface
 
         bool Delete(int id, int tenantId);
 
-        MTableFileResponseVM GetAllByCourseId(int courseId);
+        //MTableFileResponseVM GetAllByCourseId(int courseId);
     }
 }

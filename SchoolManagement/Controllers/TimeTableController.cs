@@ -94,19 +94,19 @@ namespace SchoolManagement.Controllers
             return new ResponseResult<WeekTimeTableData>(HttpStatusCode.OK, data);
         }
 
-        [HttpGet("files/{courseId}")]
+        //[HttpGet("files/{courseId}")]
 
-        public ResponseResult<MTableFileResponseVM> GetAllFilesByCourseId(int courseId)
-        {
-            var data = _service.GetAllByCourseId(courseId);
-            if (data != null)
-            {
-                return new ResponseResult<MTableFileResponseVM>(HttpStatusCode.OK, data,"Files fetched successfully");
-            }
-            return new ResponseResult<MTableFileResponseVM>(HttpStatusCode.NotFound, data, "Not Found");
+        //public ResponseResult<MTableFileResponseVM> GetAllFilesByCourseId(int courseId)
+        //{
+        //    var data = _service.GetAllByCourseId(courseId);
+        //    if (data != null)
+        //    {
+        //        return new ResponseResult<MTableFileResponseVM>(HttpStatusCode.OK, data,"Files fetched successfully");
+        //    }
+        //    return new ResponseResult<MTableFileResponseVM>(HttpStatusCode.NotFound, data, "Not Found");
 
 
-        }
+        //}
 
 
 

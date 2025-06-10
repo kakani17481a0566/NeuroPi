@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using SchoolManagement.ViewModel.TableFile;
+using System.Collections.Generic;
 
 namespace SchoolManagement.ViewModel.VTimeTable
 {
@@ -11,7 +12,10 @@ namespace SchoolManagement.ViewModel.VTimeTable
         public string Column5 { get; set; } // Period 4
         public string Column6 { get; set; } // Period 5
         public string Column7 { get; set; } // Period 6
-        public string Column8 { get; set; } 
+        public string Column8 { get; set; }
+
+        // ⬅️ New list for video resources
+
     }
 
     public class EventInfo
@@ -30,5 +34,6 @@ namespace SchoolManagement.ViewModel.VTimeTable
 
         public List<string> Headers { get; set; }
         public List<TData> TimeTableData { get; set; }
+        public List<TableFileResponse> Resources { get; set; } = new List<TableFileResponse>();
     }
 }

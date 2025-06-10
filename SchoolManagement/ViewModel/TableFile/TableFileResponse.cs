@@ -8,26 +8,17 @@ namespace SchoolManagement.ViewModel.TableFile
 
         public string? Link { get; set; }
 
+        //public int? TimeTableId { get; set; }
+
+       
         public static TableFileResponse ToViewModel(MTableFiles mTableFiles)
         {
             return new TableFileResponse
             {
                 Name = mTableFiles.Name,
                 Link = mTableFiles.Link,
+                //TimeTableId = mTableFiles.TimeTableId
             };
         }
-
-
-}
-    public class MTableFileResponseVM
-    {
-        public List<TableFileResponse> pdfs { get; set; }
-
-        public List<TableFileResponse> videos { get; set; }
-
-
-
-
-
     }
 }
