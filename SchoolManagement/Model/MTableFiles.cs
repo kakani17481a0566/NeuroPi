@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace SchoolManagement.Model
 {
     [Table("tablefiles")]
-    public class MTableFles
+    public class MTableFiles
     {
     
   

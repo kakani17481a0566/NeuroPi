@@ -2,7 +2,7 @@
 using NeuroPi.UserManagment.Model;
 using SchoolManagement.Model;
 using SchoolManagement.ViewModel.VwTermPlanDetails;
-using static SchoolManagement.Model.MTableFles;
+using static SchoolManagement.Model.MTableFiles;
 
 namespace SchoolManagement.Data
 {
@@ -46,7 +46,7 @@ namespace SchoolManagement.Data
         public DbSet<MDailyAssessment> DailyAssessments { get; set; }
         public DbSet<MTerm> Terms { get; set; }
 
-        public DbSet<MTableFles> TableFiles { get; set; }
+        public DbSet<MTableFiles> TableFiles { get; set; }
 
        
 

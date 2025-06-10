@@ -2,10 +2,12 @@
 using SchoolManagement.Model;
 using SchoolManagement.Response;
 using SchoolManagement.Services.Interface;
+using SchoolManagement.ViewModel.TableFile;
 using SchoolManagement.ViewModel.TimeTable;
 using SchoolManagement.ViewModel.VTimeTable;
 using System.Collections.Generic;
 using System.Net;
+using static SchoolManagement.ViewModel.TableFile.TableFileResponse;
 
 namespace SchoolManagement.Controllers
 {
@@ -91,6 +93,21 @@ namespace SchoolManagement.Controllers
 
             return new ResponseResult<WeekTimeTableData>(HttpStatusCode.OK, data);
         }
+
+        [HttpGet("files/{courseId}")]
+
+        public ResponseResult<MTableFileResponseVM> GetAllFilesByCourseId(int courseId)
+        {
+            var data = _service.GetAllByCourseId(courseId);
+            if (data != null)
+            {
+                return new ResponseResult<MTableFileResponseVM>(HttpStatusCode.OK, data,"Files fetched successfully");
+            }
+            return new ResponseResult<MTableFileResponseVM>(HttpStatusCode.NotFound, data, "Not Found");
+
+
+        }
+
 
 
     }

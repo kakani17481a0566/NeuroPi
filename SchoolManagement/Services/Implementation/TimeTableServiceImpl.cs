@@ -2,11 +2,13 @@
 using SchoolManagement.Data;
 using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
+using SchoolManagement.ViewModel.TableFile;
 using SchoolManagement.ViewModel.TimeTable;
 using SchoolManagement.ViewModel.VTimeTable;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static SchoolManagement.ViewModel.TableFile.TableFileResponse;
 
 namespace SchoolManagement.Services.Implementation
 {
@@ -184,7 +186,33 @@ namespace SchoolManagement.Services.Implementation
             };
         }
 
+        public MTableFileResponseVM GetAllByCourseId(int courseId)
+        {
+            var result=_dbContext.TableFiles.Where(f=>f.CourseId == courseId).ToList();
+            List<TableFileResponse> pdfs=new List<TableFileResponse>() ;
+            List<TableFileResponse> videos = new List<TableFileResponse>() ;
 
+            if (result!=null && result.Count > 0)
+            {
+                foreach(var file in result)
+                {
+                    if (file.Type.Equals("pdf"))
+                    {
+                        pdfs.Add(TableFileResponse.ToViewModel(file));
+                    }
+                    if(file.Type.Equals("mp4"))
+                    {
+                        videos.Add(TableFileResponse.ToViewModel(file));
+                    }
 
+                }
+                return new MTableFileResponseVM()
+                {
+                    pdfs = pdfs,
+                    videos = videos,
+                };
+            }
+            return null;
+        }
     }
 }

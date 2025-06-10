@@ -1,7 +1,9 @@
 ﻿using SchoolManagement.Model;
+using SchoolManagement.ViewModel.TableFile;
 using SchoolManagement.ViewModel.TimeTable;
 using SchoolManagement.ViewModel.VTimeTable;
 using System.Collections.Generic;
+using static SchoolManagement.ViewModel.TableFile.TableFileResponse;
 
 namespace SchoolManagement.Services.Interface
 {
@@ -19,5 +21,7 @@ namespace SchoolManagement.Services.Interface
 
 
         bool Delete(int id, int tenantId);
+
+        MTableFileResponseVM GetAllByCourseId(int courseId);
     }
 }
