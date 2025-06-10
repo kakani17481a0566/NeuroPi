@@ -48,7 +48,7 @@ namespace SchoolManagement.Data
 
         public DbSet<MTableFles> TableFiles { get; set; }
 
-
+       
 
         // views
         public DbSet<MVwComprehensiveTimeTable> VwComprehensiveTimeTables { get; set; }

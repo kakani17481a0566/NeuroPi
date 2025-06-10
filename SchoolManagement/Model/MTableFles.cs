@@ -3,11 +3,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SchoolManagement.Model
 {
+    [Table("tablefiles")]
     public class MTableFles
     {
-        [Table("tablefiles")]
-        public class TableFile
-        {
+    
+  
+       
             [Key]
             [Column("id")]
             public int Id { get; set; }
@@ -47,6 +48,6 @@ namespace SchoolManagement.Model
             [Required]
             [Column("is_deleted")]
             public bool IsDeleted { get; set; }
-        }
+        
     }
 }
