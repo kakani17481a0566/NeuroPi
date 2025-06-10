@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NeuroPi.UserManagment.Model
@@ -16,16 +17,17 @@ namespace NeuroPi.UserManagment.Model
         public string Name { get; set; }
 
         [Column("parent_id")]
-        [ForeignKey("ParentOrganization")]
         public int? ParentId { get; set; }
 
+        [ForeignKey(nameof(ParentId))]
+        public virtual MOrganization ParentOrganization { get; set; }
+
         [Column("tenant_id")]
-        [ForeignKey("Tenant")]
         public int TenantId { get; set; }
 
-        // Navigation properties
-        public virtual MOrganization ParentOrganization { get; set; }
+        [ForeignKey(nameof(TenantId))]
         public virtual MTenant Tenant { get; set; }
+
         public virtual ICollection<MDepartment> Departments { get; set; } = new List<MDepartment>();
     }
 }

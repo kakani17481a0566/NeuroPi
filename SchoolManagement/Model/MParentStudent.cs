@@ -14,19 +14,19 @@ namespace SchoolManagement.Model
         [Column("parent_id")]
         public int ParentId { get; set; }
 
-        [ForeignKey("ParentId")]
+        [ForeignKey(nameof(ParentId))]
         public virtual MParent Parent { get; set; }
 
         [Column("student_id")]
         public int StudentId { get; set; }
 
-        [ForeignKey("StudentId")]
+        [ForeignKey(nameof(StudentId))]
         public virtual MStudent Student { get; set; }
 
         [Column("tenant_id")]
         public int TenantId { get; set; }
 
-        [ForeignKey("TenantId")]
+        [ForeignKey(nameof(TenantId))]
         public virtual MTenant Tenant { get; set; }
     }
 }

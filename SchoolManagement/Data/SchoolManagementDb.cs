@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SchoolManagement.Model;
 using NeuroPi.UserManagment.Model;
+using SchoolManagement.Model;
+using SchoolManagement.ViewModel.VwTermPlanDetails;
+using static SchoolManagement.Model.MTableFles;
 
 namespace SchoolManagement.Data
 {
@@ -41,22 +43,36 @@ namespace SchoolManagement.Data
         public DbSet<MParentStudent> ParentStudents { get; set; }
         public DbSet<MTimeTableTopic> TimeTableTopics { get; set; }
         public DbSet<MTimeTableWorksheet> TimeTableWorksheets { get; set; }
-
         public DbSet<MDailyAssessment> DailyAssessments { get; set; }
-
         public DbSet<MTerm> Terms { get; set; }
 
+        public DbSet<MTableFles> TableFiles { get; set; }
+
+       
 
         // views
+        public DbSet<MVwComprehensiveTimeTable> VwComprehensiveTimeTables { get; set; }
+        public DbSet<MVwTermPlanDetails> VwTermPlanDetails { get; set; }
 
-        //public DbSet<DailyTeachingSchedule> DailyTeachingSchedules { get; set; }
+        public DbSet<MVTimeTable> VTimeTable { get; set; }
 
-
-
-
-
-
+        public DbSet<MVTermTable> VTermTable { get; set; }
 
 
+
+
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<MVwComprehensiveTimeTable>().HasNoKey().ToView("vw_comprehensive_time_table");
+
+            modelBuilder.Entity<MVwTermPlanDetails>().HasNoKey().ToView("vw_term_plan_details");
+
+            modelBuilder.Entity<MVTimeTable>().HasNoKey().ToView("v_time_table");
+
+            modelBuilder.Entity<MVTermTable>().HasNoKey().ToView("v_term_table");
+        }
     }
 }

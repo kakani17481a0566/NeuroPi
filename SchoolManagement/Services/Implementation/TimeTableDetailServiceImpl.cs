@@ -69,7 +69,7 @@ namespace SchoolManagement.Services.Implementation
             entity.PeriodId = vm.PeriodId;
             entity.SubjectId = vm.SubjectId;
             entity.TimeTableId = vm.TimeTableId;
-            entity.TeacherId = vm.TeacherId;
+            //entity.TeacherId = vm.TeacherId;
             entity.UpdatedOn = DateTime.UtcNow;
             entity.UpdatedBy = vm.UpdatedBy;
 

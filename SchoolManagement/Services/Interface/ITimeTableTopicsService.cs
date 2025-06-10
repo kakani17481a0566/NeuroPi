@@ -5,12 +5,12 @@ namespace SchoolManagement.Services.Interface
 {
     public interface ITimeTableTopicsService
     {
-        TimeTableTopicResponseVM Create(TimeTableTopicRequestVM request);
         List<TimeTableTopicResponseVM> GetAll();
         List<TimeTableTopicResponseVM> GetAllByTenantId(int tenantId);
         TimeTableTopicResponseVM GetById(int id);
         TimeTableTopicResponseVM GetByIdAndTenantId(int id, int tenantId);
+        TimeTableTopicResponseVM Create(TimeTableTopicRequestVM request);
         TimeTableTopicResponseVM UpdateByIdAndTenantId(int id, int tenantId, TimeTableTopicUpdateVM request);
-        TimeTableTopicResponseVM DeleteByIdAndTenantId(int id, int tenantId);
+        bool Delete(int id, int tenantId);
     }
 }

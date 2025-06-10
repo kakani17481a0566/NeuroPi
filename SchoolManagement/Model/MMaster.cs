@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using NeuroPi.UserManagment.Model;
 
@@ -16,17 +15,15 @@ namespace SchoolManagement.Model
         public string Name { get; set; }
 
         [Column("masters_type_id")]
-        public int MasterTypeId { get; set; }
+        public int? MasterTypeId { get; set; }
 
-
-        [ForeignKey("MasterTypeId")]
-        public MMasterType MasterType { get; set; }
+        [ForeignKey(nameof(MasterTypeId))]
+        public virtual MMasterType MasterType { get; set; }
 
         [Column("tenant_id")]
         public int TenantId { get; set; }
 
-      
-        [ForeignKey("TenantId")]
+        [ForeignKey(nameof(TenantId))]
         public virtual MTenant Tenant { get; set; }
     }
 }

@@ -30,13 +30,21 @@ namespace SchoolManagement.Model
         public int? HolidayId { get; set; }
         public virtual MPublicHoliday PublicHoliday { get; set; }
 
-        [Required]
         [Column("status")]
-        public string Status { get; set; } // "working" or "holiday"
+        public string Status { get; set; } //"working" or "holiday"
 
+        [ForeignKey(nameof(Course))]
+        [Column("course_id")]
+        public int? CourseId { get; set; }
+        public virtual MCourse Course { get; set; }
+
+        [Required]
         [ForeignKey(nameof(Tenant))]
         [Column("tenant_id")]
         public int TenantId { get; set; }
         public virtual MTenant Tenant { get; set; }
     }
+
+
+
 }

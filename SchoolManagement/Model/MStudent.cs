@@ -4,19 +4,26 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SchoolManagement.Model
 {
+    [Table("students")]
     public class MStudent : MBaseModel
     {
         [Key]
+        [Column("id")]
         public int Id { get; set; }
 
         [Required]
+        [Column("name")]
         public string Name { get; set; }
 
-        [ForeignKey("Course")]
+        [Required]
+        [Column("course_id")]
+        [ForeignKey(nameof(Course))]
         public int CourseId { get; set; }
         public virtual MCourse Course { get; set; }
 
-        [ForeignKey("Tenant")]
+        [Required]
+        [Column("tenant_id")]
+        [ForeignKey(nameof(Tenant))]
         public int TenantId { get; set; }
         public virtual MTenant Tenant { get; set; }
     }

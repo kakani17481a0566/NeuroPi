@@ -1,10 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Data;
 using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.TimeTable;
+using SchoolManagement.ViewModel.VTimeTable;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SchoolManagement.Services.Implementation
 {
@@ -43,7 +45,6 @@ namespace SchoolManagement.Services.Implementation
         {
             var model = _dbContext.TimeTables
                 .FirstOrDefault(x => x.Id == id && x.TenantId == tenantId && !x.IsDeleted);
-
             return TimeTableResponseVM.FromModel(model);
         }
 
@@ -52,7 +53,6 @@ namespace SchoolManagement.Services.Implementation
             var entity = vm.ToModel();
             _dbContext.TimeTables.Add(entity);
             _dbContext.SaveChanges();
-
             return TimeTableResponseVM.FromModel(entity);
         }
 
@@ -72,7 +72,6 @@ namespace SchoolManagement.Services.Implementation
             entity.UpdatedBy = vm.UpdatedBy;
 
             _dbContext.SaveChanges();
-
             return TimeTableResponseVM.FromModel(entity);
         }
 
@@ -93,22 +92,30 @@ namespace SchoolManagement.Services.Implementation
 
         public WeekTimeTableData GetWeeklyTimeTable(int weekId, int tenantId, int courseId)
         {
-            var records = _dbContext.VTimeTable
-                .Where(x => x.WeekId == weekId && x.TenantId == tenantId && x.CourseId == courseId)
-                      .ToList();
+            var query = _dbContext.VTimeTable
+                .Where(x => x.TenantId == tenantId && x.CourseId == courseId);
 
+            if (weekId > 0)
+            {
+                query = query.Where(x => x.WeekId == weekId);
+            }
+            else if (weekId == -1)
+            {
+                var today = DateTime.UtcNow.Date;
+                query = query.Where(x => x.Date.Value.Date == today);
+            }
+            // weekId == 0 => get all weeks, no need to filter
+
+            var records = query.ToList();
             if (!records.Any()) return null;
 
             var first = records.First();
-
             var timetableData = new List<TData>();
 
             var groupedByDate = records.GroupBy(x => x.Date.Value.Date).ToList();
 
-            for (int g = 0; g < groupedByDate.Count; g++)
+            foreach (var group in groupedByDate)
             {
-                var group = groupedByDate[g];
-
                 var tData = new TData
                 {
                     Column1 = group.First().Date?.ToString("dddd")
@@ -118,16 +125,11 @@ namespace SchoolManagement.Services.Implementation
 
                 for (int i = 1; i <= 6; i++)
                 {
-                    var periodItems = new List<string>();
-
-                    foreach (var x in group)
-                    {
-                        if (x.PeriodId == i)
-                        {
-                            var content = string.IsNullOrWhiteSpace(x.Description) ? x.TopicName : x.Description;
-                            periodItems.Add(content);
-                        }
-                    }
+                    var periodItems = group
+                        //.Where(x => x.PeriodId == i && !new[] { "FT", "AS", "NR", "ET" }.Contains(x.TopicTypeCode))
+                             .Where(x => x.PeriodId == i )
+                        .Select(x => string.IsNullOrWhiteSpace(x.Description) ? x.TopicName : x.Description)
+                        .ToList();
 
                     periods[i - 1] = string.Join("\n", periodItems);
                 }
@@ -142,33 +144,25 @@ namespace SchoolManagement.Services.Implementation
                 timetableData.Add(tData);
             }
 
-            // Build event list using for loop
-            var eventList = new List<EventInfo>();
-            var eventGroups = records
+            // Event Info
+            var eventList = records
                 .Where(x => x.TopicTypeName == "Event")
                 .GroupBy(x => new { x.TopicName, x.Date })
+                .Select(g => new EventInfo
+                {
+                    Name = g.Key.TopicName,
+                    Date = g.Key.Date?.ToString("yyyy-MM-dd")
+                })
                 .ToList();
 
-            for (int i = 0; i < eventGroups.Count; i++)
-            {
-                var group = eventGroups[i];
-                var item = new EventInfo
-                {
-                    Name = group.Key.TopicName,
-                    Date = group.Key.Date?.ToString("yyyy-MM-dd")
-                };
-                eventList.Add(item);
-            }
-
-            // Build headers dynamically using for loop
+            // Headers
             var headers = new List<string> { "Days" };
             for (int i = 1; i <= 6; i++)
             {
                 string header = $"Period {i}";
 
-                for (int j = 0; j < records.Count; j++)
+                foreach (var record in records)
                 {
-                    var record = records[j];
                     if (record.PeriodId == i && !string.IsNullOrWhiteSpace(record.SubjectName))
                     {
                         header = $"{record.SubjectName}\n{record.SubjectCode}";
@@ -179,7 +173,7 @@ namespace SchoolManagement.Services.Implementation
                 headers.Add(header);
             }
 
-            var response = new WeekTimeTableData
+            return new WeekTimeTableData
             {
                 Month = $"{first.Date?.ToString("MMMM")} {first.StartDate?.ToString("dd")} - {first.EndDate?.ToString("dd")}",
                 WeekName = first.WeekName,
@@ -188,8 +182,6 @@ namespace SchoolManagement.Services.Implementation
                 Headers = headers,
                 TimeTableData = timetableData
             };
-
-            return response;
         }
 
 
