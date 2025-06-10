@@ -112,7 +112,7 @@ namespace SchoolManagement.Services.Implementation
 
                 // Fill COLUM2 ONLY with FT, AS, NR, ET Topic Names grouped by TopicTypeCode
                 var groupedHeaderTopics = weekGroup
-                    .Where(x => new[] { "FT", "AS", "NR", "ET" }.Contains(x.TopicTypeCode))
+                    .Where(x => new[] { "FT", "AS", "NR" }.Contains(x.TopicTypeCode))
                     .GroupBy(x => x.TopicTypeCode)
                     .Select(g =>
                     {
@@ -135,7 +135,7 @@ namespace SchoolManagement.Services.Implementation
                         //if (!string.IsNullOrWhiteSpace(period.TopicName))
                         //    cellTextList.Add(period.TopicName);
 
-                        if (!string.IsNullOrWhiteSpace(period.TopicName) && !new[] { "FT", "AS", "NR", "ET" }.Contains(period.TopicTypeCode))
+                        if (!string.IsNullOrWhiteSpace(period.TopicName) && !new[] { "FT", "AS", "NR"}.Contains(period.TopicTypeCode))
                             cellTextList.Add(period.TopicName);
 
                     }
