@@ -26,6 +26,8 @@ namespace SchoolManagement.ViewModel.VTimeTable
 
     public class WeekTimeTableData
     {
+
+        public string CurrentDate { get; set; }
         public string Month { get; set; }
         public string WeekName { get; set; }
         public string Course { get; set; }
@@ -33,10 +35,13 @@ namespace SchoolManagement.ViewModel.VTimeTable
         public List<EventInfo> Events { get; set; }
 
         public List<string> Headers { get; set; }
-        public List<TData> TimeTableData { get; set; }
+        public List<TData> TimeTableData { get; set; } 
+
 
 
         public Dictionary<string, List<TableFileResponse>> Resources { get; set; } = new();
+
+       
 
 
     }

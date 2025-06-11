@@ -58,6 +58,10 @@ namespace SchoolManagement.Services.Implementation
             return TimeTableResponseVM.FromModel(entity);
         }
 
+
+        // Time table
+
+
         public TimeTableResponseVM Update(int id, int tenantId, TimeTableUpdateVM vm)
         {
             var entity = _dbContext.TimeTables
@@ -90,6 +94,9 @@ namespace SchoolManagement.Services.Implementation
             _dbContext.SaveChanges();
             return true;
         }
+
+
+        // weekly time table if 
 
         public WeekTimeTableData GetWeeklyTimeTable(int weekId, int tenantId, int courseId)
         {
@@ -210,7 +217,9 @@ namespace SchoolManagement.Services.Implementation
                 Events = eventList,
                 Headers = headers,
                 TimeTableData = timetableData,
-                Resources = groupedResources
+                Resources = groupedResources,
+                CurrentDate = DateTime.UtcNow.ToString("dd/MM/yyyy") // <- new field added
+
             };
         }
 
