@@ -34,6 +34,10 @@ namespace SchoolManagement.ViewModel.VTimeTable
 
         public List<string> Headers { get; set; }
         public List<TData> TimeTableData { get; set; }
-        public List<TableFileResponse> Resources { get; set; } = new List<TableFileResponse>();
+
+
+        public Dictionary<string, List<TableFileResponse>> Resources { get; set; } = new();
+
+
     }
 }

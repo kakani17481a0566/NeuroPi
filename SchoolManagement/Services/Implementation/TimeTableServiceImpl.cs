@@ -91,7 +91,6 @@ namespace SchoolManagement.Services.Implementation
             return true;
         }
 
-
         public WeekTimeTableData GetWeeklyTimeTable(int weekId, int tenantId, int courseId)
         {
             var query = _dbContext.VTimeTable
@@ -111,20 +110,27 @@ namespace SchoolManagement.Services.Implementation
             if (!records.Any()) return null;
 
             var first = records.First();
+            var groupedByDate = records.GroupBy(x => x.Date.Value.Date);
             var timetableData = new List<TData>();
 
-            var groupedByDate = records.GroupBy(x => x.Date.Value.Date);
-
-            // Fetch all resources for the course (not per-day)
-            var allResources = _dbContext.TableFiles
+            // Group course files by type
+            var courseFiles = _dbContext.TableFiles
                 .Where(f => f.CourseId == courseId && !f.IsDeleted)
-                .Select(f => new TableFileResponse
-                {
-                    Name = f.Name,
-                    Link = f.Link
-                })
                 .ToList();
 
+            var groupedResources = courseFiles
+                .GroupBy(f => f.Type?.ToLower() ?? "unknown")
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Select(f => new TableFileResponse
+                    {
+                        Name = f.Name,
+                        Link = f.Link,
+                        Type = f.Type
+                    }).ToList()
+                );
+
+            // Build timetable data
             foreach (var group in groupedByDate)
             {
                 var date = group.Key;
@@ -142,17 +148,15 @@ namespace SchoolManagement.Services.Implementation
                         .Where(x => x.PeriodId == i)
                         .Select(x =>
                         {
-                            if (string.IsNullOrWhiteSpace(x.TopicTypeCode))
-                                return string.IsNullOrWhiteSpace(x.Description)
-                                    ? x.TopicName
-                                    : $"{x.TopicName},{x.Description}";
+                            var topic = string.IsNullOrWhiteSpace(x.TopicTypeCode)
+                                ? x.TopicName
+                                : $"{x.TopicTypeCode}: {x.TopicName}";
 
                             return string.IsNullOrWhiteSpace(x.Description)
-                                ? $"{x.TopicTypeCode}: {x.TopicName}"
-                                : $"{x.TopicTypeCode}: {x.TopicName} - {x.Description}";
+                                ? topic
+                                : $"{topic} - {x.Description}";
                         })
-        .ToList();
-
+                        .ToList();
 
                     periods[i - 1] = string.Join("\n", periodItems);
                 }
@@ -164,18 +168,16 @@ namespace SchoolManagement.Services.Implementation
                 tData.Column6 = periods[4];
                 tData.Column7 = periods[5];
 
-                // PDF File for the current day's timetable
-                var dayFile = _dbContext.TableFiles
+                // Add first PDF resource for the day (if any)
+                tData.Column8 = _dbContext.TableFiles
                     .Where(f => f.TimeTableId == timeTableId && f.Type == "pdf" && !f.IsDeleted)
                     .Select(f => f.Link)
                     .FirstOrDefault();
 
-                // Include name and link as a concatenated string or adjust your model
-                tData.Column8 = dayFile;
-
                 timetableData.Add(tData);
             }
 
+            // Events
             var eventList = records
                 .Where(x => x.TopicTypeName == "Event")
                 .GroupBy(x => new { x.TopicName, x.Date })
@@ -186,16 +188,16 @@ namespace SchoolManagement.Services.Implementation
                 })
                 .ToList();
 
+            // Headers
             var headers = new List<string> { "Days" };
             for (int i = 1; i <= 6; i++)
             {
-                string header = $"Period {i}";
-                var subjectRecord = records.FirstOrDefault(r => r.PeriodId == i && !string.IsNullOrWhiteSpace(r.SubjectName));
+                var subjectRecord = records
+                    .FirstOrDefault(r => r.PeriodId == i && !string.IsNullOrWhiteSpace(r.SubjectName));
 
-                if (subjectRecord != null)
-                {
-                    header = $"{subjectRecord.SubjectName}\n{subjectRecord.SubjectCode}";
-                }
+                string header = subjectRecord != null
+                    ? $"{subjectRecord.SubjectName}\n{subjectRecord.SubjectCode}"
+                    : $"Period {i}";
 
                 headers.Add(header);
             }
@@ -208,9 +210,11 @@ namespace SchoolManagement.Services.Implementation
                 Events = eventList,
                 Headers = headers,
                 TimeTableData = timetableData,
-                Resources = allResources
+                Resources = groupedResources
             };
         }
+
+
 
 
 
