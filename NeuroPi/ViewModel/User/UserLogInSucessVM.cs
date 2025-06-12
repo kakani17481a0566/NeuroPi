@@ -9,5 +9,9 @@
 
         public int TenantId { get; set; }
         public string token { get; set; }
+
+        public UserResponseVM UserProfile { get; set; }
+
+
     }
 }

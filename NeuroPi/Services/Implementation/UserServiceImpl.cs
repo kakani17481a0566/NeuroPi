@@ -32,7 +32,9 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 UserName = username,
                 TenantId = user.TenantId,
                 UserId = user.UserId,
-                token = GenerateJwtToken(user)
+                token = GenerateJwtToken(user),
+                UserProfile = UserResponseVM.ToViewModel(user)
+
             };
         }
 
