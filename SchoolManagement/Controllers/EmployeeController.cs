@@ -50,6 +50,29 @@ namespace SchoolManagement.Controllers
             }
             return new ResponseResult<EmployeeResponseVM>(HttpStatusCode.OK, response, "Employee created  successfully");
         }
+        [HttpGet("/employee/tenant")]
+        public ResponseResult<EmployeeResponseVM> GetEmployeeByTenantIdAndId([FromQuery(Name = "id")] int id, [FromQuery(Name = "tenantId")] int tenantId)
+        {
+            var response = _employeeService.GetByIdAndTenantId(id, tenantId);
+
+            if (response == null)
+            {
+                return new ResponseResult<EmployeeResponseVM>(HttpStatusCode.NotFound, response, "No data Found");
+            }
+            return new ResponseResult<EmployeeResponseVM>(HttpStatusCode.OK, response, "Employee created  successfully");
+        }
+
+        [HttpDelete("/employee/{id}/{tenantId}")]
+        public ResponseResult<EmployeeResponseVM> DeleteByIdAndTenantId([FromRoute] int id, [FromRoute] int tenantId)
+        {
+            var response = _employeeService.DeleteById(id, tenantId);
+            if (response != null)
+            {
+                return new ResponseResult<EmployeeResponseVM>(HttpStatusCode.OK, response, "Deleted Successfully");
+            }
+            return new ResponseResult<EmployeeResponseVM>(HttpStatusCode.NoContent, response, $"No Data found with Id {id}");
+
+        }
 
 
 

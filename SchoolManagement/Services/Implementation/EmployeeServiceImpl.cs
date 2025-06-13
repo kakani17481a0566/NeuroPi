@@ -22,7 +22,15 @@ namespace SchoolManagement.Services.Implementation
 
         public EmployeeResponseVM DeleteById(int id, int tenantId)
         {
-            throw new NotImplementedException();
+            var employee= _context.Employees.FirstOrDefault(x => x.Id == id && x.TenantId==tenantId &&  !x.IsDeleted);
+            if (employee != null)
+            {
+                employee.IsDeleted = true;
+                _context.SaveChanges();
+                return EmployeeResponseVM.ToViewModel(employee);
+
+            }
+            return null;
         }
 
         public List<EmployeeResponseVM> GetAll()
@@ -36,14 +44,9 @@ namespace SchoolManagement.Services.Implementation
             return null;
         }
 
-        //public List<EmployeeResponseVM> GetAllByMasterTypeId(int id, int tenantId)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
         public List<EmployeeResponseVM> GetAllByTenantId(int tenantId)
         {
-            var result=_context.Employees.Where(e=>e.TenantId== tenantId).ToList();
+            var result=_context.Employees.Where(e=>e.TenantId== tenantId && !e.IsDeleted).ToList();
             if (result != null && result.Count>0)
             {
                 return EmployeeResponseVM.ToViewModelList(result);
@@ -53,12 +56,22 @@ namespace SchoolManagement.Services.Implementation
 
         public EmployeeResponseVM GetById(int id)
         {
-            throw new NotImplementedException();
+            var result = _context.Employees.FirstOrDefault(e => e.Id == id && !e.IsDeleted);
+            if (result != null)
+            {
+                return EmployeeResponseVM.ToViewModel(result);
+            }
+            return null;
         }
 
         public EmployeeResponseVM GetByIdAndTenantId(int id, int tenantId)
         {
-            throw new NotImplementedException();
+            var result = _context.Employees.FirstOrDefault(e => !e.IsDeleted && e.Id == id && e.TenantId == tenantId);
+            if(result != null)
+            {
+               return  EmployeeResponseVM.ToViewModel(result);
+            }
+            return null;
         }
 
         public EmployeeResponseVM UpdateEmployee(int id, int tenantId, MasterUpdateVM masterType)
