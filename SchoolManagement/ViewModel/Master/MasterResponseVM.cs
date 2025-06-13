@@ -14,7 +14,6 @@ namespace SchoolManagement.ViewModel.Master
 
         public int TenantId { get; set; }
 
-        public string? MasterTypeName { get; set; }
 
         public int? MasterTypeId { get; set; }
 
@@ -28,7 +27,6 @@ namespace SchoolManagement.ViewModel.Master
                 Name = master.Name,
                 Code = master.Code,
                 TenantId = master.TenantId,
-                MasterTypeName=master.MasterType?.Name,
                 MasterTypeId=master.MasterTypeId,
              };
         public static List<MasterResponseVM> ToViewModelList(List<MMaster> masters)
