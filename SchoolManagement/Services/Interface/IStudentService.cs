@@ -13,5 +13,9 @@ namespace SchoolManagement.Services.Interface
         StudentResponseVM Create(StudentRequestVM request); // ✅ Add these if not present
         StudentResponseVM Update(int id, StudentRequestVM request);
         StudentResponseVM Delete(int id);
+
+        List<StudentResponseVM> GetByTenantCourseBranch(int tenantId, int courseId, int branchId);
+
+
     }
 }
