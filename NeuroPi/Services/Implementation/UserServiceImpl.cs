@@ -6,6 +6,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.EntityFrameworkCore;
 
 namespace NeuroPi.UserManagment.Services.Implementation
 {
@@ -20,10 +21,20 @@ namespace NeuroPi.UserManagment.Services.Implementation
             _configuration = configuration;
         }
 
+
+        // login
         public UserLogInSucessVM LogIn(string username, string password)
         {
             var user = _context.Users.FirstOrDefault(u =>
                 !u.IsDeleted && u.Username == username && u.Password == password);
+            MUserRole Role = null;
+
+            if (user != null)
+            {
+                Role = _context.UserRoles.Include(r => r.Role).FirstOrDefault(r => !r.IsDeleted && r.UserId == user.UserId && r.TenantId == user.TenantId)
+                    ;
+            }
+
 
             if (user == null) return null;
 
@@ -33,7 +44,8 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 TenantId = user.TenantId,
                 UserId = user.UserId,
                 token = GenerateJwtToken(user),
-                UserProfile = UserResponseVM.ToViewModel(user)
+                UserProfile = UserResponseVM.ToViewModel(user),
+                RoleName = Role.Role.Name != null ? Role.Role.Name : null
 
             };
         }

@@ -24,6 +24,8 @@ namespace NeuroPi.UserManagment.ViewModel.User
 
         public int? UpdatedBy { get; set; } // Keep as int? to match MBaseModel
 
+
+
         public static UserResponseVM ToViewModel(MUser user)
         {
             return new UserResponseVM

@@ -14,6 +14,8 @@ namespace SchoolManagement.ViewModel.VTimeTable
         public string Column7 { get; set; } // Period 6
         public string Column8 { get; set; }
 
+        public string Column9 { get; set; }
+
         // ⬅️ New list for video resources
 
     }

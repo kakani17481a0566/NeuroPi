@@ -15,6 +15,7 @@ cls
 echo ================================================
 echo           %CYAN%GIT TOOL - INTERACTIVE MENU%RESET%
 echo ================================================
+echo  0.  GitHub Login via Browser
 echo  1.  Show git status
 echo  2.  Show git log (last 20 commits)
 echo  3.  List all local branches
@@ -37,8 +38,9 @@ echo 19.  Create Pull Request
 echo 20.  Backup master/main branch
 echo 21.  Exit
 echo ================================================
-set /p choice="%YELLOW%Select an option (1-21): %RESET%"
+set /p choice="%YELLOW%Select an option (0-21): %RESET%"
 
+if "%choice%"=="0" goto github_login
 if "%choice%"=="1" goto status
 if "%choice%"=="2" goto log
 if "%choice%"=="3" goto list_local
@@ -61,6 +63,27 @@ if "%choice%"=="19" goto create_pull_request
 if "%choice%"=="20" goto backup_master
 if "%choice%"=="21" goto end
 goto menu
+
+:github_login
+echo.
+where gh >nul 2>nul
+if errorlevel 1 (
+    echo %RED%GitHub CLI not found.%RESET%
+    echo Please install it from: https://cli.github.com/
+    goto pause_return
+)
+
+echo Logging in via browser...
+gh auth login --hostname github.com --web --scopes "repo,user" || goto error
+
+echo.
+echo %GREEN%Successfully authenticated with GitHub.%RESET%
+echo Fetching user info...
+
+for /f "tokens=* delims=" %%a in ('gh api user --jq ".login + \" (\" + .name + \")\" "') do set user=%%a
+
+echo Logged in as: %CYAN%%user%%RESET%
+goto pause_return
 
 :status
 echo.
@@ -160,21 +183,14 @@ echo === Remote Branches ===
 git branch -r
 echo.
 call :progress_line "Staging and committing changes"
-
-:: Stage all changes (add files)
 git add . || goto error
-
-:: Check if there are any changes to commit
 git diff --cached --quiet
 if %errorlevel% == 0 (
     echo %YELLOW%No changes detected. Proceeding with push...%RESET%
 ) else (
-    :: Initialize variables for commit message
     set "msg=Auto commit: "
     setlocal EnableDelayedExpansion
     set fileCount=0
-
-    :: Loop through all staged files and append them to the commit message
     for /f "delims=" %%f in ('git diff --name-only --cached') do (
         set /a fileCount+=1
         if !fileCount! leq 5 (
@@ -182,14 +198,10 @@ if %errorlevel% == 0 (
             set "msg=!msg! !file!"
         )
     )
-
-    :: If more than 5 files, add "and X more" to the commit message
     if !fileCount! gtr 5 (
         set /a remaining=fileCount - 5
         set "msg=!msg! and !remaining! more"
     )
-
-    :: Commit the changes with the generated message
     endlocal & set msg=%msg%
     git commit -m "%msg%" || goto error
     echo %GREEN%Successfully committed changes: %msg%%RESET%
@@ -217,11 +229,6 @@ for /f "tokens=*" %%a in ('git branch -r') do (
 )
 goto pause_return
 
-
-
-
-
-:: Commit and push changes (without tmp files)
 :commit_push
 echo.
 set "msg=Updated:"
@@ -239,11 +246,9 @@ if !fileCount! gtr 5 (
     set "msg=!msg! and !remaining! more"
 )
 endlocal & set msg=%msg%
-
 call :progress_line "Committing changes"
 git add . || goto error
 git commit -m "%msg%" || goto error
-
 for /f %%b in ('git branch --show-current') do set currentBranch=%%b
 call :progress_line "Pushing %currentBranch%"
 git push origin %currentBranch% || goto error
@@ -261,7 +266,6 @@ echo.
 echo Are you sure you want to delete all local changes? This action cannot be undone.
 set /p confirm="Type 'yes' to confirm, or anything else to cancel: "
 if /i not "%confirm%"=="yes" goto pause_return
-
 echo.
 call :progress_line "Resetting working directory"
 git reset --hard || goto error
@@ -273,12 +277,10 @@ echo.
 for /f %%b in ('git branch --show-current') do set currentBranch=%%b
 for /f %%d in ('git symbolic-ref refs/remotes/origin/HEAD') do set defaultBranch=%%d
 set defaultBranch=!defaultBranch:refs/remotes/origin/=!
-
 for /f "delims=" %%r in ('git config --get remote.origin.url') do set REPO_URL=%%r
 set "REPO_URL=!REPO_URL:git@github.com:=https://github.com/!"
 set "REPO_URL=!REPO_URL:.git=!"
 set "REPO_URL=!REPO_URL::=/!"
-
 echo Creating Pull Request from !currentBranch! to !defaultBranch!
 echo Please visit:
 echo !REPO_URL!/compare/!currentBranch!...!defaultBranch!
@@ -305,4 +307,4 @@ pause
 goto menu
 
 :progress_line
-echo
+echo.
