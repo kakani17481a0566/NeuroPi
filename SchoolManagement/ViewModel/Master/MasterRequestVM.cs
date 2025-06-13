@@ -11,6 +11,7 @@ namespace SchoolManagement.ViewModel.Master
 
         public int MasterTypeId { get; set; }
 
+        public string Code { get; set; }
         public int TenantId { get; set; }
 
         public int CreatedBy { get; set; }
@@ -23,6 +24,7 @@ namespace SchoolManagement.ViewModel.Master
                 Name = masterRequestVM.Name,
                 TenantId = masterRequestVM.TenantId,
                 MasterTypeId = masterRequestVM.MasterTypeId,
+                Code = masterRequestVM.Code,
                 CreatedBy = masterRequestVM.CreatedBy,
             };
         }

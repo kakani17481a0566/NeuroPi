@@ -7,6 +7,8 @@
         public int MasterTypeId { get; set; }
         public int UpdatedBy { get; set; }
 
+        public string Code { get; set; }
+
 
     }
 }

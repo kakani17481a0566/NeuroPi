@@ -22,6 +22,9 @@ namespace SchoolManagement.Model
         [ForeignKey("MasterTypeId")]
         public MMasterType MasterType { get; set; }
 
+        [Column("code")]
+        public string? Code { get; set; }
+
         [Column("tenant_id")]
         public int TenantId { get; set; }
 
