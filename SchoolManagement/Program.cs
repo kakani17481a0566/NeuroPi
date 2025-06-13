@@ -37,6 +37,8 @@ builder.Services.AddScoped<IBooksService, BooksServiceImpl>();
 builder.Services.AddScoped<IUtilitesService, UtilitiesServiceImpl>();
 builder.Services.AddScoped<IItemService, ItemServiceImpl>();
 
+builder.Services.AddScoped<IStudentService, StudentServiceImpl>();
+
 builder.Services.AddScoped<ISubjectService, SubjectServiceImpl>();
 builder.Services.AddScoped<ICourseService, CourseServiceImpl>();
 builder.Services.AddScoped<ICourseSubjectService, CourseSubjectServiceImpl>();

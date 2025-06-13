@@ -13,6 +13,7 @@ namespace SchoolManagement.ViewModel.DailyAssessment
         public int ConductedById { get; set; }
         public int TenantId { get; set; }
         public int CreatedBy { get; set; }
+        public int? BranchId { get; set; }
 
         public MDailyAssessment ToModel()
         {
@@ -23,6 +24,7 @@ namespace SchoolManagement.ViewModel.DailyAssessment
                 WorksheetId = this.WorksheetId,
                 GradeId = this.GradeId,
                 StudentId = this.StudentId,
+                BranchId = this.BranchId,
                 //CourseId = this.CourseId,
                 ConductedById = this.ConductedById,
                 TenantId = this.TenantId,

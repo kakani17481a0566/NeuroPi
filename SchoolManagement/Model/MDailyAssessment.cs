@@ -27,10 +27,6 @@ namespace SchoolManagement.Model
         [Column("student_id")]
         public int StudentId { get; set; }
 
-        //[ForeignKey("Course")]
-        //[Column("course_id")]
-        //public int CourseId { get; set; } 
-
         [ForeignKey("ConductedBy")]
         [Column("conducted_by")]
         public int ConductedById { get; set; }
@@ -40,8 +36,16 @@ namespace SchoolManagement.Model
         public int TenantId { get; set; }
 
         [Column("grade_id")]
-        public int? GradeId { get; set; } 
+        public int? GradeId { get; set; }
+
+
+        [ForeignKey("Branch")]
+        [Column("branch_id")]
+        public int? BranchId { get; set; }
+
 
         public virtual MTenant Tenant { get; set; }
+
+        public virtual MBranch Branch { get; set; }
     }
 }
