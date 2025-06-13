@@ -25,6 +25,8 @@ namespace SchoolManagement.Data
         public DbSet<MUtilitiesList> UtilitiesList { get; set; }
 
         public DbSet<MBranch> Branches { get; set; }
+        public DbSet<MEmployee> Employees { get; set; }
+
 
 
         // New School Management DbSets
