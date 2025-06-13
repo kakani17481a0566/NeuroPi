@@ -62,6 +62,7 @@ namespace SchoolManagement.Services.Implementation
             entity.StudentId = request.StudentId;
             //entity.CourseId = request.CourseId;
             entity.ConductedById = request.ConductedById;
+            entity.BranchId = request.BranchId;
             entity.UpdatedBy = request.UpdatedBy;
             entity.UpdatedOn = DateTime.UtcNow;
 

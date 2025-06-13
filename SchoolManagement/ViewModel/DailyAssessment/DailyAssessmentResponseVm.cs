@@ -14,6 +14,7 @@ namespace SchoolManagement.ViewModel.DailyAssessment
         public int ConductedById { get; set; }
         public int TenantId { get; set; }
 
+        public int? BranchId { get; set; }
         public static DailyAssessmentResponseVm FromModel(MDailyAssessment model)
         {
             return new DailyAssessmentResponseVm
@@ -24,6 +25,7 @@ namespace SchoolManagement.ViewModel.DailyAssessment
                 WorksheetId = model.WorksheetId,
                 GradeId = model.GradeId,
                 StudentId = model.StudentId,
+                BranchId = model.BranchId,
                 //CourseId = model.CourseId,
                 ConductedById = model.ConductedById,
                 TenantId = model.TenantId

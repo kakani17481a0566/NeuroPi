@@ -45,6 +45,7 @@ namespace SchoolManagement.Data
         public DbSet<MGrade> Grades { get; set; }
         public DbSet<MParent> Parents { get; set; }
         public DbSet<MStudent> Students { get; set; }
+
         public DbSet<MParentStudent> ParentStudents { get; set; }
         public DbSet<MTimeTableTopic> TimeTableTopics { get; set; }
         public DbSet<MTimeTableWorksheet> TimeTableWorksheets { get; set; }
