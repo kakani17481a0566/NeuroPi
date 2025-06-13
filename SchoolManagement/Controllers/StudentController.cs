@@ -72,5 +72,17 @@ namespace SchoolManagement.Controllers
                 ? new ResponseResult<StudentResponseVM>(HttpStatusCode.OK, result, "Deleted successfully")
                 : new ResponseResult<StudentResponseVM>(HttpStatusCode.NotFound, null, "Not found");
         }
+
+        [HttpGet("by-tenant-course-branch")]
+        public ResponseResult<List<StudentResponseVM>> GetByTenantCourseBranch([FromQuery] int tenantId, [FromQuery] int courseId, [FromQuery] int branchId)
+        {
+            var data = _studentService.GetByTenantCourseBranch(tenantId, courseId, branchId);
+            if (data == null || data.Count == 0)
+                return new ResponseResult<List<StudentResponseVM>>(HttpStatusCode.NotFound, data, "No students found for given filters.");
+
+            return new ResponseResult<List<StudentResponseVM>>(HttpStatusCode.OK, data, "Filtered students fetched successfully.");
+        }
+
+
     }
 }

@@ -93,5 +93,16 @@ namespace SchoolManagement.Services.Implementation
             _context.SaveChanges();
             return StudentResponseVM.ToViewModel(student);
         }
+
+
+        public List<StudentResponseVM> GetByTenantCourseBranch(int tenantId, int courseId, int branchId)
+        {
+            return _context.Students
+                .Where(s => s.TenantId == tenantId && s.CourseId == courseId && s.BranchId == branchId && !s.IsDeleted)
+                .Select(StudentResponseVM.ToViewModel)
+                .ToList();
+        }
+
+
     }
 }
