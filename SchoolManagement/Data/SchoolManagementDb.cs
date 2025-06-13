@@ -24,6 +24,9 @@ namespace SchoolManagement.Data
         public DbSet<MPrefixSuffix> PrefixSuffix { get; set; }
         public DbSet<MUtilitiesList> UtilitiesList { get; set; }
 
+        public DbSet<MBranch> Branches { get; set; }
+
+
         // New School Management DbSets
         public DbSet<MSubject> subjects { get; set; }
         public DbSet<MCourse> Courses { get; set; }

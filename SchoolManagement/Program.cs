@@ -55,6 +55,7 @@ builder.Services.AddScoped<ITimeTableServices, TimeTableServiceImpl>();
 
 builder.Services.AddScoped<IPublicHolidayService, PublicHolidayServiceImpl>();
 
+builder.Services.AddScoped<IBranchService, BranchServiceImpl>();
 
 //view
 builder.Services.AddScoped<IVwComprehensiveTimeTablesService, VwComprehensiveTimeTablesService>();
