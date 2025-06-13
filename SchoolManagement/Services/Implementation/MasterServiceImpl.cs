@@ -85,6 +85,7 @@ namespace SchoolManagement.Services.Implementation
             {
                 masterType.Name = request.Name;
                 masterType.MasterTypeId = request.MasterTypeId;
+                masterType.Code = request.Code;
                 masterType.UpdatedBy = request.UpdatedBy;
                 masterType.UpdatedOn = DateTime.UtcNow;
                 _context.SaveChanges();

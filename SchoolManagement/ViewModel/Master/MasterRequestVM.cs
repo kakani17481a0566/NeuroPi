@@ -11,6 +11,7 @@ namespace SchoolManagement.ViewModel.Master
 
         public int MasterTypeId { get; set; }
 
+        public string Code { get; set; }
         public int TenantId { get; set; }
 
         public int CreatedBy { get; set; }

@@ -1,4 +1,5 @@
-﻿using NeuroPi.UserManagment.Model;
+﻿using System.Linq;
+using NeuroPi.UserManagment.Model;
 using SchoolManagement.Data;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.Account;
@@ -83,7 +84,7 @@ namespace SchoolManagement.Services.Implementation
         // Developed by: Kiran
         public List<AccountResponseVM> GetAccountDetails()
         {
-            var accounts = _context.Accounts.ToList();
+            var accounts = _context.Accounts.Where(a=>!a.IsDeleted).ToList();
             return AccountResponseVM.ToViewModelList(accounts);
 
         }

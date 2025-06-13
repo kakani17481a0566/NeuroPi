@@ -10,6 +10,7 @@ namespace SchoolManagement.ViewModel.Master
         public int Id { get; set; }
 
         public string Name { get; set; }
+        
 
         public int TenantId { get; set; }
 
@@ -17,12 +18,15 @@ namespace SchoolManagement.ViewModel.Master
 
         public int? MasterTypeId { get; set; }
 
+        public string Code { get; set; }
+
 
         public static MasterResponseVM ToViewModel(MMaster master) =>
              new MasterResponseVM
              {
                 Id = master.Id,
                 Name = master.Name,
+                Code = master.Code,
                 TenantId = master.TenantId,
                 MasterTypeName=master.MasterType?.Name,
                 MasterTypeId=master.MasterTypeId,
