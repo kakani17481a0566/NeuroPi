@@ -12,10 +12,10 @@ namespace SchoolManagement.Services.Interface
         List<EmployeeResponseVM> GetAllByTenantId(int tenantId);
         EmployeeResponseVM GetByIdAndTenantId(int id, int tenantId);
 
-        EmployeeResponseVM CreateEmployee(EmployeeRequestVM masterType);
+        EmployeeResponseVM CreateEmployee(EmployeeRequestVM employee);
 
 
-        EmployeeResponseVM UpdateEmployee(int id, int tenantId, MasterUpdateVM masterType);
+        EmployeeResponseVM UpdateEmployee(int id, int tenantId, EmployeeUpdateVM employee);
 
         EmployeeResponseVM DeleteById(int id, int tenantId);
 

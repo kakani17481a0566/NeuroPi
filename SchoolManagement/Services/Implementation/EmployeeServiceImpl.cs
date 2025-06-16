@@ -74,9 +74,18 @@ namespace SchoolManagement.Services.Implementation
             return null;
         }
 
-        public EmployeeResponseVM UpdateEmployee(int id, int tenantId, MasterUpdateVM masterType)
+        public EmployeeResponseVM UpdateEmployee(int id, int tenantId, EmployeeUpdateVM masterType)
         {
-            throw new NotImplementedException();
+            var employee = _context.Employees.FirstOrDefault(e => e.Id == id && e.TenantId == tenantId && !e.IsDeleted);
+            if (employee != null)
+            {
+                employee.EmpCode = masterType.EmpCode;
+                _context.SaveChanges();
+                return EmployeeResponseVM.ToViewModel(employee);
+
+            }
+            return null;
+
         }
     }
 }
