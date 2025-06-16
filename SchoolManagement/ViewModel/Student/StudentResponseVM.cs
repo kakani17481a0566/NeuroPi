@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using SchoolManagement.Model;
+﻿using SchoolManagement.Model;
 
 namespace SchoolManagement.ViewModel.Students
 {
@@ -8,8 +7,10 @@ namespace SchoolManagement.ViewModel.Students
         public int Id { get; set; }
         public string Name { get; set; }
         public int CourseId { get; set; }
+        public string CourseName { get; set; }    // New
         public int TenantId { get; set; }
         public int BranchId { get; set; }
+        public string BranchName { get; set; }    // New
 
         public static StudentResponseVM ToViewModel(MStudent student)
         {
@@ -18,19 +19,11 @@ namespace SchoolManagement.ViewModel.Students
                 Id = student.Id,
                 Name = student.Name,
                 CourseId = student.CourseId,
+                CourseName = student.Course?.Name,
                 TenantId = student.TenantId,
-                BranchId = student.BranchId
+                BranchId = student.BranchId,
+                BranchName = student.Branch?.Name
             };
-        }
-
-        public static List<StudentResponseVM> ToViewModelList(List<MStudent> students)
-        {
-            var list = new List<StudentResponseVM>();
-            foreach (var student in students)
-            {
-                list.Add(ToViewModel(student));
-            }
-            return list;
         }
     }
 }
