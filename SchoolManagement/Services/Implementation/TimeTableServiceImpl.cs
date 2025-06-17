@@ -175,23 +175,24 @@ namespace SchoolManagement.Services.Implementation
                 tData.Column6 = periods[4];
                 tData.Column7 = periods[5];
 
-                // PDF resource (Column8)
+                // Column8: First PDF link
                 tData.Column8 = _dbContext.TableFiles
                     .Where(f => f.TimeTableId == timeTableId && f.Type == "pdf" && !f.IsDeleted && f.CourseId == courseId)
                     .Select(f => f.Link)
                     .FirstOrDefault();
 
-                // Worksheet list (Column9)
-                var worksheets = (from ttw in _dbContext.TimeTableWorksheets
-                                  join w in _dbContext.Worksheets on ttw.WorksheetId equals w.Id
-                                  where ttw.TimeTableId == timeTableId 
-                                                    orderby w.Id   
-
-                                  select new { w.Name, w.Location }).ToList();
-
-                tData.Column9 = string.Join("\n", worksheets.Select(w => $"{w.Name}: {w.Location}"));
+                // Column9: First worksheet link
+                // Column9: First worksheet link
+                tData.Column9 = (from ttw in _dbContext.TimeTableWorksheets
+                                 join w in _dbContext.Worksheets on ttw.WorksheetId equals w.Id
+                                 join t in _dbContext.TimeTables on ttw.TimeTableId equals t.Id
+                                 where ttw.TimeTableId == timeTableId
+                                 where t.CourseId == courseId
+                                 orderby w.Id
+                                 select w.Location).FirstOrDefault();
 
                 timetableData.Add(tData);
+
             }
 
             // Events
@@ -231,8 +232,6 @@ namespace SchoolManagement.Services.Implementation
                 CurrentDate = DateTime.UtcNow.ToString("dd/MM/yyyy")
             };
         }
-
-
 
 
 
