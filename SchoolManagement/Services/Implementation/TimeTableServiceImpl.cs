@@ -183,13 +183,14 @@ namespace SchoolManagement.Services.Implementation
 
                 // Column9: First worksheet link
                 // Column9: First worksheet link
-                tData.Column9 = (from ttw in _dbContext.TimeTableWorksheets
-                                 join w in _dbContext.Worksheets on ttw.WorksheetId equals w.Id
-                                 join t in _dbContext.TimeTables on ttw.TimeTableId equals t.Id
-                                 where ttw.TimeTableId == timeTableId
-                                 where t.CourseId == courseId
-                                 orderby w.Id
-                                 select w.Location).FirstOrDefault();
+                tData.Column9 = string.Join("\n",
+    (from ttw in _dbContext.TimeTableWorksheets
+     join w in _dbContext.Worksheets on ttw.WorksheetId equals w.Id
+     join t in _dbContext.TimeTables on ttw.TimeTableId equals t.Id
+     where ttw.TimeTableId == timeTableId && t.CourseId == courseId
+     orderby w.Id
+     select w.Location).ToList());
+
 
                 timetableData.Add(tData);
 
