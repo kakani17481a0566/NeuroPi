@@ -21,7 +21,7 @@ namespace SchoolManagement.ViewModel.DailyAssessment
             {
                 AssessmentDate = this.AssessmentDate,
                 TimeTableId = this.TimeTableId,
-                WorksheetId = this.WorksheetId,
+                //WorksheetId = this.WorksheetId,
                 GradeId = this.GradeId,
                 StudentId = this.StudentId,
                 BranchId = this.BranchId,

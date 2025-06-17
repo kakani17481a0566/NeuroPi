@@ -14,6 +14,9 @@ namespace SchoolManagement.Services.Interface
 
         DailyAssessmentResponseVm GetById(int id, int tenantId);
         DailyAssessmentResponseVm Update(int id, int tenantId, DailyAssessmentUpdateVm request);
+        AssessmentMatrixResponse GetAssessmentMatrixByTimeTable(int tenantId, int courseId, int branchId, int timeTableId);
+
+       
 
         bool Delete(int id, int tenantId);
     }

@@ -22,7 +22,7 @@ namespace SchoolManagement.ViewModel.DailyAssessment
                 Id = model.Id,
                 AssessmentDate = model.AssessmentDate,
                 TimeTableId = model.TimeTableId,
-                WorksheetId = model.WorksheetId,
+                //WorksheetId = model.WorksheetId,
                 GradeId = model.GradeId,
                 StudentId = model.StudentId,
                 BranchId = model.BranchId,

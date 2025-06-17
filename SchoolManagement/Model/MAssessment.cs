@@ -18,11 +18,11 @@ namespace SchoolManagement.Model
         [Column("description")]
         public string Description { get; set; }
 
-        [Required]
+  
         [ForeignKey(nameof(Topic))]
         [Column("topic_id")]
-        public int TopicId { get; set; }
-        public virtual MTopic Topic { get; set; }
+        public int? TopicId { get; set; }
+        public virtual MTopic? Topic { get; set; }
 
         [Required]
         [ForeignKey(nameof(AssessmentSkill))]
