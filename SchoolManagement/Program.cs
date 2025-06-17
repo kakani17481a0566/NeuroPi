@@ -53,6 +53,7 @@ builder.Services.AddScoped<ITermService, TermServiceImpl>();
 builder.Services.AddScoped<ITimeTableDetailService, TimeTableDetailServiceImpl>();
 builder.Services.AddScoped<ITimeTableServices, TimeTableServiceImpl>();
 builder.Services.AddScoped<IBranchService, BranchServiceImpl>();
+builder.Services.AddScoped<ITimeTableAssessmentService, TimeTableAssessmentServiceImpl>();
 
 
 
