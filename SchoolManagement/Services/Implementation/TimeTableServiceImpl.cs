@@ -177,14 +177,14 @@ namespace SchoolManagement.Services.Implementation
 
                 // PDF resource (Column8)
                 tData.Column8 = _dbContext.TableFiles
-                    .Where(f => f.TimeTableId == timeTableId && f.Type == "pdf" && !f.IsDeleted)
+                    .Where(f => f.TimeTableId == timeTableId && f.Type == "pdf" && !f.IsDeleted && f.CourseId == courseId)
                     .Select(f => f.Link)
                     .FirstOrDefault();
 
                 // Worksheet list (Column9)
                 var worksheets = (from ttw in _dbContext.TimeTableWorksheets
                                   join w in _dbContext.Worksheets on ttw.WorksheetId equals w.Id
-                                  where ttw.TimeTableId == timeTableId
+                                  where ttw.TimeTableId == timeTableId 
                                                     orderby w.Id   
 
                                   select new { w.Name, w.Location }).ToList();
