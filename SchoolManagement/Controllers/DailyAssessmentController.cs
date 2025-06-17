@@ -95,6 +95,17 @@ namespace SchoolManagement.Controllers
         }
 
 
+        [HttpPut("update-grade")]
+        public ResponseResult<UpdateGradeResponseVm> UpdateStudentGrade([FromBody] UpdateGradeRequestVm request)
+        {
+            var result = _service.UpdateStudentGrade(request.Id, request.TimeTableId, request.StudentId, request.BranchId, request.NewGradeId);
+            if (result == null)
+                return new ResponseResult<UpdateGradeResponseVm>(HttpStatusCode.NotFound, null, "Assessment record not found.");
+
+            return new ResponseResult<UpdateGradeResponseVm>(HttpStatusCode.OK, result, "Grade updated successfully.");
+        }
+
+
 
 
     }

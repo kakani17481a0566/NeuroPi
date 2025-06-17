@@ -171,8 +171,38 @@ namespace SchoolManagement.Services.Implementation
             };
         }
 
+        public UpdateGradeResponseVm UpdateStudentGrade(int id, int timeTableId, int studentId, int branchId, int newGradeId)
+        {
+            var entity = _context.DailyAssessments
+                .FirstOrDefault(x =>
+                    x.Id == id &&
+                    x.TimeTableId == timeTableId &&
+                    x.StudentId == studentId &&
+                    x.BranchId == branchId &&
+                    !x.IsDeleted);
 
-     
+            if (entity == null)
+                return null;
+
+            var originalGradeId = entity.GradeId ?? 0;
+
+            entity.GradeId = newGradeId;
+            entity.UpdatedOn = DateTime.UtcNow;
+
+            _context.SaveChanges();
+
+            return new UpdateGradeResponseVm
+            {
+                Id = entity.Id,
+                TimeTableId = entity.TimeTableId,
+                StudentId = entity.StudentId,
+                BranchId = entity.BranchId ?? 0,
+                OriginalGradeId = originalGradeId,
+                UpdatedGradeId = newGradeId
+            };
+        }
+
+
 
 
 
