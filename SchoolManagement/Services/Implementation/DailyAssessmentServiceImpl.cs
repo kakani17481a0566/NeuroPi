@@ -125,15 +125,7 @@ namespace SchoolManagement.Services.Implementation
             var headers = new List<string> { "S.NO.", "NAME OF THE STUDENT" };
             headers.AddRange(uniqueAssessments.Keys.OrderBy(name => name));
 
-            // 4. Build lookup: StudentId -> (AssessmentId -> GradeName)
-            var gradeLookup = dailyAssessments
-                .GroupBy(d => d.StudentId)
-                .ToDictionary(
-                    g => g.Key,
-                    g => g.ToDictionary(x => x.AssessmentId, x => x.Grade?.Name ?? "Marks Not Added")
-                );
-
-            // 5. Build Matrix Rows
+            // 4. Build Matrix Rows
             var rows = new List<AssessmentMatrixRow>();
             int serial = 1;
 
@@ -144,7 +136,7 @@ namespace SchoolManagement.Services.Implementation
                     SNo = serial++,
                     StudentId = student.Id,
                     Name = student.Name,
-                    Grades = new Dictionary<string, string>()
+                    Grades = new Dictionary<string, GradeDetail>()
                 };
 
                 foreach (var entry in uniqueAssessments)
@@ -152,14 +144,15 @@ namespace SchoolManagement.Services.Implementation
                     var assessmentName = entry.Key;
                     var assessmentId = entry.Value;
 
-                    string grade = "Marks Not Added";
-                    if (gradeLookup.TryGetValue(student.Id, out var studentGrades))
-                    {
-                        if (studentGrades.TryGetValue(assessmentId, out var g))
-                            grade = g;
-                    }
+                    var da = dailyAssessments.FirstOrDefault(d =>
+                        d.StudentId == student.Id &&
+                        d.AssessmentId == assessmentId);
 
-                    row.Grades[assessmentName] = grade;
+                    row.Grades[assessmentName] = new GradeDetail
+                    {
+                        Grade = da?.Grade?.Name ?? "Marks Not Added",
+                        Id = da.Id
+                    };
                 }
 
                 rows.Add(row);
