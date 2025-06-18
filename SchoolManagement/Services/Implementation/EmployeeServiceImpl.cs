@@ -35,7 +35,7 @@ namespace SchoolManagement.Services.Implementation
 
         public List<EmployeeResponseVM> GetAll()
         {
-            var result=_context.Employees.ToList();
+            var result = _context.Employees.Where(e => !e.IsDeleted).ToList();
             if (result != null && result.Count>0)
             {
                 return EmployeeResponseVM.ToViewModelList(result);
