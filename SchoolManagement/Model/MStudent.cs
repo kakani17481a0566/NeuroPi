@@ -27,5 +27,13 @@ namespace SchoolManagement.Model
 
         [ForeignKey(nameof(TenantId))]
         public virtual MTenant Tenant { get; set; }
+
+        [ForeignKey(nameof(CourseId))]
+        public virtual MCourse Course { get; set; }
+
+        [ForeignKey(nameof(BranchId))]
+        public virtual MBranch Branch { get; set; }
+
+        // Tenant navigation already present
     }
 }

@@ -82,5 +82,31 @@ namespace SchoolManagement.Controllers
             return new ResponseResult<object>(HttpStatusCode.OK, result, "Assessment updated");
         }
 
+        [HttpGet("get-matrix")]
+        public ResponseResult<AssessmentMatrixResponse> GetMatrix(
+    [FromQuery] int tenantId,
+    [FromQuery] int courseId,
+    [FromQuery] int branchId,
+    [FromQuery] int timeTableId)
+        {
+            var result = _service.GetAssessmentMatrixByTimeTable(tenantId, courseId, branchId, timeTableId);
+            return new ResponseResult<AssessmentMatrixResponse>(
+                HttpStatusCode.OK, result, "Assessment matrix fetched successfully.");
+        }
+
+
+        [HttpPut("update-grade")]
+        public ResponseResult<UpdateGradeResponseVm> UpdateStudentGrade([FromBody] UpdateGradeRequestVm request)
+        {
+            var result = _service.UpdateStudentGrade(request.Id, request.TimeTableId, request.StudentId, request.BranchId, request.NewGradeId);
+            if (result == null)
+                return new ResponseResult<UpdateGradeResponseVm>(HttpStatusCode.NotFound, null, "Assessment record not found.");
+
+            return new ResponseResult<UpdateGradeResponseVm>(HttpStatusCode.OK, result, "Grade updated successfully.");
+        }
+
+
+
+
     }
 }

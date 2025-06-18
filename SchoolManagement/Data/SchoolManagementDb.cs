@@ -54,7 +54,9 @@ namespace SchoolManagement.Data
 
         public DbSet<MTableFiles> TableFiles { get; set; }
 
-       
+        public DbSet<MTimeTableAssessment> TimeTableAssessments { get; set; }
+
+
 
         // views
         public DbSet<MVwComprehensiveTimeTable> VwComprehensiveTimeTables { get; set; }
@@ -79,6 +81,9 @@ namespace SchoolManagement.Data
             modelBuilder.Entity<MVTimeTable>().HasNoKey().ToView("v_time_table");
 
             modelBuilder.Entity<MVTermTable>().HasNoKey().ToView("v_term_table");
+
+            //modelBuilder.Entity<MTimeTableAssessment>().ToTable("time_table_assessments");
+
         }
     }
 }

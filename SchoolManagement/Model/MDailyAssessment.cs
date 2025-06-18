@@ -15,37 +15,45 @@ namespace SchoolManagement.Model
         [Column("assessment_date")]
         public DateTime AssessmentDate { get; set; }
 
-        [ForeignKey("TimeTable")]
+        [Required]
+        [ForeignKey(nameof(TimeTable))]
         [Column("time_table_id")]
         public int TimeTableId { get; set; }
+        public virtual MTimeTable TimeTable { get; set; }
 
-        [ForeignKey("Worksheet")]
-        [Column("worksheet_id")]
-        public int WorksheetId { get; set; }
-
-        [ForeignKey("Student")]
+        [Required]
+        [ForeignKey(nameof(Student))]
         [Column("student_id")]
         public int StudentId { get; set; }
+        public virtual MStudent Student { get; set; }
 
-        [ForeignKey("ConductedBy")]
         [Column("conducted_by")]
         public int ConductedById { get; set; }
 
-        [ForeignKey("Tenant")]
+        [ForeignKey(nameof(ConductedById))] // <-- THIS LINE IS MANDATORY
+        public virtual MUser ConductedByUser { get; set; }
+
+
+
+        [Required]
+        [ForeignKey(nameof(Tenant))]
         [Column("tenant_id")]
         public int TenantId { get; set; }
+        public virtual MTenant Tenant { get; set; }
 
         [Column("grade_id")]
         public int? GradeId { get; set; }
+        public virtual MGrade Grade { get; set; }
 
-
-        [ForeignKey("Branch")]
         [Column("branch_id")]
+        [ForeignKey(nameof(Branch))]
         public int? BranchId { get; set; }
-
-
-        public virtual MTenant Tenant { get; set; }
-
         public virtual MBranch Branch { get; set; }
+
+        [Required]
+        [ForeignKey(nameof(Assessment))]
+        [Column("assessment_id")]
+        public int AssessmentId { get; set; }
+        public virtual MAssessment Assessment { get; set; }
     }
 }

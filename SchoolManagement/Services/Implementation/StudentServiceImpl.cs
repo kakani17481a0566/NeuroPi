@@ -95,9 +95,12 @@ namespace SchoolManagement.Services.Implementation
         }
 
 
-        public List<StudentResponseVM> GetByTenantCourseBranch(int tenantId, int courseId, int branchId)
+       
+     public List<StudentResponseVM> GetByTenantCourseBranch(int tenantId, int courseId, int branchId)
         {
             return _context.Students
+                .Include(s => s.Course)
+                .Include(s => s.Branch)
                 .Where(s => s.TenantId == tenantId && s.CourseId == courseId && s.BranchId == branchId && !s.IsDeleted)
                 .Select(StudentResponseVM.ToViewModel)
                 .ToList();
