@@ -97,7 +97,7 @@ namespace SchoolManagement.Services.Implementation
             // 1. Get students of course+branch
             var students = _context.Students
                 .Where(s => s.TenantId == tenantId && s.BranchId == branchId && s.CourseId == courseId && !s.IsDeleted)
-                .OrderBy(s => s.Name)
+                .OrderBy(s => s.Id)
                 .ToList();
 
             var studentIds = students.Select(s => s.Id).ToList();
@@ -142,6 +142,7 @@ namespace SchoolManagement.Services.Implementation
                 var row = new AssessmentMatrixRow
                 {
                     SNo = serial++,
+                    StudentId = student.Id,
                     Name = student.Name,
                     Grades = new Dictionary<string, string>()
                 };

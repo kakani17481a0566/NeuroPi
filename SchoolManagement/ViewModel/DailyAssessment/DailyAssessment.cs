@@ -11,6 +11,7 @@ namespace SchoolManagement.ViewModel.DailyAssessment
     public class AssessmentMatrixRow
     {
         public int SNo { get; set; }
+        public int StudentId { get; set; }
         public string Name { get; set; }
         public Dictionary<string, string> Grades { get; set; } = new();
     }
