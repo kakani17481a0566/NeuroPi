@@ -51,9 +51,14 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
         public List<RoleResponseVM> GetAllRolesByTenantId(int tenantId)
         {
-            var roles = _context.Roles.Where(r => !r.IsDeleted && r.TenantId == tenantId).ToList();
+            var roles = _context.Roles
+                .Include(r => r.Tenant)  // 👈 Include tenant name
+                .Where(r => !r.IsDeleted && r.TenantId == tenantId)
+                .ToList();
+
             return roles.Any() ? RoleResponseVM.ToViewModelList(roles) : null;
         }
+
 
         public RoleResponseVM GetRoleById(int id)
         {
