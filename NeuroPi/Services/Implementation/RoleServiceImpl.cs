@@ -16,15 +16,37 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
         public RoleResponseVM AddRole(RoleRequestVM roleRequestVM)
         {
+            var existingRole = _context.Roles
+                .FirstOrDefault(r => r.TenantId == roleRequestVM.TenantId
+                                     && r.Name.ToLower() == roleRequestVM.Name.ToLower());
 
+            if (existingRole != null)
+            {
+                if (existingRole.IsDeleted)
+                {
+                    // Reactivate the role
+                    existingRole.IsDeleted = false;
+                    existingRole.UpdatedBy = roleRequestVM.CreatedBy;
+                    existingRole.UpdatedOn = DateTime.UtcNow;
+                    _context.SaveChanges();
 
-            var roleModel = RoleRequestVM.ToModel(roleRequestVM);
-            roleModel.CreatedOn = DateTime.UtcNow;
-            _context.Roles.Add(roleModel);
+                    return RoleResponseVM.ToViewModel(existingRole);
+                }
+
+                // Already exists and not deleted → Reject
+                throw new Exception($"Role '{roleRequestVM.Name}' already exists for this tenant.");
+            }
+
+            // New role
+            var newRole = RoleRequestVM.ToModel(roleRequestVM);
+            newRole.CreatedOn = DateTime.UtcNow;
+
+            _context.Roles.Add(newRole);
             var result = _context.SaveChanges();
 
-            return result > 0 ? RoleResponseVM.ToViewModel(roleModel) : null;
+            return result > 0 ? RoleResponseVM.ToViewModel(newRole) : null;
         }
+
 
         public bool DeleteRoleByTenantIdAndId(int tenantId, int id)
         {
