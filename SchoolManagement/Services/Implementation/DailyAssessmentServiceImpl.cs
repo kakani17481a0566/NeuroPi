@@ -92,78 +92,78 @@ namespace SchoolManagement.Services.Implementation
             _context.SaveChanges();
             return true;
         }
-        public AssessmentMatrixResponse GetAssessmentMatrixByTimeTable(int tenantId, int courseId, int branchId, int timeTableId)
-        {
-            // 1. Get students of course+branch
-            var students = _context.Students
-                .Where(s => s.TenantId == tenantId && s.BranchId == branchId && s.CourseId == courseId && !s.IsDeleted)
-                .OrderBy(s => s.Id)
-                .ToList();
+        //public AssessmentMatrixResponse GetAssessmentMatrixByTimeTable(int tenantId, int courseId, int branchId, int timeTableId)
+        //{
+        //    // 1. Get students of course+branch
+        //    var students = _context.Students
+        //        .Where(s => s.TenantId == tenantId && s.BranchId == branchId && s.CourseId == courseId && !s.IsDeleted)
+        //        .OrderBy(s => s.Id)
+        //        .ToList();
 
-            var studentIds = students.Select(s => s.Id).ToList();
+        //    var studentIds = students.Select(s => s.Id).ToList();
 
-            // 2. Get Daily Assessments for this timetable
-            var dailyAssessments = _context.DailyAssessments
-                .Where(d =>
-                    d.TenantId == tenantId &&
-                    d.BranchId == branchId &&
-                    d.TimeTableId == timeTableId &&
-                    !d.IsDeleted &&
-                    studentIds.Contains(d.StudentId))
-                .Include(d => d.Grade)
-                .Include(d => d.Assessment)
-                    .ThenInclude(a => a.AssessmentSkill)
-                .ToList();
+        //    // 2. Get Daily Assessments for this timetable
+        //    var dailyAssessments = _context.DailyAssessments
+        //        .Where(d =>
+        //            d.TenantId == tenantId &&
+        //            d.BranchId == branchId &&
+        //            d.TimeTableId == timeTableId &&
+        //            !d.IsDeleted &&
+        //            studentIds.Contains(d.StudentId))
+        //        .Include(d => d.Grade)
+        //        .Include(d => d.Assessment)
+        //            .ThenInclude(a => a.AssessmentSkill)
+        //        .ToList();
 
-            // 3. Extract assessments present in this time table only
-            var uniqueAssessments = dailyAssessments
-                .Select(d => d.Assessment)
-                .Where(a => a != null && !string.IsNullOrEmpty(a.Name))
-                .GroupBy(a => a.Name)
-                .ToDictionary(g => g.Key, g => g.First().Id);
+        //    // 3. Extract assessments present in this time table only
+        //    var uniqueAssessments = dailyAssessments
+        //        .Select(d => d.Assessment)
+        //        .Where(a => a != null && !string.IsNullOrEmpty(a.Name))
+        //        .GroupBy(a => a.Name)
+        //        .ToDictionary(g => g.Key, g => g.First().Id);
 
-            var headers = new List<string> { "S.NO.", "NAME OF THE STUDENT" };
-            headers.AddRange(uniqueAssessments.Keys.OrderBy(name => name));
+        //    var headers = new List<string> { "S.NO.", "NAME OF THE STUDENT" };
+        //    headers.AddRange(uniqueAssessments.Keys.OrderBy(name => name));
 
-            // 4. Build Matrix Rows
-            var rows = new List<AssessmentMatrixRow>();
-            int serial = 1;
+        //    // 4. Build Matrix Rows
+        //    var rows = new List<AssessmentMatrixRow>();
+        //    int serial = 1;
 
-            foreach (var student in students)
-            {
-                var row = new AssessmentMatrixRow
-                {
-                    SNo = serial++,
-                    StudentId = student.Id,
-                    Name = student.Name,
-                    Grades = new Dictionary<string, GradeDetail>()
-                };
+        //    foreach (var student in students)
+        //    {
+        //        var row = new AssessmentMatrixRow
+        //        {
+        //            SNo = serial++,
+        //            StudentId = student.Id,
+        //            Name = student.Name,
+        //            Grades = new Dictionary<string, GradeDetail>()
+        //        };
 
-                foreach (var entry in uniqueAssessments)
-                {
-                    var assessmentName = entry.Key;
-                    var assessmentId = entry.Value;
+        //        foreach (var entry in uniqueAssessments)
+        //        {
+        //            var assessmentName = entry.Key;
+        //            var assessmentId = entry.Value;
 
-                    var da = dailyAssessments.FirstOrDefault(d =>
-                        d.StudentId == student.Id &&
-                        d.AssessmentId == assessmentId);
+        //            var da = dailyAssessments.FirstOrDefault(d =>
+        //                d.StudentId == student.Id &&
+        //                d.AssessmentId == assessmentId);
 
-                    row.Grades[assessmentName] = new GradeDetail
-                    {
-                        Grade = da?.Grade?.Name ?? "Marks Not Added",
-                        Id = da.Id
-                    };
-                }
+        //            row.Grades[assessmentName] = new GradeDetail
+        //            {
+        //                Grade = da?.Grade?.Name ?? "Marks Not Added",
+        //                Id = da.Id
+        //            };
+        //        }
 
-                rows.Add(row);
-            }
+        //        rows.Add(row);
+        //    }
 
-            return new AssessmentMatrixResponse
-            {
-                Headers = headers,
-                Rows = rows
-            };
-        }
+        //    return new AssessmentMatrixResponse
+        //    {
+        //        Headers = headers,
+        //        Rows = rows
+        //    };
+        //}
 
         public UpdateGradeResponseVm UpdateStudentGrade(int id, int timeTableId, int studentId, int branchId, int newGradeId)
         {

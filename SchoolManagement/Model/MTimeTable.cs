@@ -38,6 +38,11 @@ namespace SchoolManagement.Model
         public int? CourseId { get; set; }
         public virtual MCourse Course { get; set; }
 
+        [ForeignKey(nameof(AssessmentStatus))]
+        [Column("assessment_status_code")]
+        public int? AssessmentStatusCode { get; set; }
+        public virtual MMaster AssessmentStatus { get; set; }
+
         [Required]
         [ForeignKey(nameof(Tenant))]
         [Column("tenant_id")]

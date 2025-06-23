@@ -62,6 +62,8 @@ builder.Services.AddScoped<IGradeService, GradeServiceImpl>();
 builder.Services.AddScoped<IPublicHolidayService, PublicHolidayServiceImpl>();
 
 builder.Services.AddScoped<IBranchService, BranchServiceImpl>();
+builder.Services.AddScoped<IAssessmentMatrixService, AssessmentMatrixService>();
+
 
 //view
 builder.Services.AddScoped<IVwComprehensiveTimeTablesService, VwComprehensiveTimeTablesService>();
