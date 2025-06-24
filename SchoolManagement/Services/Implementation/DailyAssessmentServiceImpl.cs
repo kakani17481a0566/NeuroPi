@@ -205,26 +205,35 @@ namespace SchoolManagement.Services.Implementation
             {
                 var now = DateTime.UtcNow;
 
+                // Step 1: Preload existing DailyAssessment records for the same TimeTableId, BranchId, TenantId
+                var existingMap = _context.DailyAssessments
+                    .Where(x =>
+                        !x.IsDeleted &&
+                        x.TimeTableId == request.TimeTableId &&
+                        x.BranchId == request.BranchId &&
+                        x.TenantId == request.TenantId)
+                    .ToDictionary(x => (x.StudentId, x.AssessmentId));
+
+                // Step 2: Loop over submitted students and grades
                 foreach (var student in request.Students)
                 {
                     foreach (var gradeEntry in student.Grades)
                     {
-                        var existing = _context.DailyAssessments.FirstOrDefault(x =>
-                            !x.IsDeleted &&
-                            x.StudentId == student.StudentId &&
-                            x.AssessmentId == gradeEntry.AssessmentId &&
-                            x.TimeTableId == request.TimeTableId &&
-                            x.BranchId == request.BranchId &&
-                            x.TenantId == request.TenantId);
+                        var key = (student.StudentId, gradeEntry.AssessmentId);
 
-                        if (existing != null)
+                        if (existingMap.TryGetValue(key, out var existing))
                         {
-                            existing.GradeId = gradeEntry.GradeId;
-                            existing.UpdatedBy = request.ConductedById;
-                            existing.UpdatedOn = now;
+                            // Only update if grade is different
+                            if (existing.GradeId != gradeEntry.GradeId)
+                            {
+                                existing.GradeId = gradeEntry.GradeId;
+                                existing.UpdatedBy = request.ConductedById;
+                                existing.UpdatedOn = now;
+                            }
                         }
                         else
                         {
+                            // Create new assessment entry
                             var newEntry = new MDailyAssessment
                             {
                                 AssessmentDate = now,
@@ -243,6 +252,7 @@ namespace SchoolManagement.Services.Implementation
                     }
                 }
 
+                // Step 3: Save changes
                 _context.SaveChanges();
                 return true;
             }

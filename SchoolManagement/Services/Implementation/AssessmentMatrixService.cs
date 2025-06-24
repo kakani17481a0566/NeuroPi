@@ -16,40 +16,68 @@ namespace SchoolManagement.Services.Implementation
 
         public AssessmentMatrixResponse GetMatrix(int timeTableId, int tenantId, int courseId, int branchId)
         {
-            var students = _db.Students
+            // 1. Fetch students
+            var studentList = _db.Students
                 .Where(s => !s.IsDeleted && s.TenantId == tenantId && s.CourseId == courseId && s.BranchId == branchId)
                 .OrderBy(s => s.Id)
                 .ToList();
 
-            var studentIds = students.Select(s => s.Id).ToList();
+            var studentIds = studentList.Select(s => s.Id).ToList();
 
-            var dailyAssessments = _db.DailyAssessments
-                .Where(d => !d.IsDeleted && studentIds.Contains(d.StudentId) && d.TimeTableId == timeTableId)
-                .Include(d => d.Grade)
-                .ToList();
-
-            var assessments = _db.TimeTableAssessments
-                .Where(x => x.TimeTableId == timeTableId && !x.IsDeleted)
-                .Select(x => x.AssessmentId)
+            // 2. Fetch assessments linked to timetable
+            var assessmentIdList = _db.TimeTableAssessments
+                .Where(tt => tt.TimeTableId == timeTableId && !tt.IsDeleted)
+                .Select(tt => tt.AssessmentId)
                 .Distinct()
                 .ToList();
 
-            var assessmentNames = _db.Assessments
-                .Where(a => assessments.Contains(a.Id) && !a.IsDeleted)
+            // 3. Fetch full assessment details
+            var assessmentList = _db.Assessments
+                .Include(a => a.AssessmentSkill)
+                .Where(a => assessmentIdList.Contains(a.Id) && !a.IsDeleted)
                 .OrderBy(a => a.Id)
-                .ToDictionary(a => a.Id, a => a.Name);
+                .ToList();
 
-            var assessmentMap = dailyAssessments
-                .GroupBy(d => new { d.StudentId, d.AssessmentId })
-                .ToDictionary(g => g.Key, g => g.First());
+            // 4. Map headers
+            var assessmentNameMap = new Dictionary<int, string>();
+            var headerAssessmentMap = new Dictionary<string, int>();
 
+            foreach (var a in assessmentList)
+            {
+                var skillCode = a.AssessmentSkill?.Code?.Trim() ?? "SKILL";
+                var assessmentCode = a.Name?.Trim() ?? "CODE";
+             
+                var header = $"{assessmentCode}";
+
+
+                if (!assessmentNameMap.ContainsKey(a.Id))
+                {
+                    assessmentNameMap[a.Id] = header;
+                    headerAssessmentMap[header] = a.Id;
+                }
+            }
+
+            // 5. Fetch existing grades
+            var dailyAssessmentList = _db.DailyAssessments
+                .Where(da => !da.IsDeleted && da.TimeTableId == timeTableId && studentIds.Contains(da.StudentId))
+                .Include(da => da.Grade)
+                .ToList();
+
+            var assessmentLookup = dailyAssessmentList
+                .ToDictionary(
+                    da => (da.StudentId, da.AssessmentId),
+                    da => da
+                );
+
+            // 6. Build headers
             var headers = new List<string> { "Student Name" };
-            headers.AddRange(assessmentNames.Values.Select(name => name.Trim())); // ✅ Trim header names
+            headers.AddRange(assessmentNameMap.Values);
 
+            // 7. Build matrix rows
             var rows = new List<AssessmentMatrixRow>();
             int serial = 1;
 
-            foreach (var student in students)
+            foreach (var student in studentList)
             {
                 var row = new AssessmentMatrixRow
                 {
@@ -59,22 +87,22 @@ namespace SchoolManagement.Services.Implementation
                     AssessmentGrades = new Dictionary<string, GradeDetail>()
                 };
 
-                foreach (var kv in assessmentNames)
+                foreach (var kvp in assessmentNameMap)
                 {
-                    var key = new { StudentId = student.Id, AssessmentId = kv.Key };
-                    var cleanHeader = kv.Value.Trim(); // ✅ Trim dictionary key
+                    var assessmentId = kvp.Key;
+                    var header = kvp.Value;
 
-                    if (assessmentMap.TryGetValue(key, out var da))
+                    if (assessmentLookup.TryGetValue((student.Id, assessmentId), out var da))
                     {
-                        row.AssessmentGrades[cleanHeader] = new GradeDetail
+                        row.AssessmentGrades[header] = new GradeDetail
                         {
                             GradeId = da.GradeId ?? 0,
-                            GradeName = da.Grade?.Name ?? "Not Graded"
+                            GradeName = da.Grade?.Name?.Trim() ?? "Not Graded"
                         };
                     }
                     else
                     {
-                        row.AssessmentGrades[cleanHeader] = new GradeDetail
+                        row.AssessmentGrades[header] = new GradeDetail
                         {
                             GradeId = 0,
                             GradeName = "Not Graded"
@@ -85,20 +113,23 @@ namespace SchoolManagement.Services.Implementation
                 rows.Add(row);
             }
 
-            var assessmentStatuses = _db.Masters
+            // 8. Get grade status master values
+            var statusList = _db.Masters
                 .Where(m => m.MasterTypeId == 40 && !m.IsDeleted)
                 .Select(m => new AssessmentStatusVm
                 {
                     Id = m.Id,
-                    Name = m.Name
+                    Name = m.Name.Trim()
                 })
                 .ToList();
 
+            // 9. Final response
             return new AssessmentMatrixResponse
             {
                 Headers = headers,
                 Rows = rows,
-                AssessmentStatusCode = assessmentStatuses
+                AssessmentStatusCode = statusList,
+                HeaderSkillMap = headerAssessmentMap
             };
         }
     }

@@ -114,7 +114,7 @@ namespace SchoolManagement.Controllers
                 _service.SaveAssessmentMatrix(request);
                 return new ResponseResult<string>(
                     HttpStatusCode.Created,
-                    "Matrix saved",
+                    "Matrix saved",     
                     "Assessment matrix saved successfully."
                 );
             }

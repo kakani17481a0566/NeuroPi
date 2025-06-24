@@ -4,7 +4,10 @@
     {
         public List<string> Headers { get; set; } = new();
         public List<AssessmentMatrixRow> Rows { get; set; } = new();
-        public List<AssessmentStatusVm> AssessmentStatusCode { get; set; } // Changed from List<string>
+        public List<AssessmentStatusVm> AssessmentStatusCode { get; set; } = new();
+
+        // ✅ Header (e.g. "PSED[A1]") to AssessmentId map for safe saving
+        public Dictionary<string, int> HeaderSkillMap { get; set; } = new();
     }
 
     public class AssessmentMatrixRow
@@ -12,6 +15,7 @@
         public int SerialNumber { get; set; }
         public int StudentId { get; set; }
         public string StudentName { get; set; }
+
         public Dictionary<string, GradeDetail> AssessmentGrades { get; set; } = new();
     }
 
