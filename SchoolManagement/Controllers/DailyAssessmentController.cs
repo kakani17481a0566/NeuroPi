@@ -106,6 +106,28 @@ namespace SchoolManagement.Controllers
         }
 
 
+        [HttpPost("save-matrix")]
+        public ResponseResult<string> SaveAssessmentMatrix([FromBody] SaveAssessmentMatrixRequestVm request)
+        {
+            try
+            {
+                _service.SaveAssessmentMatrix(request);
+                return new ResponseResult<string>(
+                    HttpStatusCode.Created,
+                    "Matrix saved",
+                    "Assessment matrix saved successfully."
+                );
+            }
+            catch (Exception ex)
+            {
+                return new ResponseResult<string>(
+                    HttpStatusCode.InternalServerError,
+                    null,
+                    $"Failed to save matrix: {ex.Message}"
+                );
+            }
+        }
+
 
 
     }

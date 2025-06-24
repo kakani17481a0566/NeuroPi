@@ -1,7 +1,6 @@
 ﻿using SchoolManagement.Data;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.DailyAssessment;
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
 
 namespace SchoolManagement.Services.Implementation
@@ -27,7 +26,6 @@ namespace SchoolManagement.Services.Implementation
             var dailyAssessments = _db.DailyAssessments
                 .Where(d => !d.IsDeleted && studentIds.Contains(d.StudentId) && d.TimeTableId == timeTableId)
                 .Include(d => d.Grade)
-                .Include(d => d.Assessment)
                 .ToList();
 
             var assessments = _db.TimeTableAssessments
@@ -38,10 +36,15 @@ namespace SchoolManagement.Services.Implementation
 
             var assessmentNames = _db.Assessments
                 .Where(a => assessments.Contains(a.Id) && !a.IsDeleted)
+                .OrderBy(a => a.Id)
                 .ToDictionary(a => a.Id, a => a.Name);
 
+            var assessmentMap = dailyAssessments
+                .GroupBy(d => new { d.StudentId, d.AssessmentId })
+                .ToDictionary(g => g.Key, g => g.First());
+
             var headers = new List<string> { "Student Name" };
-            headers.AddRange(assessmentNames.Values.OrderBy(x => x));
+            headers.AddRange(assessmentNames.Values.Select(name => name.Trim())); // ✅ Trim header names
 
             var rows = new List<AssessmentMatrixRow>();
             int serial = 1;
@@ -58,19 +61,31 @@ namespace SchoolManagement.Services.Implementation
 
                 foreach (var kv in assessmentNames)
                 {
-                    var da = dailyAssessments.FirstOrDefault(d => d.StudentId == student.Id && d.AssessmentId == kv.Key);
+                    var key = new { StudentId = student.Id, AssessmentId = kv.Key };
+                    var cleanHeader = kv.Value.Trim(); // ✅ Trim dictionary key
 
-                    row.AssessmentGrades[kv.Value] = new GradeDetail
+                    if (assessmentMap.TryGetValue(key, out var da))
                     {
-                        GradeId = da?.GradeId ?? 0,
-                        GradeName = da?.Grade?.Name ?? "Not Graded"
-                    };
+                        row.AssessmentGrades[cleanHeader] = new GradeDetail
+                        {
+                            GradeId = da.GradeId ?? 0,
+                            GradeName = da.Grade?.Name ?? "Not Graded"
+                        };
+                    }
+                    else
+                    {
+                        row.AssessmentGrades[cleanHeader] = new GradeDetail
+                        {
+                            GradeId = 0,
+                            GradeName = "Not Graded"
+                        };
+                    }
                 }
 
                 rows.Add(row);
             }
 
-            var assessmentStatusList = _db.Masters
+            var assessmentStatuses = _db.Masters
                 .Where(m => m.MasterTypeId == 40 && !m.IsDeleted)
                 .Select(m => new AssessmentStatusVm
                 {
@@ -83,7 +98,7 @@ namespace SchoolManagement.Services.Implementation
             {
                 Headers = headers,
                 Rows = rows,
-                AssessmentStatusCode = assessmentStatusList
+                AssessmentStatusCode = assessmentStatuses
             };
         }
     }

@@ -199,6 +199,63 @@ namespace SchoolManagement.Services.Implementation
 
 
 
+        public bool SaveAssessmentMatrix(SaveAssessmentMatrixRequestVm request)
+        {
+            try
+            {
+                var now = DateTime.UtcNow;
+
+                foreach (var student in request.Students)
+                {
+                    foreach (var gradeEntry in student.Grades)
+                    {
+                        var existing = _context.DailyAssessments.FirstOrDefault(x =>
+                            !x.IsDeleted &&
+                            x.StudentId == student.StudentId &&
+                            x.AssessmentId == gradeEntry.AssessmentId &&
+                            x.TimeTableId == request.TimeTableId &&
+                            x.BranchId == request.BranchId &&
+                            x.TenantId == request.TenantId);
+
+                        if (existing != null)
+                        {
+                            existing.GradeId = gradeEntry.GradeId;
+                            existing.UpdatedBy = request.ConductedById;
+                            existing.UpdatedOn = now;
+                        }
+                        else
+                        {
+                            var newEntry = new MDailyAssessment
+                            {
+                                AssessmentDate = now,
+                                TimeTableId = request.TimeTableId,
+                                StudentId = student.StudentId,
+                                AssessmentId = gradeEntry.AssessmentId,
+                                GradeId = gradeEntry.GradeId,
+                                ConductedById = request.ConductedById,
+                                BranchId = request.BranchId,
+                                TenantId = request.TenantId,
+                                CreatedOn = now,
+                                CreatedBy = request.ConductedById
+                            };
+                            _context.DailyAssessments.Add(newEntry);
+                        }
+                    }
+                }
+
+                _context.SaveChanges();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] SaveAssessmentMatrix: {ex.Message}");
+                return false;
+            }
+        }
+
+
+
+
 
 
     }
