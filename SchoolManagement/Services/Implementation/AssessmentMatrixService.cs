@@ -46,7 +46,7 @@ namespace SchoolManagement.Services.Implementation
             {
                 var skillCode = a.AssessmentSkill?.Code?.Trim() ?? "SKILL";
                 var assessmentCode = a.Name?.Trim() ?? "CODE";
-             
+
                 var header = $"{assessmentCode}";
 
 
@@ -124,13 +124,30 @@ namespace SchoolManagement.Services.Implementation
                 .ToList();
 
             // 9. Final response
+
+
+
+            // 10. Get current status id from time_table
+            var currentStatusId = _db.TimeTables
+    .Where(tt => tt.Id == timeTableId && !tt.IsDeleted)
+    .Select(tt => tt.AssessmentStatusCode)
+    .FirstOrDefault() ?? 0; // ← this fixes it
+
+            var currentStatusName = _db.Masters
+                .Where(m => m.Id == currentStatusId && m.MasterTypeId == 40 && !m.IsDeleted)
+                .Select(m => m.Name.Trim())
+                .FirstOrDefault() ?? "UNKNOWN";
+
             return new AssessmentMatrixResponse
             {
                 Headers = headers,
                 Rows = rows,
                 AssessmentStatusCode = statusList,
-                HeaderSkillMap = headerAssessmentMap
+                HeaderSkillMap = headerAssessmentMap,
+                CurrentStatusId = currentStatusId,
+                CurrentStatusName = currentStatusName
             };
+
         }
     }
 }

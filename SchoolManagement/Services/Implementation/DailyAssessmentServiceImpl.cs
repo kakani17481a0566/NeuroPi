@@ -205,7 +205,7 @@ namespace SchoolManagement.Services.Implementation
             {
                 var now = DateTime.UtcNow;
 
-                // Step 1: Preload existing DailyAssessment records for the same TimeTableId, BranchId, TenantId
+                // Step 1: Preload existing DailyAssessment records
                 var existingMap = _context.DailyAssessments
                     .Where(x =>
                         !x.IsDeleted &&
@@ -214,16 +214,23 @@ namespace SchoolManagement.Services.Implementation
                         x.TenantId == request.TenantId)
                     .ToDictionary(x => (x.StudentId, x.AssessmentId));
 
-                // Step 2: Loop over submitted students and grades
+                bool allStudentsFullyGraded = true;
+
+                // Step 2: Process student grades
                 foreach (var student in request.Students)
                 {
                     foreach (var gradeEntry in student.Grades)
                     {
                         var key = (student.StudentId, gradeEntry.AssessmentId);
 
+                        // Check if any grade is 0 (Not Graded)
+                        if (gradeEntry.GradeId == 0)
+                        {
+                            allStudentsFullyGraded = false;
+                        }
+
                         if (existingMap.TryGetValue(key, out var existing))
                         {
-                            // Only update if grade is different
                             if (existing.GradeId != gradeEntry.GradeId)
                             {
                                 existing.GradeId = gradeEntry.GradeId;
@@ -233,7 +240,6 @@ namespace SchoolManagement.Services.Implementation
                         }
                         else
                         {
-                            // Create new assessment entry
                             var newEntry = new MDailyAssessment
                             {
                                 AssessmentDate = now,
@@ -252,8 +258,27 @@ namespace SchoolManagement.Services.Implementation
                     }
                 }
 
-                // Step 3: Save changes
+                // Step 3: Save all assessment grades
                 _context.SaveChanges();
+
+                // Step 4: Update assessment status to COMPLETED only if all students graded
+                var timeTableAssessment = _context.TimeTableAssessments.FirstOrDefault(x =>
+                    !x.IsDeleted &&
+                    x.TimeTableId == request.TimeTableId &&
+                    x.TenantId == request.TenantId 
+                   
+                );
+
+                if (timeTableAssessment != null)
+                {
+                    timeTableAssessment.Status = allStudentsFullyGraded ? "COMPLETED" : "IN-PROGRESS";
+                    timeTableAssessment.UpdatedOn = now;
+                    timeTableAssessment.UpdatedBy = request.ConductedById;
+
+                    _context.TimeTableAssessments.Update(timeTableAssessment);
+                    _context.SaveChanges();
+                }
+
                 return true;
             }
             catch (Exception ex)

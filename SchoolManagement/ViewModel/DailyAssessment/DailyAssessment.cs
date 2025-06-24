@@ -8,6 +8,9 @@
 
         // ✅ Header (e.g. "PSED[A1]") to AssessmentId map for safe saving
         public Dictionary<string, int> HeaderSkillMap { get; set; } = new();
+
+        public int CurrentStatusId { get; set; }
+        public string CurrentStatusName { get; set; }
     }
 
     public class AssessmentMatrixRow
