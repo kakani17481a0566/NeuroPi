@@ -235,6 +235,7 @@ namespace SchoolManagement.Services.Implementation
                 Month = $"{first.Date?.ToString("MMMM")} {first.StartDate?.ToString("dd")} - {first.EndDate?.ToString("dd")}",
                 WeekName = first.WeekName,
                 Course = first.CourseName,
+                courseId=(int)first.CourseId,
                 Events = eventList,
                 Headers = headers,
                 TimeTableData = timetableData,

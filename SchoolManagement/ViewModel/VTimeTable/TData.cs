@@ -35,6 +35,7 @@ namespace SchoolManagement.ViewModel.VTimeTable
         public string Month { get; set; }
         public string WeekName { get; set; }
         public string Course { get; set; }
+        public int courseId { get; set; }
 
         public List<EventInfo> Events { get; set; }
 
