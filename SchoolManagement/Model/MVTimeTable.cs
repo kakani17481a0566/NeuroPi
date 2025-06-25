@@ -78,6 +78,9 @@ namespace SchoolManagement.Model
         [Column("topic_type_code")]
         public string? TopicTypeCode { get; set; }
 
+        [Column("assessment_status_code")]
+        public int assessmentId { get; set; }
+
         
 
 

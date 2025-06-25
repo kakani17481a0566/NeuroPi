@@ -23,5 +23,7 @@ namespace SchoolManagement.Services.Interface
         bool Delete(int id, int tenantId);
 
         //MTableFileResponseVM GetAllByCourseId(int courseId);
+
+        String GetWeekTimeTable(int courseId,int tenantId);
     }
 }

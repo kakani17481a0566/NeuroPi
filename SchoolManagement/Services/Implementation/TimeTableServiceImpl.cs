@@ -15,10 +15,13 @@ namespace SchoolManagement.Services.Implementation
     public class TimeTableServiceImpl : ITimeTableServices
     {
         private readonly SchoolManagementDb _dbContext;
+        private readonly ILogger _logger;
 
-        public TimeTableServiceImpl(SchoolManagementDb dbContext)
+
+        public TimeTableServiceImpl(SchoolManagementDb dbContext, ILogger<TimeTableServiceImpl> logger)
         {
             _dbContext = dbContext;
+            _logger = logger;
         }
 
         public List<TimeTableResponseVM> GetAll()
@@ -102,6 +105,8 @@ namespace SchoolManagement.Services.Implementation
         {
             var query = _dbContext.VTimeTable
                 .Where(x => x.TenantId == tenantId && x.CourseId == courseId);
+            _logger.LogInformation("query is", query);
+            
 
             if (weekId > 0)
             {
@@ -142,6 +147,7 @@ namespace SchoolManagement.Services.Implementation
             {
                 var date = group.Key;
                 var timeTableId = group.First().TimeTableId;
+                var assessmentId = group.First().assessmentId;
 
                 var tData = new TData
                 {
@@ -174,6 +180,9 @@ namespace SchoolManagement.Services.Implementation
                 tData.Column5 = periods[3];
                 tData.Column6 = periods[4];
                 tData.Column7 = periods[5];
+                tData.Column7 = periods[5];
+                tData.timeTableId = (int)timeTableId;
+                tData.assessmentStausCodeId = assessmentId;
 
                 // Column8: First PDF link
                 tData.Column8 = _dbContext.TableFiles
@@ -232,6 +241,15 @@ namespace SchoolManagement.Services.Implementation
                 Resources = groupedResources,
                 CurrentDate = DateTime.UtcNow.ToString("dd/MM/yyyy")
             };
+        }
+
+        public string GetWeekTimeTable(int courseId, int tenantId)
+        {
+            var day = DateTime.UtcNow.DayOfWeek;
+            string today = day.ToString("dddd");
+
+            return today;
+
         }
 
 

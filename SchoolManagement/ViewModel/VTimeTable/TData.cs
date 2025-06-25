@@ -15,6 +15,8 @@ namespace SchoolManagement.ViewModel.VTimeTable
         public string Column8 { get; set; }
 
         public string Column9 { get; set; }
+        public int timeTableId { get; set; }
+        public int assessmentStausCodeId{ get; set; }
 
         // ⬅️ New list for video resources
 

@@ -110,5 +110,12 @@ namespace SchoolManagement.Controllers
 
 
 
+        [HttpGet("/week/{courseId}/{tenantId}")]
+        public ResponseResult<String> GetWeekTimeTable([FromQuery]int courseId,int tenantId)
+        {
+            var result=_service.GetWeekTimeTable(courseId, tenantId);
+            return new ResponseResult<string>(HttpStatusCode.OK, result, "Data Fetched successfully");
+        }
+
     }
 }
