@@ -56,6 +56,8 @@ namespace SchoolManagement.Data
 
         public DbSet<MTimeTableAssessment> TimeTableAssessments { get; set; }
 
+        public DbSet<MStudentAttendance> StudentAttendance { get; set; }
+
 
 
         // views

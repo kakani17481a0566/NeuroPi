@@ -40,5 +40,10 @@ namespace SchoolManagement.Model
         [ForeignKey("Branch")]
         public int? BranchId { get; set; }
         public virtual MBranch Branch { get; set; }
+
+        [Column("tenant_id")]
+        [ForeignKey("Tenant")]
+        public int TenantId { get; set; }
+        public virtual MTenant Tenant { get; set; }
     }
 }

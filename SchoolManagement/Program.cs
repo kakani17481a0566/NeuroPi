@@ -56,6 +56,7 @@ builder.Services.AddScoped<IBranchService, BranchServiceImpl>();
 builder.Services.AddScoped<ITimeTableAssessmentService, TimeTableAssessmentServiceImpl>();
 builder.Services.AddScoped<IEmployeeService, EmployeeServiceImpl>();
 builder.Services.AddScoped<IGradeService, GradeServiceImpl>();
+builder.Services.AddScoped<IStudentAttendanceService, StudentAttendanceServiceImpl>();
 
 
 
