@@ -64,6 +64,7 @@ namespace SchoolManagement.Services.Implementation
         }
 
 
+
         public MVTermTableWeeklyMatrixVM GetTermTableWeeklyMatrix(int tenantId, int courseId, int termId)
         {
             var result = _dbContext.VTermTable

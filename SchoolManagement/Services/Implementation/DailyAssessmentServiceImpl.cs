@@ -198,7 +198,6 @@ namespace SchoolManagement.Services.Implementation
 
 
 
-
         public bool SaveAssessmentMatrix(SaveAssessmentMatrixRequestVm request)
         {
             try
@@ -252,107 +251,35 @@ namespace SchoolManagement.Services.Implementation
 
                 _context.SaveChanges(); // Save grades first
 
-                // Step 3: Load expected student and assessment IDs
-                var expectedStudentIds = _context.Students
-                    .Where(s =>
-                        !s.IsDeleted &&
-                        s.TenantId == request.TenantId &&
-                        s.BranchId == request.BranchId &&
-                        s.CourseId == request.CourseId)
-                    .Select(s => s.Id)
-                    .ToHashSet();
+                // Step 3: Update timetable assessment status only from frontend override
+           {
+                    var timeTable = _context.TimeTables
+                        .FirstOrDefault(tt =>
+                            !tt.IsDeleted &&
+                            tt.Id == request.TimeTableId &&
+                            tt.TenantId == request.TenantId);
 
-                var expectedAssessmentIds = _context.TimeTableAssessments
-                    .Where(t =>
-                        !t.IsDeleted &&
-                        t.TimeTableId == request.TimeTableId)
-                    .Select(t => t.AssessmentId)
-                    .ToHashSet();
-
-                int expectedCount = expectedStudentIds.Count * expectedAssessmentIds.Count;
-
-                // Step 4: Count valid grades (excluding Not Graded = 0 and Absent = 6)
-                int actualGradedCount = _context.DailyAssessments
-                    .Where(x =>
-                        !x.IsDeleted &&
-                        x.TimeTableId == request.TimeTableId &&
-                        x.BranchId == request.BranchId &&
-                        x.TenantId == request.TenantId &&
-                        x.GradeId > 0 &&
-                        x.GradeId != 6 &&
-                        expectedStudentIds.Contains(x.StudentId) &&
-                        expectedAssessmentIds.Contains(x.AssessmentId))
-                    .Select(x => new { x.StudentId, x.AssessmentId })
-                    .Distinct()
-                    .Count();
-
-                bool allGraded = actualGradedCount == expectedCount;
-
-                // Step 5: Update TimeTable assessment status
-                const int STATUS_IN_PROGRESS = 172;
-                const int STATUS_COMPLETED = 174;
-
-                var timeTable = _context.TimeTables
-                    .FirstOrDefault(tt =>
-                        !tt.IsDeleted &&
-                        tt.Id == request.TimeTableId &&
-                        tt.TenantId == request.TenantId);
-
-                if (timeTable != null)
-                {
-                    int newStatus;
-
-                    // ✅ Priority 1: Use override if provided
-                    if (request.OverrideStatusCode.HasValue)
+                    if (timeTable != null)
                     {
-                        newStatus = request.OverrideStatusCode.Value;
-                        Console.WriteLine($"[DEBUG] OverrideStatusCode applied: {newStatus}");
-                    }
-                    // ✅ Priority 2: Use status logic mode
-                    else if (!string.IsNullOrEmpty(request.StatusLogicMode))
-                    {
-                        switch (request.StatusLogicMode.Trim().ToLowerInvariant())
-                        {
-                            case "forcecomplete":
-                                newStatus = STATUS_COMPLETED;
-                                break;
-                            case "forceinprogress":
-                                newStatus = STATUS_IN_PROGRESS;
-                                break;
-                            case "auto":
-                            default:
-                                newStatus = allGraded ? STATUS_COMPLETED : STATUS_IN_PROGRESS;
-                                break;
-                        }
-                        Console.WriteLine($"[DEBUG] StatusLogicMode applied: {request.StatusLogicMode} => {newStatus}");
-                    }
-                    // ✅ Fallback logic
-                    else
-                    {
-                        newStatus = allGraded ? STATUS_COMPLETED : STATUS_IN_PROGRESS;
-                        Console.WriteLine($"[DEBUG] Default status logic applied => {newStatus}");
-                    }
 
-                    if (timeTable.AssessmentStatusCode != newStatus)
-                    {
-                        timeTable.AssessmentStatusCode = newStatus;
+
+
+                        timeTable.AssessmentStatusCode = request.OverrideStatusCode;
                         timeTable.UpdatedBy = request.ConductedById;
                         timeTable.UpdatedOn = now;
 
-                        _context.TimeTables.Update(timeTable);
+                        //_context.TimeTables.Update(timeTable);
                         _context.SaveChanges();
 
-                        Console.WriteLine($"[DEBUG] TimeTable status updated to: {(newStatus == STATUS_COMPLETED ? "COMPLETED" : "IN-PROGRESS")} | Graded: {actualGradedCount}/{expectedCount}");
+                        Console.WriteLine($"[DEBUG] TimeTable status updated to: {request.OverrideStatusCode}");
                     }
+
                     else
                     {
-                        Console.WriteLine($"[DEBUG] TimeTable status unchanged: {(newStatus == STATUS_COMPLETED ? "COMPLETED" : "IN-PROGRESS")} | Graded: {actualGradedCount}/{expectedCount}");
+                        Console.WriteLine($"[DEBUG] TimeTable status already set to: {request.OverrideStatusCode}");
                     }
-                }
-                else
-                {
-                    Console.WriteLine($"[ERROR] TimeTable not found for ID: {request.TimeTableId}");
-                }
+                    }
+                  
 
                 return true;
             }
@@ -362,9 +289,6 @@ namespace SchoolManagement.Services.Implementation
                 return false;
             }
         }
-
-
-
 
 
 

@@ -10,11 +10,8 @@
 
         public List<StudentAssessmentGradeVm> Students { get; set; } = new();
 
-        // ✅ Optional: allow user to override status manually
-        public int? OverrideStatusCode { get; set; }
-
-        // ✅ Optional: allow user to choose predefined logic mode
-        public string? StatusLogicMode { get; set; } // "auto", "forceComplete", "forceInProgress"
+        // ✅ Required now: status always comes from frontend
+        public int OverrideStatusCode { get; set; }
     }
 
     public class StudentAssessmentGradeVm
