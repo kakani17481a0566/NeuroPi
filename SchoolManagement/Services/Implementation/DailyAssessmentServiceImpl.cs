@@ -198,14 +198,13 @@ namespace SchoolManagement.Services.Implementation
 
 
 
-
         public bool SaveAssessmentMatrix(SaveAssessmentMatrixRequestVm request)
         {
             try
             {
                 var now = DateTime.UtcNow;
 
-                // Step 1: Preload existing DailyAssessment records
+                // Step 1: Load existing DailyAssessment records
                 var existingMap = _context.DailyAssessments
                     .Where(x =>
                         !x.IsDeleted &&
@@ -214,80 +213,82 @@ namespace SchoolManagement.Services.Implementation
                         x.TenantId == request.TenantId)
                     .ToDictionary(x => (x.StudentId, x.AssessmentId));
 
-                bool allStudentsFullyGraded = true;
-
-                // Step 2: Process student grades
+                // Step 2: Save or update grades
                 foreach (var student in request.Students)
                 {
-                    foreach (var gradeEntry in student.Grades)
+                    foreach (var grade in student.Grades)
                     {
-                        var key = (student.StudentId, gradeEntry.AssessmentId);
-
-                        // Check if any grade is 0 (Not Graded)
-                        if (gradeEntry.GradeId == 0)
-                        {
-                            allStudentsFullyGraded = false;
-                        }
+                        var key = (student.StudentId, grade.AssessmentId);
 
                         if (existingMap.TryGetValue(key, out var existing))
                         {
-                            if (existing.GradeId != gradeEntry.GradeId)
+                            if (existing.GradeId != grade.GradeId)
                             {
-                                existing.GradeId = gradeEntry.GradeId;
+                                existing.GradeId = grade.GradeId;
                                 existing.UpdatedBy = request.ConductedById;
                                 existing.UpdatedOn = now;
                             }
                         }
                         else
                         {
-                            var newEntry = new MDailyAssessment
+                            _context.DailyAssessments.Add(new MDailyAssessment
                             {
                                 AssessmentDate = now,
                                 TimeTableId = request.TimeTableId,
                                 StudentId = student.StudentId,
-                                AssessmentId = gradeEntry.AssessmentId,
-                                GradeId = gradeEntry.GradeId,
+                                AssessmentId = grade.AssessmentId,
+                                GradeId = grade.GradeId,
                                 ConductedById = request.ConductedById,
                                 BranchId = request.BranchId,
                                 TenantId = request.TenantId,
+                                CreatedBy = request.ConductedById,
                                 CreatedOn = now,
-                                CreatedBy = request.ConductedById
-                            };
-                            _context.DailyAssessments.Add(newEntry);
+                                IsDeleted = false
+                            });
                         }
                     }
                 }
 
-                // Step 3: Save all assessment grades
-                _context.SaveChanges();
+                _context.SaveChanges(); // Save grades first
 
-                // Step 4: Update assessment status to COMPLETED only if all students graded
-                var timeTableAssessment = _context.TimeTableAssessments.FirstOrDefault(x =>
-                    !x.IsDeleted &&
-                    x.TimeTableId == request.TimeTableId &&
-                    x.TenantId == request.TenantId 
-                   
-                );
+                // Step 3: Update timetable assessment status only from frontend override
+           {
+                    var timeTable = _context.TimeTables
+                        .FirstOrDefault(tt =>
+                            !tt.IsDeleted &&
+                            tt.Id == request.TimeTableId &&
+                            tt.TenantId == request.TenantId);
 
-                if (timeTableAssessment != null)
-                {
-                    timeTableAssessment.Status = allStudentsFullyGraded ? "COMPLETED" : "IN-PROGRESS";
-                    timeTableAssessment.UpdatedOn = now;
-                    timeTableAssessment.UpdatedBy = request.ConductedById;
+                    if (timeTable != null)
+                    {
 
-                    _context.TimeTableAssessments.Update(timeTableAssessment);
-                    _context.SaveChanges();
-                }
+
+
+                        timeTable.AssessmentStatusCode = request.OverrideStatusCode;
+                        timeTable.UpdatedBy = request.ConductedById;
+                        timeTable.UpdatedOn = now;
+
+                        //_context.TimeTables.Update(timeTable);
+                        _context.SaveChanges();
+
+                        Console.WriteLine($"[DEBUG] TimeTable status updated to: {request.OverrideStatusCode}");
+                    }
+
+                    else
+                    {
+                        Console.WriteLine($"[DEBUG] TimeTable status already set to: {request.OverrideStatusCode}");
+                    }
+                    }
+                  
 
                 return true;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ERROR] SaveAssessmentMatrix: {ex.Message}");
+                Console.WriteLine($"[ERROR] SaveAssessmentMatrix Exception: {ex.Message}");
                 return false;
             }
         }
-
 
 
 

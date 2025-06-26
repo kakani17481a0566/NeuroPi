@@ -64,6 +64,7 @@ namespace SchoolManagement.Services.Implementation
         }
 
 
+
         public MVTermTableWeeklyMatrixVM GetTermTableWeeklyMatrix(int tenantId, int courseId, int termId)
         {
             var result = _dbContext.VTermTable
@@ -78,7 +79,8 @@ namespace SchoolManagement.Services.Implementation
 
             var vm = new MVTermTableWeeklyMatrixVM
             {
-                Month = $"{term.TermName} {term.StartDate?.ToString("yyyy-MM-dd")} - {term.EndDate?.ToString("yyyy-MM-dd")}",
+                Month = $"{term.TermName} Term Start Date : {(term.StartDate?.ToString("yyyy-MM-dd") ?? "-")} |  Term End Date : {(term.EndDate?.ToString("yyyy-MM-dd") ?? "-")}",
+
                 Week = $"{term.WeekName} ({term.WeekStart?.ToString("yyyy-MM-dd")} - {term.WeekEnd?.ToString("yyyy-MM-dd")})",
                 //Week = $"{term.WeekName} ({term.WeekStart?.ToString("dd")} - {term.WeekEnd?.ToString("dd")})",
 
@@ -102,11 +104,13 @@ namespace SchoolManagement.Services.Implementation
 
             foreach (var weekGroup in groupedByWeek)
             {
-                var weekStart = weekGroup.Min(x => x.Date)?.ToString("dd") ?? "";
-                var weekEnd = weekGroup.Max(x => x.Date)?.ToString("dd") ?? "";
+                var weekStart = weekGroup.Min(x => x.Date)?.ToString("dd MMM yyyy") ?? "";
+                var weekEnd = weekGroup.Max(x => x.Date)?.ToString("dd MMM yyyy") ?? "";
+
                 var row = new WeeklyTopicMatrixRow
                 {
-                    COLUM1 = $"{weekGroup.Key.WeekName} ({weekStart} - {weekEnd})",
+                    COLUM1 = $"{weekGroup.Key.WeekName}\n({weekStart} - {weekEnd})",
+
                     COLUM2 = "",
                     COLUM3 = "",
                     COLUM4 = "",
