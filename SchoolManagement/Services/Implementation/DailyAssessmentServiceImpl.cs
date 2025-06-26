@@ -205,7 +205,7 @@ namespace SchoolManagement.Services.Implementation
             {
                 var now = DateTime.UtcNow;
 
-                // Step 1: Preload existing DailyAssessment records
+                // Step 1: Load existing DailyAssessment records
                 var existingMap = _context.DailyAssessments
                     .Where(x =>
                         !x.IsDeleted &&
@@ -214,79 +214,156 @@ namespace SchoolManagement.Services.Implementation
                         x.TenantId == request.TenantId)
                     .ToDictionary(x => (x.StudentId, x.AssessmentId));
 
-                bool allStudentsFullyGraded = true;
-
-                // Step 2: Process student grades
+                // Step 2: Save or update grades
                 foreach (var student in request.Students)
                 {
-                    foreach (var gradeEntry in student.Grades)
+                    foreach (var grade in student.Grades)
                     {
-                        var key = (student.StudentId, gradeEntry.AssessmentId);
-
-                        // Check if any grade is 0 (Not Graded)
-                        if (gradeEntry.GradeId == 0)
-                        {
-                            allStudentsFullyGraded = false;
-                        }
+                        var key = (student.StudentId, grade.AssessmentId);
 
                         if (existingMap.TryGetValue(key, out var existing))
                         {
-                            if (existing.GradeId != gradeEntry.GradeId)
+                            if (existing.GradeId != grade.GradeId)
                             {
-                                existing.GradeId = gradeEntry.GradeId;
+                                existing.GradeId = grade.GradeId;
                                 existing.UpdatedBy = request.ConductedById;
                                 existing.UpdatedOn = now;
                             }
                         }
                         else
                         {
-                            var newEntry = new MDailyAssessment
+                            _context.DailyAssessments.Add(new MDailyAssessment
                             {
                                 AssessmentDate = now,
                                 TimeTableId = request.TimeTableId,
                                 StudentId = student.StudentId,
-                                AssessmentId = gradeEntry.AssessmentId,
-                                GradeId = gradeEntry.GradeId,
+                                AssessmentId = grade.AssessmentId,
+                                GradeId = grade.GradeId,
                                 ConductedById = request.ConductedById,
                                 BranchId = request.BranchId,
                                 TenantId = request.TenantId,
+                                CreatedBy = request.ConductedById,
                                 CreatedOn = now,
-                                CreatedBy = request.ConductedById
-                            };
-                            _context.DailyAssessments.Add(newEntry);
+                                IsDeleted = false
+                            });
                         }
                     }
                 }
 
-                // Step 3: Save all assessment grades
-                _context.SaveChanges();
+                _context.SaveChanges(); // Save grades first
 
-                // Step 4: Update assessment status to COMPLETED only if all students graded
-                var timeTableAssessment = _context.TimeTableAssessments.FirstOrDefault(x =>
-                    !x.IsDeleted &&
-                    x.TimeTableId == request.TimeTableId &&
-                    x.TenantId == request.TenantId 
-                   
-                );
+                // Step 3: Load expected student and assessment IDs
+                var expectedStudentIds = _context.Students
+                    .Where(s =>
+                        !s.IsDeleted &&
+                        s.TenantId == request.TenantId &&
+                        s.BranchId == request.BranchId &&
+                        s.CourseId == request.CourseId)
+                    .Select(s => s.Id)
+                    .ToHashSet();
 
-                if (timeTableAssessment != null)
+                var expectedAssessmentIds = _context.TimeTableAssessments
+                    .Where(t =>
+                        !t.IsDeleted &&
+                        t.TimeTableId == request.TimeTableId)
+                    .Select(t => t.AssessmentId)
+                    .ToHashSet();
+
+                int expectedCount = expectedStudentIds.Count * expectedAssessmentIds.Count;
+
+                // Step 4: Count valid grades (excluding Not Graded = 0 and Absent = 6)
+                int actualGradedCount = _context.DailyAssessments
+                    .Where(x =>
+                        !x.IsDeleted &&
+                        x.TimeTableId == request.TimeTableId &&
+                        x.BranchId == request.BranchId &&
+                        x.TenantId == request.TenantId &&
+                        x.GradeId > 0 &&
+                        x.GradeId != 6 &&
+                        expectedStudentIds.Contains(x.StudentId) &&
+                        expectedAssessmentIds.Contains(x.AssessmentId))
+                    .Select(x => new { x.StudentId, x.AssessmentId })
+                    .Distinct()
+                    .Count();
+
+                bool allGraded = actualGradedCount == expectedCount;
+
+                // Step 5: Update TimeTable assessment status
+                const int STATUS_IN_PROGRESS = 172;
+                const int STATUS_COMPLETED = 174;
+
+                var timeTable = _context.TimeTables
+                    .FirstOrDefault(tt =>
+                        !tt.IsDeleted &&
+                        tt.Id == request.TimeTableId &&
+                        tt.TenantId == request.TenantId);
+
+                if (timeTable != null)
                 {
-                    timeTableAssessment.Status = allStudentsFullyGraded ? "COMPLETED" : "IN-PROGRESS";
-                    timeTableAssessment.UpdatedOn = now;
-                    timeTableAssessment.UpdatedBy = request.ConductedById;
+                    int newStatus;
 
-                    _context.TimeTableAssessments.Update(timeTableAssessment);
-                    _context.SaveChanges();
+                    // ✅ Priority 1: Use override if provided
+                    if (request.OverrideStatusCode.HasValue)
+                    {
+                        newStatus = request.OverrideStatusCode.Value;
+                        Console.WriteLine($"[DEBUG] OverrideStatusCode applied: {newStatus}");
+                    }
+                    // ✅ Priority 2: Use status logic mode
+                    else if (!string.IsNullOrEmpty(request.StatusLogicMode))
+                    {
+                        switch (request.StatusLogicMode.Trim().ToLowerInvariant())
+                        {
+                            case "forcecomplete":
+                                newStatus = STATUS_COMPLETED;
+                                break;
+                            case "forceinprogress":
+                                newStatus = STATUS_IN_PROGRESS;
+                                break;
+                            case "auto":
+                            default:
+                                newStatus = allGraded ? STATUS_COMPLETED : STATUS_IN_PROGRESS;
+                                break;
+                        }
+                        Console.WriteLine($"[DEBUG] StatusLogicMode applied: {request.StatusLogicMode} => {newStatus}");
+                    }
+                    // ✅ Fallback logic
+                    else
+                    {
+                        newStatus = allGraded ? STATUS_COMPLETED : STATUS_IN_PROGRESS;
+                        Console.WriteLine($"[DEBUG] Default status logic applied => {newStatus}");
+                    }
+
+                    if (timeTable.AssessmentStatusCode != newStatus)
+                    {
+                        timeTable.AssessmentStatusCode = newStatus;
+                        timeTable.UpdatedBy = request.ConductedById;
+                        timeTable.UpdatedOn = now;
+
+                        _context.TimeTables.Update(timeTable);
+                        _context.SaveChanges();
+
+                        Console.WriteLine($"[DEBUG] TimeTable status updated to: {(newStatus == STATUS_COMPLETED ? "COMPLETED" : "IN-PROGRESS")} | Graded: {actualGradedCount}/{expectedCount}");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"[DEBUG] TimeTable status unchanged: {(newStatus == STATUS_COMPLETED ? "COMPLETED" : "IN-PROGRESS")} | Graded: {actualGradedCount}/{expectedCount}");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"[ERROR] TimeTable not found for ID: {request.TimeTableId}");
                 }
 
                 return true;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ERROR] SaveAssessmentMatrix: {ex.Message}");
+                Console.WriteLine($"[ERROR] SaveAssessmentMatrix Exception: {ex.Message}");
                 return false;
             }
         }
+
+
 
 
 
