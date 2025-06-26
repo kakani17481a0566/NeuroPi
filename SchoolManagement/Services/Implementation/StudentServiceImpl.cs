@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Data;
 using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
+using SchoolManagement.ViewModel.Student;
 using SchoolManagement.ViewModel.Students;
 
 namespace SchoolManagement.Services.Implementation
@@ -96,14 +97,36 @@ namespace SchoolManagement.Services.Implementation
 
 
        
-     public List<StudentResponseVM> GetByTenantCourseBranch(int tenantId, int courseId, int branchId)
+     public StudentVM GetByTenantCourseBranch(int tenantId, int courseId, int branchId)
         {
-            return _context.Students
+            var result= _context.Students
                 .Include(s => s.Course)
                 .Include(s => s.Branch)
                 .Where(s => s.TenantId == tenantId && s.CourseId == courseId && s.BranchId == branchId && !s.IsDeleted)
-                .Select(StudentResponseVM.ToViewModel)
                 .ToList();
+            if(result!=null && result.Count > 0)
+            {
+                StudentVM student = new StudentVM();
+                student.CourseId = result.First().CourseId;
+                student.CourseName = result.First().Course.Name;
+                student.BranchId = result.First().BranchId;
+                student.BranchName = result.First().Branch.Name;
+                student.TenantId = result.First().TenantId;
+                List<Student> students = new List<Student>();
+                foreach(MStudent stu in result){
+                    Student s = new Student()
+                    {
+                        id = stu.Id,
+                        name = stu.Name
+                    };
+                    students.Add(s);
+
+                }
+                student.students = students;
+                return student;
+            }
+            return null;
+
         }
 
 

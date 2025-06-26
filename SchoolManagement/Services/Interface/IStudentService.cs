@@ -1,4 +1,5 @@
-﻿using SchoolManagement.ViewModel.Students;
+﻿using SchoolManagement.ViewModel.Student;
+using SchoolManagement.ViewModel.Students;
 using System.Collections.Generic;
 
 namespace SchoolManagement.Services.Interface
@@ -14,7 +15,7 @@ namespace SchoolManagement.Services.Interface
         StudentResponseVM Update(int id, StudentRequestVM request);
         StudentResponseVM Delete(int id);
 
-        List<StudentResponseVM> GetByTenantCourseBranch(int tenantId, int courseId, int branchId);
+        StudentVM GetByTenantCourseBranch(int tenantId, int courseId, int branchId);
 
 
     }

@@ -246,10 +246,9 @@ namespace SchoolManagement.Services.Implementation
 
         public string GetWeekTimeTable(int courseId, int tenantId)
         {
-            var day = DateTime.UtcNow.DayOfWeek;
-            string today = day.ToString("dddd");
+            string day = DateTime.UtcNow.DayOfWeek.ToString();
 
-            return today;
+            return day;
 
         }
 

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Response;
 using SchoolManagement.Services.Interface;
-
+using SchoolManagement.ViewModel.Student;
 using SchoolManagement.ViewModel.Students;
 using System.Net;
 
@@ -74,13 +74,13 @@ namespace SchoolManagement.Controllers
         }
 
         [HttpGet("by-tenant-course-branch")]
-        public ResponseResult<List<StudentResponseVM>> GetByTenantCourseBranch([FromQuery] int tenantId, [FromQuery] int courseId, [FromQuery] int branchId)
+        public ResponseResult<StudentVM> GetByTenantCourseBranch([FromQuery] int tenantId, [FromQuery] int courseId, [FromQuery] int branchId)
         {
             var data = _studentService.GetByTenantCourseBranch(tenantId, courseId, branchId);
-            if (data == null || data.Count == 0)
-                return new ResponseResult<List<StudentResponseVM>>(HttpStatusCode.NotFound, data, "No students found for given filters.");
+            if (data == null )
+                return new ResponseResult<StudentVM>(HttpStatusCode.NotFound, data, "No students found for given filters.");
 
-            return new ResponseResult<List<StudentResponseVM>>(HttpStatusCode.OK, data, "Filtered students fetched successfully.");
+            return new ResponseResult<StudentVM>(HttpStatusCode.OK, data, "Filtered students fetched successfully.");
         }
 
 

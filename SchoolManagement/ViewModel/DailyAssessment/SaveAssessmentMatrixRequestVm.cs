@@ -7,6 +7,8 @@
         public int BranchId { get; set; }
         public int ConductedById { get; set; }
 
+        public int assessmentCode { get; set; }
+
         public List<StudentAssessmentGradeVm> Students { get; set; } = new();
     }
 
