@@ -1,11 +1,11 @@
-﻿using System;
+﻿using NeuroPi.UserManagment.Model;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SchoolManagement.Model
 {
     [Table("course_teacher")]
-    public class MCourseTeacher
+    public class MCourseTeacher : MBaseModel
     {
         [Key]
         [Column("id")]
@@ -27,20 +27,12 @@ namespace SchoolManagement.Model
         [Column("tenant_id")]
         public int TenantId { get; set; }
 
-        [Column("created_on")]
-        public DateTimeOffset? CreatedOn { get; set; }
+        // Navigation properties
+        [ForeignKey("TenantId")]
+        public virtual MTenant Tenant { get; set; } = null!;
 
-        [Column("created_by")]
-        public int? CreatedBy { get; set; }
 
-        [Column("updated_on")]
-        public DateTimeOffset? UpdatedOn { get; set; }
 
-        [Column("updated_by")]
-        public int? UpdatedBy { get; set; }
-
-        [Required]
-        [Column("is_deleted")]
-        public bool IsDeleted { get; set; }
+        // Add other navigation properties like Course, Teacher, Branch if models exist
     }
 }

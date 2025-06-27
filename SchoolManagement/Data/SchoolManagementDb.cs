@@ -58,6 +58,8 @@ namespace SchoolManagement.Data
 
         public DbSet<MStudentAttendance> StudentAttendance { get; set; }
 
+        public DbSet<MCourseTeacher> CourseTeachers { get; set; }
+
 
 
         // views

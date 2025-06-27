@@ -2,37 +2,42 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SchoolManagement.Model
+[Table("books")]
+public class MBook : MBaseModel
 {
-    [Table("course_teacher")]
-    public class MCourseTeacher : MBaseModel
-    {
-        [Key]
-        [Column("id")]
-        public int Id { get; set; }
+    [Key]
+    [Column("id")]
+    public int Id { get; set; }
 
-        [Required]
-        [Column("course_id")]
-        public int CourseId { get; set; }
+    [Required]
+    [Column("name")]
+    public string Name { get; set; }
 
-        [Required]
-        [Column("teacher_id")]
-        public int TeacherId { get; set; }
+    [Column("parent_id")]
+    public int? ParentId { get; set; }
 
-        [Required]
-        [Column("branch_id")]
-        public int BranchId { get; set; }
+    [Column("user_id")]
+    public int? UserId { get; set; }
 
-        [Required]
-        [Column("tenant_id")]
-        public int TenantId { get; set; }
+    [Column("institution_id")]  
+    public int? InstitutionId { get; set; }
 
-        // Navigation properties
-        [ForeignKey("TenantId")]
-        public virtual MTenant Tenant { get; set; } = null!;
+    [Column("books_type_id")]
+    public int? BooksTypeId { get; set; }
 
+    [Column("tenant_id")]
+    public int TenantId { get; set; }
 
+    // Navigation properties
+    [ForeignKey("TenantId")]
+    public virtual MTenant Tenant { get; set; } = null!;
 
-        // Add other navigation properties like Course, Teacher, Branch if models exist
-    }
+    [ForeignKey("CreatedBy")]
+    public virtual MUser CreatedByUser { get; set; } = null!;
+
+    [ForeignKey("UpdatedBy")]
+    public virtual MUser? UpdatedByUser { get; set; }
+
+    [ForeignKey("ParentId")]
+    public virtual MBook? Parent { get; set; }
 }
