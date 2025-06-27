@@ -28,12 +28,12 @@ namespace NeuroPi.UserManagment.Services.Implementation
             var user = _context.Users.FirstOrDefault(u =>
                 !u.IsDeleted && u.Username == username && u.Password == password);
             MUserRole Role = null;
-            MDepartment department = null;
+            MUserDepartment department = null;
 
             if (user != null)
             {
                 Role = _context.UserRoles.Include(r => r.Role).FirstOrDefault(r => !r.IsDeleted && r.UserId == user.UserId && r.TenantId == user.TenantId);
-                department=_context.Departments.FirstOrDefault(d=>d.HeadUserId == user.UserId && !d.IsDeleted);
+                department=_context.UserDepartments.FirstOrDefault(d=>d.UserId == user.UserId && !d.IsDeleted);
 
             }
 
