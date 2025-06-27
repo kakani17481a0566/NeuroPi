@@ -84,5 +84,40 @@ namespace SchoolManagement.Controllers
                 : new ResponseResult<bool>(HttpStatusCode.NotFound, false, "Student attendance not found for the specified ID and tenant");
 
         }
+
+
+        [HttpGet("summary-structured")]
+        public IActionResult GetStructuredAttendanceSummary(
+            [FromQuery] DateTime? date,
+            [FromQuery] int tenantId,
+            [FromQuery] int branchId,
+            [FromQuery] int courseId // ✅ id as courseId
+        )
+        {
+            if (!date.HasValue)
+                return BadRequest("Date is required and must be in yyyy-MM-dd format.");
+
+            var records = _studentAttendanceService
+                .GetAttendanceSummary(date.Value, tenantId, branchId)
+                .Where(r => r.CourseId == courseId) // ✅ filter by courseId
+                .ToList();
+
+            var headers = typeof(StudentAttendanceSummaryVm)
+                .GetProperties()
+                .Select(p => char.ToLowerInvariant(p.Name[0]) + p.Name.Substring(1))
+                .ToList();
+
+            var response = new
+            {
+                id = courseId, // ✅ direct from query
+                headers,
+                data = records,
+            };
+
+            return Ok(response);
+        }
+
+
+
     }
 }

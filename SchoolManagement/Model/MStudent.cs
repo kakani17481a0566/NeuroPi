@@ -34,6 +34,9 @@ namespace SchoolManagement.Model
         [ForeignKey(nameof(BranchId))]
         public virtual MBranch Branch { get; set; }
 
+        public virtual ICollection<MStudentAttendance> StudentAttendances { get; set; } = new List<MStudentAttendance>();
+
+
         // Tenant navigation already present
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NeuroPi.UserManagment.Model;
 using SchoolManagement.Model;
 using SchoolManagement.ViewModel.VwTermPlanDetails;
@@ -74,20 +75,43 @@ namespace SchoolManagement.Data
 
 
 
+
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
+            base.OnModelCreating(modelBuilder); // Always call base first
 
-            modelBuilder.Entity<MVwComprehensiveTimeTable>().HasNoKey().ToView("vw_comprehensive_time_table");
+            // ✅ 1. Apply UTC conversion to all DateTime properties
+            var dateTimeProps = modelBuilder.Model
+                .GetEntityTypes()
+                .SelectMany(t => t.GetProperties())
+                .Where(p => p.ClrType == typeof(DateTime) || p.ClrType == typeof(DateTime?));
 
-            modelBuilder.Entity<MVwTermPlanDetails>().HasNoKey().ToView("vw_term_plan_details");
+            foreach (var prop in dateTimeProps)
+            {
+                prop.SetValueConverter(new ValueConverter<DateTime, DateTime>(
+                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc),
+                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc)
+                ));
+            }
 
-            modelBuilder.Entity<MVTimeTable>().HasNoKey().ToView("v_time_table");
+            // ✅ 2. Configure views
+            modelBuilder.Entity<MVwComprehensiveTimeTable>()
+                .HasNoKey()
+                .ToView("vw_comprehensive_time_table");
 
-            modelBuilder.Entity<MVTermTable>().HasNoKey().ToView("v_term_table");
+            modelBuilder.Entity<MVwTermPlanDetails>()
+                .HasNoKey()
+                .ToView("vw_term_plan_details");
 
-            //modelBuilder.Entity<MTimeTableAssessment>().ToTable("time_table_assessments");
+            modelBuilder.Entity<MVTimeTable>()
+                .HasNoKey()
+                .ToView("v_time_table");
 
+            modelBuilder.Entity<MVTermTable>()
+                .HasNoKey()
+                .ToView("v_term_table");
         }
+
     }
 }
