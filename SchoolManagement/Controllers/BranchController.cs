@@ -1,9 +1,10 @@
-﻿using System.Net;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NeuroPi.UserManagment.Response;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.Branch;
+using SchoolManagement.ViewModel.CourseTeacher;
+using System.Net;
 
 namespace SchoolManagement.Controllers
 {
@@ -86,13 +87,13 @@ namespace SchoolManagement.Controllers
 
         //sai vardhan
 
-        [HttpGet("/department/{departmentId}")]
-        public ResponseResult<BranchResponseVM> GetBranchByDepartmentId(int departmentId)
+        [HttpGet("/department/{departmentId}/user/{userId}")]
+        public ResponseResult<CourseTeacherVM> GetBranchByDepartmentId(int departmentId,int userId)
         {
-            var branch = _branchService.GetBranchByDepartmentId(departmentId);
+            var branch = _branchService.GetBranchByDepartmentId(departmentId, userId);
             return branch == null
-                ? new ResponseResult<BranchResponseVM>(HttpStatusCode.NotFound, null, "Branch not found")
-                : new ResponseResult<BranchResponseVM>(HttpStatusCode.OK, branch, "Branch retrieved successfully");
+                ? new ResponseResult<CourseTeacherVM>(HttpStatusCode.NotFound, null, "Branch not found")
+                : new ResponseResult<CourseTeacherVM>(HttpStatusCode.OK, branch, "Ids  Fetched  successfully");
         }
     }
 }

@@ -15,6 +15,10 @@ namespace SchoolManagement.Model
         [Column("course_id")]
         public int CourseId { get; set; }
 
+
+        [ForeignKey("CourseId")]
+        public MCourse Course {  get; set; }
+
         [Required]
         [Column("teacher_id")]
         public int TeacherId { get; set; }

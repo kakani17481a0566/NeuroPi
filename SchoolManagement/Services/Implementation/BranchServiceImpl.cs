@@ -1,6 +1,10 @@
-﻿using SchoolManagement.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using NeuroPi.UserManagment.Model;
+using SchoolManagement.Data;
+using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.Branch;
+using SchoolManagement.ViewModel.CourseTeacher;
 
 namespace NeuroPi.UserManagment.Services.Implementation
 {
@@ -27,13 +31,13 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 .FirstOrDefault(b => b.Id == id && b.TenantId == tenantId && !b.IsDeleted);
             if (branch == null)
             {
-                return false; 
+                return false;
             }
-            branch.IsDeleted = true; 
-            branch.UpdatedOn = DateTime.UtcNow; 
-            _context.Branches.Update(branch); 
-            _context.SaveChanges(); 
-            return true; 
+            branch.IsDeleted = true;
+            branch.UpdatedOn = DateTime.UtcNow;
+            _context.Branches.Update(branch);
+            _context.SaveChanges();
+            return true;
         }
 
         public List<BranchResponseVM> GetAllBranches()
@@ -44,7 +48,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
             return BranchResponseVM.ToViewModelList(branches);
         }
 
-    
+
 
         public BranchResponseVM GetBranchById(int id)
         {
@@ -52,7 +56,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 .FirstOrDefault(b => b.Id == id && !b.IsDeleted);
             if (branch == null)
             {
-                return null; 
+                return null;
             }
             return BranchResponseVM.ToViewModel(branch);
         }
@@ -71,19 +75,19 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
         public List<BranchResponseVM> GetBranchesByTenantId(int tenantId)
         {
-           var branch = _context.Branches
-                .Where(b => b.TenantId == tenantId && !b.IsDeleted)
-                .ToList();
+            var branch = _context.Branches
+                 .Where(b => b.TenantId == tenantId && !b.IsDeleted)
+                 .ToList();
             return branch.Select(BranchResponseVM.ToViewModel).ToList();
         }
 
         public BranchResponseVM UpdateBranch(int id, int tenantId, BranchUpdateVM branch)
         {
             var existingBranch = _context.Branches
-                .FirstOrDefault(b => b.Id == id && b.TenantId==tenantId && !b.IsDeleted);
+                .FirstOrDefault(b => b.Id == id && b.TenantId == tenantId && !b.IsDeleted);
             if (existingBranch == null)
             {
-                return null; 
+                return null;
             }
             existingBranch.Name = branch.Name;
             existingBranch.Contact = branch.Contact;
@@ -92,18 +96,40 @@ namespace NeuroPi.UserManagment.Services.Implementation
             existingBranch.District = branch.District;
             existingBranch.State = branch.State;
             existingBranch.UpdatedBy = branch.UpdatedBy;
-            existingBranch.UpdatedOn = DateTime.UtcNow; 
-            _context.Branches.Update(existingBranch); 
-            _context.SaveChanges(); 
-            return BranchResponseVM.ToViewModel(existingBranch); 
+            existingBranch.UpdatedOn = DateTime.UtcNow;
+            _context.Branches.Update(existingBranch);
+            _context.SaveChanges();
+            return BranchResponseVM.ToViewModel(existingBranch);
         }
         //sai vardhan
-        public BranchResponseVM GetBranchByDepartmentId(int departmentId)
+        public CourseTeacherVM GetBranchByDepartmentId(int departmentId, int userId)
         {
-            var branch = _context.Branches.FirstOrDefault(b=>b.DepartmentId== departmentId && !b.IsDeleted);
+            DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
+            var branch = _context.Branches.FirstOrDefault(b => b.DepartmentId == departmentId && !b.IsDeleted);
+            CourseTeacherVM courseTeacherVM = new CourseTeacherVM();
+
             if (branch != null)
             {
-                return BranchResponseVM.ToViewModel(branch);
+                courseTeacherVM.branchId = branch.Id;
+                var courseTeacher = _context.CourseTeachers.Where(c => c.Id == branch.Id && c.TeacherId==userId && !c.IsDeleted).Include(c => c.Course).ToList();
+                List<Course> courses = new List<Course>();
+                foreach (MCourseTeacher course in courseTeacher)
+                {
+                    var courseObj = new Course()
+                    {
+                        id = course.Course.Id,
+                        name = course.Course.Name,
+                    };
+                    courses.Add(courseObj);
+
+                }
+                courseTeacherVM.courses = courses;
+
+                var week = _context.Weeks.Where(w => w.StartDate <= today && w.EndDate >= today && !w.IsDeleted).FirstOrDefault();
+                courseTeacherVM.weekId = week != null ? week.Id : 0;
+                courseTeacherVM.termId = week != null ? week.TermId : 0;
+
+                return courseTeacherVM;
             }
             return null;
         }

@@ -1,4 +1,5 @@
 ﻿using SchoolManagement.ViewModel.Branch;
+using SchoolManagement.ViewModel.CourseTeacher;
 
 namespace SchoolManagement.Services.Interface
 {
@@ -18,6 +19,6 @@ namespace SchoolManagement.Services.Interface
 
         bool DeleteBranch(int id,int tenantId);
 
-        BranchResponseVM GetBranchByDepartmentId(int departmentId);
+        CourseTeacherVM GetBranchByDepartmentId(int departmentId,int userId);
     }
 }
