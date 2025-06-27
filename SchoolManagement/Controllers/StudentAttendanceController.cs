@@ -118,6 +118,15 @@ namespace SchoolManagement.Controllers
         }
 
 
+        [HttpPost("mark-attendance")]
+        public IActionResult MarkAttendance([FromBody] SaveAttendanceRequestVm request)
+        {
+            var result = _studentAttendanceService.SaveAttendance(request);
+            return Ok(new { success = result });
+        }
+
+
+
 
     }
 }

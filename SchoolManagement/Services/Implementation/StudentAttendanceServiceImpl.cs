@@ -191,6 +191,63 @@ namespace SchoolManagement.Services.Implementation
             return result;
         }
 
+
+        public bool SaveAttendance(SaveAttendanceRequestVm request)
+        {
+            var now = DateTime.UtcNow;
+
+            // Get student IDs from entries
+            var studentIds = request.Entries.Select(e => e.StudentId).ToList();
+
+            // Fetch existing attendance records for those students
+            var existingAttendance = _context.StudentAttendance
+                .Where(a =>
+                    !a.IsDeleted &&
+                    a.Date == request.Date &&
+                    a.BranchId == request.BranchId &&
+                    a.TenantId == request.TenantId &&
+                    studentIds.Contains(a.StudentId))
+                .ToDictionary(a => a.StudentId);
+
+            foreach (var entry in request.Entries)
+            {
+                if (existingAttendance.TryGetValue(entry.StudentId, out var attendance))
+                {
+                    // ✅ Update check-in or check-out if not already set
+                    if (attendance.FromTime == TimeSpan.Zero && entry.FromTime != TimeSpan.Zero)
+                        attendance.FromTime = entry.FromTime;
+
+                    if (attendance.ToTime == TimeSpan.Zero && entry.ToTime != TimeSpan.Zero)
+                        attendance.ToTime = entry.ToTime;
+
+                    attendance.UpdatedBy = request.UserId;
+                    attendance.UpdatedOn = now;
+                }
+                else
+                {
+                    // ✅ Insert new attendance record
+                    _context.StudentAttendance.Add(new MStudentAttendance
+                    {
+                        StudentId = entry.StudentId,
+                        UserId = request.UserId,
+                        Date = request.Date,
+                        FromTime = entry.FromTime,
+                        ToTime = entry.ToTime,
+                        BranchId = request.BranchId,
+                        TenantId = request.TenantId,
+                        CreatedBy = request.UserId,
+                        CreatedOn = now,
+                        IsDeleted = false
+                    });
+                }
+            }
+
+            _context.SaveChanges();
+            return true;
+        }
+
+
+
         // 🔽 Helper Methods 🔽
 
         private string FormatTime(TimeSpan? time) =>

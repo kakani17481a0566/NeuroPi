@@ -18,5 +18,8 @@ namespace SchoolManagement.Services.Interface
 
         bool DeleteStudentAttendance(int id, int tenantId);
         List<StudentAttendanceSummaryVm> GetAttendanceSummary(DateTime date, int tenantId, int branchId);
+
+        bool SaveAttendance(SaveAttendanceRequestVm request);
+
     }
 }
