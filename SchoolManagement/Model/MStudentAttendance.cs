@@ -32,7 +32,6 @@ namespace SchoolManagement.Model
         [Column("from_time")]
         public TimeSpan FromTime { get; set; }
 
-        [Required]
         [Column("to_time")]
         public TimeSpan ToTime { get; set; }
 
