@@ -12,14 +12,76 @@ namespace SchoolManagement.Services.Implementation
         {
             _context = context;
         }
-        public StudentAttendanceResponseVm AddStudentAttendance(StudentAttendanceRequestVM studentAttendanceRequestVm)
+        //public StudentAttendanceResponseVm AddStudentAttendance(StudentAttendanceRequestVM studentAttendanceRequestVm)
+        //{
+        //    var newAttendance = StudentAttendanceRequestVM.ToModel(studentAttendanceRequestVm);
+        //    newAttendance.CreatedOn = DateTime.UtcNow;
+        //    _context.StudentAttendance.Add(newAttendance);
+        //    _context.SaveChanges();
+        //    return StudentAttendanceResponseVm.ToViewModel(newAttendance);
+        //}
+        public StudentAttendanceResponseVm AddStudentAttendance(StudentAttendanceRequestVM request)
         {
-            var newAttendance = StudentAttendanceRequestVM.ToModel(studentAttendanceRequestVm);
-            newAttendance.CreatedOn = DateTime.UtcNow;
-            _context.StudentAttendance.Add(newAttendance);
-            _context.SaveChanges();
-            return StudentAttendanceResponseVm.ToViewModel(newAttendance);
+            var attendanceDate = request.Date.Date;
+
+            var existingRecord = _context.StudentAttendance
+                .FirstOrDefault(a => a.StudentId == request.StudentId && a.Date.Date == attendanceDate);
+
+            if (request.FromTime != TimeSpan.Zero && request.ToTime == TimeSpan.Zero)
+            {
+                // Check-in only
+                if (existingRecord != null && existingRecord.FromTime != TimeSpan.Zero)
+                {
+                    throw new Exception("Student already checked in for the day.");
+                }
+
+                if (existingRecord == null)
+                {
+                    var newRecord = StudentAttendanceRequestVM.ToModel(request);
+                    newRecord.CreatedOn = DateTime.UtcNow;
+                    _context.StudentAttendance.Add(newRecord);
+                    _context.SaveChanges();
+
+                    return StudentAttendanceResponseVm.ToViewModel(newRecord);
+                }
+                else
+                {
+                    existingRecord.FromTime = request.FromTime;
+                    existingRecord.UpdatedBy = request.CreatedBy;
+                    existingRecord.UpdatedOn = DateTime.UtcNow;
+                    _context.StudentAttendance.Update(existingRecord);
+                    _context.SaveChanges();
+
+                    return StudentAttendanceResponseVm.ToViewModel(existingRecord);
+                }
+            }
+            else if (request.ToTime != TimeSpan.Zero)
+            {
+                // Check-out
+                if (existingRecord == null || existingRecord.FromTime == TimeSpan.Zero)
+                {
+                    throw new Exception("The student didn't check in.");
+                }
+
+                if (existingRecord.ToTime != TimeSpan.Zero)
+                {
+                    throw new Exception("Student already checked out.");
+                }
+
+                existingRecord.ToTime = request.ToTime;
+                existingRecord.UpdatedBy = request.CreatedBy;
+                existingRecord.UpdatedOn = DateTime.UtcNow;
+                _context.StudentAttendance.Update(existingRecord);
+                _context.SaveChanges();
+
+                return StudentAttendanceResponseVm.ToViewModel(existingRecord);
+            }
+            else
+            {
+                throw new Exception("Invalid attendance data. Either check-in or check-out time must be provided.");
+            }
         }
+
 
         public bool DeleteStudentAttendance(int id, int tenantId)
         {
