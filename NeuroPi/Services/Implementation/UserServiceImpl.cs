@@ -28,11 +28,13 @@ namespace NeuroPi.UserManagment.Services.Implementation
             var user = _context.Users.FirstOrDefault(u =>
                 !u.IsDeleted && u.Username == username && u.Password == password);
             MUserRole Role = null;
+            MDepartment department = null;
 
             if (user != null)
             {
-                Role = _context.UserRoles.Include(r => r.Role).FirstOrDefault(r => !r.IsDeleted && r.UserId == user.UserId && r.TenantId == user.TenantId)
-                    ;
+                Role = _context.UserRoles.Include(r => r.Role).FirstOrDefault(r => !r.IsDeleted && r.UserId == user.UserId && r.TenantId == user.TenantId);
+                department=_context.Departments.FirstOrDefault(d=>d.HeadUserId == user.UserId && !d.IsDeleted);
+
             }
 
 
@@ -45,7 +47,8 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 UserId = user.UserId,
                 token = GenerateJwtToken(user),
                 UserProfile = UserResponseVM.ToViewModel(user),
-                RoleName = Role.Role.Name != null ? Role.Role.Name : null
+                RoleName = Role.Role.Name != null ? Role.Role.Name : null,
+                departmentId = department.DepartmentId!=null ? department.DepartmentId:0
 
             };
         }

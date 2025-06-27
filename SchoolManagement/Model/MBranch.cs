@@ -29,6 +29,8 @@ namespace SchoolManagement.Model
 
         [Column("state")]
         public string State { get; set; }
+        [Column("department_id")]
+        public int  DepartmentId { get; set; }
 
         [Column("tenant_id")]
         public int TenantId { get; set; }

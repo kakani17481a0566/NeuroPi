@@ -44,6 +44,8 @@ namespace NeuroPi.UserManagment.Services.Implementation
             return BranchResponseVM.ToViewModelList(branches);
         }
 
+    
+
         public BranchResponseVM GetBranchById(int id)
         {
             var branch = _context.Branches
@@ -94,6 +96,16 @@ namespace NeuroPi.UserManagment.Services.Implementation
             _context.Branches.Update(existingBranch); 
             _context.SaveChanges(); 
             return BranchResponseVM.ToViewModel(existingBranch); 
+        }
+        //sai vardhan
+        public BranchResponseVM GetBranchByDepartmentId(int departmentId)
+        {
+            var branch = _context.Branches.FirstOrDefault(b=>b.DepartmentId== departmentId && !b.IsDeleted);
+            if (branch != null)
+            {
+                return BranchResponseVM.ToViewModel(branch);
+            }
+            return null;
         }
     }
 }

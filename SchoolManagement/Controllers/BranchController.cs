@@ -83,5 +83,16 @@ namespace SchoolManagement.Controllers
 
 
         }
+
+        //sai vardhan
+
+        [HttpGet("/department/{departmentId}")]
+        public ResponseResult<BranchResponseVM> GetBranchByDepartmentId(int departmentId)
+        {
+            var branch = _branchService.GetBranchByDepartmentId(departmentId);
+            return branch == null
+                ? new ResponseResult<BranchResponseVM>(HttpStatusCode.NotFound, null, "Branch not found")
+                : new ResponseResult<BranchResponseVM>(HttpStatusCode.OK, branch, "Branch retrieved successfully");
+        }
     }
 }

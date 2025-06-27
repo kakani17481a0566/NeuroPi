@@ -17,5 +17,7 @@ namespace SchoolManagement.Services.Interface
         BranchResponseVM UpdateBranch(int id, int tenantId, BranchUpdateVM branch);
 
         bool DeleteBranch(int id,int tenantId);
+
+        BranchResponseVM GetBranchByDepartmentId(int departmentId);
     }
 }
