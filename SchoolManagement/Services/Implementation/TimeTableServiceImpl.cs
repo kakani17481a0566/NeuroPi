@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using NodaTime;
 using SchoolManagement.Data;
 using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
@@ -106,6 +107,7 @@ namespace SchoolManagement.Services.Implementation
             var query = _dbContext.VTimeTable
                 .Where(x => x.TenantId == tenantId && x.CourseId == courseId);
             _logger.LogInformation("query is", query);
+           
             
 
             if (weekId > 0)
@@ -155,7 +157,12 @@ namespace SchoolManagement.Services.Implementation
                 };
 
                 var periods = new string[6];
-                for (int i = 1; i <= 6; i++)
+                int index = 0;
+                var periodStart = _dbContext.Periods.Where(p => p.CourseId == courseId).Min(p=>p.Id);
+                var periodEnd = _dbContext.Periods.Where(p => p.CourseId == courseId).Max(p => p.Id);
+
+
+                for (int i = periodStart; i <= periodEnd; i++)
                 {
                     var periodItems = group
                         .Where(x => x.PeriodId == i)
@@ -171,7 +178,8 @@ namespace SchoolManagement.Services.Implementation
                         })
                         .ToList();
 
-                    periods[i - 1] = string.Join("\n", periodItems);
+                    periods[index] = string.Join("\n", periodItems);
+                    index++;
                 }
 
                 tData.Column2 = periods[0];
