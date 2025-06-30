@@ -143,6 +143,8 @@ namespace SchoolManagement.Services.Implementation
                         Type = f.Type
                     }).ToList()
                 );
+            var periodStart = _dbContext.Periods.Where(p => p.CourseId == courseId).Min(p => p.Id);
+            var periodEnd = _dbContext.Periods.Where(p => p.CourseId == courseId).Max(p => p.Id);
 
             // Build timetable data per day
             foreach (var group in groupedByDate)
@@ -158,8 +160,7 @@ namespace SchoolManagement.Services.Implementation
 
                 var periods = new string[6];
                 int index = 0;
-                var periodStart = _dbContext.Periods.Where(p => p.CourseId == courseId).Min(p=>p.Id);
-                var periodEnd = _dbContext.Periods.Where(p => p.CourseId == courseId).Max(p => p.Id);
+               
 
 
                 for (int i = periodStart; i <= periodEnd; i++)
@@ -226,7 +227,7 @@ namespace SchoolManagement.Services.Implementation
 
             // Headers
             var headers = new List<string> { "Days" };
-            for (int i = 1; i <= 6; i++)
+            for (int i = periodStart; i <=periodEnd ; i++)
             {
                 var subjectRecord = records
                     .FirstOrDefault(r => r.PeriodId == i && !string.IsNullOrWhiteSpace(r.SubjectName));
