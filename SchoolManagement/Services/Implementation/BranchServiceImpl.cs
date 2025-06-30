@@ -111,7 +111,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
             if (branch != null)
             {
                 courseTeacherVM.branchId = branch.Id;
-                var courseTeacher = _context.CourseTeachers.Where(c => c.Id == branch.Id && c.TeacherId==userId && !c.IsDeleted).Include(c => c.Course).ToList();
+                var courseTeacher = _context.CourseTeachers.Where(c => c.BranchId == branch.Id && c.TeacherId==userId && !c.IsDeleted).Include(c => c.Course).ToList();
                 List<Course> courses = new List<Course>();
                 foreach (MCourseTeacher course in courseTeacher)
                 {
