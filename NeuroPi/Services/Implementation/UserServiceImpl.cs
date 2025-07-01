@@ -51,7 +51,8 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 token = GenerateJwtToken(user),
                 UserProfile = UserResponseVM.ToViewModel(user),
                 RoleName = Role.Role.Name != null ? Role.Role.Name : null,
-                departmentId = department.DepartmentId!=null ? department.DepartmentId:0
+                departmentId = department.DepartmentId!=null ? department.DepartmentId:0,
+                UserImageUrl = user.UserImageUrl ?? null
 
             };
         }
