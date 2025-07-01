@@ -1,12 +1,15 @@
-﻿using NeuroPi.UserManagment.Data;
+﻿using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using NeuroPi.UserManagment.Data;
 using NeuroPi.UserManagment.Model;
 using NeuroPi.UserManagment.Services.Interface;
 using NeuroPi.UserManagment.ViewModel.User;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.EntityFrameworkCore;
 
 namespace NeuroPi.UserManagment.Services.Implementation
 {
@@ -134,5 +137,35 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
             return UserResponseVM.ToViewModel(user);
         }
+
+        public async Task<string> UpdateUserImageAsync(int id, int tenantId, UserImageUploadVM request, Cloudinary cloudinary)
+        {
+            var user = _context.Users.FirstOrDefault(u => u.UserId == id && u.TenantId == tenantId && !u.IsDeleted);
+            if (user == null || request.Image == null || request.Image.Length == 0)
+                return null;
+
+            var uploadParams = new ImageUploadParams
+            {
+                File = new FileDescription(request.Image.FileName, request.Image.OpenReadStream()),
+                UseFilename = true,
+                UniqueFilename = true,
+                Overwrite = true,
+                Folder = "user_profiles"
+            };
+
+            var uploadResult = await cloudinary.UploadAsync(uploadParams);
+            if (uploadResult.StatusCode != HttpStatusCode.OK)
+                return null;
+
+            var imageUrl = uploadResult.SecureUrl.AbsoluteUri;
+
+            user.UserImageUrl = imageUrl;
+            user.UpdatedBy = request.UpdatedBy;
+            user.UpdatedOn = DateTime.UtcNow;
+
+            _context.SaveChanges();
+            return imageUrl;
+        }
+
     }
 }

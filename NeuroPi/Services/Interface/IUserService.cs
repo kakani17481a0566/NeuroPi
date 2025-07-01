@@ -1,4 +1,5 @@
-﻿using NeuroPi.UserManagment.ViewModel.User;
+﻿using CloudinaryDotNet;
+using NeuroPi.UserManagment.ViewModel.User;
 using System.Collections.Generic;
 
 namespace NeuroPi.UserManagment.Services.Interface
@@ -18,5 +19,8 @@ namespace NeuroPi.UserManagment.Services.Interface
         UserResponseVM UpdateUser(int id, int tenantId, UserUpdateRequestVM userUpdate);
 
         UserResponseVM DeleteUser(int id, int tenantId);
+
+        Task<string> UpdateUserImageAsync(int id, int tenantId, UserImageUploadVM request, Cloudinary cloudinary);
+
     }
 }

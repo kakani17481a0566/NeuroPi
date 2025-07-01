@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using CloudinaryDotNet;
+using Microsoft.AspNetCore.Mvc;
 using NeuroPi.UserManagment.Response;
 using NeuroPi.UserManagment.Services.Interface;
 using NeuroPi.UserManagment.ViewModel.User;
@@ -103,5 +104,21 @@ namespace NeuroPi.UserManagment.Controllers
 
             return new ResponseResult<UserResponseVM>(HttpStatusCode.BadRequest, null, "Failed to add user");
         }
+
+        [HttpPut("{id}/image")]
+        public async Task<ResponseResult<string>> UpdateUserImageAsync(
+    int id,
+    [FromQuery] int tenantId,
+    [FromForm] UserImageUploadVM request,
+    [FromServices] Cloudinary cloudinary)
+        {
+            var result = await _userService.UpdateUserImageAsync(id, tenantId, request, cloudinary);
+
+            if (!string.IsNullOrEmpty(result))
+                return new ResponseResult<string>(HttpStatusCode.OK, result, "Image updated successfully");
+
+            return new ResponseResult<string>(HttpStatusCode.BadRequest, null, "Failed to update user image");
+        }
+
     }
 }

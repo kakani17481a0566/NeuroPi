@@ -6,30 +6,48 @@ using Microsoft.OpenApi.Models;
 using NeuroPi.UserManagment.Data;
 using NeuroPi.UserManagment.Services.Implementation;
 using NeuroPi.UserManagment.Services.Interface;
+using CloudinaryDotNet;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
-// ALSO load NeuroPi-specific settings (renamed to avoid conflict)
+// -------------------------------------------
+// Load Configuration Files
+// -------------------------------------------
 builder.Configuration
     .AddJsonFile("neuro_appsettings.json", optional: true, reloadOnChange: true)
     .AddJsonFile($"neuro_appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
 
+// -------------------------------------------
+// Cloudinary Configuration
+// -------------------------------------------
+var cloudinary = new Cloudinary(new Account(
+    builder.Configuration["Cloudinary:CloudName"],
+    builder.Configuration["Cloudinary:ApiKey"],
+    builder.Configuration["Cloudinary:ApiSecret"]
+));
+cloudinary.Api.Secure = true;
+builder.Services.AddSingleton(cloudinary);
 
-// Add services to the container.
+// -------------------------------------------
+// Add Services to Container
+// -------------------------------------------
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-// Configure Swagger with JWT Bearer Authentication
+// -------------------------------------------
+// Swagger Configuration with JWT
+// -------------------------------------------
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new OpenApiInfo { Title = "NeuroPi.UserManagment", Version = "v1" });
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "NeuroPi.UserManagment",
+        Version = "v1"
+    });
 
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Description = @"JWT Authorization header using the Bearer scheme. 
-                        Enter 'Bearer' [space] and then your token.
-                        Example: 'Bearer 12345abcdef'",
+        Description = "JWT Authorization header using the Bearer scheme. Example: 'Bearer {token}'",
         Name = "Authorization",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.ApiKey,
@@ -41,33 +59,32 @@ builder.Services.AddSwaggerGen(options =>
         {
             new OpenApiSecurityScheme
             {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                },
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" },
                 Scheme = "oauth2",
                 Name = "Bearer",
-                In = ParameterLocation.Header,
+                In = ParameterLocation.Header
             },
             new List<string>()
         }
     });
 });
 
-// Enable CORS for all origins (for development only)
+// -------------------------------------------
+// CORS Policy (Dev Only)
+// -------------------------------------------
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy
-            .AllowAnyOrigin()
-            .AllowAnyHeader()
-            .AllowAnyMethod();
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
     });
 });
 
-// Configure JWT Authentication
+// -------------------------------------------
+// JWT Authentication
+// -------------------------------------------
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -83,17 +100,20 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
     };
 });
 
-// Register DbContext
+// -------------------------------------------
+// Register EF DbContext
+// -------------------------------------------
 builder.Services.AddDbContext<NeuroPiDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
-// Register application services
+// -------------------------------------------
+// Register Application Services
+// -------------------------------------------
 builder.Services.AddScoped<ITenantService, TenantServiceImpl>();
 builder.Services.AddScoped<IDepartmentService, DepartmentServiceImpl>();
 builder.Services.AddScoped<IGroupService, GroupServiceImpl>();
@@ -109,9 +129,14 @@ builder.Services.AddScoped<IConfigService, ConfigServiceImpl>();
 builder.Services.AddScoped<IUserRolesService, UserRolesServiceImpl>();
 builder.Services.AddScoped<IUserService, UserServiceImpl>();
 
+// -------------------------------------------
+// Build App
+// -------------------------------------------
 var app = builder.Build();
 
-// Configure the HTTP request pipeline
+// -------------------------------------------
+// Middleware Pipeline
+// -------------------------------------------
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -119,12 +144,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-app.UseCors("AllowAll"); 
-
+app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

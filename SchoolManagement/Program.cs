@@ -1,3 +1,4 @@
+using CloudinaryDotNet;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using NeuroPi.UserManagment.Data;
@@ -82,6 +83,14 @@ builder.Services.AddDbContext<NeuroPiDbContext>(options =>
 builder.Services.AddDbContext<SchoolManagementDb>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+var cloudinary = new Cloudinary(new Account(
+    builder.Configuration["Cloudinary:CloudName"],
+    builder.Configuration["Cloudinary:ApiKey"],
+    builder.Configuration["Cloudinary:ApiSecret"]
+));
+cloudinary.Api.Secure = true;
+builder.Services.AddSingleton(cloudinary);
+
 
 // Configure Swagger with JWT Bearer Authentication
 builder.Services.AddSwaggerGen(options =>
@@ -129,6 +138,7 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader();
     });
 });
+builder.Services.AddSingleton(cloudinary);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
