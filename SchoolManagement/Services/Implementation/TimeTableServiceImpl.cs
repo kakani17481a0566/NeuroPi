@@ -129,7 +129,7 @@ namespace SchoolManagement.Services.Implementation
 
             // Group course files by type
             var courseFiles = _dbContext.TableFiles
-                .Where(f => f.CourseId == courseId && !f.IsDeleted)
+                .Where(f => f.CourseId == courseId && f.TimeTableId==first.TimeTableId && !f.IsDeleted)
                 .ToList();
 
             var groupedResources = courseFiles
