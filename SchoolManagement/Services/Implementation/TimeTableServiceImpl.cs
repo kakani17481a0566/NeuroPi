@@ -195,10 +195,9 @@ namespace SchoolManagement.Services.Implementation
 
                 // Column8: First PDF link
                 tData.Column8 = _dbContext.TableFiles
-    .Where(f => f.TimeTableId == timeTableId && f.Type == "pdf" && !f.IsDeleted && f.CourseId == courseId)
-    .Select(f => f.Link)
-    .ToList(); // or .ToArray()
-
+                    .Where(f => f.TimeTableId == timeTableId && f.Type == "pdf" && !f.IsDeleted && f.CourseId == courseId)
+                    .Select(f => f.Link)
+                    .FirstOrDefault();
 
                 // Column9: First worksheet link
                 // Column9: First worksheet link

@@ -12,9 +12,7 @@ namespace SchoolManagement.ViewModel.VTimeTable
         public string Column5 { get; set; } // Period 4
         public string Column6 { get; set; } // Period 5
         public string Column7 { get; set; } // Period 6
-        //public string Column8 { get; set; }
-        public List<string> Column8 { get; set; } // or string[] Column8
-
+        public string Column8 { get; set; }
 
         public string Column9 { get; set; }
         public int timeTableId { get; set; }
