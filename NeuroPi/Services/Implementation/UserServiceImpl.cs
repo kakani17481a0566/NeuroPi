@@ -128,6 +128,11 @@ namespace NeuroPi.UserManagment.Services.Implementation
             return UserResponseVM.ToViewModel(user);
         }
 
+       
+        
+
+
+
         public UserResponseVM DeleteUser(int id, int tenantId)
         {
             var user = _context.Users.FirstOrDefault(u => u.UserId == id && u.TenantId == tenantId && !u.IsDeleted);
