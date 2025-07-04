@@ -26,7 +26,7 @@ namespace SchoolManagement.Model
 
         [Required]
         [Column("date")]
-        public DateTime Date { get; set; }
+        public DateOnly Date { get; set; }
 
         [Required]
         [Column("from_time")]

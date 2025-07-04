@@ -6,7 +6,7 @@
 
         public int UserId { get; set; }
 
-        public DateTime Date { get; set; }
+        public DateOnly Date { get; set; }
 
         public TimeSpan FromTime { get; set; }
         public TimeSpan ToTime { get; set; }

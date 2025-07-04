@@ -96,9 +96,10 @@ namespace SchoolManagement.Controllers
         {
             if (!date.HasValue)
                 return BadRequest("Date is required and must be in yyyy-MM-dd format.");
+            var dateOnly= DateOnly.FromDateTime(date.Value);
 
             var records = _studentAttendanceService
-                .GetAttendanceSummary(date.Value, tenantId, branchId)
+                .GetAttendanceSummary(dateOnly, tenantId, branchId)
                 .Where(r => r.CourseId == courseId) // ✅ filter by courseId
                 .ToList();
 

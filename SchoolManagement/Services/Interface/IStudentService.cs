@@ -16,6 +16,7 @@ namespace SchoolManagement.Services.Interface
         StudentResponseVM Delete(int id);
 
         StudentVM GetByTenantCourseBranch(int tenantId, int courseId, int branchId);
+        StudentsData GetStudentDetails(int courseId, int branchId,DateOnly date, int tenantId);
 
 
     }

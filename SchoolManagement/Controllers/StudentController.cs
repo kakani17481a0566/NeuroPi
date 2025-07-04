@@ -83,6 +83,20 @@ namespace SchoolManagement.Controllers
             return new ResponseResult<StudentVM>(HttpStatusCode.OK, data, "Filtered students fetched successfully.");
         }
 
+        [HttpGet("/students/{courseId}/branch/{branchId}")]
+        public ResponseResult< StudentsData> GetStudentDetails(int courseId,int branchId, DateTime dateTime, int tenantId)
+        {
+            var date = DateOnly.FromDateTime(dateTime);
+            var response =_studentService.GetStudentDetails(courseId,branchId,date, tenantId);
+            if (response == null)
+            {
+                return new ResponseResult<StudentsData>(HttpStatusCode.NotFound, response, " No Student Details Fetched SuccessFully");
+            }
+            return new ResponseResult<StudentsData>(HttpStatusCode.OK, response, "Student Details Fetched SuccessFully");
+
+        }
+
+
 
     }
 }

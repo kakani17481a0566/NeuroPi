@@ -22,10 +22,10 @@ namespace SchoolManagement.Services.Implementation
 
         public StudentAttendanceResponseVm AddStudentAttendance(StudentAttendanceRequestVM request)
         {
-            var attendanceDate = request.Date.Date;
+            var attendanceDate = request.Date;
 
             var existingRecord = _context.StudentAttendance
-                .FirstOrDefault(a => a.StudentId == request.StudentId && a.Date.Date == attendanceDate);
+                .FirstOrDefault(a => a.StudentId == request.StudentId && a.Date == attendanceDate);
 
             if (request.FromTime != TimeSpan.Zero && request.ToTime == TimeSpan.Zero)
             {
@@ -135,7 +135,7 @@ namespace SchoolManagement.Services.Implementation
             return StudentAttendanceResponseVm.ToViewModel(existingAttendance);
         }
 
-        public List<StudentAttendanceSummaryVm> GetAttendanceSummary(DateTime date, int tenantId, int branchId)
+        public List<StudentAttendanceSummaryVm> GetAttendanceSummary(DateOnly date, int tenantId, int branchId)
         {
             var studentsWithAttendance = _context.Students
                 .Where(s => !s.IsDeleted && s.TenantId == tenantId && s.BranchId == branchId)
@@ -147,7 +147,7 @@ namespace SchoolManagement.Services.Implementation
 
                     CourseName = s.Course.Name,
                     Attendance = s.StudentAttendances
-                        .Where(a => a.Date == date.Date && !a.IsDeleted)
+                        .Where(a => a.Date == date && !a.IsDeleted)
                         .OrderByDescending(a => a.Id)
                         .FirstOrDefault()
                 })

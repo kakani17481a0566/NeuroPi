@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Data;
 using SchoolManagement.Model;
@@ -129,6 +130,49 @@ namespace SchoolManagement.Services.Implementation
 
         }
 
+        public StudentsData GetStudentDetails(int courseId, int branchId, DateOnly date,int tenantId)
+        {
+            int totalStudents = 0;
+            int checkedIn = 0;
+            int checkedOut = 0;
+            List<StudentDetails> studentDetails = new List<StudentDetails>();
+            var students = _context.StudentAttendance.Where(s => s.Date == date && s.TenantId == tenantId && !s.IsDeleted).Include(s => s.Student).ToList();
+            if (students != null &&  students.Count>0){
+                foreach (MStudentAttendance student in students)
+                {
+                    MStudent mStudent = student.Student;
+                    if (mStudent.BranchId == branchId && mStudent.CourseId == courseId)
+                    {
+                        if (student.FromTime != TimeSpan.Zero)
+                        {
+                            checkedIn++;
+                        }
+                        if (student.ToTime != TimeSpan.Zero)
+                        {
+                            checkedOut++;
+                        }
+                        var Student = new StudentDetails()
+                        {
+                            Name = mStudent.Name,
+                            date = student.Date,
+                            checkedIn = student.FromTime,
+                            checkedOut = student.ToTime,
+                        };
+                        studentDetails.Add(Student);
+                       
+                    }
 
+                }
+                var response = new StudentsData()
+                {
+                    totalStudents = studentDetails.Count,
+                    checkedIn = checkedIn,
+                    checkedOut = checkedOut,
+                    students = studentDetails,
+                };
+                return response;
+            }
+            return null;
+        }
     }
 }
