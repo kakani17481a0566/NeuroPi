@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
 using SchoolManagement.Data;
+using SchoolManagement.Response;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.Transaction;
 using SchoolManagement.ViewModel.Transcation;
@@ -10,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Net;
 
 namespace SchoolManagement.Services.Implementation
 {
@@ -24,6 +26,8 @@ namespace SchoolManagement.Services.Implementation
             _context = context;
         }
 
+        #region Transfer
+
         // Transfer money between accounts
         // Developed by: Mohith
         public TransactionResultVM Transfer(TransactionRequestVM req)
@@ -37,46 +41,44 @@ namespace SchoolManagement.Services.Implementation
                 };
             }
 
-            // Validate account IDs
             try
             {
                 using var connection = new NpgsqlConnection(_connectionString);
+                connection.Open();
 
                 var parameters = new DynamicParameters();
                 parameters.Add("p_debit_acc_id", req.DebitAccId, DbType.Int32);
                 parameters.Add("p_credit_acc_id", req.CreditAccId, DbType.Int32);
                 parameters.Add("p_amount", req.Amount, DbType.Double);
-                parameters.Add("p_trx_type_id", req.TrxTypeId, DbType.Int32);
                 parameters.Add("p_trx_mode_id", req.TrxModeId, DbType.Int32);
                 parameters.Add("p_trx_status", req.TrxStatus, DbType.Int32);
                 parameters.Add("p_tenant_id", req.TenantId, DbType.Int32);
                 parameters.Add("p_created_by", req.CreatedBy, DbType.Int32);
-                parameters.Add("p_trx_desc", req.TrxDesc, DbType.String);
+                parameters.Add("p_trx_desc", req.TrxDesc ?? string.Empty, DbType.String);
                 parameters.Add("p_debit_acc_head_id", req.DebitAccHeadId, DbType.Int32);
                 parameters.Add("p_credit_acc_head_id", req.CreditAccHeadId, DbType.Int32);
+                parameters.Add("p_trx_date", req.TrxDate, DbType.Date); // ✅ NEW
 
-                string sql = @"
-                    SELECT
-                        debit_trx_id AS DebitTrxId,
-                        credit_trx_id AS CreditTrxId,
-                        ref_trns_id AS RefTrnsId
-                    FROM sp_full_transaction_transfer(
-                        @p_debit_acc_id,
-                        @p_credit_acc_id,
-                        @p_amount,
-                        @p_trx_type_id,
-                        @p_trx_mode_id,
-                        @p_trx_status,
-                        @p_tenant_id,
-                        @p_created_by,
-                        @p_trx_desc,
-                        @p_debit_acc_head_id,
-                        @p_credit_acc_head_id
-                    );
-                ";
+                const string sql = @"
+            SELECT
+                debit_trx_id AS DebitTrxId,
+                credit_trx_id AS CreditTrxId,
+                ref_trns_id AS RefTrnsId
+            FROM sp_full_transaction_transfer(
+                @p_debit_acc_id,
+                @p_credit_acc_id,
+                @p_amount,
+                @p_trx_mode_id,
+                @p_trx_status,
+                @p_tenant_id,
+                @p_created_by,
+                @p_trx_desc,
+                @p_debit_acc_head_id,
+                @p_credit_acc_head_id,
+                @p_trx_date -- ✅ Include this in the function call
+            );
+        ";
 
-                // Open the connection and execute the stored procedure
-                
                 var result = connection.QueryFirstOrDefault<SpTransferResult>(sql, parameters);
 
                 if (result == null)
@@ -101,40 +103,34 @@ namespace SchoolManagement.Services.Implementation
                 return new TransactionResultVM
                 {
                     IsSuccess = false,
-                    ErrorMessage = "An error occurred: " + ex.Message
+                    ErrorMessage = $"An error occurred during transfer: {ex.Message}"
                 };
             }
         }
 
-        // Get transaction by transaction ID
-        // Developed by: Mohith
+
+        #endregion
+
+        #region Querying Transactions
+
         public TransactionResponseVM GetByTrxId(int trxId)
         {
             var trx = _context.Transactions
                 .AsNoTracking()
                 .FirstOrDefault(t => t.TrxId == trxId && !t.IsDeleted);
 
-            if (trx == null)
-                return null;
-
-            return MapToVM(trx);
+            return trx == null ? null : MapToVM(trx);
         }
 
-        // Get transaction by transaction ID and tenant ID
-        // Developed by: Mohith
         public TransactionResponseVM GetByTrxIdAndTenantId(int trxId, int tenantId)
         {
             var trx = _context.Transactions
                 .AsNoTracking()
                 .FirstOrDefault(t => t.TrxId == trxId && t.TenantId == tenantId && !t.IsDeleted);
 
-            if (trx == null)
-                return null;
-
-            return MapToVM(trx);
+            return trx == null ? null : MapToVM(trx);
         }
 
-        // Get transactions by reference transaction ID
         public List<TransactionResponseVM> GetByRefTrnsId(string refTrnsId)
         {
             var trxs = _context.Transactions
@@ -142,21 +138,20 @@ namespace SchoolManagement.Services.Implementation
                 .Where(t => t.RefTrnsId == refTrnsId && !t.IsDeleted)
                 .ToList();
 
-            if (trxs == null || trxs.Count == 0)
-                return null;
-
-            return trxs.Select(MapToVM).ToList();
+            return trxs.Any() ? trxs.Select(MapToVM).ToList() : null;
         }
 
-        // Update transaction amount by reference transaction ID and tenant ID
-        // Developed by: Mohith
+        #endregion
+
+        #region Update
+
         public bool UpdateAmountByRefTrnsIdAndTenant(string refTrnsId, int tenantId, double newAmount, int modifiedBy)
         {
             var transactions = _context.Transactions
                 .Where(t => t.RefTrnsId == refTrnsId && t.TenantId == tenantId && !t.IsDeleted)
                 .ToList();
 
-            if (transactions == null || transactions.Count == 0)
+            if (!transactions.Any())
                 return false;
 
             foreach (var trx in transactions)
@@ -170,9 +165,10 @@ namespace SchoolManagement.Services.Implementation
             return true;
         }
 
+        #endregion
 
-        // Helper method to map dynamic transaction object to TransactionResponseVM
-        // Developed by: Mohith
+        #region Helpers
+
         private TransactionResponseVM MapToVM(dynamic trx)
         {
             return new TransactionResponseVM
@@ -191,12 +187,123 @@ namespace SchoolManagement.Services.Implementation
             };
         }
 
-        // Private class to hold the result of the stored procedure call
         private class SpTransferResult
         {
             public int DebitTrxId { get; set; }
             public int CreditTrxId { get; set; }
             public string RefTrnsId { get; set; }
         }
+
+        #endregion
+
+
+
+        public ResponseResult<VTransactionTableVM> GetFormattedTransactionTable(int tenantId)
+        {
+            try
+            {
+                var transactions = (
+                    from t in _context.Transactions
+                    join acc in _context.Accounts on t.AccId equals acc.Id into accGroup
+                    from acc in accGroup.DefaultIfEmpty()
+                    join tt in _context.Masters on t.TrxTypeId equals tt.Id into ttGroup
+                    from tt in ttGroup.DefaultIfEmpty()
+                    join tm in _context.Masters on t.TrxModeId equals tm.Id into tmGroup
+                    from tm in tmGroup.DefaultIfEmpty()
+                    join ts in _context.Masters on t.TrxStatus equals ts.Id into tsGroup
+                    from ts in tsGroup.DefaultIfEmpty()
+                    join ah in _context.Masters on t.AccHeadId equals ah.Id into ahGroup
+                    from ah in ahGroup.DefaultIfEmpty()
+                    where !t.IsDeleted && t.TenantId == tenantId
+                    orderby t.CreatedOn descending
+                    select new
+                    {
+                        t.TrxId,
+                        t.TrxDesc,
+                        t.TrxDate,
+                        t.TrxAmount,
+                        t.RefTrnsId,
+                        AccountId = acc ,
+                        AccountName = acc.AccName,
+                        AccountType = acc.AccType,
+                        BankName = acc.BankName,
+                        Branch = acc.Branch,
+                        IFSCCode = acc.IfscCode,
+                        TrxTypeName = tt.Name,
+                        TrxModeName = tm.Name,
+                        TrxStatusName = ts.Name,
+                        AccHeadName = ah.Name,
+                        t.CreatedBy,
+                        t.CreatedOn,
+                        t.TenantId
+                    }).ToList();
+
+                var headerLabels = new List<string>
+        {
+            "TrxId", "TrxDesc", "TrxDate", "TrxAmount", "RefTrnsId",
+            "AccountId", "AccountName", "AccountType", "BankName", "Branch", "IFSCCode",
+            "TrxType", "TrxMode", "TrxStatus", "AccHead",
+            "CreatedBy", "CreatedOn", "TenantId"
+        };
+
+                var headers = headerLabels
+                    .Select((label, index) => new TableHeader
+                    {
+                        Key = $"Col{index + 1}",
+                        Label = label
+                    }).ToList();
+
+                var rows = new List<Dictionary<string, object>>();
+
+                foreach (var row in transactions)
+                {
+                    var dict = new Dictionary<string, object>
+                    {
+                        ["Col1"] = row.TrxId,
+                        ["Col2"] = row.TrxDesc,
+                        ["Col3"] = row.TrxDate,
+                        ["Col4"] = row.TrxAmount,
+                        ["Col5"] = row.RefTrnsId,
+                        ["Col6"] = row.AccountId,
+                        ["Col7"] = row.AccountName,
+                        ["Col8"] = row.AccountType,
+                        ["Col9"] = row.BankName,
+                        ["Col10"] = row.Branch,
+                        ["Col11"] = row.IFSCCode,
+                        ["Col12"] = row.TrxTypeName,
+                        ["Col13"] = row.TrxModeName,
+                        ["Col14"] = row.TrxStatusName,
+                        ["Col15"] = row.AccHeadName,
+                        ["Col16"] = row.CreatedBy,
+                        ["Col17"] = row.CreatedOn,
+                        ["Col18"] = row.TenantId
+                    };
+
+                    rows.Add(dict);
+                }
+
+                return new ResponseResult<VTransactionTableVM>(
+                    HttpStatusCode.OK,
+                    new VTransactionTableVM
+                    {
+                        Headers = headers,
+                        TData = rows
+                    },
+                    "Transaction table fetched successfully."
+                );
+            }
+            catch (Exception ex)
+            {
+                return new ResponseResult<VTransactionTableVM>(
+                    HttpStatusCode.InternalServerError,
+                    null,
+                    $"Error: {ex.Message}"
+                );
+            }
+        }
+
+
+
     }
 }
+

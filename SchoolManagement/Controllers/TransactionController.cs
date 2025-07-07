@@ -18,17 +18,15 @@ namespace SchoolManagement.Controllers
             _transactionService = transactionService;
         }
 
-        // transfer money between accounts 
-        // POST api/transaction/transfer
-        // Developed by : Mohith
+        // POST: api/transaction/transfer
         [HttpPost("transfer")]
-        public IActionResult Transfer([FromBody] TransactionRequestVM request)
+        public ResponseResult<object> Transfer([FromBody] TransactionRequestVM request)
         {
             var result = _transactionService.Transfer(request);
 
             if (!result.IsSuccess)
             {
-                return new ResponseResult<string>(HttpStatusCode.BadRequest, null, result.ErrorMessage);
+                return new ResponseResult<object>(HttpStatusCode.BadRequest, null, result.ErrorMessage);
             }
 
             var responseData = new
@@ -41,50 +39,42 @@ namespace SchoolManagement.Controllers
             return new ResponseResult<object>(HttpStatusCode.OK, responseData, "Transaction successful");
         }
 
-        // Get transaction by transaction ID
-        // GET api/transaction/get-by-trxid
-        // Developed by : Mohith
+        // GET: api/transaction/get-by-trxid
         [HttpGet("get-by-trxid")]
-        public IActionResult GetByTrxId([FromQuery] int trxId)
+        public ResponseResult<TransactionResponseVM> GetByTrxId([FromQuery] int trxId)
         {
             var result = _transactionService.GetByTrxId(trxId);
             if (result == null)
-                return new ResponseResult<string>(HttpStatusCode.NotFound, null, "Transaction not found.");
+                return new ResponseResult<TransactionResponseVM>(HttpStatusCode.NotFound, null, "Transaction not found.");
 
             return new ResponseResult<TransactionResponseVM>(HttpStatusCode.OK, result);
         }
 
-        // Get transaction by transaction ID and tenant ID
-        // GET api/transaction/get-by-trxid-tenant
-        // Developed by : Mohith
+        // GET: api/transaction/get-by-trxid-tenant
         [HttpGet("get-by-trxid-tenant")]
-        public IActionResult GetByTrxIdAndTenantId([FromQuery] int trxId, [FromQuery] int tenantId)
+        public ResponseResult<TransactionResponseVM> GetByTrxIdAndTenantId([FromQuery] int trxId, [FromQuery] int tenantId)
         {
             var result = _transactionService.GetByTrxIdAndTenantId(trxId, tenantId);
             if (result == null)
-                return new ResponseResult<string>(HttpStatusCode.NotFound, null, "Transaction not found.");
+                return new ResponseResult<TransactionResponseVM>(HttpStatusCode.NotFound, null, "Transaction not found.");
 
             return new ResponseResult<TransactionResponseVM>(HttpStatusCode.OK, result);
         }
 
-        // Get transactions by reference transaction ID
-        // GET api/transaction/get-by-reftrnsid
-        // Developed by : Mohith
+        // GET: api/transaction/get-by-reftrnsid
         [HttpGet("get-by-reftrnsid")]
-        public IActionResult GetByRefTrnsId([FromQuery] string refTrnsId)
+        public ResponseResult<List<TransactionResponseVM>> GetByRefTrnsId([FromQuery] string refTrnsId)
         {
             var result = _transactionService.GetByRefTrnsId(refTrnsId);
             if (result == null || result.Count == 0)
-                return new ResponseResult<string>(HttpStatusCode.NotFound, null, "Transaction not found.");
+                return new ResponseResult<List<TransactionResponseVM>>(HttpStatusCode.NotFound, null, "Transaction not found.");
 
             return new ResponseResult<List<TransactionResponseVM>>(HttpStatusCode.OK, result);
         }
 
-        // Update transaction amount by reference transaction ID and tenant ID
-        // PUT api/transaction/update-amount-by-ref
-        // Developed by : Mohith
+        // PUT: api/transaction/update-amount-by-ref
         [HttpPut("update-amount-by-ref")]
-        public IActionResult UpdateTrxAmountByRefAndTenant([FromBody] UpdateTrxAmountRequestVM request)
+        public ResponseResult<string> UpdateTrxAmountByRefAndTenant([FromBody] UpdateTrxAmountRequestVM request)
         {
             var isSuccess = _transactionService.UpdateAmountByRefTrnsIdAndTenant(
                 request.RefTrnsId, request.TenantId, request.NewAmount, request.ModifiedBy);
@@ -95,6 +85,13 @@ namespace SchoolManagement.Controllers
             }
 
             return new ResponseResult<string>(HttpStatusCode.OK, null, "Transaction amounts updated successfully.");
+        }
+
+        // GET: api/transaction/table/tenant/{tenantId}
+        [HttpGet("table/tenant/{tenantId}")]
+        public ResponseResult<VTransactionTableVM> GetFormattedTransactionTable(int tenantId)
+        {
+            return _transactionService.GetFormattedTransactionTable(tenantId);
         }
     }
 }

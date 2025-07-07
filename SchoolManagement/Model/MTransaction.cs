@@ -47,6 +47,10 @@ namespace NeuroPi.UserManagment.Model
 
         public virtual MTenant Tenant { get; set; }
 
+        [Column("trx_date")]
+        public DateTime? TrxDate { get; set; }
+
+
 
     }
 }
