@@ -196,7 +196,6 @@ namespace SchoolManagement.Services.Implementation
             };
         }
 
-
         public bool SaveAssessmentMatrix(SaveAssessmentMatrixRequestVm request)
         {
             try
@@ -212,9 +211,13 @@ namespace SchoolManagement.Services.Implementation
                         x.TenantId == request.TenantId)
                     .ToDictionary(x => (x.StudentId, x.AssessmentId));
 
+                Console.WriteLine($"[DEBUG] Existing assessments found: {existingMap.Count}");
+
                 // Step 2: Insert or update grades
                 foreach (var student in request.Students)
                 {
+                    Console.WriteLine($"[DEBUG] Processing student: {student.StudentId}");
+
                     foreach (var grade in student.Grades)
                     {
                         var key = (student.StudentId, grade.AssessmentId);
@@ -226,11 +229,12 @@ namespace SchoolManagement.Services.Implementation
                                 existing.GradeId = grade.GradeId;
                                 existing.UpdatedBy = request.ConductedById;
                                 existing.UpdatedOn = now;
+                                Console.WriteLine($"[DEBUG] Updated Grade: StudentId={student.StudentId}, AssessmentId={grade.AssessmentId}, GradeId={grade.GradeId}");
                             }
                         }
                         else
                         {
-                            _context.DailyAssessments.Add(new MDailyAssessment
+                            var newEntry = new MDailyAssessment
                             {
                                 AssessmentDate = now,
                                 TimeTableId = request.TimeTableId,
@@ -243,14 +247,24 @@ namespace SchoolManagement.Services.Implementation
                                 CreatedBy = request.ConductedById,
                                 CreatedOn = now,
                                 IsDeleted = false
-                            });
+                            };
+
+                            _context.DailyAssessments.Add(newEntry);
+
+                            Console.WriteLine($"[DEBUG] Added Grade: StudentId={student.StudentId}, AssessmentId={grade.AssessmentId}, GradeId={grade.GradeId}");
                         }
                     }
                 }
 
-                _context.SaveChanges();
+                // Log number of new additions before saving
+                var addedCount = _context.ChangeTracker.Entries()
+                    .Count(e => e.State == EntityState.Added);
+                Console.WriteLine($"[DEBUG] Total new records to insert: {addedCount}");
 
-                // Step 3: Update timetable assessment status if override provided
+                var saveResult = _context.SaveChanges();
+                Console.WriteLine($"[DEBUG] SaveChanges() result: {saveResult}");
+
+                // Step 3: Update timetable assessment status
                 var timeTable = _context.TimeTables.FirstOrDefault(tt =>
                     !tt.IsDeleted &&
                     tt.Id == request.TimeTableId &&
@@ -261,9 +275,9 @@ namespace SchoolManagement.Services.Implementation
                     timeTable.AssessmentStatusCode = request.OverrideStatusCode;
                     timeTable.UpdatedBy = request.ConductedById;
                     timeTable.UpdatedOn = now;
-                    _context.SaveChanges();
 
-                    Console.WriteLine($"[DEBUG] TimeTable status updated to: {request.OverrideStatusCode}");
+                    var updateResult = _context.SaveChanges();
+                    Console.WriteLine($"[DEBUG] TimeTable status updated. SaveChanges() result: {updateResult}");
                 }
                 else
                 {
@@ -278,7 +292,6 @@ namespace SchoolManagement.Services.Implementation
                 return false;
             }
         }
-
 
 
     }
