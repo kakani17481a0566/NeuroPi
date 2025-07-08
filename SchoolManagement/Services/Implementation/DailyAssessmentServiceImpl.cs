@@ -197,14 +197,13 @@ namespace SchoolManagement.Services.Implementation
         }
 
 
-
         public bool SaveAssessmentMatrix(SaveAssessmentMatrixRequestVm request)
         {
             try
             {
                 var now = DateTime.UtcNow;
 
-                // Step 1: Load existing DailyAssessment records
+                // Step 1: Load existing records
                 var existingMap = _context.DailyAssessments
                     .Where(x =>
                         !x.IsDeleted &&
@@ -213,7 +212,7 @@ namespace SchoolManagement.Services.Implementation
                         x.TenantId == request.TenantId)
                     .ToDictionary(x => (x.StudentId, x.AssessmentId));
 
-                // Step 2: Save or update grades
+                // Step 2: Insert or update grades
                 foreach (var student in request.Students)
                 {
                     foreach (var grade in student.Grades)
@@ -249,48 +248,36 @@ namespace SchoolManagement.Services.Implementation
                     }
                 }
 
-                _context.SaveChanges(); // Save grades first
+                _context.SaveChanges();
 
-                // Step 3: Update timetable assessment status only from frontend override
-           {
-                    var timeTable = _context.TimeTables
-                        .FirstOrDefault(tt =>
-                            !tt.IsDeleted &&
-                            tt.Id == request.TimeTableId &&
-                            tt.TenantId == request.TenantId);
+                // Step 3: Update timetable assessment status if override provided
+                var timeTable = _context.TimeTables.FirstOrDefault(tt =>
+                    !tt.IsDeleted &&
+                    tt.Id == request.TimeTableId &&
+                    tt.TenantId == request.TenantId);
 
-                    if (timeTable != null)
-                    {
+                if (timeTable != null)
+                {
+                    timeTable.AssessmentStatusCode = request.OverrideStatusCode;
+                    timeTable.UpdatedBy = request.ConductedById;
+                    timeTable.UpdatedOn = now;
+                    _context.SaveChanges();
 
-
-
-                        timeTable.AssessmentStatusCode = request.OverrideStatusCode;
-                        timeTable.UpdatedBy = request.ConductedById;
-                        timeTable.UpdatedOn = now;
-
-                        //_context.TimeTables.Update(timeTable);
-                        _context.SaveChanges();
-
-                        Console.WriteLine($"[DEBUG] TimeTable status updated to: {request.OverrideStatusCode}");
-                    }
-
-                    else
-                    {
-                        Console.WriteLine($"[DEBUG] TimeTable status already set to: {request.OverrideStatusCode}");
-                    }
-                    }
-                  
+                    Console.WriteLine($"[DEBUG] TimeTable status updated to: {request.OverrideStatusCode}");
+                }
+                else
+                {
+                    Console.WriteLine($"[DEBUG] TimeTable not found for ID: {request.TimeTableId}");
+                }
 
                 return true;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ERROR] SaveAssessmentMatrix Exception: {ex.Message}");
+                Console.WriteLine($"[ERROR] SaveAssessmentMatrix Exception: {ex}");
                 return false;
             }
         }
-
-
 
 
 
