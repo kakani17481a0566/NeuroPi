@@ -13,14 +13,16 @@ namespace SchoolManagement.Model
 
         [Required]
         [Column("user_id")]
-        [ForeignKey(nameof(User))]
         public int UserId { get; set; }
-        public virtual MUser User { get; set; }
+
+        [ForeignKey(nameof(UserId))]
+        public virtual MUser User { get; set; }  // Will give ParentName from User.Username
 
         [Required]
         [Column("tenant_id")]
-        [ForeignKey(nameof(Tenant))]
         public int TenantId { get; set; }
+
+        [ForeignKey(nameof(TenantId))]
         public virtual MTenant Tenant { get; set; }
     }
 }

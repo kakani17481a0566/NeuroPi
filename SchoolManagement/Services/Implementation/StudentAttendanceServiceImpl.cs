@@ -145,6 +145,19 @@ namespace SchoolManagement.Services.Implementation
                     s.Name,
                     CourseId = s.Course.Id,
                     CourseName = s.Course.Name,
+
+                    // ✅ Get first non-deleted parent username
+                    Parent = s.ParentStudents
+    .Where(ps => !ps.IsDeleted && !ps.Parent.IsDeleted && ps.Parent.User != null)
+    .Select(ps => new
+    {
+        ps.ParentId,
+        ParentName = ps.Parent.User.Username
+    })
+    .FirstOrDefault(),
+
+
+
                     Attendance = s.StudentAttendances
                         .Where(a => a.Date == date && !a.IsDeleted)
                         .OrderByDescending(a => a.Id)
@@ -175,6 +188,11 @@ namespace SchoolManagement.Services.Implementation
                     ClassName = x.CourseName,
                     CourseId = x.CourseId,
 
+                    // ✅ Add parent name
+                    ParentId = x.Parent?.ParentId ?? 0,
+                    ParentName = x.Parent?.ParentName ?? "Not Assigned",
+
+
                     AttendanceId = att?.Id,
                     AttendanceDate = att?.Date.ToString("yyyy-MM-dd") ?? "Attendance not given",
                     FromTime = FormatTime(att?.FromTime),
@@ -201,7 +219,6 @@ namespace SchoolManagement.Services.Implementation
             {
                 Records = records,
                 Courses = distinctCourses,
-               
             };
         }
 

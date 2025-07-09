@@ -9,6 +9,10 @@
         public int CourseId { get; set; }
 
         public int? AttendanceId { get; set; }
+        public int ParentId { get; set; }
+        public string ParentName { get; set; }
+
+
         public string AttendanceDate { get; set; }
         public string FromTime { get; set; }
         public string ToTime { get; set; }

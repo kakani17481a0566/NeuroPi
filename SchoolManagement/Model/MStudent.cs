@@ -36,6 +36,9 @@ namespace SchoolManagement.Model
 
         public virtual ICollection<MStudentAttendance> StudentAttendances { get; set; } = new List<MStudentAttendance>();
 
+        public virtual ICollection<MParentStudent> ParentStudents { get; set; }
+
+
 
         // Tenant navigation already present
     }
