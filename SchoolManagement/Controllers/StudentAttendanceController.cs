@@ -130,6 +130,18 @@ namespace SchoolManagement.Controllers
         }
 
 
+        [HttpGet("graph")]
+        public IActionResult GetStudentAttendanceGraph(int studentId, int tenantId, int? branchId, int days = 7)
+        {
+            var data = _studentAttendanceService.GetStudentAttendanceGraph(studentId, tenantId, branchId, days);
+            return Ok(new
+            {
+                statusCode = 200,
+                message = "Attendance graph data fetched successfully.",
+                data = data
+            });
+        }
+
 
 
     }

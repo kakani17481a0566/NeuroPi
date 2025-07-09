@@ -22,5 +22,8 @@ namespace SchoolManagement.Services.Interface
 
         bool SaveAttendance(SaveAttendanceRequestVm request);
 
+        List<StudentAttendanceGraphVM> GetStudentAttendanceGraph(int studentId, int tenantId, int? branchId, int days = 7);
+
+
     }
 }

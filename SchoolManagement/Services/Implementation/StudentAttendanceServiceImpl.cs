@@ -323,5 +323,32 @@ namespace SchoolManagement.Services.Implementation
 
 
 
+        public List<StudentAttendanceGraphVM> GetStudentAttendanceGraph(int studentId, int tenantId, int? branchId, int days = 7)
+        {
+            var fromDate = DateOnly.FromDateTime(DateTime.Now.AddDays(-days));
+
+            var query = _context.StudentAttendance
+                .Where(s => !s.IsDeleted &&
+                            s.StudentId == studentId &&
+                            s.TenantId == tenantId &&
+                            s.Date >= fromDate);
+
+            if (branchId.HasValue)
+                query = query.Where(s => s.BranchId == branchId);
+
+            return query
+                .OrderBy(s => s.Date)
+                .ThenBy(s => s.FromTime)
+                .Select(s => new StudentAttendanceGraphVM
+                {
+                    Date = s.Date.ToString("yyyy-MM-dd"),
+                    InTime = s.FromTime.ToString(@"hh\:mm"),
+                    OutTime = s.ToTime.ToString(@"hh\:mm")
+                })
+                .ToList();
+        }
+
+
+
     }
 }
