@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using NeuroPi.UserManagment.Data;
 using SchoolManagement.Data;
 using SchoolManagement.Model;
@@ -134,93 +135,9 @@ namespace SchoolManagement.Services.Implementation
             _context.SaveChanges();
             return StudentAttendanceResponseVm.ToViewModel(existingAttendance);
         }
-
-        public StudentAttendanceStructuredSummaryVm GetAttendanceSummary(DateOnly date, int tenantId, int branchId)
-        {
-            var studentsWithAttendance = _context.Students
-                .Where(s => !s.IsDeleted && s.TenantId == tenantId && s.BranchId == branchId)
-                .Select(s => new
-                {
-                    s.Id,
-                    s.Name,
-                    CourseId = s.Course.Id,
-                    CourseName = s.Course.Name,
-
-                    // ✅ Get first non-deleted parent username
-                    Parent = s.ParentStudents
-    .Where(ps => !ps.IsDeleted && !ps.Parent.IsDeleted && ps.Parent.User != null)
-    .Select(ps => new
-    {
-        ps.ParentId,
-        ParentName = ps.Parent.User.Username
-    })
-    .FirstOrDefault(),
+   
 
 
-
-                    Attendance = s.StudentAttendances
-                        .Where(a => a.Date == date && !a.IsDeleted)
-                        .OrderByDescending(a => a.Id)
-                        .FirstOrDefault()
-                })
-                .OrderBy(x => x.CourseName)
-                .ThenBy(x => x.Id)
-                .ToList();
-
-            var userIds = studentsWithAttendance
-                .SelectMany(x => new[] { x.Attendance?.CreatedBy, x.Attendance?.UpdatedBy })
-                .Where(id => id.HasValue)
-                .Select(id => id.Value)
-                .Distinct()
-                .ToList();
-
-            var users = _userContext.Users
-                .Where(u => userIds.Contains(u.UserId))
-                .ToDictionary(u => u.UserId, u => $"{u.FirstName} {u.LastName}".Trim());
-
-            var records = studentsWithAttendance.Select(x =>
-            {
-                var att = x.Attendance;
-                return new StudentAttendanceSummaryVm
-                {
-                    StudentId = x.Id,
-                    StudentName = x.Name,
-                    ClassName = x.CourseName,
-                    CourseId = x.CourseId,
-
-                    // ✅ Add parent name
-                    ParentId = x.Parent?.ParentId ?? 0,
-                    ParentName = x.Parent?.ParentName ?? "Not Assigned",
-
-
-                    AttendanceId = att?.Id,
-                    AttendanceDate = att?.Date.ToString("yyyy-MM-dd") ?? "Attendance not given",
-                    FromTime = FormatTime(att?.FromTime),
-                    ToTime = FormatTime(att?.ToTime),
-                    MarkedBy = att?.CreatedBy != null && users.TryGetValue(att.CreatedBy, out var createdBy) ? createdBy : "Not marked",
-                    MarkedOn = att != null ? FormatDateTime(att.CreatedOn) : null,
-                    UpdatedBy = att?.UpdatedBy != null && users.TryGetValue(att.UpdatedBy.Value, out var updatedBy) ? updatedBy : "",
-                    UpdatedOn = att?.UpdatedOn.HasValue == true ? FormatDateTime(att.UpdatedOn.Value) : null,
-                    AttendanceStatus = GetAttendanceStatus(att)
-                };
-            }).ToList();
-
-            var distinctCourses = records
-                .GroupBy(r => new { r.CourseId, r.ClassName })
-                .Select(g => new CourseVm
-                {
-                    Id = g.Key.CourseId,
-                    Name = g.Key.ClassName
-                })
-                .OrderBy(c => c.Name)
-                .ToList();
-
-            return new StudentAttendanceStructuredSummaryVm
-            {
-                Records = records,
-                Courses = distinctCourses,
-            };
-        }
 
 
         public bool SaveAttendance(SaveAttendanceRequestVm request)
@@ -279,10 +196,105 @@ namespace SchoolManagement.Services.Implementation
 
 
 
+        public StudentAttendanceStructuredSummaryVm GetAttendanceSummary(DateOnly date, int tenantId, int branchId)
+        {
+            var studentsWithAttendance = _context.Students
+                .Where(s => !s.IsDeleted && s.TenantId == tenantId && s.BranchId == branchId)
+                .Include(s => s.Course)
+                .Include(s => s.ParentStudents).ThenInclude(ps => ps.Parent).ThenInclude(p => p.User)
+                .Include(s => s.StudentAttendances)
+                .AsEnumerable()
+                .Select(s => new
+                {
+                    s.Id,
+                    s.Name,
+                    CourseId = s.Course?.Id ?? 0,
+                    CourseName = s.Course?.Name ?? "Unassigned",
+                    Parent = s.ParentStudents
+                        .Where(ps => !ps.IsDeleted && !ps.Parent.IsDeleted && ps.Parent.User != null)
+                        .Select(ps => new
+                        {
+                            ps.ParentId,
+                            ParentName = ps.Parent.User.Username,
+                            MobileNumber = ps.Parent.User.MobileNumber,
+                            AlternateNumber = ps.Parent.User.AlternateNumber
+                        })
+                        .FirstOrDefault(),
+                    Attendance = s.StudentAttendances
+                        .Where(a => a.Date == date && !a.IsDeleted)
+                        .OrderByDescending(a => a.Id)
+                        .FirstOrDefault()
+                })
+                .OrderBy(x => x.CourseName)
+                .ThenBy(x => x.Name)
+                .ToList();
+
+            var userIds = studentsWithAttendance
+                .SelectMany(x => new[] { x.Attendance?.CreatedBy, x.Attendance?.UpdatedBy })
+                .Where(id => id.HasValue)
+                .Select(id => id.Value)
+                .Distinct()
+                .ToList();
+
+            var users = _userContext.Users
+                .Where(u => userIds.Contains(u.UserId))
+                .ToDictionary(u => u.UserId, u => $"{u.FirstName} {u.LastName}".Trim());
+
+            var records = studentsWithAttendance.Select(x =>
+            {
+                var att = x.Attendance;
+
+                return new StudentAttendanceSummaryVm
+                {
+                    StudentId = x.Id,
+                    StudentName = x.Name,
+                    ClassName = x.CourseName,
+                    CourseId = x.CourseId,
+                    ParentId = x.Parent?.ParentId ?? 0,
+                    ParentName = x.Parent?.ParentName ?? "Not Assigned",
+                    MobileNumber = x.Parent?.MobileNumber ?? "-",
+                    AlternateNumber = x.Parent?.AlternateNumber ?? "-",
+                    AttendanceId = att?.Id,
+                    AttendanceDate = att?.Date.ToString("yyyy-MM-dd") ?? "Attendance not given",
+                    FromTime = FormatTime(att?.FromTime),
+                    ToTime = FormatTime(att?.ToTime),
+                    MarkedBy = att?.CreatedBy is int cb && users.TryGetValue(cb, out var mb) ? mb : "Not marked",
+                    MarkedOn = att != null ? FormatDateTime(att.CreatedOn) : null,
+                    UpdatedBy = att?.UpdatedBy is int ub && users.TryGetValue(ub, out var ubName) ? ubName : "",
+                    UpdatedOn = att?.UpdatedOn.HasValue == true ? FormatDateTime(att.UpdatedOn.Value) : null,
+                    AttendanceStatus = GetAttendanceStatus(att)
+                };
+            }).ToList();
+
+            var distinctCourses = records
+                .GroupBy(r => new { r.CourseId, r.ClassName })
+                .Select(g => new CourseVm
+                {
+                    Id = g.Key.CourseId,
+                    Name = g.Key.ClassName
+                })
+                .OrderBy(c => c.Name)
+                .ToList();
+
+            return new StudentAttendanceStructuredSummaryVm
+            {
+                Records = records,
+                Courses = distinctCourses,
+                TotalStudents = records.Count,
+                CheckedInCount = records.Count(r => r.AttendanceStatus == "Checked-In"),
+                CheckedOutCount = records.Count(r => r.AttendanceStatus == "Checked-Out"),
+                NotMarkedCount = records.Count(r => r.AttendanceStatus == "Not Marked"),
+                UnknownCount = records.Count(r => r.AttendanceStatus == "Unknown")
+            };
+        }
+
+
+
+
         // 🔽 Helper Methods 🔽
 
         private string FormatTime(TimeSpan? time) =>
-            time.HasValue && time.Value != TimeSpan.Zero ? time.Value.ToString(@"hh\:mm") : "Not marked";
+         time.HasValue && time.Value != TimeSpan.Zero ? time.Value.ToString(@"hh\:mm") : "Not marked";
 
         private string FormatDateTime(DateTime dateTime) =>
             dateTime.ToString("yyyy-MM-dd HH:mm");
@@ -290,9 +302,18 @@ namespace SchoolManagement.Services.Implementation
         private string GetAttendanceStatus(MStudentAttendance attendance)
         {
             if (attendance == null) return "Not Marked";
-            if (attendance.FromTime != TimeSpan.Zero && attendance.ToTime == TimeSpan.Zero) return "Checked-In";
-            if (attendance.FromTime != TimeSpan.Zero && attendance.ToTime != TimeSpan.Zero) return "Checked-Out";
-            return "Unknown";
+
+            var hasFrom = attendance.FromTime != null && attendance.FromTime != TimeSpan.Zero;
+            var hasTo = attendance.ToTime != null && attendance.ToTime != TimeSpan.Zero;
+
+            if (hasFrom && hasTo) return "Checked-Out";
+            if (hasFrom) return "Checked-In";
+
+            return "Not Marked";
         }
+
+
+
+
     }
 }
