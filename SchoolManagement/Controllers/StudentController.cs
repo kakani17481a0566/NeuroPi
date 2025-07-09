@@ -4,6 +4,7 @@ using SchoolManagement.Response;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.Student;
 using SchoolManagement.ViewModel.Students;
+using SchoolManagement.ViewModel.Subject;
 using System.Net;
 
 namespace SchoolManagement.Controllers
@@ -95,6 +96,28 @@ namespace SchoolManagement.Controllers
             return new ResponseResult<StudentsData>(HttpStatusCode.OK, response, "Student Details Fetched SuccessFully");
 
         }
+
+        [HttpGet("performance")]
+        public ResponseResult<List<VStudentPerformanceVM>> GetStudentPerformance([FromQuery] int tenantId, [FromQuery] int courseId, [FromQuery] int branchId)
+        {
+            var data = _studentService.GetStudentPerformance(tenantId, courseId, branchId);
+            if (data == null || !data.Any())
+                return new ResponseResult<List<VStudentPerformanceVM>>(HttpStatusCode.NotFound, null, "No performance data found.");
+
+            return new ResponseResult<List<VStudentPerformanceVM>>(HttpStatusCode.OK, data, "Student performance data fetched successfully.");
+        }
+
+
+        [HttpGet("chart-performance")]
+        public ResponseResult<VStudentPerformanceChartVM> GetStudentChartData([FromQuery] int tenantId, [FromQuery] int courseId, [FromQuery] int branchId)
+        {
+            var result = _studentService.GetStudentPerformanceChartData(tenantId, courseId, branchId);
+            if (result == null || !result.Headers.Any())
+                return new ResponseResult<VStudentPerformanceChartVM>(HttpStatusCode.NotFound, null, "No chart data found");
+
+            return new ResponseResult<VStudentPerformanceChartVM>(HttpStatusCode.OK, result, "Chart data fetched successfully");
+        }
+
 
 
 

@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.AspNetCore.Components.Forms;
+﻿using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Data;
 using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.Student;
 using SchoolManagement.ViewModel.Students;
+using SchoolManagement.ViewModel.Subject;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SchoolManagement.Services.Implementation
 {
@@ -174,5 +175,127 @@ namespace SchoolManagement.Services.Implementation
             }
             return null;
         }
+
+
+
+
+        public List<VStudentPerformanceVM> GetStudentPerformance(int tenantId, int courseId, int branchId)
+        {
+            var result = _context.DailyAssessments
+                .Include(d => d.Student)
+                .Include(d => d.Grade)
+                .Include(d => d.TimeTable)
+                    .ThenInclude(t => t.Week)
+                        .ThenInclude(w => w.Term)
+                .Include(d => d.TimeTable.Course)
+                .Include(d => d.Assessment)
+                    .ThenInclude(a => a.AssessmentSkill)
+                .Where(d =>
+                    !d.IsDeleted &&
+                    !d.Student.IsDeleted &&
+                    !d.Grade.IsDeleted &&
+                    !d.TimeTable.IsDeleted &&
+                    !d.TimeTable.Week.IsDeleted &&
+                    !d.TimeTable.Week.Term.IsDeleted &&
+                    !d.Assessment.IsDeleted &&
+                    !d.Assessment.AssessmentSkill.IsDeleted &&
+                    !d.TimeTable.Course.IsDeleted &&
+                    d.Student.TenantId == tenantId &&
+                    d.Student.CourseId == courseId &&
+                    d.Student.BranchId == branchId
+                )
+                .Select(d => new VStudentPerformanceVM
+                {
+                    AssessmentId = d.Id,
+                    AssessmentDate = d.AssessmentDate,
+                    StudentId = d.Student.Id,
+                    StudentName = d.Student.Name,
+                    GradeId = d.Grade.Id,
+                    Grade = d.Grade.Name,
+                    GradeDescription = d.Grade.Description,
+                    TimeTableId = d.TimeTable.Id,
+                    DayName = d.TimeTable.Name,
+                    TimeTableDate = d.TimeTable.Date,
+                    WeekId = d.TimeTable.Week.Id,
+                    WeekName = d.TimeTable.Week.Name,
+                    WeekStartDate = d.TimeTable.Week.StartDate.ToDateTime(TimeOnly.MinValue),
+                    WeekEndDate = d.TimeTable.Week.EndDate.ToDateTime(TimeOnly.MinValue),
+                    TermId = d.TimeTable.Week.Term.Id,
+                    TermName = d.TimeTable.Week.Term.Name,
+                    TermStartDate = d.TimeTable.Week.Term.StartDate,
+                    TermEndDate = d.TimeTable.Week.Term.EndDate,
+                    CourseId = d.TimeTable.Course.Id,
+                    CourseName = d.TimeTable.Course.Name,
+                    AssessmentItemId = d.Assessment.Id,
+                    AssessmentName = d.Assessment.Name,
+                    SkillId = d.Assessment.AssessmentSkill.Id,
+                    SkillName = d.Assessment.AssessmentSkill.Name,
+                    SkillCode = d.Assessment.AssessmentSkill.Code
+                })
+                .ToList();
+
+            return result;
+        }
+
+
+        public VStudentPerformanceChartVM GetStudentPerformanceChartData(int tenantId, int courseId, int branchId)
+        {
+            var rawData = _context.DailyAssessments
+                .Where(d => !d.IsDeleted &&
+                            !d.Student.IsDeleted &&
+                            !d.Grade.IsDeleted &&
+                            !d.TimeTable.IsDeleted &&
+                            !d.TimeTable.Week.IsDeleted &&
+                            !d.TimeTable.Week.Term.IsDeleted &&
+                            !d.TimeTable.Course.IsDeleted &&
+                            !d.Assessment.IsDeleted &&
+                            !d.Assessment.AssessmentSkill.IsDeleted &&
+                            d.Student.TenantId == tenantId &&
+                            d.Student.CourseId == courseId &&
+                            d.Student.BranchId == branchId)
+                .Select(d => new
+                {
+                    StudentId = d.Student.Id,
+                    StudentName = d.Student.Name,
+                    SkillCode = d.Assessment.AssessmentSkill.Code,
+                    Grade = d.Grade.Name
+                })
+                .ToList();
+
+            var skillCodes = rawData
+                .Select(x => x.SkillCode)
+                .Distinct()
+                .OrderBy(x => x)
+                .ToList();
+
+            var headers = new List<string> { "Student" };
+            headers.AddRange(skillCodes);
+
+            var studentGroups = rawData
+                .GroupBy(x => new { x.StudentId, x.StudentName })
+                .ToList();
+
+            var tdata = new List<List<string>>();
+
+            foreach (var student in studentGroups)
+            {
+                var row = new List<string> { student.Key.StudentName };
+                foreach (var skill in skillCodes)
+                {
+                    var grade = student.FirstOrDefault(x => x.SkillCode == skill)?.Grade ?? "Not Graded";
+                    row.Add(grade);
+                }
+                tdata.Add(row);
+            }
+
+            return new VStudentPerformanceChartVM
+            {
+                Headers = headers,
+                TData = tdata
+            };
+        }
+
+
+
     }
 }

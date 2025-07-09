@@ -96,12 +96,17 @@ namespace SchoolManagement.Controllers
         {
             if (!date.HasValue)
                 return BadRequest("Date is required and must be in yyyy-MM-dd format.");
-            var dateOnly= DateOnly.FromDateTime(date.Value);
+
+            var dateOnly = DateOnly.FromDateTime(date.Value);
 
             var records = _studentAttendanceService
-                .GetAttendanceSummary(dateOnly, tenantId, branchId)
-                .Where(r => r.CourseId == courseId) // ✅ filter by courseId
-                .ToList();
+                .GetAttendanceSummary(dateOnly, tenantId, branchId);
+
+            // ✅ Apply courseId filter only if courseId != -1
+            if (courseId != -1)
+            {
+                records = records.Where(r => r.CourseId == courseId).ToList();
+            }
 
             var headers = typeof(StudentAttendanceSummaryVm)
                 .GetProperties()
@@ -110,13 +115,14 @@ namespace SchoolManagement.Controllers
 
             var response = new
             {
-                id = courseId, // ✅ direct from query
+                id = courseId, // Keep it as passed (including -1 for "all")
                 headers,
                 data = records,
             };
 
             return Ok(response);
         }
+
 
 
         [HttpPost("mark-attendance")]

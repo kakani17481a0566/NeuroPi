@@ -1,5 +1,6 @@
 ﻿using SchoolManagement.ViewModel.Student;
 using SchoolManagement.ViewModel.Students;
+using SchoolManagement.ViewModel.Subject;
 using System.Collections.Generic;
 
 namespace SchoolManagement.Services.Interface
@@ -17,6 +18,10 @@ namespace SchoolManagement.Services.Interface
 
         StudentVM GetByTenantCourseBranch(int tenantId, int courseId, int branchId);
         StudentsData GetStudentDetails(int courseId, int branchId,DateOnly date, int tenantId);
+
+        List<VStudentPerformanceVM> GetStudentPerformance(int tenantId, int courseId, int branchId);
+
+        VStudentPerformanceChartVM GetStudentPerformanceChartData(int tenantId, int courseId, int branchId);
 
 
     }
