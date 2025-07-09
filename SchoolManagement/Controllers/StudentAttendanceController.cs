@@ -87,41 +87,38 @@ namespace SchoolManagement.Controllers
 
 
         [HttpGet("summary-structured")]
-        public IActionResult GetStructuredAttendanceSummary(
-            [FromQuery] DateTime? date,
-            [FromQuery] int tenantId,
-            [FromQuery] int branchId,
-            [FromQuery] int courseId // ✅ id as courseId
-        )
+        public ResponseResult<StudentAttendanceStructuredSummaryVm> GetStructuredAttendanceSummary(
+       [FromQuery] DateTime? date,
+       [FromQuery] int tenantId,
+       [FromQuery] int branchId,
+       [FromQuery] int courseId
+   )
         {
             if (!date.HasValue)
-                return BadRequest("Date is required and must be in yyyy-MM-dd format.");
+            {
+                return new ResponseResult<StudentAttendanceStructuredSummaryVm>(
+                    HttpStatusCode.BadRequest,
+                    null,
+                    "Date is required."
+                );
+            }
 
             var dateOnly = DateOnly.FromDateTime(date.Value);
 
-            var records = _studentAttendanceService
-                .GetAttendanceSummary(dateOnly, tenantId, branchId);
+            var summary = _studentAttendanceService.GetAttendanceSummary(dateOnly, tenantId, branchId);
 
-            // ✅ Apply courseId filter only if courseId != -1
-            if (courseId != -1)
-            {
-                records = records.Where(r => r.CourseId == courseId).ToList();
-            }
-
-            var headers = typeof(StudentAttendanceSummaryVm)
-                .GetProperties()
-                .Select(p => char.ToLowerInvariant(p.Name[0]) + p.Name.Substring(1))
+            // ✅ Apply course filter to records
+            summary.Records = summary.Records
+                .Where(r => courseId == -1 || r.CourseId == courseId)
                 .ToList();
 
-            var response = new
-            {
-                id = courseId, // Keep it as passed (including -1 for "all")
-                headers,
-                data = records,
-            };
-
-            return Ok(response);
+            return new ResponseResult<StudentAttendanceStructuredSummaryVm>(
+                HttpStatusCode.OK,
+                summary,
+                "Attendance summary with course list retrieved successfully"
+            );
         }
+
 
 
 

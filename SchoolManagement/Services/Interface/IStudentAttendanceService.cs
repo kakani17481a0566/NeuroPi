@@ -17,7 +17,8 @@ namespace SchoolManagement.Services.Interface
         StudentAttendanceResponseVm UpdateStudentAttendance(int id, int tenantId,StudentAttendanceUpdateVM studentAttendanceRequestVm);
 
         bool DeleteStudentAttendance(int id, int tenantId);
-        List<StudentAttendanceSummaryVm> GetAttendanceSummary(DateOnly date, int tenantId, int branchId);
+        StudentAttendanceStructuredSummaryVm GetAttendanceSummary(DateOnly date, int tenantId, int branchId);
+
 
         bool SaveAttendance(SaveAttendanceRequestVm request);
 

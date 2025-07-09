@@ -135,7 +135,7 @@ namespace SchoolManagement.Services.Implementation
             return StudentAttendanceResponseVm.ToViewModel(existingAttendance);
         }
 
-        public List<StudentAttendanceSummaryVm> GetAttendanceSummary(DateOnly date, int tenantId, int branchId)
+        public StudentAttendanceStructuredSummaryVm GetAttendanceSummary(DateOnly date, int tenantId, int branchId)
         {
             var studentsWithAttendance = _context.Students
                 .Where(s => !s.IsDeleted && s.TenantId == tenantId && s.BranchId == branchId)
@@ -143,8 +143,7 @@ namespace SchoolManagement.Services.Implementation
                 {
                     s.Id,
                     s.Name,
-                    CourseId = s.Course.Id, 
-
+                    CourseId = s.Course.Id,
                     CourseName = s.Course.Name,
                     Attendance = s.StudentAttendances
                         .Where(a => a.Date == date && !a.IsDeleted)
@@ -166,7 +165,7 @@ namespace SchoolManagement.Services.Implementation
                 .Where(u => userIds.Contains(u.UserId))
                 .ToDictionary(u => u.UserId, u => $"{u.FirstName} {u.LastName}".Trim());
 
-            var result = studentsWithAttendance.Select(x =>
+            var records = studentsWithAttendance.Select(x =>
             {
                 var att = x.Attendance;
                 return new StudentAttendanceSummaryVm
@@ -174,7 +173,7 @@ namespace SchoolManagement.Services.Implementation
                     StudentId = x.Id,
                     StudentName = x.Name,
                     ClassName = x.CourseName,
-                    CourseId = x.CourseId, 
+                    CourseId = x.CourseId,
 
                     AttendanceId = att?.Id,
                     AttendanceDate = att?.Date.ToString("yyyy-MM-dd") ?? "Attendance not given",
@@ -188,7 +187,22 @@ namespace SchoolManagement.Services.Implementation
                 };
             }).ToList();
 
-            return result;
+            var distinctCourses = records
+                .GroupBy(r => new { r.CourseId, r.ClassName })
+                .Select(g => new CourseVm
+                {
+                    Id = g.Key.CourseId,
+                    Name = g.Key.ClassName
+                })
+                .OrderBy(c => c.Name)
+                .ToList();
+
+            return new StudentAttendanceStructuredSummaryVm
+            {
+                Records = records,
+                Courses = distinctCourses,
+               
+            };
         }
 
 
