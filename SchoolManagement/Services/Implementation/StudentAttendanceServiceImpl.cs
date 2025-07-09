@@ -229,6 +229,13 @@ namespace SchoolManagement.Services.Implementation
                 .ThenBy(x => x.Name)
                 .ToList();
 
+            // Step 1: Get headers from the VM using reflection
+            var headers = typeof(StudentAttendanceSummaryVm)
+                .GetProperties()
+                .Select(p => char.ToLowerInvariant(p.Name[0]) + p.Name.Substring(1)) // convert to camelCase for frontend
+                .ToList();
+
+
             var userIds = studentsWithAttendance
                 .SelectMany(x => new[] { x.Attendance?.CreatedBy, x.Attendance?.UpdatedBy })
                 .Where(id => id.HasValue)
@@ -278,6 +285,7 @@ namespace SchoolManagement.Services.Implementation
 
             return new StudentAttendanceStructuredSummaryVm
             {
+                Headers = headers,
                 Records = records,
                 Courses = distinctCourses,
                 TotalStudents = records.Count,
