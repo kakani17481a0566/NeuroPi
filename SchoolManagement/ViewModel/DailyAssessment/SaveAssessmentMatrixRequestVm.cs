@@ -26,5 +26,8 @@
     {
         public int AssessmentId { get; set; }
         public int GradeId { get; set; }
+
+        public DateTime? AssessmentDate { get; set; } // ✅ NEW
     }
+
 }

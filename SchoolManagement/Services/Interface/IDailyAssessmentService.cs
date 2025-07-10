@@ -15,5 +15,8 @@ namespace SchoolManagement.Services.Interface
         bool Delete(int id, int tenantId);
 
         bool SaveAssessmentMatrix(SaveAssessmentMatrixRequestVm request);
+
+        DailyAssessmentPerformanceSummaryResponse GetPerformanceSummary(int tenantId, int courseId, int branchId, int weekId);
+
     }
 }

@@ -294,5 +294,111 @@ namespace SchoolManagement.Services.Implementation
         }
 
 
+
+
+
+        public DailyAssessmentPerformanceSummaryResponse GetPerformanceSummary(int tenantId, int courseId, int branchId, int weekId)
+        {
+            // Step 1: Fetch students for the given tenant, course, and branch
+            var students = _context.Students
+                .Where(s => !s.IsDeleted && s.TenantId == tenantId && s.BranchId == branchId && s.CourseId == courseId)
+                .Select(s => new StudentInfoVm
+                {
+                    StudentId = s.Id,
+                    StudentName = s.Name
+                })
+                .OrderBy(s => s.StudentId)
+                .ToList();
+
+            var studentIds = students.Select(s => s.StudentId).ToList();
+
+            // Step 2: Fetch daily assessments for the selected week
+            var dailyAssessments = _context.DailyAssessments
+                .Where(d =>
+                    !d.IsDeleted &&
+                    d.TenantId == tenantId &&
+                    d.BranchId == branchId &&
+                    studentIds.Contains(d.StudentId) &&
+                    d.TimeTable.WeekId == weekId)
+                .Include(d => d.Grade)
+                .Include(d => d.Assessment)
+                .ThenInclude(a => a.AssessmentSkill)
+                .ToList();
+
+            // Step 3: Build unique assessment headers
+            var headers = dailyAssessments
+                .Where(d => d.Assessment != null)
+                .Select(d => d.Assessment.Name)
+                .Distinct()
+                .OrderBy(h => h)
+                .ToList();
+
+            // Step 4: Build unique grade names used
+            var gradesUsed = dailyAssessments
+                .Select(d => d.Grade?.Name ?? "Not Graded")
+                .Distinct()
+                .ToList();
+
+            // Step 5: Build matrix of assessment scores
+            var assessmentGrades = new Dictionary<string, Dictionary<int, AssessmentScoreVm>>();
+            var studentScores = new Dictionary<int, List<decimal>>();
+
+            foreach (var header in headers)
+            {
+                assessmentGrades[header] = new Dictionary<int, AssessmentScoreVm>();
+
+                foreach (var student in students)
+                {
+                    var da = dailyAssessments.FirstOrDefault(d =>
+                        d.Assessment.Name == header &&
+                        d.StudentId == student.StudentId);
+
+                    var gradeName = da?.Grade?.Name ?? "Not Graded";
+                    decimal? score = da?.Grade?.MaxPercentage;
+                    DateTime? assessmentDate = da?.AssessmentDate;
+
+                    assessmentGrades[header][student.StudentId] = new AssessmentScoreVm
+                    {
+                        Grade = gradeName,
+                        Score = score,
+                        AssessmentDate = assessmentDate
+                    };
+
+                    if (score.HasValue)
+                    {
+                        if (!studentScores.ContainsKey(student.StudentId))
+                            studentScores[student.StudentId] = new List<decimal>();
+
+                        studentScores[student.StudentId].Add(score.Value);
+                    }
+                }
+            }
+
+            // Step 6: Compute average and std. deviation for each student
+            foreach (var student in students)
+            {
+                if (studentScores.TryGetValue(student.StudentId, out var scores) && scores.Any())
+                {
+                    var avg = scores.Average();
+                    var variance = scores.Sum(s => (decimal)Math.Pow((double)(s - avg), 2)) / scores.Count;
+                    var stdDev = Math.Sqrt((double)variance);
+
+                    student.AverageScore = Math.Round(avg, 2);
+                    student.StandardDeviation = Math.Round((decimal)stdDev, 2);
+                }
+            }
+
+            // Step 7: Return final response
+            return new DailyAssessmentPerformanceSummaryResponse
+            {
+                Headers = headers,
+                Students = students,
+                AssessmentGrades = assessmentGrades,
+                AssessmentStatusCode = gradesUsed
+            };
+        }
+
+
+
     }
 }

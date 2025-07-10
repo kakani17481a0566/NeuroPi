@@ -128,6 +128,21 @@ namespace SchoolManagement.Controllers
             }
         }
 
+        [HttpGet("performance-summary")]
+        public ResponseResult<DailyAssessmentPerformanceSummaryResponse> GetPerformanceSummary(
+    [FromQuery] int tenantId,
+    [FromQuery] int courseId,
+    [FromQuery] int branchId,
+    [FromQuery] int weekId)
+        {
+            var result = _service.GetPerformanceSummary(tenantId, courseId, branchId, weekId);
+            return new ResponseResult<DailyAssessmentPerformanceSummaryResponse>(
+                HttpStatusCode.OK,
+                result,
+                "Performance summary fetched successfully.");
+        }
+
+
 
 
     }
