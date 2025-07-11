@@ -299,7 +299,7 @@ namespace SchoolManagement.Services.Implementation
 
         public DailyAssessmentPerformanceSummaryResponse GetPerformanceSummary(int tenantId, int courseId, int branchId, int weekId)
         {
-            // Step 1: Fetch students for the given tenant, course, and branch
+            // Step 1: Fetch all students
             var students = _context.Students
                 .Where(s => !s.IsDeleted && s.TenantId == tenantId && s.BranchId == branchId && s.CourseId == courseId)
                 .Select(s => new StudentInfoVm
@@ -312,34 +312,80 @@ namespace SchoolManagement.Services.Implementation
 
             var studentIds = students.Select(s => s.StudentId).ToList();
 
-            // Step 2: Fetch daily assessments for the selected week
+            // Step 2: Resolve effective weekId
+            DateOnly today = DateOnly.FromDateTime(DateTime.Today);
+            int? effectiveWeekId = weekId switch
+            {
+                -1 => _context.Weeks
+                        .Where(w => !w.IsDeleted && w.StartDate <= today && w.EndDate >= today)
+                        .Select(w => (int?)w.Id)
+                        .FirstOrDefault(),
+                > 0 => weekId,
+                _ => null
+            };
+
+            // Step 3: Fetch filtered assessments
             var dailyAssessments = _context.DailyAssessments
                 .Where(d =>
                     !d.IsDeleted &&
                     d.TenantId == tenantId &&
                     d.BranchId == branchId &&
                     studentIds.Contains(d.StudentId) &&
-                    d.TimeTable.WeekId == weekId)
+                    (effectiveWeekId == null || d.TimeTable.WeekId == effectiveWeekId))
                 .Include(d => d.Grade)
                 .Include(d => d.Assessment)
-                .ThenInclude(a => a.AssessmentSkill)
+                    .ThenInclude(a => a.AssessmentSkill)
+                        .ThenInclude(s => s.Subject)
+                .Include(d => d.TimeTable)
+                    .ThenInclude(t => t.Week)
                 .ToList();
 
-            // Step 3: Build unique assessment headers
-            var headers = dailyAssessments
-                .Where(d => d.Assessment != null)
-                .Select(d => d.Assessment.Name)
-                .Distinct()
-                .OrderBy(h => h)
+            // Step 4: Week dictionary
+            var weekDictionary = _context.Weeks
+                .Where(w => !w.IsDeleted)
+                .OrderBy(w => w.StartDate)
+                .ToDictionary(
+                    w => w.Id,
+                    w => $"{w.Name} ({w.StartDate:dd MMM} - {w.EndDate:dd MMM})"
+                );
+
+            // Step 5: Extract selected week
+            var selectedWeek = dailyAssessments
+                .Select(d => d.TimeTable.Week)
+                .Where(w => w != null)
+                .OrderBy(w => w.StartDate)
+                .FirstOrDefault();
+
+            string? weekName = selectedWeek?.Name;
+            DateOnly? weekStartDate = selectedWeek?.StartDate;
+            DateOnly? weekEndDate = selectedWeek?.EndDate;
+
+            // Step 6: Header details (add SubjectCode)
+            var headerDetails = dailyAssessments
+                .Where(d => d.Assessment != null && d.Assessment.AssessmentSkill != null && d.Assessment.AssessmentSkill.Subject != null)
+                .GroupBy(d => d.Assessment.Id)
+                .Select(g => new AssessmentHeaderVm
+                {
+                    AssessmentId = g.Key,
+                    Name = g.First().Assessment.Name,
+                    SkillId = g.First().Assessment.AssessmentSkill.Id,
+                    SkillName = g.First().Assessment.AssessmentSkill.Name,
+                    SubjectId = g.First().Assessment.AssessmentSkill.Subject.Id,
+                    SubjectName = g.First().Assessment.AssessmentSkill.Subject.Name,
+                    SubjectCode = g.First().Assessment.AssessmentSkill.Subject.Code // ✅ Added
+                })
+                .OrderBy(h => h.AssessmentId)
                 .ToList();
 
-            // Step 4: Build unique grade names used
+            var headers = headerDetails.Select(h => h.Name).ToList();
+
+            // Step 7: Grades used
             var gradesUsed = dailyAssessments
                 .Select(d => d.Grade?.Name ?? "Not Graded")
                 .Distinct()
                 .ToList();
 
-            // Step 5: Build matrix of assessment scores
+            // Step 8: Score matrix
             var assessmentGrades = new Dictionary<string, Dictionary<int, AssessmentScoreVm>>();
             var studentScores = new Dictionary<int, List<decimal>>();
 
@@ -374,7 +420,7 @@ namespace SchoolManagement.Services.Implementation
                 }
             }
 
-            // Step 6: Compute average and std. deviation for each student
+            // Step 9: Compute average and stddev
             foreach (var student in students)
             {
                 if (studentScores.TryGetValue(student.StudentId, out var scores) && scores.Any())
@@ -388,15 +434,72 @@ namespace SchoolManagement.Services.Implementation
                 }
             }
 
-            // Step 7: Return final response
+            // Step 10: Subject-wise assessments (add SubjectCode)
+            var subjectWiseAssessments = headerDetails
+                .GroupBy(h => new { h.SubjectId, h.SubjectName, h.SubjectCode }) // ✅ Include SubjectCode
+                .Select(subjectGroup => new SubjectGroupedAssessmentVm
+                {
+                    SubjectId = subjectGroup.Key.SubjectId,
+                    SubjectName = subjectGroup.Key.SubjectName,
+                    SubjectCode = subjectGroup.Key.SubjectCode, // ✅ Assign
+                    Skills = subjectGroup.Select(header => new SkillAssessmentVm
+                    {
+                        AssessmentId = header.AssessmentId,
+                        Name = header.Name,
+                        SkillId = header.SkillId,
+                        SkillName = header.SkillName,
+                        StudentScores = students.Select(s =>
+                        {
+                            var scoreVm = assessmentGrades.TryGetValue(header.Name, out var studentMap) &&
+                                          studentMap.TryGetValue(s.StudentId, out var score)
+                                ? score
+                                : new AssessmentScoreVm();
+
+                            return new StudentScoreEntryVm
+                            {
+                                StudentId = s.StudentId,
+                                Grade = scoreVm.Grade,
+                                Score = scoreVm.Score,
+                                AssessmentDate = scoreVm.AssessmentDate
+                            };
+                        }).ToList()
+                    }).ToList()
+                }).ToList();
+
+            // Step 11: Assessment schedule
+            var assessmentSchedule = dailyAssessments
+                .Select(d => d.TimeTable)
+                .Where(t => t != null)
+                .GroupBy(t => t.Id)
+                .Select(g => new AssessmentScheduleVm
+                {
+                    TimeTableId = g.Key,
+                    Name = g.First().Name,
+                    Date = DateOnly.FromDateTime(g.First().Date)
+                })
+                .OrderBy(s => s.Date)
+                .ToList();
+
+            // Step 12: Final Response
             return new DailyAssessmentPerformanceSummaryResponse
             {
                 Headers = headers,
                 Students = students,
                 AssessmentGrades = assessmentGrades,
-                AssessmentStatusCode = gradesUsed
+                AssessmentStatusCode = gradesUsed,
+                HeaderDetails = headerDetails,
+                SubjectWiseAssessments = subjectWiseAssessments,
+                StudentDictionary = students.ToDictionary(s => s.StudentId, s => s.StudentName),
+                SubjectDictionary = subjectWiseAssessments.ToDictionary(s => s.SubjectId, s => s.SubjectName),
+                WeekDictionary = weekDictionary,
+                WeekName = weekName,
+                WeekStartDate = weekStartDate,
+                WeekEndDate = weekEndDate,
+                AssessmentSchedule = assessmentSchedule
             };
         }
+
+
 
 
 

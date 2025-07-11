@@ -12,7 +12,6 @@
 
         public List<StudentAssessmentGradeVm> Students { get; set; } = new();
 
-        // ✅ Required now: status always comes from frontend
         public int OverrideStatusCode { get; set; }
     }
 
@@ -26,8 +25,8 @@
     {
         public int AssessmentId { get; set; }
         public int GradeId { get; set; }
-
-        public DateTime? AssessmentDate { get; set; } // ✅ NEW
+        public DateTime? AssessmentDate { get; set; }
+        public int? AssessmentSkillId { get; set; }
+        public string? AssessmentSkillName { get; set; }
     }
-
 }
