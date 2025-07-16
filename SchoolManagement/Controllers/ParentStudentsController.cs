@@ -19,59 +19,59 @@ namespace SchoolManagement.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] ParentStudentRequestVM request)
+        public ResponseResult<ParentStudentResponseVM> Create([FromBody] ParentStudentRequestVM request)
         {
             var result = _service.Create(request);
-            return new ResponseResult<ParentStudentResponseVM>(HttpStatusCode.OK, result);
+            return new ResponseResult<ParentStudentResponseVM>(HttpStatusCode.OK, result, "Created successfully");
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        public ResponseResult<List<ParentStudentResponseVM>> GetAll()
         {
             var result = _service.GetAll();
-            return new ResponseResult<List<ParentStudentResponseVM>>(HttpStatusCode.OK, result);
+            return new ResponseResult<List<ParentStudentResponseVM>>(HttpStatusCode.OK, result, "Fetched successfully");
         }
 
         [HttpGet("tenant/{tenantId}")]
-        public IActionResult GetAllByTenantId(int tenantId)
+        public ResponseResult<List<ParentStudentResponseVM>> GetAllByTenantId(int tenantId)
         {
             var result = _service.GetAllByTenantId(tenantId);
-            return new ResponseResult<List<ParentStudentResponseVM>>(HttpStatusCode.OK, result);
+            return new ResponseResult<List<ParentStudentResponseVM>>(HttpStatusCode.OK, result, "Fetched successfully");
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public ResponseResult<ParentStudentResponseVM> GetById(int id)
         {
             var result = _service.GetById(id);
             return result == null
-                ? new ResponseResult<string>(HttpStatusCode.NotFound, null, "Not found")
-                : new ResponseResult<ParentStudentResponseVM>(HttpStatusCode.OK, result);
+                ? new ResponseResult<ParentStudentResponseVM>(HttpStatusCode.NotFound, null, "Not found")
+                : new ResponseResult<ParentStudentResponseVM>(HttpStatusCode.OK, result, "Fetched successfully");
         }
 
         [HttpGet("{id}/tenant/{tenantId}")]
-        public IActionResult GetByIdAndTenantId(int id, int tenantId)
+        public ResponseResult<ParentStudentResponseVM> GetByIdAndTenantId(int id, int tenantId)
         {
             var result = _service.GetByIdAndTenantId(id, tenantId);
             return result == null
-                ? new ResponseResult<string>(HttpStatusCode.NotFound, null, "Not found")
-                : new ResponseResult<ParentStudentResponseVM>(HttpStatusCode.OK, result);
+                ? new ResponseResult<ParentStudentResponseVM>(HttpStatusCode.NotFound, null, "Not found")
+                : new ResponseResult<ParentStudentResponseVM>(HttpStatusCode.OK, result, "Fetched successfully");
         }
 
         [HttpPut("{id}/tenant/{tenantId}")]
-        public IActionResult Update(int id, int tenantId, [FromBody] ParentStudentUpdateVM request)
+        public ResponseResult<ParentStudentResponseVM> Update(int id, int tenantId, [FromBody] ParentStudentUpdateVM request)
         {
             var result = _service.UpdateByIdAndTenantId(id, tenantId, request);
             return result == null
-                ? new ResponseResult<string>(HttpStatusCode.NotFound, null, "Update failed")
-                : new ResponseResult<ParentStudentResponseVM>(HttpStatusCode.OK, result);
+                ? new ResponseResult<ParentStudentResponseVM>(HttpStatusCode.NotFound, null, "Update failed")
+                : new ResponseResult<ParentStudentResponseVM>(HttpStatusCode.OK, result, "Updated successfully");
         }
 
         [HttpDelete("{id}/tenant/{tenantId}")]
-        public IActionResult Delete(int id, int tenantId)
+        public ResponseResult<ParentStudentResponseVM> Delete(int id, int tenantId)
         {
             var result = _service.DeleteByIdAndTenantId(id, tenantId);
             return result == null
-                ? new ResponseResult<string>(HttpStatusCode.NotFound, null, "Delete failed")
+                ? new ResponseResult<ParentStudentResponseVM>(HttpStatusCode.NotFound, null, "Delete failed")
                 : new ResponseResult<ParentStudentResponseVM>(HttpStatusCode.OK, result, "Deleted successfully");
         }
     }

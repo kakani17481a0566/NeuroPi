@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using NeuroPi.UserManagment.Model;
@@ -25,6 +26,17 @@ namespace SchoolManagement.Model
         [Column("tenant_id")]
         public int TenantId { get; set; }
 
+        [Column("student_image_url")]
+        public string StudentImageUrl { get; set; }
+
+        [Column("bloodgroup")]
+        public string BloodGroup { get; set; }
+
+        [Column("gender")]
+        public string Gender { get; set; }
+
+        // Navigation properties
+
         [ForeignKey(nameof(TenantId))]
         public virtual MTenant Tenant { get; set; }
 
@@ -38,8 +50,6 @@ namespace SchoolManagement.Model
 
         public virtual ICollection<MParentStudent> ParentStudents { get; set; }
 
-
-
-        // Tenant navigation already present
+        // Audit properties might be in MBaseModel
     }
 }

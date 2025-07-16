@@ -135,7 +135,7 @@ namespace SchoolManagement.Services.Implementation
             _context.SaveChanges();
             return StudentAttendanceResponseVm.ToViewModel(existingAttendance);
         }
-   
+
 
 
 
@@ -144,10 +144,8 @@ namespace SchoolManagement.Services.Implementation
         {
             var now = DateTime.UtcNow;
 
-            // Get student IDs from entries
             var studentIds = request.Entries.Select(e => e.StudentId).ToList();
 
-            // Fetch existing attendance records for those students
             var existingAttendance = _context.StudentAttendance
                 .Where(a =>
                     !a.IsDeleted &&
@@ -159,6 +157,14 @@ namespace SchoolManagement.Services.Implementation
 
             foreach (var entry in request.Entries)
             {
+                // ⚠️ Skip invalid time range
+                if (entry.FromTime != TimeSpan.Zero &&
+                    entry.ToTime != TimeSpan.Zero &&
+                    entry.ToTime < entry.FromTime)
+                {
+                    throw new InvalidOperationException($"Check-out time cannot be earlier than check-in time for student ID {entry.StudentId}.");
+                }
+
                 if (existingAttendance.TryGetValue(entry.StudentId, out var attendance))
                 {
                     // ✅ Update check-in or check-out if not already set
@@ -173,7 +179,6 @@ namespace SchoolManagement.Services.Implementation
                 }
                 else
                 {
-                    // ✅ Insert new attendance record
                     _context.StudentAttendance.Add(new MStudentAttendance
                     {
                         StudentId = entry.StudentId,
@@ -334,7 +339,7 @@ namespace SchoolManagement.Services.Implementation
                             s.Date >= fromDate);
 
             if (branchId.HasValue)
-                query = query.Where(s => s.BranchId == branchId);
+                query = query.Where(s => s.BranchId == branchId.Value); // Safe nullable filter
 
             return query
                 .OrderBy(s => s.Date)
@@ -342,11 +347,13 @@ namespace SchoolManagement.Services.Implementation
                 .Select(s => new StudentAttendanceGraphVM
                 {
                     Date = s.Date.ToString("yyyy-MM-dd"),
-                    InTime = s.FromTime.ToString(@"hh\:mm"),
-                    OutTime = s.ToTime.ToString(@"hh\:mm")
+                    InTime = TimeOnly.FromTimeSpan(s.FromTime).ToString("HH:mm"),
+                    OutTime = TimeOnly.FromTimeSpan(s.ToTime).ToString("HH:mm")
                 })
                 .ToList();
         }
+
+
 
 
 
