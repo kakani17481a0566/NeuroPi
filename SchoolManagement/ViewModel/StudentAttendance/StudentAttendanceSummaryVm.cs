@@ -21,6 +21,9 @@
         public string UpdatedBy { get; set; }
         public string UpdatedOn { get; set; }
         public string AttendanceStatus { get; set; }
+        public string BloodGroup { get; set; }
+        public string ImageUrl { get; set; }
+        public string Gender { get; set; }
     }
 
     public class CourseVm

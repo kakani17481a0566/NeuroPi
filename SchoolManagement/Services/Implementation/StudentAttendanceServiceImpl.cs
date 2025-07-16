@@ -213,6 +213,9 @@ namespace SchoolManagement.Services.Implementation
                 {
                     s.Id,
                     s.Name,
+                    s.StudentImageUrl,
+                    s.BloodGroup,
+                    s.Gender,
                     CourseId = s.Course?.Id ?? 0,
                     CourseName = s.Course?.Name ?? "Unassigned",
                     Parent = s.ParentStudents
@@ -261,6 +264,9 @@ namespace SchoolManagement.Services.Implementation
                     StudentId = x.Id,
                     StudentName = x.Name,
                     ClassName = x.CourseName,
+                    ImageUrl = x.StudentImageUrl,
+                    Gender=x.Gender,
+                    BloodGroup=x.BloodGroup,       
                     CourseId = x.CourseId,
                     ParentId = x.Parent?.ParentId ?? 0,
                     ParentName = x.Parent?.ParentName ?? "Not Assigned",
