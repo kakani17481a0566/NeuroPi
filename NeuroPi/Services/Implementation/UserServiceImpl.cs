@@ -173,5 +173,24 @@ namespace NeuroPi.UserManagment.Services.Implementation
             return imageUrl;
         }
 
+
+
+        public bool UpdateUserPassword(int id, int tenantId, UserUpdatePasswordVM request)
+        {
+            var user = _context.Users.FirstOrDefault(u => u.UserId == id && u.TenantId == tenantId && !u.IsDeleted);
+            if (user == null) return false;
+
+            // Simple check — ideally use hashed password comparison
+            if (user.Password != request.CurrentPassword)
+                return false;
+
+            user.Password = request.NewPassword; // Consider hashing here
+            user.UpdatedOn = DateTime.UtcNow;
+
+            _context.SaveChanges();
+            return true;
+        }
+
+
     }
 }

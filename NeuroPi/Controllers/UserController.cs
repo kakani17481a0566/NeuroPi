@@ -120,5 +120,21 @@ namespace NeuroPi.UserManagment.Controllers
             return new ResponseResult<string>(HttpStatusCode.BadRequest, null, "Failed to update user image");
         }
 
+
+        [HttpPut("{id}/password")]
+        public ResponseResult<object> UpdatePassword(
+    int id,
+    [FromQuery] int tenantId,
+    [FromBody] UserUpdatePasswordVM request)
+        {
+            var result = _userService.UpdateUserPassword(id, tenantId, request);
+
+            if (result)
+                return new ResponseResult<object>(HttpStatusCode.OK, null, "Password updated successfully");
+
+            return new ResponseResult<object>(HttpStatusCode.BadRequest, null, "Failed to update password");
+        }
+
+
     }
 }
