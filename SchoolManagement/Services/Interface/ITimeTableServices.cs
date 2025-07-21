@@ -22,7 +22,7 @@ namespace SchoolManagement.Services.Interface
         String GetWeekTimeTable(int courseId,int tenantId);
 
         TimeTableData GetAllStructured(int tenantId);
-        ResponseResult<TimeTableInsertTableOptionsVM> GetInsertOptions();
+        TimeTableInsertTableOptionsVM GetInsertOptions(int tenantId);
 
 
     }

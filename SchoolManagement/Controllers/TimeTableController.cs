@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using NeuroPi.UserManagment.ViewModel.Tenent;
 using SchoolManagement.Model;
 using SchoolManagement.Response;
 using SchoolManagement.Services.Interface;
@@ -124,14 +125,17 @@ namespace SchoolManagement.Controllers
             return new ResponseResult<TimeTableData>(HttpStatusCode.OK, data, "Structured Time Table Data");
         }
 
-        [HttpGet("insert-options-time-table")]
-        public ResponseResult<TimeTableInsertTableOptionsVM> GetInsertOptions()
+        [HttpGet("insert-options-time-table/{tenantId}")]
+        public ResponseResult<TimeTableInsertTableOptionsVM> GetInsertOptions(int tenantId)
         {
-            var result = new TimeTableInsertTableOptionsVM { /* populate values */ };
-
-            return new ResponseResult<TimeTableInsertTableOptionsVM>(
-                HttpStatusCode.OK, result, "Insert options fetched"
-            );
+            var result = _service.GetInsertOptions(tenantId);
+            if (result != null)
+            {
+                return new ResponseResult<TimeTableInsertTableOptionsVM>(
+                    HttpStatusCode.OK, result, "Insert options fetched"
+                );
+            }
+            return new ResponseResult<TimeTableInsertTableOptionsVM>(HttpStatusCode.NotFound, result, "No insert options found");
         }
 
 

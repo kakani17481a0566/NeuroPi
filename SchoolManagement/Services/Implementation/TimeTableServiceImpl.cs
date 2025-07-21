@@ -7,6 +7,7 @@ using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.TableFile;
 using SchoolManagement.ViewModel.TimeTable;
 using SchoolManagement.ViewModel.VTimeTable;
+using SchoolManagement.ViewModel.Week;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -367,33 +368,34 @@ namespace SchoolManagement.Services.Implementation
 
 
 
-        public ResponseResult<TimeTableInsertTableOptionsVM> GetInsertOptions()
+        public TimeTableInsertTableOptionsVM GetInsertOptions(int tenantId)
         {
+           
             var result = new TimeTableInsertTableOptionsVM
             {
                 Weeks = _dbContext.Weeks
-    .Where(w => w.IsDeleted == false) // ✅ safer than !w.IsDeleted
-    .Select(w => new IdNameVM { Id = w.Id, Name = w.Name })
-    .ToList(),
+                   .Where(w => !w.IsDeleted && w.TenantId==tenantId) // ✅ safer than !w.IsDeleted
+                    .Select(w => new IdNameVM { Id = w.Id, Name = w.Name })
+                   .ToList(),
 
 
                 Holidays = _dbContext.PublicHolidays
-                    .Where(h => !h.IsDeleted)
+                    .Where(h => !h.IsDeleted && h.TenantId == tenantId)
                     .Select(h => new IdNameVM { Id = h.Id, Name = h.Name })
                     .ToList(),
 
                 Courses = _dbContext.Courses
-                    .Where(c => !c.IsDeleted)
+                    .Where(c => !c.IsDeleted && c.TenantId == tenantId)
                     .Select(c => new IdNameVM { Id = c.Id, Name = c.Name })
                     .ToList(),
 
                 Tenants = _dbContext.Tenants
-                    .Where(t => !t.IsDeleted)
+                    .Where(t => !t.IsDeleted && t.TenantId == tenantId)
                     .Select(t => new IdNameVM { Id = t.TenantId, Name = t.Name })
                     .ToList(),
 
                 AssessmentStatuses = _dbContext.Masters
-                    .Where(m => !m.IsDeleted && m.MasterTypeId == 1)
+                    .Where(m => !m.IsDeleted && m.MasterTypeId == 40 && m.TenantId==tenantId)
                     .Select(m => new CodeNameVM
                     {
                         Code = m.Id,
@@ -404,11 +406,8 @@ namespace SchoolManagement.Services.Implementation
                 StatusOptions = new List<string> { "working", "holiday" }
             };
 
-            return new ResponseResult<TimeTableInsertTableOptionsVM>(
-                HttpStatusCode.OK,
-                result,
-                "Eligible insert values fetched"
-            );
+            return result;
+           
         }
 
 
