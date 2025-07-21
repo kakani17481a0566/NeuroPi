@@ -101,5 +101,28 @@ namespace SchoolManagement.Controllers
 
             return new ResponseResult<string>(HttpStatusCode.OK, "Deleted", "Topic deleted successfully");
         }
+
+        [HttpGet("Topic-full-data/{tenantId}")]
+        public ResponseResult<List<TopicDetailVM>> GetResolvedTopics(int tenantId)
+        {
+            var result = _service.GetResolvedTopics(tenantId);
+
+            if (result == null || result.Count == 0)
+            {
+                return new ResponseResult<List<TopicDetailVM>>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    "No resolved topics found for the given tenant"
+                );
+            }
+
+            return new ResponseResult<List<TopicDetailVM>>(
+                HttpStatusCode.OK,
+                result,
+                "Resolved topics fetched successfully"
+            );
+        }
+
+
     }
 }

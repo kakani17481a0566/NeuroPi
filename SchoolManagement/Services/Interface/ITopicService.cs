@@ -5,14 +5,17 @@ namespace SchoolManagement.Services.Interface
 {
     public interface ITopicService
     {
-
-        List<TopicResponseVM> GetAll(); // Get all topics (no tenant filter)
-        TopicResponseVM GetById(int id); // Get topic by ID (no tenant filter)
+        // Existing
+        List<TopicResponseVM> GetAll();
+        TopicResponseVM GetById(int id);
 
         List<TopicResponseVM> GetAll(int tenantId);
         TopicResponseVM GetById(int id, int tenantId);
         TopicResponseVM Create(TopicRequestVM request);
         TopicResponseVM Update(int id, int tenantId, TopicUpdateVM request);
         bool Delete(int id, int tenantId);
+
+        // ✅ New: Resolved topic details (names instead of IDs)
+        List<TopicDetailVM> GetResolvedTopics(int tenantId);
     }
 }

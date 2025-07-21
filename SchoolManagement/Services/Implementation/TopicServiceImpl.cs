@@ -1,4 +1,5 @@
-﻿using SchoolManagement.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using SchoolManagement.Data;
 using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.Topic;
@@ -6,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-// Developed by Mohith  
 namespace SchoolManagement.Services.Implementation
 {
     public class TopicServiceImpl : ITopicService
@@ -17,7 +17,6 @@ namespace SchoolManagement.Services.Implementation
         {
             _dbContext = dbContext;
         }
-
 
         public List<TopicResponseVM> GetAll()
         {
@@ -89,5 +88,36 @@ namespace SchoolManagement.Services.Implementation
 
             return true;
         }
+
+        // ✅ New method: Resolved details
+        public List<TopicDetailVM> GetResolvedTopics(int tenantId)
+        {
+            var masters = _dbContext.Masters.ToDictionary(m => m.Id, m => m.Name);
+
+            var topics = _dbContext.Topics
+                .Where(t => !t.IsDeleted && t.TenantId == tenantId)
+                .Include(t => t.Subject)
+                    .ThenInclude(s => s.Course) // ✅ include Course
+                .Include(t => t.Tenant)
+                .ToList()
+                .Select(t => new TopicDetailVM
+                {
+                    Id = t.Id,
+                    Name = t.Name,
+                    Code = t.Code,
+                    Description = t.Description,
+                    SubjectName = t.Subject?.Name,
+                    CourseName = t.Subject?.Course?.Name, // ✅ get course name via subject
+                    TopicTypeName = t.TopicTypeId.HasValue && masters.ContainsKey(t.TopicTypeId.Value)
+                        ? masters[t.TopicTypeId.Value]
+                        : null,
+                    TenantName = t.Tenant?.Name
+                })
+                .ToList();
+
+            return topics;
+        }
+
+
     }
 }
