@@ -103,25 +103,26 @@ namespace SchoolManagement.Controllers
         }
 
         [HttpGet("Topic-full-data/{tenantId}")]
-        public ResponseResult<List<TopicDetailVM>> GetResolvedTopics(int tenantId)
+        public ResponseResult<TopicFullResponseVM> GetResolvedTopics(int tenantId)
         {
             var result = _service.GetResolvedTopics(tenantId);
 
-            if (result == null || result.Count == 0)
+            if (result == null || result.TDataTopic.Count == 0)
             {
-                return new ResponseResult<List<TopicDetailVM>>(
+                return new ResponseResult<TopicFullResponseVM>(
                     HttpStatusCode.NotFound,
                     null,
                     "No resolved topics found for the given tenant"
                 );
             }
 
-            return new ResponseResult<List<TopicDetailVM>>(
+            return new ResponseResult<TopicFullResponseVM>(
                 HttpStatusCode.OK,
                 result,
                 "Resolved topics fetched successfully"
             );
         }
+
 
 
     }

@@ -16,6 +16,7 @@ namespace SchoolManagement.Services.Interface
         bool Delete(int id, int tenantId);
 
         // ✅ New: Resolved topic details (names instead of IDs)
-        List<TopicDetailVM> GetResolvedTopics(int tenantId);
+        TopicFullResponseVM GetResolvedTopics(int tenantId);
+
     }
 }
