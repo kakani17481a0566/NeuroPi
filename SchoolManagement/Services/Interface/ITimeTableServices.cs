@@ -1,4 +1,5 @@
-﻿using SchoolManagement.Model;
+﻿using NeuroPi.UserManagment.Response;
+using SchoolManagement.Model;
 using SchoolManagement.ViewModel.TableFile;
 using SchoolManagement.ViewModel.TimeTable;
 using SchoolManagement.ViewModel.VTimeTable;
@@ -15,15 +16,14 @@ namespace SchoolManagement.Services.Interface
         TimeTableResponseVM GetById(int id, int tenantId);
         TimeTableResponseVM Create(TimeTableRequestVM vm);
         TimeTableResponseVM Update(int id, int tenantId, TimeTableUpdateVM vm);
-
-
         WeekTimeTableData GetWeeklyTimeTable(int weekId, int tenantId, int courseId);
-
-
         bool Delete(int id, int tenantId);
-
         //MTableFileResponseVM GetAllByCourseId(int courseId);
-
         String GetWeekTimeTable(int courseId,int tenantId);
+
+        TimeTableData GetAllStructured(int tenantId);
+        ResponseResult<TimeTableInsertTableOptionsVM> GetInsertOptions();
+
+
     }
 }

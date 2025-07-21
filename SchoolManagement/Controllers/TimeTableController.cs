@@ -117,5 +117,23 @@ namespace SchoolManagement.Controllers
             return new ResponseResult<string>(HttpStatusCode.OK, result, "Data Fetched successfully");
         }
 
+        [HttpGet("structured/{tenantId}")]
+        public ResponseResult<TimeTableData> GetStructuredTimeTable(int tenantId)
+        {
+            var data = _service.GetAllStructured(tenantId);
+            return new ResponseResult<TimeTableData>(HttpStatusCode.OK, data, "Structured Time Table Data");
+        }
+
+        [HttpGet("insert-options-time-table")]
+        public ResponseResult<TimeTableInsertTableOptionsVM> GetInsertOptions()
+        {
+            var result = new TimeTableInsertTableOptionsVM { /* populate values */ };
+
+            return new ResponseResult<TimeTableInsertTableOptionsVM>(
+                HttpStatusCode.OK, result, "Insert options fetched"
+            );
+        }
+
+
     }
 }

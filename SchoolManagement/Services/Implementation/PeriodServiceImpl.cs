@@ -1,10 +1,12 @@
-﻿using SchoolManagement.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using SchoolManagement.Data;
 using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.Period;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace SchoolManagement.Services.Implementation
 {
@@ -82,5 +84,70 @@ namespace SchoolManagement.Services.Implementation
 
             return true;
         }
+
+        public PeriodDataVmRaw GetHeadersWithData(int tenantId, int courseId)
+        {
+            var query = _dbContext.Periods
+                .Where(p => !p.IsDeleted && p.TenantId == tenantId);
+
+            if (courseId != -1)
+            {
+                query = query.Where(p => p.CourseId == courseId);
+            }
+
+            var data = query
+                .Include(p => p.Course)
+                .Include(p => p.Tenant)
+                .Select(p => PeriodDisplayVmRaw.FromModel(p))
+                .ToList();
+
+            var headers = new Dictionary<string, string>();
+            var props = typeof(PeriodDisplayVmRaw).GetProperties();
+            int index = 1;
+
+            foreach (PropertyInfo prop in props)
+            {
+                headers.Add($"column {index}", prop.Name);
+                index++;
+            }
+
+            // Prepare filterData.courses
+            List<CourseVm> courses;
+
+            if (courseId == -1)
+            {
+                courses = _dbContext.Courses
+                    .Where(c => c.TenantId == tenantId && !c.IsDeleted)
+                    .Select(c => new CourseVm
+                    {
+                        Id = c.Id,
+                        Name = c.Name
+                    })
+                    .ToList();
+            }
+            else
+            {
+                var course = _dbContext.Courses
+                    .Where(c => c.Id == courseId && c.TenantId == tenantId && !c.IsDeleted)
+                    .Select(c => new CourseVm
+                    {
+                        Id = c.Id,
+                        Name = c.Name
+                    })
+                    .ToList(); // force it into a list
+                courses = course;
+            }
+
+            return new PeriodDataVmRaw
+            {
+                Headers = headers,
+                Data = data,
+                FilterData = new FilterDataVm
+                {
+                    Courses = courses
+                }
+            };
+        }
+
     }
 }

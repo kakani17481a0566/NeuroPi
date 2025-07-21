@@ -73,5 +73,16 @@ namespace SchoolManagement.Controllers
                 return new ResponseResult<object>(HttpStatusCode.NotFound, null, "Period not found");
             return new ResponseResult<object>(HttpStatusCode.OK, null, "Period deleted successfully");
         }
+
+
+        [HttpGet("table-data")]
+        public ResponseResult<object> GetTableData([FromQuery] int tenantId, [FromQuery] int courseId)
+        {
+            var result = _periodService.GetHeadersWithData(tenantId, courseId);
+            return new ResponseResult<object>(HttpStatusCode.OK, result);
+        }
+
+
+
     }
 }

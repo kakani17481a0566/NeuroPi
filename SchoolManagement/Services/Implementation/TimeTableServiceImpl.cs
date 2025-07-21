@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using NeuroPi.UserManagment.Response;
 using NodaTime;
 using SchoolManagement.Data;
 using SchoolManagement.Model;
@@ -9,6 +10,7 @@ using SchoolManagement.ViewModel.VTimeTable;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using static SchoolManagement.ViewModel.TableFile.TableFileResponse;
 
 namespace SchoolManagement.Services.Implementation
@@ -292,6 +294,126 @@ namespace SchoolManagement.Services.Implementation
         //        };
         //    }
         //    return null;
+
+
+
+
+
+        public TimeTableData GetAllStructured(int tenantId)
+        {
+            // Project only required fields directly into the ViewModel
+            var dataList = _dbContext.TimeTables
+                .Where(x => !x.IsDeleted && x.TenantId == tenantId)
+                .AsNoTracking()
+                .Select(r => new TDataTimeTable
+                {
+                    Id = r.Id,
+                    Name = r.Name,
+                    Date = r.Date,
+                    WeekId = r.WeekId,
+                    WeekName = r.Week != null ? r.Week.Name : null,
+                    CourseId = r.CourseId,
+                    CourseName = r.Course != null ? r.Course.Name : null,
+                    AssessmentStatusCode = r.AssessmentStatusCode,
+                    AssessmentStatusName = r.AssessmentStatus != null ? r.AssessmentStatus.Name : null,
+                    TenantId = r.TenantId,
+                    TenantName = r.Tenant != null ? r.Tenant.Name : null
+                })
+                .ToList();
+
+            var headers = new Dictionary<string, string>
+    {
+        { "Id", "Time Table ID" },
+        { "Name", "Title" },
+        { "Date", "Scheduled Date" },
+        { "WeekId", "Week ID" },
+        { "WeekName", "Week Name" },
+        { "CourseId", "Course ID" },
+        { "CourseName", "Course" },
+        { "AssessmentStatusCode", "Assessment Status ID" },
+        { "AssessmentStatusName", "Assessment Status" },
+        { "TenantId", "Tenant ID" },
+        { "TenantName", "Tenant" }
+    };
+
+            // Build filters from dataList (no extra DB queries or object graphs)
+            var weeks = dataList
+                .Where(x => x.WeekId.HasValue && !string.IsNullOrWhiteSpace(x.WeekName))
+                .GroupBy(x => x.WeekId.Value)
+                .ToDictionary(g => g.Key, g => g.First().WeekName);
+
+            var courses = dataList
+                .Where(x => x.CourseId.HasValue && !string.IsNullOrWhiteSpace(x.CourseName))
+                .GroupBy(x => x.CourseId.Value)
+                .ToDictionary(g => g.Key, g => g.First().CourseName);
+
+            var assessmentStatuses = dataList
+                .Where(x => x.AssessmentStatusCode.HasValue && !string.IsNullOrWhiteSpace(x.AssessmentStatusName))
+                .GroupBy(x => x.AssessmentStatusCode.Value)
+                .ToDictionary(g => g.Key, g => g.First().AssessmentStatusName);
+
+            return new TimeTableData
+            {
+                Headers = headers,
+                TimeTableDataList = dataList,
+                Filters = new FilterOptions
+                {
+                    Weeks = weeks,
+                    Courses = courses,
+                    AssessmentStatuses = assessmentStatuses
+                }
+            };
+        }
+
+
+
+        public ResponseResult<TimeTableInsertTableOptionsVM> GetInsertOptions()
+        {
+            var result = new TimeTableInsertTableOptionsVM
+            {
+                Weeks = _dbContext.Weeks
+    .Where(w => w.IsDeleted == false) // ✅ safer than !w.IsDeleted
+    .Select(w => new IdNameVM { Id = w.Id, Name = w.Name })
+    .ToList(),
+
+
+                Holidays = _dbContext.PublicHolidays
+                    .Where(h => !h.IsDeleted)
+                    .Select(h => new IdNameVM { Id = h.Id, Name = h.Name })
+                    .ToList(),
+
+                Courses = _dbContext.Courses
+                    .Where(c => !c.IsDeleted)
+                    .Select(c => new IdNameVM { Id = c.Id, Name = c.Name })
+                    .ToList(),
+
+                Tenants = _dbContext.Tenants
+                    .Where(t => !t.IsDeleted)
+                    .Select(t => new IdNameVM { Id = t.TenantId, Name = t.Name })
+                    .ToList(),
+
+                AssessmentStatuses = _dbContext.Masters
+                    .Where(m => !m.IsDeleted && m.MasterTypeId == 1)
+                    .Select(m => new CodeNameVM
+                    {
+                        Code = m.Id,
+                        Name = m.Name
+                    })
+                    .ToList(),
+
+                StatusOptions = new List<string> { "working", "holiday" }
+            };
+
+            return new ResponseResult<TimeTableInsertTableOptionsVM>(
+                HttpStatusCode.OK,
+                result,
+                "Eligible insert values fetched"
+            );
+        }
+
+
+
+
 
     }
 }

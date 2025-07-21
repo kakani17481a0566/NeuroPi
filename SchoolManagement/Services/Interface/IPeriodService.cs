@@ -12,5 +12,9 @@ namespace SchoolManagement.Services.Interface
         PeriodResponseVM Create(PeriodRequestVM model);
         PeriodResponseVM Update(int id, int tenantId, PeriodUpdateVM model);
         bool Delete(int id, int tenantId);
+        PeriodDataVmRaw GetHeadersWithData(int tenantId, int courseId);
+
+        
+
     }
 }

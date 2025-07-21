@@ -11,6 +11,9 @@ namespace SchoolManagement.Data
     {
         public SchoolManagementDb(DbContextOptions<SchoolManagementDb> options) : base(options) { }
 
+        public DbSet<MTenant> Tenants { get; set; }
+
+
         // Existing DbSets
         public DbSet<MContact> Contacts { get; set; }
         public DbSet<MInstitution> Institutions { get; set; }
