@@ -2,6 +2,7 @@
 using SchoolManagement.Data;
 using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
+using SchoolManagement.ViewModel.TimeTable;
 using SchoolManagement.ViewModel.Topic;
 using System;
 using System.Collections.Generic;
@@ -148,6 +149,42 @@ namespace SchoolManagement.Services.Implementation
                 Subjects = subjectDict,
                 SubjectCourseMap = subjectCourseMap // ✅ Include subject → course mapping
             };
+        }
+
+
+        public TimeTableDropDown GetTimeTableDropDown(int tenantId)
+        {
+            var courses = _dbContext.Courses
+                .Include(c => c.Subjects)
+                .Where(c => c.TenantId == tenantId && !c.IsDeleted)
+                .ToList();
+
+            // ✅ Updated type to TopicTypeOptionVM
+            var topicTypes = _dbContext.Masters
+                .Where(m => !m.IsDeleted && m.TenantId == tenantId && m.MasterTypeId == 37)
+                .Select(m => new TopicTypeOptionVM
+                {
+                    Id = m.Id,
+                    Name = m.Name
+                })
+                .ToList();
+
+            var vm = new TimeTableDropDown
+            {
+                Courses = courses.ToDictionary(
+                    c => c.Id,
+                    c => new CourseInfo
+                    {
+                        Name = c.Name,
+                        Subjects = c.Subjects
+                            .Where(s => !s.IsDeleted)
+                            .ToDictionary(s => s.Id, s => s.Name)
+                    }
+                ),
+                TopicTypes = topicTypes
+            };
+
+            return vm;
         }
 
 

@@ -1,4 +1,5 @@
-﻿using SchoolManagement.ViewModel.Topic;
+﻿using SchoolManagement.ViewModel.TimeTable;
+using SchoolManagement.ViewModel.Topic;
 using System.Collections.Generic;
 
 namespace SchoolManagement.Services.Interface
@@ -14,9 +15,9 @@ namespace SchoolManagement.Services.Interface
         TopicResponseVM Create(TopicRequestVM request);
         TopicResponseVM Update(int id, int tenantId, TopicUpdateVM request);
         bool Delete(int id, int tenantId);
-
-        // ✅ New: Resolved topic details (names instead of IDs)
         TopicFullResponseVM GetResolvedTopics(int tenantId);
+        TimeTableDropDown GetTimeTableDropDown(int tenantId);
+
 
     }
 }
