@@ -26,6 +26,7 @@ builder.Services.AddScoped<IUserDepartmentService, UserDepartmentServiceImpl>();
 builder.Services.AddScoped<IConfigService, ConfigServiceImpl>();
 builder.Services.AddScoped<IUserRolesService, UserRolesServiceImpl>();
 builder.Services.AddScoped<IUserService, UserServiceImpl>();
+builder.Services.AddScoped<IAudioTranscriptionService, AudioTranscriptionServiceImpl>();
 
 builder.Services.AddScoped<IContactService, ContactServiceImpl>();
 builder.Services.AddScoped<IInstitutionService, InstitutionServiceImpl>();
