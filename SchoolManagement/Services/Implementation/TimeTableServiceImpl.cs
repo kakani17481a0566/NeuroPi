@@ -62,8 +62,10 @@ namespace SchoolManagement.Services.Implementation
             var entity = vm.ToModel();
             _dbContext.TimeTables.Add(entity);
             _dbContext.SaveChanges();
+
             return TimeTableResponseVM.FromModel(entity);
         }
+
 
 
         // Time table

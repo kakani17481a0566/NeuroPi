@@ -58,11 +58,26 @@ namespace SchoolManagement.Controllers
         }
 
         [HttpPost]
-        public ResponseResult<TimeTableResponseVM> Create(TimeTableRequestVM vm)
+        public ResponseResult<TimeTableResponseVM> Create([FromBody] TimeTableRequestVM vm)
         {
             var data = _service.Create(vm);
-            return new ResponseResult<TimeTableResponseVM>(HttpStatusCode.Created, data);
+
+            if (data == null)
+            {
+                return new ResponseResult<TimeTableResponseVM>(
+                    HttpStatusCode.BadRequest,
+                    null,
+                    "Failed to create time table. Please check the input data."
+                );
+            }
+
+            return new ResponseResult<TimeTableResponseVM>(
+                HttpStatusCode.Created,
+                data,
+                "Time table created successfully"
+            );
         }
+
 
         [HttpPut("{id}/{tenantId}")]
         public ResponseResult<TimeTableResponseVM> Update(int id, int tenantId, TimeTableUpdateVM vm)
