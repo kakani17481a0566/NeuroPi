@@ -12,6 +12,9 @@ namespace SchoolManagement.ViewModel.Topic
         public int TopicTypeId { get; set; }
         public int TenantId { get; set; }
 
+        // ✅ New field
+        public int CreatedBy { get; set; }
+
         public MTopic ToModel()
         {
             return new MTopic
@@ -22,7 +25,9 @@ namespace SchoolManagement.ViewModel.Topic
                 SubjectId = this.SubjectId,
                 TopicTypeId = this.TopicTypeId,
                 TenantId = this.TenantId,
-                CreatedOn = DateTime.UtcNow
+                CreatedOn = DateTime.UtcNow,
+                CreatedBy = this.CreatedBy, // ✅ Mapped
+                IsDeleted = false           // optional, but safe to be explicit
             };
         }
     }

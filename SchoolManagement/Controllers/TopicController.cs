@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Response;
 using SchoolManagement.Services.Interface;
+using SchoolManagement.ViewModel.TimeTable;
 using SchoolManagement.ViewModel.Topic;
 using System.Collections.Generic;
 using System.Net;
@@ -101,5 +102,38 @@ namespace SchoolManagement.Controllers
 
             return new ResponseResult<string>(HttpStatusCode.OK, "Deleted", "Topic deleted successfully");
         }
+
+        [HttpGet("Topic-full-data/{tenantId}")]
+        public ResponseResult<TopicFullResponseVM> GetResolvedTopics(int tenantId)
+        {
+            var result = _service.GetResolvedTopics(tenantId);
+
+            if (result == null || result.TDataTopic.Count == 0)
+            {
+                return new ResponseResult<TopicFullResponseVM>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    "No resolved topics found for the given tenant"
+                );
+            }
+
+            return new ResponseResult<TopicFullResponseVM>(
+                HttpStatusCode.OK,
+                result,
+                "Resolved topics fetched successfully"
+            );
+        }
+
+        [HttpGet("timetable-dropdown/{tenantId}")]
+        public ResponseResult<TimeTableDropDown> GetTimeTableDropDown(int tenantId)
+        {
+            var result = _service.GetTimeTableDropDown(tenantId);
+            if (result == null)
+            {
+                return new ResponseResult<TimeTableDropDown>(HttpStatusCode.NotFound, null, "No courses or subjects found");
+            }
+            return new ResponseResult<TimeTableDropDown>(HttpStatusCode.OK, result, "Timetable dropdown data fetched successfully");
+        }
+
     }
 }

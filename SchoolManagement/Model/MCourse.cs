@@ -1,5 +1,5 @@
 ﻿using NeuroPi.UserManagment.Model;
-using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -26,6 +26,7 @@ namespace SchoolManagement.Model
 
         public virtual MTenant Tenant { get; set; }
 
-      
+        // Add this navigation property:
+        public virtual ICollection<MSubject> Subjects { get; set; }
     }
 }

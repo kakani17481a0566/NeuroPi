@@ -28,6 +28,13 @@ namespace SchoolManagement.Model
         [Column("tenant_id")]
         [ForeignKey(nameof(Tenant))]
         public int TenantId { get; set; }
+
         public virtual MTenant Tenant { get; set; }
+
+        [Column("course_id")]
+        [ForeignKey(nameof(Course))]
+        public int? CourseId { get; set; }
+
+        public virtual MCourse Course { get; set; }
     }
 }

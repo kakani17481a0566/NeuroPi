@@ -16,10 +16,10 @@ namespace SchoolManagement.Model
         public string Name { get; set; }
 
         [Column("code")]
-        public string Code { get; set; }
+        public string? Code { get; set; }
 
         [Column("description")]
-        public string Description { get; set; }
+        public string ?Description { get; set; }
 
         [Required]
         [Column("subject_id")]
