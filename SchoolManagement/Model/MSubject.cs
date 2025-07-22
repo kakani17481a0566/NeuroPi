@@ -1,4 +1,5 @@
 ﻿using NeuroPi.UserManagment.Model;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -36,5 +37,9 @@ namespace SchoolManagement.Model
         public int? CourseId { get; set; }
 
         public virtual MCourse Course { get; set; }
+
+        // --- Add these navigation properties below ---
+        public virtual ICollection<MTopic> Topics { get; set; } = new List<MTopic>();
+        public virtual ICollection<MTimeTableDetail> TimeTableDetails { get; set; } = new List<MTimeTableDetail>();
     }
 }

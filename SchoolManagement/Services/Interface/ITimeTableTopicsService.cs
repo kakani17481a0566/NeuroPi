@@ -12,5 +12,10 @@ namespace SchoolManagement.Services.Interface
         TimeTableTopicResponseVM Create(TimeTableTopicRequestVM request);
         TimeTableTopicResponseVM UpdateByIdAndTenantId(int id, int tenantId, TimeTableTopicUpdateVM request);
         bool Delete(int id, int tenantId);
+
+        TimeTableTopicsVM GetStructured(int tenantId);
+        TimeTableTopicDropdown GetDropdownMapped(int tenantId);
+
+
     }
 }

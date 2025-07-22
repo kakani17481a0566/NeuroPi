@@ -1,4 +1,5 @@
-﻿using SchoolManagement.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using SchoolManagement.Data;
 using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.TimeTableTopics;
@@ -84,5 +85,108 @@ namespace SchoolManagement.Services.Implementation
             _dbContext.SaveChanges();
             return true;
         }
+
+
+        public TimeTableTopicsVM GetStructured(int tenantId)
+        {
+            var timeTableTopics = _dbContext.TimeTableTopics
+                .Where(x => !x.IsDeleted && x.TenantId == tenantId)
+                .Include(x => x.Topic)
+                    .ThenInclude(t => t.Subject)
+                        .ThenInclude(s => s.Course)
+                .Include(x => x.TimeTableDetail)
+                    .ThenInclude(ttd => ttd.Period)
+                .Include(x => x.TimeTableDetail)
+                    .ThenInclude(ttd => ttd.TimeTable)
+                .ToList();
+
+            var data = timeTableTopics.Select(x => new TDataTimeTableTopic
+            {
+                Id = x.Id,
+                TopicId = x.TopicId,
+                TimeTableDetailId = x.TimeTableDetailId,
+                TopicName = x.Topic?.Name ?? "",
+                SubjectName = x.Topic?.Subject?.Name ?? "",
+                CourseName = x.Topic?.Subject?.Course?.Name ?? "",
+                PeriodId = x.TimeTableDetail?.PeriodId,
+                PeriodName = x.TimeTableDetail?.Period?.Name ?? "",
+                TimeTableName = x.TimeTableDetail?.TimeTable?.Name ?? "",
+                TimeTableDate = x.TimeTableDetail?.TimeTable?.Date
+            }).ToList();
+
+            return new TimeTableTopicsVM
+            {
+                TDataTimeTableTopics = data
+                // Headers uses default dictionary in the VM class
+            };
+        }
+
+
+        public TimeTableTopicDropdown GetDropdownMapped(int tenantId)
+        {
+            var courses = _dbContext.Courses
+                .Where(c => !c.IsDeleted && c.TenantId == tenantId)
+                .Include(c => c.Subjects)
+                    .ThenInclude(s => s.Topics)
+                .Include(c => c.Subjects)
+                    .ThenInclude(s => s.TimeTableDetails)
+                        .ThenInclude(ttd => ttd.Period)
+                .Include(c => c.Subjects)
+                    .ThenInclude(s => s.TimeTableDetails)
+                        .ThenInclude(ttd => ttd.TimeTable)
+                .ToList();
+
+            var result = new TimeTableTopicDropdown { Courses = new List<CourseDropdownVM>() };
+
+            foreach (var course in courses)
+            {
+                var courseVm = new CourseDropdownVM
+                {
+                    Id = course.Id,
+                    Name = course.Name,
+                    Subjects = new List<SubjectDropdownVM>()
+                };
+
+                foreach (var subject in course.Subjects.Where(s => !s.IsDeleted))
+                {
+                    var subjectVm = new SubjectDropdownVM
+                    {
+                        Id = subject.Id,
+                        Name = subject.Name,
+                        Topics = new List<TopicDropdownVM>(),
+                        TimeTableDetails = new List<TimeTableDetailDropdownVM>()
+                    };
+
+                    foreach (var topic in subject.Topics.Where(t => !t.IsDeleted))
+                    {
+                        subjectVm.Topics.Add(new TopicDropdownVM
+                        {
+                            Id = topic.Id,
+                            Name = topic.Name
+                        });
+                    }
+
+                    if (subject.TimeTableDetails != null)
+                    {
+                        foreach (var ttd in subject.TimeTableDetails.Where(ttd => !ttd.IsDeleted))
+                        {
+                            subjectVm.TimeTableDetails.Add(new TimeTableDetailDropdownVM
+                            {
+                                Id = ttd.Id,
+                                Name = (ttd.Period != null ? ttd.Period.Name : "") +
+                                       (ttd.TimeTable != null ? " - " + ttd.TimeTable.Name : "")
+                            });
+                        }
+                    }
+
+                    courseVm.Subjects.Add(subjectVm);
+                }
+
+                result.Courses.Add(courseVm);
+            }
+
+            return result;
+        }
+
     }
 }
