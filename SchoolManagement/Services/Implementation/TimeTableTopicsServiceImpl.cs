@@ -174,7 +174,8 @@ namespace SchoolManagement.Services.Implementation
                             {
                                 Id = ttd.Id,
                                 Name = (ttd.Period != null ? ttd.Period.Name : "") +
-                                       (ttd.TimeTable != null ? " - " + ttd.TimeTable.Name : "")
+                                       (ttd.TimeTable != null ? " - " + ttd.TimeTable.Name : ""),
+                                Date = ttd.TimeTable?.Date  // <-- ADDED HERE
                             });
                         }
                     }
@@ -187,6 +188,8 @@ namespace SchoolManagement.Services.Implementation
 
             return result;
         }
+
+
 
     }
 }
