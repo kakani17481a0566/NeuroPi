@@ -24,6 +24,9 @@ namespace NeuroPi.UserManagment.Model
         [Column("is_deleted")]
         public bool IsDeleted { get; set; } = false;
 
-       
+
+
+
+
     }
 }

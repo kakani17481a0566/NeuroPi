@@ -9,12 +9,10 @@ namespace SchoolManagement.ViewModel.TimeTable
         public DateTime Date { get; set; }
         public int? WeekId { get; set; }
         public int? HolidayId { get; set; }
-
         public string Status { get; set; }
-
-  
         public int? CourseId { get; set; }
-  
+        public int? AssessmentStatusCode { get; set; } // <-- Add if needed
         public int UpdatedBy { get; set; }
     }
+
 }

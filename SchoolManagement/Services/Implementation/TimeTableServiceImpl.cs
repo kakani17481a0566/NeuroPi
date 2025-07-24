@@ -83,12 +83,15 @@ namespace SchoolManagement.Services.Implementation
             entity.WeekId = vm.WeekId;
             entity.HolidayId = vm.HolidayId;
             entity.Status = vm.Status;
+            entity.CourseId = vm.CourseId; 
+            entity.AssessmentStatusCode = vm.AssessmentStatusCode;
             entity.UpdatedOn = DateTime.UtcNow;
             entity.UpdatedBy = vm.UpdatedBy;
 
             _dbContext.SaveChanges();
             return TimeTableResponseVM.FromModel(entity);
         }
+
 
         public bool Delete(int id, int tenantId)
         {
