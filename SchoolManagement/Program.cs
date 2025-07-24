@@ -10,12 +10,79 @@ using SchoolManagement.Services.Interface;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// === Register Services ===
-// Example registrations — add all your AddScoped registrations here
+// Add services to the container.NeuroPi.UserManagment
+// Register application services
 builder.Services.AddScoped<ITenantService, TenantServiceImpl>();
-// ... (other AddScoped registrations)
+builder.Services.AddScoped<IDepartmentService, DepartmentServiceImpl>();
+builder.Services.AddScoped<IGroupService, GroupServiceImpl>();
+builder.Services.AddScoped<IOrganizationService, OrganizationImpl>();
+builder.Services.AddScoped<IGroupUserService, GroupUserServiceImpl>();
+builder.Services.AddScoped<IRolePermissionService, RolePermissionServiceImpl>();
+builder.Services.AddScoped<ITeamService, TeamServiceImpl>();
+builder.Services.AddScoped<IRoleService, RoleServiceImpl>();
+builder.Services.AddScoped<ITeamUserService, TeamUserServiceImpl>();
+builder.Services.AddScoped<IPermissionService, PermissionServiceImpl>();
+builder.Services.AddScoped<IUserDepartmentService, UserDepartmentServiceImpl>();
+builder.Services.AddScoped<IConfigService, ConfigServiceImpl>();
+builder.Services.AddScoped<IUserRolesService, UserRolesServiceImpl>();
+builder.Services.AddScoped<IUserService, UserServiceImpl>();
 
-// Cloudinary
+builder.Services.AddScoped<IContactService, ContactServiceImpl>();
+builder.Services.AddScoped<IInstitutionService, InstitutionServiceImpl>();
+
+builder.Services.AddScoped<IAccountService, AccountServiceImpl>();
+builder.Services.AddScoped<ITransactionService, TransactionServiceImpl>();
+builder.Services.AddScoped<IMasterService, MasterServiceImpl>();
+builder.Services.AddScoped<IMasterTypeService, MasterTypeServiceImpl>();
+builder.Services.AddScoped<IBooksService, BooksServiceImpl>();
+builder.Services.AddScoped<IUtilitesService, UtilitiesServiceImpl>();
+builder.Services.AddScoped<IItemService, ItemServiceImpl>();
+
+builder.Services.AddScoped<IStudentService, StudentServiceImpl>();
+
+builder.Services.AddScoped<ISubjectService, SubjectServiceImpl>();
+builder.Services.AddScoped<ICourseService, CourseServiceImpl>();
+builder.Services.AddScoped<ICourseSubjectService, CourseSubjectServiceImpl>();
+builder.Services.AddScoped<ITopicService, TopicServiceImpl>();
+builder.Services.AddScoped<IWeekService, WeekServiceImpl>();
+builder.Services.AddScoped<IParentStudentsService, ParentStudentsServiceImpl>();
+builder.Services.AddScoped<ITimeTableTopicsService, TimeTableTopicsServiceImpl>();
+builder.Services.AddScoped<ITimeTableWorksheetService, TimeTableWorksheetServiceImpl>();    
+builder.Services.AddScoped<IDailyAssessmentService, DailyAssessmentServiceImpl>();
+builder.Services.AddScoped<IPeriodService, PeriodServiceImpl>();
+builder.Services.AddScoped<ITermService, TermServiceImpl>();
+builder.Services.AddScoped<ITimeTableDetailService, TimeTableDetailServiceImpl>();
+builder.Services.AddScoped<ITimeTableServices, TimeTableServiceImpl>();
+builder.Services.AddScoped<IBranchService, BranchServiceImpl>();
+builder.Services.AddScoped<ITimeTableAssessmentService, TimeTableAssessmentServiceImpl>();
+builder.Services.AddScoped<IEmployeeService, EmployeeServiceImpl>();
+builder.Services.AddScoped<IGradeService, GradeServiceImpl>();
+builder.Services.AddScoped<IStudentAttendanceService, StudentAttendanceServiceImpl>();
+
+
+
+builder.Services.AddScoped<IPublicHolidayService, PublicHolidayServiceImpl>();
+
+builder.Services.AddScoped<IBranchService, BranchServiceImpl>();
+builder.Services.AddScoped<IAssessmentMatrixService, AssessmentMatrixService>();
+
+
+//view
+builder.Services.AddScoped<IVwComprehensiveTimeTablesService, VwComprehensiveTimeTablesService>();
+builder.Services.AddScoped<IVwTermPlanDetailsService, VwTermPlanDetailsViewServiceImpl>();
+builder.Services.AddScoped<IMVTermTableService,VTermTableServiceImpl>();
+
+//builder.Services.AddScoped<IBooksService, BooksServiceImpl>();
+
+
+builder.Services.AddScoped<IPrefixSuffixService, PrefixSuffixServiceImpl>();
+
+builder.Services.AddDbContext<NeuroPiDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddDbContext<SchoolManagementDb>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 var cloudinary = new Cloudinary(new Account(
     builder.Configuration["Cloudinary:CloudName"],
     builder.Configuration["Cloudinary:ApiKey"],
@@ -24,20 +91,15 @@ var cloudinary = new Cloudinary(new Account(
 cloudinary.Api.Secure = true;
 builder.Services.AddSingleton(cloudinary);
 
-// DbContexts
-builder.Services.AddDbContext<NeuroPiDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddDbContext<SchoolManagementDb>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-// Swagger + JWT
+// Configure Swagger with JWT Bearer Authentication
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo { Title = "NeuroPi.UserManagment", Version = "v1" });
+
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Description = @"JWT Authorization header using the Bearer scheme.
+        Description = @"JWT Authorization header using the Bearer scheme. 
                         Enter 'Bearer' [space] and then your token.
                         Example: 'Bearer 12345abcdef'",
         Name = "Authorization",
@@ -45,6 +107,7 @@ builder.Services.AddSwaggerGen(options =>
         Type = SecuritySchemeType.ApiKey,
         Scheme = "Bearer"
     });
+
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -64,7 +127,8 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-// CORS: Allow all origins, methods, headers (for local/dev)
+
+// Add CORS policy to allow all origins, methods, headers
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -74,11 +138,12 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader();
     });
 });
+builder.Services.AddSingleton(cloudinary);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
-// === Build App ===
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -87,13 +152,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// Always place CORS before controllers!
 app.UseHttpsRedirection();
-app.UseCors("AllowAll");    // <--- Enable CORS globally
 
-// app.UseAuthentication(); // Uncomment if you use authentication
+// Enable CORS middleware with your policy globally
+app.UseCors("AllowAll");
+
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
