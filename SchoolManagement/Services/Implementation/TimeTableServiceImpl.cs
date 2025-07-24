@@ -323,7 +323,8 @@ namespace SchoolManagement.Services.Implementation
                     AssessmentStatusCode = r.AssessmentStatusCode,
                     AssessmentStatusName = r.AssessmentStatus != null ? r.AssessmentStatus.Name : null,
                     TenantId = r.TenantId,
-                    TenantName = r.Tenant != null ? r.Tenant.Name : null
+                    TenantName = r.Tenant != null ? r.Tenant.Name : null,
+                    Status = r.Status           // <-- Ensure Status is included!
                 })
                 .ToList();
 
@@ -339,7 +340,8 @@ namespace SchoolManagement.Services.Implementation
         { "AssessmentStatusCode", "Assessment Status ID" },
         { "AssessmentStatusName", "Assessment Status" },
         { "TenantId", "Tenant ID" },
-        { "TenantName", "Tenant" }
+        { "TenantName", "Tenant" },
+        { "Status", "Status" } // <-- ADD Status to headers!
     };
 
             // Build filters from dataList (no extra DB queries or object graphs)
@@ -370,7 +372,6 @@ namespace SchoolManagement.Services.Implementation
                 }
             };
         }
-
 
 
         public TimeTableInsertTableOptionsVM GetInsertOptions(int tenantId)

@@ -28,6 +28,8 @@
 
         public int? AssessmentStatusCode { get; set; }
         public string? AssessmentStatusName { get; set; }
+        public string? Status { get; set; }              // <-- ADD THIS LINE!
+
 
         public int TenantId { get; set; }
         public string? TenantName { get; set; }
