@@ -138,7 +138,7 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader();
     });
 });
-builder.Services.AddSingleton(cloudinary);
+//builder.Services.AddSingleton(cloudinary);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
