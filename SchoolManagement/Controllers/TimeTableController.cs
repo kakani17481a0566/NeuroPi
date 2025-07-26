@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NeuroPi.UserManagment.ViewModel.Tenent;
 using SchoolManagement.Model;
 using SchoolManagement.Response;
@@ -23,12 +24,17 @@ namespace SchoolManagement.Controllers
             _service = service;
         }
 
+        [Authorize]
+
         [HttpGet("all")]
         public ResponseResult<List<TimeTableResponseVM>> GetAll()
         {
             var data = _service.GetAll();
             return new ResponseResult<List<TimeTableResponseVM>>(HttpStatusCode.OK, data);
         }
+        
+        
+        [Authorize]
 
         [HttpGet("all/{tenantId}")]
         public ResponseResult<List<TimeTableResponseVM>> GetByTenant(int tenantId)
@@ -132,6 +138,8 @@ namespace SchoolManagement.Controllers
             var result=_service.GetWeekTimeTable(courseId, tenantId);
             return new ResponseResult<string>(HttpStatusCode.OK, result, "Data Fetched successfully");
         }
+
+        [Authorize]
 
         [HttpGet("structured/{tenantId}")]
         public ResponseResult<TimeTableData> GetStructuredTimeTable(int tenantId)

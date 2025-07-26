@@ -24,7 +24,11 @@ namespace SchoolManagement.Model
         [ForeignKey("Tenant")]
         [Column("tenant_id")]
         public int TenantId { get; set; }
-
         public virtual MTenant Tenant { get; set; }
+
+        [ForeignKey("Subject")]
+        [Column("subject_id")]
+        public int? SubjectId { get; set; }
+        public virtual MSubject Subject { get; set; }
     }
 }

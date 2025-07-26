@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using SchoolManagement.Response;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.TimeTableTopics;
-using SchoolManagement.Response;
 using System.Collections.Generic;
 using System.Net;
 
@@ -79,6 +80,7 @@ namespace SchoolManagement.Controllers
             return new ResponseResult<TimeTableTopicResponseVM>(HttpStatusCode.OK, null, "Deleted successfully");
         }
 
+        [Authorize]
 
         [HttpGet("structured/{tenantId}")]
         public ResponseResult<TimeTableTopicsVM> GetStructured(int tenantId)

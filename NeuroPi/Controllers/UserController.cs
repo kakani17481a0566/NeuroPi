@@ -1,4 +1,5 @@
 ﻿using CloudinaryDotNet;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NeuroPi.UserManagment.Response;
 using NeuroPi.UserManagment.Services.Interface;
@@ -120,7 +121,7 @@ namespace NeuroPi.UserManagment.Controllers
             return new ResponseResult<string>(HttpStatusCode.BadRequest, null, "Failed to update user image");
         }
 
-
+        [Authorize]
         [HttpPut("{id}/password")]
         public ResponseResult<object> UpdatePassword(
     int id,
