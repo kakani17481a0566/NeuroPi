@@ -105,6 +105,7 @@ namespace SchoolManagement.Controllers
             return new ResponseResult<string>(HttpStatusCode.OK, "Deleted successfully");
         }
 
+        [Authorize]
         [HttpGet("weekId/{weekId}/tenantId/{tenantId}/courseId/{courseId}")]
         public ResponseResult<WeekTimeTableData> GetWeeklyTimeTable(int weekId, int tenantId, int courseId)
         {
