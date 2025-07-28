@@ -1,4 +1,5 @@
 ﻿// StudentController.cs
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Response;
 using SchoolManagement.Services.Interface;
@@ -74,6 +75,8 @@ namespace SchoolManagement.Controllers
                 : new ResponseResult<StudentResponseVM>(HttpStatusCode.NotFound, null, "Not found");
         }
 
+
+        [Authorize]
         [HttpGet("by-tenant-course-branch")]
         public ResponseResult<StudentVM> GetByTenantCourseBranch([FromQuery] int tenantId, [FromQuery] int courseId, [FromQuery] int branchId)
         {
