@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NeuroPi.UserManagment.Response;
@@ -85,7 +86,7 @@ namespace SchoolManagement.Controllers
 
         }
 
-
+        [Authorize]
         [HttpGet("summary-structured")]
         public ResponseResult<StudentAttendanceStructuredSummaryVm> GetStructuredAttendanceSummary(
        [FromQuery] DateTime? date,
