@@ -1,22 +1,37 @@
 ﻿using Microsoft.CognitiveServices.Speech;
 using Microsoft.CognitiveServices.Speech.Audio;
 using Microsoft.CognitiveServices.Speech.PronunciationAssessment;
-using OpenAI_API;
 using SchoolManagement.Services.Interface;
-using System.Net.Http.Headers;
-using System.Text;
+using SchoolManagement.ViewModel.Audio;
 using System.Text.Json;
+
 
 namespace SchoolManagement.Services.Implementation
 {
     public class AudioTranscriptionServiceImpl : IAudioTranscriptionService
     {
-        private readonly string _subscriptionKey = "7ZHQnjdH8f35SZypT2rYaoM1r7tfXWL2OoIafMUeqLzVFqDLTGE8JQQJ99BGACYeBjFXJ3w3AAAYACOGVCzT";
-        private readonly string _region = "eastus";
 
-        public async Task<byte[]> TranscribeAudioAsync(byte[] audioBytes, string fileExtension,string text)
+        private readonly ApiKeyService apiKeyService;
+        public AudioTranscriptionServiceImpl(ApiKeyService _apiKeyService)
         {
-            var config = SpeechConfig.FromSubscription(_subscriptionKey, _region);
+            apiKeyService = _apiKeyService;
+        }
+
+
+        //string azureApiKey= apiKeyService.getAzureApiKey();
+
+
+            /// private readonly string _subscriptionKey = "7ZHQnjdH8f35SZypT2rYaoM1r7tfXWL2OoIafMUeqLzVFqDLTGE8JQQJ99BGACYeBjFXJ3w3AAAYACOGVCzT";
+
+
+
+
+        public async Task<byte[]> TranscribeAudioAsync(byte[] audioBytes, string fileExtension, string text)
+        {
+        string _subscriptionKey = apiKeyService.GetAzureApiKey();
+        string _region = "eastus";
+
+        var config = SpeechConfig.FromSubscription(_subscriptionKey, _region);
             string tempFilePath = Path.GetTempFileName() + fileExtension;
             await File.WriteAllBytesAsync(tempFilePath, audioBytes);
 
@@ -42,19 +57,19 @@ namespace SchoolManagement.Services.Implementation
                         if (pronunciationResult.AccuracyScore >= 85.0)
                         {
                             // Return pronunciation confirmation as audio
-                            var aiHelper = new AiPronunciationHelper();
+                            var aiHelper = new AiPronunciationHelper(apiKeyService);
                             return await aiHelper.ConvertTextToSpeechAsync("Great job! You pronounced it correctly.");
                         }
                         else
                         {
-                            var aiHelper = new AiPronunciationHelper();
+                            var aiHelper = new AiPronunciationHelper(apiKeyService);
                             var textHelp = await aiHelper.GetPronunciationHelpFromGoogleAsync(referenceText);
                             return await aiHelper.ConvertTextToSpeechAsync(textHelp);
                         }
                     }
                     else
                     {
-                        return await new AiPronunciationHelper().ConvertTextToSpeechAsync("Sorry, we could not recognize your speech.");
+                        return await new AiPronunciationHelper(apiKeyService).ConvertTextToSpeechAsync("Sorry, we could not recognize your speech.");
                     }
                 }
             }
@@ -78,94 +93,151 @@ namespace SchoolManagement.Services.Implementation
                 }
             }
         }
+        public PronouncationResponseVM TranscribeAndCompareAsync(byte[] audioBytes, string fileExtension, string[] words)
+        {
+            return TranscribeAndCompareInternalAsync(audioBytes, fileExtension, words).GetAwaiter().GetResult();
+        }
 
+        private async Task<PronouncationResponseVM> TranscribeAndCompareInternalAsync(
+     byte[] audioBytes,
+     string fileExtension,
+     string[] expectedWords,
+     CancellationToken ct = default)
+        {
+            string _subscriptionKey = apiKeyService.GetAzureApiKey();
+            string _region = "eastus";
+            var config = SpeechConfig.FromSubscription(_subscriptionKey, _region);
+            string tempFilePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N") + fileExtension);
+            await File.WriteAllBytesAsync(tempFilePath, audioBytes, ct);
 
+            var mispronouncedWords = new List<string>();
+            var spokenWordSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var audioClips = new List<byte[]>();
 
+            var referenceText = string.Join(" ", expectedWords);
+            var pronunciationConfig = new PronunciationAssessmentConfig(
+                referenceText,
+                GradingSystem.HundredMark,
+                Granularity.Word,
+                enableMiscue: true);
 
-        public class AiPronunciationHelper
-    {
-            private readonly string _googleApiKey = "";
-
-            public async Task<string> GetPronunciationHelpFromGoogleAsync(string word)
+            try
             {
-                string apiKey = "AIzaSyADRBX3vm2b-p2VRGkPeDd7ilViG3i6sD4"; // Replace with your actual Gemini API key
-                string endpoint = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={apiKey}";
+                using var audioInput = AudioConfig.FromWavFileInput(tempFilePath);
+                using var recognizer = new SpeechRecognizer(config, audioInput);
+                pronunciationConfig.ApplyTo(recognizer);
+                var result = await recognizer.RecognizeOnceAsync();
 
-                using var client = new HttpClient();
-
-                var requestBody = new
+                if (result.Reason == ResultReason.RecognizedSpeech)
                 {
-                    contents = new[]
+                    var jsonResult = result.Properties.GetProperty(PropertyId.SpeechServiceResponse_JsonResult);
+                    using var parsedResult = JsonDocument.Parse(jsonResult);
+
+                    if (parsedResult.RootElement.TryGetProperty("NBest", out var nBest) &&
+                        nBest.GetArrayLength() > 0 &&
+                        nBest[0].TryGetProperty("Words", out var wordList))
                     {
-            new
-            {
-                parts = new[]
-                {
-                    new { text = $"Can you give me a short and simple sentence using the word\"{word}\" for kids?" }
+                        foreach (var word in wordList.EnumerateArray())
+                        {
+                            if (word.TryGetProperty("Word", out var wordTextElement) &&
+                                word.TryGetProperty("PronunciationAssessment", out var assessment) &&
+                                assessment.TryGetProperty("AccuracyScore", out var accuracyScoreElement))
+                            {
+                                string spokenWord = wordTextElement.GetString() ?? string.Empty;
+                                double accuracy = accuracyScoreElement.GetDouble();
+
+                                if (!string.IsNullOrWhiteSpace(spokenWord))
+                                    spokenWordSet.Add(spokenWord);
+
+                                if (accuracy < 85.0 &&
+                                    expectedWords.Contains(spokenWord, StringComparer.OrdinalIgnoreCase))
+                                {
+                                    mispronouncedWords.Add(spokenWord);
+                                }
+                            }
+                        }
+                    }
                 }
             }
-        }
-                };
+            finally
+            {
+                try { if (File.Exists(tempFilePath)) File.Delete(tempFilePath); } catch { }
+            }
 
-                var json = JsonSerializer.Serialize(requestBody);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
+            // Identify missed words (not spoken at all)
+            var missedWords = expectedWords
+                .Where(w => !spokenWordSet.Contains(w))
+                .ToList();
 
-                var response = await client.PostAsync(endpoint, content);
-                var responseString = await response.Content.ReadAsStringAsync();
+            var allProblemWords = mispronouncedWords
+                .Concat(missedWords)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
 
-                if (!response.IsSuccessStatusCode)
-                    throw new ApplicationException($"Gemini API error {response.StatusCode}: {responseString}");
+            //var aiHelper = new AiPronunciationHelper(
+            //    geminiApiKey: "<YOUR_GEMINI_API_KEY>",
+            //    azureSpeechKey: "<YOUR_AZURE_SPEECH_KEY>",
+            //    azureRegion: _region // same region as used above
+            //);
+            var aiHelper = new AiPronunciationHelper(apiKeyService);
+
+            foreach (var word in allProblemWords)
+            {
+                string textToSpeak;
+
+                if (missedWords.Contains(word, StringComparer.OrdinalIgnoreCase))
+                {
+                    // Missed word: just say the word
+                    textToSpeak = $"The  missing word is {word}.";
+                }
+                else
+                {
+                    // Mispronounced word: ask for rhyme help
+                    try
+                    {
+                        string rhymeLine = await aiHelper.GetKidFriendlyRhymesAsync(word, ct);
+                        textToSpeak = $"{word}. {rhymeLine}";
+                    }
+                    catch
+                    {
+                        textToSpeak = $"The word is {word}.";
+                    }
+                }
 
                 try
                 {
-                    using var doc = JsonDocument.Parse(responseString);
-                    var root = doc.RootElement;
-
-                    var candidates = root.GetProperty("candidates");
-                    if (candidates.GetArrayLength() == 0)
-                        return "No response candidates from Gemini.";
-
-                    var parts = candidates[0]
-                                    .GetProperty("content")
-                                    .GetProperty("parts");
-
-                    if (parts.GetArrayLength() == 0)
-                        return "No response parts from Gemini.";
-
-                    var text = parts[0].GetProperty("text").GetString();
-                    return text?.Trim() ?? "No explanation returned.";
+                    var audio = await aiHelper.ConvertTextToSpeechAsync(textToSpeak, ct);
+                    if (audio != null && audio.Length > 0)
+                        audioClips.Add(audio);
                 }
-                catch (Exception ex)
+                catch
                 {
-                    Console.WriteLine($"Error parsing Gemini response: {ex.Message}");
-                    Console.WriteLine($"Raw response: {responseString}");
-                    return "Unable to parse response from Gemini API.";
+                    // skip audio failure for this word
                 }
             }
 
-
-            public async Task<byte[]> ConvertTextToSpeechAsync(string text)
+            // Combine all audio clips into one byte array
+            byte[] finalAudio;
+            if (audioClips.Count == 1)
             {
-                var speechConfig = SpeechConfig.FromSubscription("7ZHQnjdH8f35SZypT2rYaoM1r7tfXWL2OoIafMUeqLzVFqDLTGE8JQQJ99BGACYeBjFXJ3w3AAAYACOGVCzT", "eastus");
-                speechConfig.SpeechSynthesisVoiceName = "en-US-JennyNeural"; // or any preferred voice
-                speechConfig.SetSpeechSynthesisOutputFormat(SpeechSynthesisOutputFormat.Audio16Khz32KBitRateMonoMp3);
-
-                using var synthesizer = new SpeechSynthesizer(speechConfig, null);
-                using var result = await synthesizer.SpeakTextAsync(text);
-
-                if (result.Reason == ResultReason.SynthesizingAudioCompleted)
-                {
-                    return result.AudioData;
-                }
-                else if (result.Reason == ResultReason.Canceled)
-                {
-                    var cancellation = SpeechSynthesisCancellationDetails.FromResult(result);
-                    throw new Exception($"Synthesis canceled: {cancellation.Reason}. Error: {cancellation.ErrorDetails}");
-                }
-
-                throw new Exception("Text-to-Speech synthesis failed.");
+                finalAudio = audioClips[0];
             }
-        }
+            else
+            {
+                // Combine MP3s — in production use an audio library to merge properly
+                // Here: naive concat (some players may skip after first segment)
+                finalAudio = audioClips.SelectMany(b => b).ToArray();
+            }
 
+            return new PronouncationResponseVM
+            {
+                misPronouncedWords = allProblemWords,
+                rhymses = finalAudio
+            };
+        }
     }
+
+
+
+
 }

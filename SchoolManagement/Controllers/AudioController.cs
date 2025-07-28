@@ -12,19 +12,31 @@ public class AudioController : ControllerBase
     }
 
     [HttpPost("upload/{text}")]
-    public async Task<IActionResult> UploadAudio(IFormFile audioFile,String text)
+    public IActionResult UploadAudio(IFormFile audioFile, string text)
     {
         if (audioFile == null || audioFile.Length == 0)
             return BadRequest("Invalid audio file.");
-
+        string[] words = text.Split(' ');
         using var ms = new MemoryStream();
-        await audioFile.CopyToAsync(ms);
+        audioFile.CopyTo(ms); // Synchronous version
         byte[] audioBytes = ms.ToArray();
+        if (words.Length != 0 && words.Length == 1)
+        {
+          byte[] audioResponse = _transcriptionService
+          .TranscribeAudioAsync(audioBytes, Path.GetExtension(audioFile.FileName), text)
+          .GetAwaiter()
+          .GetResult();
 
-        var transcriptionService = new AudioTranscriptionServiceImpl();
-        byte[] audioResponse = await transcriptionService.TranscribeAudioAsync(audioBytes, Path.GetExtension(audioFile.FileName),text);
+            return File(audioResponse, "audio/mpeg", "pronunciation_feedback.mp3");
+        }
+        else
+        {
+            var result = _transcriptionService
+           .TranscribeAndCompareAsync(audioBytes, Path.GetExtension(audioFile.FileName), words);
 
-        return File(audioResponse, "audio/mpeg", "pronunciation_feedback.mp3");
+            return Ok(result);
+        }
     }
+
 
 }

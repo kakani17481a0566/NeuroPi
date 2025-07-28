@@ -1,5 +1,6 @@
 using CloudinaryDotNet;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.OpenApi.Models;
 using NeuroPi.UserManagment.Data;
 using NeuroPi.UserManagment.Services.Implementation;
@@ -7,8 +8,13 @@ using NeuroPi.UserManagment.Services.Interface;
 using SchoolManagement.Data;
 using SchoolManagement.Services.Implementation;
 using SchoolManagement.Services.Interface;
+using SchoolManagement.ViewModel.Audio;
 
 var builder = WebApplication.CreateBuilder(args);
+var googleApiKey = builder.Configuration["GoogleApiKey"];
+var azureApiKey= builder.Configuration["AzureApiKey"];
+
+
 
 // Add services to the container.NeuroPi.UserManagment
 // Register application services
@@ -27,6 +33,7 @@ builder.Services.AddScoped<IConfigService, ConfigServiceImpl>();
 builder.Services.AddScoped<IUserRolesService, UserRolesServiceImpl>();
 builder.Services.AddScoped<IUserService, UserServiceImpl>();
 builder.Services.AddScoped<IAudioTranscriptionService, AudioTranscriptionServiceImpl>();
+builder.Services.AddScoped< ApiKeyService>();
 
 builder.Services.AddScoped<IContactService, ContactServiceImpl>();
 builder.Services.AddScoped<IInstitutionService, InstitutionServiceImpl>();
@@ -144,6 +151,9 @@ builder.Services.AddSingleton(cloudinary);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.Configure<SchoolManagement.ViewModel.Audio.ApiKeys>(
+    builder.Configuration.GetSection("ApiKeys")
+);
 
 var app = builder.Build();
 
