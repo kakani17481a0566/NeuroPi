@@ -31,7 +31,7 @@ public class AudioController : ControllerBase
             string base64Audio = Convert.ToBase64String(audioResponse);
             //string dataUri = $"data:audio/mpeg;base64,{base64Audio}";
 
-            // Return JSON with misPronouncedWords (optional) and rhymses (audio)
+            //Return JSON with misPronouncedWords(optional) and rhymses(audio)
             return Ok(new
             {
                 misPronouncedWords = new string[] { }, // or logic to detect any
