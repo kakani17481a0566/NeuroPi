@@ -1,8 +1,7 @@
-using System.Text;
 using CloudinaryDotNet;
+using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using NeuroPi.UserManagment.Data;
@@ -12,11 +11,10 @@ using SchoolManagement.Data;
 using SchoolManagement.Services.Implementation;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.Audio;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
-var googleApiKey = builder.Configuration["GoogleApiKey"];
-var azureApiKey= builder.Configuration["AzureApiKey"];
-
+Env.Load();
 
 
 builder.Services.AddControllers();
@@ -38,7 +36,7 @@ builder.Services.AddScoped<IConfigService, ConfigServiceImpl>();
 builder.Services.AddScoped<IUserRolesService, UserRolesServiceImpl>();
 builder.Services.AddScoped<IUserService, UserServiceImpl>();
 builder.Services.AddScoped<IAudioTranscriptionService, AudioTranscriptionServiceImpl>();
-builder.Services.AddScoped< ApiKeyService>();
+builder.Services.AddScoped<ApiKeyService>();
 
 // Shared / Core Services
 builder.Services.AddScoped<IContactService, ContactServiceImpl>();
@@ -170,7 +168,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
 app.UseStaticFiles();
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");

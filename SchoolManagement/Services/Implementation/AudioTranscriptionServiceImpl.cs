@@ -174,11 +174,7 @@ namespace SchoolManagement.Services.Implementation
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .ToList();
 
-            //var aiHelper = new AiPronunciationHelper(
-            //    geminiApiKey: "<YOUR_GEMINI_API_KEY>",
-            //    azureSpeechKey: "<YOUR_AZURE_SPEECH_KEY>",
-            //    azureRegion: _region // same region as used above
-            //);
+       
             var aiHelper = new AiPronunciationHelper(apiKeyService);
 
             foreach (var word in allProblemWords)
