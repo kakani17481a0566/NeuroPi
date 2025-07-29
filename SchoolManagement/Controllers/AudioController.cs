@@ -22,13 +22,23 @@ public class AudioController : ControllerBase
         byte[] audioBytes = ms.ToArray();
         if (words.Length != 0 && words.Length == 1)
         {
-          byte[] audioResponse = _transcriptionService
-          .TranscribeAudioAsync(audioBytes, Path.GetExtension(audioFile.FileName), text)
-          .GetAwaiter()
-          .GetResult();
+            byte[] audioResponse = _transcriptionService
+                .TranscribeAudioAsync(audioBytes, Path.GetExtension(audioFile.FileName), text)
+                .GetAwaiter()
+                .GetResult();
 
-            return File(audioResponse, "audio/mpeg", "pronunciation_feedback.mp3");
+            // Convert audio to base64 string with data URI
+            string base64Audio = Convert.ToBase64String(audioResponse);
+            //string dataUri = $"data:audio/mpeg;base64,{base64Audio}";
+
+            // Return JSON with misPronouncedWords (optional) and rhymses (audio)
+            return Ok(new
+            {
+                misPronouncedWords = new string[] { }, // or logic to detect any
+                rhymses = base64Audio
+            });
         }
+
         else
         {
             var result = _transcriptionService
