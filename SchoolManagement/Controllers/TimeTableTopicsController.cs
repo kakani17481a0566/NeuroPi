@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using SchoolManagement.Response;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.TimeTableTopics;
-using SchoolManagement.Response;
 using System.Collections.Generic;
 using System.Net;
 
@@ -78,5 +79,22 @@ namespace SchoolManagement.Controllers
 
             return new ResponseResult<TimeTableTopicResponseVM>(HttpStatusCode.OK, null, "Deleted successfully");
         }
+
+        [Authorize]
+
+        [HttpGet("structured/{tenantId}")]
+        public ResponseResult<TimeTableTopicsVM> GetStructured(int tenantId)
+        {
+            var data = _service.GetStructured(tenantId);
+            return new ResponseResult<TimeTableTopicsVM>(HttpStatusCode.OK, data, "Structured data loaded");
+        }
+
+        [HttpGet("dropdown-mapped/{tenantId}")]
+        public ResponseResult<TimeTableTopicDropdown> GetDropdownMapped(int tenantId)
+        {
+            var data = _service.GetDropdownMapped(tenantId);
+            return new ResponseResult<TimeTableTopicDropdown>(HttpStatusCode.OK, data, "Mapped dropdowns fetched successfully");
+        }
+
     }
 }

@@ -78,5 +78,19 @@ namespace SchoolManagement.Controllers
 
             return new ResponseResult<string>(HttpStatusCode.OK, "Deleted successfully");
         }
+
+        [HttpGet("timetabledetails/{tenantId}")]
+        public ResponseResult<TimeTableDetailTableResponseVM> GetTableDetails(int tenantId)
+        {
+            var data = _service.GetTableDetails(tenantId);
+            return new ResponseResult<TimeTableDetailTableResponseVM>(HttpStatusCode.OK, data);
+        }
+
+        [HttpGet("insert-options/{tenantId}")]
+        public ResponseResult<TimeTableDetailInsertOptionsVM> GetInsertOptions(int tenantId)
+        {
+            var data = _service.GetInsertOptions(tenantId);
+            return new ResponseResult<TimeTableDetailInsertOptionsVM>(HttpStatusCode.OK, data);
+        }
     }
 }

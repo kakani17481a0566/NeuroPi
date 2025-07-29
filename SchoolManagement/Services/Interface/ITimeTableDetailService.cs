@@ -12,5 +12,9 @@ namespace SchoolManagement.Services.Interface
         TimeTableDetailResponseVM Create(TimeTableDetailRequestVM vm);
         TimeTableDetailResponseVM Update(int id, int tenantId, TimeTableDetailUpdateVM vm);
         bool Delete(int id, int tenantId);
+        TimeTableDetailTableResponseVM GetTableDetails(int tenantId);
+        TimeTableDetailInsertOptionsVM GetInsertOptions(int tenantId);
+
+
     }
 }

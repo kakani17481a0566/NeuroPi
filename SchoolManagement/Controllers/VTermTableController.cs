@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NeuroPi.UserManagment.Response;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.VTimeTable;
@@ -34,6 +35,7 @@ namespace SchoolManagement.Controllers
 
         }
 
+        [Authorize]
         [HttpGet("get-week-matrix")]
         public ResponseResult<MVTermTableWeeklyMatrixVM> GetWeeklyMatrix(int tenantId, int courseId, int termId)
         {

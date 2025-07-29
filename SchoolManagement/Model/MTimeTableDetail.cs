@@ -12,23 +12,30 @@ namespace SchoolManagement.Model
         public int Id { get; set; }
 
         [Column("period_id")]
-        [ForeignKey("Period")]
+        [ForeignKey(nameof(Period))]
         public int PeriodId { get; set; }
         public virtual MPeriod Period { get; set; }
 
         [Column("subject_id")]
-        [ForeignKey("Subject")]
+        [ForeignKey(nameof(Subject))]
         public int SubjectId { get; set; }
         public virtual MSubject Subject { get; set; }
 
         [Column("time_table_id")]
-        [ForeignKey("TimeTable")]
+        [ForeignKey(nameof(TimeTable))]
         public int TimeTableId { get; set; }
         public virtual MTimeTable TimeTable { get; set; }
 
         [Column("tenant_id")]
-        [ForeignKey("Tenant")]
+        [ForeignKey(nameof(Tenant))]
         public int TenantId { get; set; }
         public virtual MTenant Tenant { get; set; }
+
+        [Column("teacher_id")]
+        [ForeignKey(nameof(Teacher))]
+        public int TeacherId { get; set; }
+        public virtual MUser Teacher { get; set; }
+
+    
     }
 }

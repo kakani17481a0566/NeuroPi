@@ -1,5 +1,4 @@
 ﻿using NeuroPi.UserManagment.Model;
-using SchoolManagement.Model;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -14,19 +13,20 @@ namespace SchoolManagement.Model
 
         [Required]
         [Column("topic_id")]
-        [ForeignKey("Topic")]
+        [ForeignKey(nameof(Topic))]
         public int TopicId { get; set; }
         public virtual MTopic Topic { get; set; }
 
         [Column("time_table_detail_id")]
-        [ForeignKey("TimeTableDetail")]
+        [ForeignKey(nameof(TimeTableDetail))]
         public int? TimeTableDetailId { get; set; }
         public virtual MTimeTableDetail TimeTableDetail { get; set; }
 
         [Required]
         [Column("tenant_id")]
-        [ForeignKey("Tenant")]
+        [ForeignKey(nameof(Tenant))]
         public int TenantId { get; set; }
         public virtual MTenant Tenant { get; set; }
     }
+
 }

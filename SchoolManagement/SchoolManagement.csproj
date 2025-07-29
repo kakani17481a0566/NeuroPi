@@ -30,4 +30,8 @@
     <ProjectReference Include="..\NeuroPi\NeuroPi.UserManagment.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="SqlQueries\" />
+  </ItemGroup>
+
 </Project>
