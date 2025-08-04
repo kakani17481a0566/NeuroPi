@@ -24,7 +24,7 @@ namespace SchoolManagement.Services.Implementation
         //}
         public async Task<string> GetPronunciationHelpFromGoogleAsync(string word)
         {
-            string apiKey = apiKeyService.GetGoogleApiKey();
+            string apiKey = "AIzaSyADRBX3vm2b-p2VRGkPeDd7ilViG3i6sD4";
             string endpoint = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={apiKey}";
 
             using var client = new HttpClient();
@@ -82,7 +82,7 @@ namespace SchoolManagement.Services.Implementation
 
         public async Task<byte[]> ConvertTextToSpeechAsync(string text)
         {
-            var speechConfig = SpeechConfig.FromSubscription(apiKeyService.GetAzureApiKey(), "eastus");
+            var speechConfig = SpeechConfig.FromSubscription("7TZnnv4r6ijxdVYsHMrDkPYWxVev4XwJBVzuMGWsCXF8Y22SuFnUJQQJ99BGACYeBjFXJ3w3AAAYACOGMuI3", "eastus");
             speechConfig.SpeechSynthesisVoiceName = "en-US-JennyNeural"; // or any preferred voice
             speechConfig.SetSpeechSynthesisOutputFormat(SpeechSynthesisOutputFormat.Audio16Khz32KBitRateMonoMp3);
 
@@ -169,7 +169,7 @@ namespace SchoolManagement.Services.Implementation
         /// </summary>
         public async Task<byte[]> ConvertTextToSpeechAsync(string text, CancellationToken ct = default)
         {
-            string _azureSpeechKey = apiKeyService.GetAzureApiKey();
+            string _azureSpeechKey = "7TZnnv4r6ijxdVYsHMrDkPYWxVev4XwJBVzuMGWsCXF8Y22SuFnUJQQJ99BGACYeBjFXJ3w3AAAYACOGMuI3";
               string _azureRegion = "eastus";
 
                 var speechConfig = SpeechConfig.FromSubscription(_azureSpeechKey, _azureRegion);

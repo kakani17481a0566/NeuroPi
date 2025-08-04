@@ -28,7 +28,7 @@ namespace SchoolManagement.Services.Implementation
 
         public async Task<byte[]> TranscribeAudioAsync(byte[] audioBytes, string fileExtension, string text)
         {
-            string _subscriptionKey = "AIzaSyADRBX3vm2b-p2VRGkPeDd7ilViG3i6sD4";
+            string _subscriptionKey = "7TZnnv4r6ijxdVYsHMrDkPYWxVev4XwJBVzuMGWsCXF8Y22SuFnUJQQJ99BGACYeBjFXJ3w3AAAYACOGMuI3";
         string _region = "eastus";
 
         var config = SpeechConfig.FromSubscription(_subscriptionKey, _region);
@@ -104,7 +104,8 @@ namespace SchoolManagement.Services.Implementation
      string[] expectedWords,
      CancellationToken ct = default)
         {
-            string _subscriptionKey = apiKeyService.GetAzureApiKey();
+            //string _subscriptionKey = apiKeyService.GetAzureApiKey();
+            string _subscriptionKey = "7TZnnv4r6ijxdVYsHMrDkPYWxVev4XwJBVzuMGWsCXF8Y22SuFnUJQQJ99BGACYeBjFXJ3w3AAAYACOGMuI3";
             string _region = "eastus";
             var config = SpeechConfig.FromSubscription(_subscriptionKey, _region);
             string tempFilePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N") + fileExtension);
