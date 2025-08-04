@@ -28,7 +28,7 @@ namespace SchoolManagement.Services.Implementation
 
         public async Task<byte[]> TranscribeAudioAsync(byte[] audioBytes, string fileExtension, string text)
         {
-        string _subscriptionKey = apiKeyService.GetAzureApiKey();
+            string _subscriptionKey = "AIzaSyADRBX3vm2b-p2VRGkPeDd7ilViG3i6sD4";
         string _region = "eastus";
 
         var config = SpeechConfig.FromSubscription(_subscriptionKey, _region);

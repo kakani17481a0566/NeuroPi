@@ -4,7 +4,7 @@ using SchoolManagement.Response;
 using SchoolManagement.Services.Implementation;
 using SchoolManagement.Services.Interface;
 
-[EnableCors("AllowAll")]
+//[EnableCors("AllowAll")]
 [Route("api/[controller]")]
 [ApiController]
 public class AudioController : ControllerBase
