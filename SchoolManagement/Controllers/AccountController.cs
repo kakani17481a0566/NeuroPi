@@ -1,12 +1,14 @@
-﻿using System.Net;
+﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NeuroPi.UserManagment.Response;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.Account;
+using System.Net;
 
 namespace SchoolManagement.Controllers
 {
+    [EnableCors("AllowAll")]
     [Route("api/[controller]")]
     [ApiController]
     public class AccountController : ControllerBase
