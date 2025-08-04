@@ -8,7 +8,7 @@ using System.Net;
 
 namespace SchoolManagement.Controllers
 {
-    [EnableCors("AllowAll")]
+    
     [Route("api/[controller]")]
     [ApiController]
     public class AccountController : ControllerBase

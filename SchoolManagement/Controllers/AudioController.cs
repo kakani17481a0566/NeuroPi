@@ -1,8 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Response;
 using SchoolManagement.Services.Implementation;
 using SchoolManagement.Services.Interface;
 
+[EnableCors("AllowAll")]
+[Route("api/[controller]")]
+[ApiController]
 public class AudioController : ControllerBase
 {
     private readonly IAudioTranscriptionService _transcriptionService;
