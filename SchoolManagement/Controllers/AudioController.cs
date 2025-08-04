@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SchoolManagement.Response;
 using SchoolManagement.Services.Implementation;
 using SchoolManagement.Services.Interface;
 
@@ -46,6 +47,20 @@ public class AudioController : ControllerBase
 
             return Ok(result);
         }
+    }
+    [HttpGet("/getImages")]
+    public ResponseResult<List<string>>GetAllText()
+    {
+        //List<string> response = new List<string>()
+        //{
+        //     "Apple",
+        //     "Ball"
+        //};
+        return new ResponseResult<List<string>>(System.Net.HttpStatusCode.OK, new List<string>()
+        {
+             "Armadillo","Ball","Cat","Dog","Egg","Fish"
+
+        });
     }
 
 
