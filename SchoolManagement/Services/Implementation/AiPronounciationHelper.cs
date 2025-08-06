@@ -24,7 +24,7 @@ namespace SchoolManagement.Services.Implementation
         //}
         public async Task<string> GetPronunciationHelpFromGoogleAsync(string word)
         {
-            string apiKey = "AIzaSyADRBX3vm2b-p2VRGkPeDd7ilViG3i6sD4";
+            string apiKey = "AIzaSyDfTNmGdgr5d0nq9v8YVYwbgt8WjDQOOds";
             string endpoint = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={apiKey}";
 
             using var client = new HttpClient();
@@ -103,7 +103,7 @@ namespace SchoolManagement.Services.Implementation
         }
         public async Task<string> GetKidFriendlyRhymesAsync(string word, CancellationToken ct = default)
         {
-            string _geminiApiKey = apiKeyService.GetGoogleApiKey();
+            string _geminiApiKey = "AIzaSyDfTNmGdgr5d0nq9v8YVYwbgt8WjDQOOds";
             // Defensive: empty/crazy inputs
             if (string.IsNullOrWhiteSpace(word))
                 return "No word given.";

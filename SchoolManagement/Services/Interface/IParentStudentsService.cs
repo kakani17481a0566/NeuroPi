@@ -1,4 +1,5 @@
-﻿using SchoolManagement.ViewModel.ParentStudents;
+﻿using SchoolManagement.ViewModel.CourseTeacher;
+using SchoolManagement.ViewModel.ParentStudents;
 using System.Collections.Generic;
 
 namespace SchoolManagement.Services.Interface
@@ -14,5 +15,7 @@ namespace SchoolManagement.Services.Interface
         ParentStudentResponseVM Create(ParentStudentRequestVM request);
         ParentStudentResponseVM UpdateByIdAndTenantId(int id, int tenantId, ParentStudentUpdateVM request);
         ParentStudentResponseVM DeleteByIdAndTenantId(int id, int tenantId);
+
+        CourseTeacherVM GetParentDetails(int userId, int tenantId);
     }
 }

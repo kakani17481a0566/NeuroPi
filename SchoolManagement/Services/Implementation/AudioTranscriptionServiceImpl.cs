@@ -16,16 +16,6 @@ namespace SchoolManagement.Services.Implementation
         {
             apiKeyService = _apiKeyService;
         }
-
-
-        //string azureApiKey= apiKeyService.getAzureApiKey();
-
-
-            /// private readonly string _subscriptionKey = "7ZHQnjdH8f35SZypT2rYaoM1r7tfXWL2OoIafMUeqLzVFqDLTGE8JQQJ99BGACYeBjFXJ3w3AAAYACOGVCzT";
-
-
-
-
         public async Task<byte[]> TranscribeAudioAsync(byte[] audioBytes, string fileExtension, string text)
         {
             string _subscriptionKey = "7TZnnv4r6ijxdVYsHMrDkPYWxVev4XwJBVzuMGWsCXF8Y22SuFnUJQQJ99BGACYeBjFXJ3w3AAAYACOGMuI3";
@@ -231,6 +221,50 @@ namespace SchoolManagement.Services.Implementation
                 misPronouncedWords = allProblemWords,
                 rhymses = finalAudio
             };
+        }
+
+        
+        public string CheckPronounciation(byte[] audioBytes,string text)
+        {
+            return CheckPronounciationAsync(audioBytes, text).GetAwaiter().GetResult();
+        }
+
+        public async  Task<string> CheckPronounciationAsync(byte[] audioBytes, string text)
+        {
+            //string fileExtension=Path.GetExtension(audioBytes)
+            string _subscriptionKey = "7TZnnv4r6ijxdVYsHMrDkPYWxVev4XwJBVzuMGWsCXF8Y22SuFnUJQQJ99BGACYeBjFXJ3w3AAAYACOGMuI3";
+            string _region = "eastus";
+            var config = SpeechConfig.FromSubscription(_subscriptionKey, _region);
+            string tempFilePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N") );
+            await File.WriteAllBytesAsync(tempFilePath, audioBytes);
+            var pronunciationConfig = new PronunciationAssessmentConfig(
+               text,
+               GradingSystem.HundredMark,
+               Granularity.Word,
+               enableMiscue: true);
+            using (var audioInput = AudioConfig.FromWavFileInput(tempFilePath))
+            using (var recognizer = new SpeechRecognizer(config, audioInput))
+            {
+                pronunciationConfig.ApplyTo(recognizer);
+                var result = await recognizer.RecognizeOnceAsync();
+                result.Properties.GetProperty(PropertyId.SpeechServiceResponse_JsonResult);
+                double score=  PronunciationAssessmentResult.FromResult(result).AccuracyScore;
+                if (score >= 90.0)
+                {
+                    return " correct word match";
+
+                }
+                else
+                {
+                    var aiHelper = new AiPronunciationHelper(apiKeyService);
+                    var textHelp = await aiHelper.GetKidFriendlyRhymesAsync(text);
+                    return textHelp;
+
+                }
+
+            }
+            ;
+            return "InCorrect word match ";
         }
     }
 

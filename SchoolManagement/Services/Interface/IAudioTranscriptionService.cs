@@ -8,5 +8,7 @@ namespace SchoolManagement.Services.Interface
 
         PronouncationResponseVM TranscribeAndCompareAsync(byte[] audioBytes, string fileExtension, string[] words);
 
+        String CheckPronounciation(byte[] audioBytes,string text);
+
     }
 }
