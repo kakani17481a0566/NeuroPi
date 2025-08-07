@@ -105,33 +105,46 @@ namespace NeuroPi.UserManagment.Services.Implementation
         public CourseTeacherVM GetBranchByDepartmentId(int departmentId, int userId)
         {
             DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
-            var branch = _context.Branches.FirstOrDefault(b => b.DepartmentId == departmentId && !b.IsDeleted);
-            CourseTeacherVM courseTeacherVM = new CourseTeacherVM();
 
-            if (branch != null)
+            // Get branch by department
+            var branch = _context.Branches
+                .FirstOrDefault(b => b.DepartmentId == departmentId && !b.IsDeleted);
+
+            if (branch == null)
+                return null;
+
+            var courseTeacherVM = new CourseTeacherVM
             {
-                courseTeacherVM.branchId = branch.Id;
-                var courseTeacher = _context.CourseTeachers.Where(c => c.BranchId == branch.Id && c.TeacherId==userId && !c.IsDeleted).Include(c => c.Course).ToList();
-                List<Course> courses = new List<Course>();
-                foreach (MCourseTeacher course in courseTeacher)
+                branchId = branch.Id
+            };
+
+            // Get course-teacher mappings
+            var courseTeachers = _context.CourseTeachers
+                .Where(ct => ct.BranchId == branch.Id && ct.TeacherId == userId && !ct.IsDeleted)
+                .Include(ct => ct.Course)
+                .ToList();
+
+            // Map courses
+            courseTeacherVM.courses = courseTeachers
+                .Where(ct => ct.Course != null) // avoid null reference
+                .Select(ct => new Course
                 {
-                    var courseObj = new Course()
-                    {
-                        id = course.Course.Id,
-                        name = course.Course.Name,
-                    };
-                    courses.Add(courseObj);
+                    id = ct.Course.Id,
+                    name = ct.Course.Name
+                })
+                .ToList();
 
-                }
-                courseTeacherVM.courses = courses;
+            // Get current week
+            var currentWeek = _context.Weeks
+                .FirstOrDefault(w => w.StartDate <= today && w.EndDate >= today && !w.IsDeleted);
 
-                var week = _context.Weeks.Where(w => w.StartDate <= today && w.EndDate >= today && !w.IsDeleted).FirstOrDefault();
-                courseTeacherVM.weekId = week != null ? week.Id : 0;
-                courseTeacherVM.termId = week != null ? week.TermId : 0;
+            courseTeacherVM.weekId = currentWeek?.Id ?? 0;
+            courseTeacherVM.termId = currentWeek?.TermId ?? 0;
 
-                return courseTeacherVM;
-            }
-            return null;
+            return courseTeacherVM;
         }
+
+    
+    
     }
 }

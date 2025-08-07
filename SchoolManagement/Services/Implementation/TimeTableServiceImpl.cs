@@ -151,8 +151,8 @@ namespace SchoolManagement.Services.Implementation
                         Type = f.Type
                     }).ToList()
                 );
-            var periodStart = _dbContext.Periods.Where(p => p.CourseId == courseId).Min(p => p.Id);
-            var periodEnd = _dbContext.Periods.Where(p => p.CourseId == courseId).Max(p => p.Id);
+            var periodStart = _dbContext.Periods.Where(p => p.CourseId == courseId && !p.IsDeleted).Min(p => p.Id);
+            var periodEnd = _dbContext.Periods.Where(p => p.CourseId == courseId && !p.IsDeleted).Max(p => p.Id);
 
             // Build timetable data per day
             foreach (var group in groupedByDate)

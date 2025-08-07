@@ -1,4 +1,5 @@
 ﻿using NeuroPi.UserManagment.Model;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -16,7 +17,7 @@ namespace SchoolManagement.Model
         public int UserId { get; set; }
 
         [ForeignKey(nameof(UserId))]
-        public virtual MUser User { get; set; }  // Will give ParentName from User.Username
+        public virtual MUser User { get; set; }
 
         [Required]
         [Column("tenant_id")]
@@ -24,5 +25,7 @@ namespace SchoolManagement.Model
 
         [ForeignKey(nameof(TenantId))]
         public virtual MTenant Tenant { get; set; }
+
+        public virtual ICollection<MParentStudent> ParentStudents { get; set; } = new List<MParentStudent>();
     }
 }

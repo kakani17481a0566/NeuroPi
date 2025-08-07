@@ -14,5 +14,9 @@ namespace SchoolManagement.Services.Interface
         ParentStudentResponseVM Create(ParentStudentRequestVM request);
         ParentStudentResponseVM UpdateByIdAndTenantId(int id, int tenantId, ParentStudentUpdateVM request);
         ParentStudentResponseVM DeleteByIdAndTenantId(int id, int tenantId);
+
+        ParentWithStudentsResponseVM GetFullParentDetailsByUserId(int userId, int tenantId);
+
+
     }
 }

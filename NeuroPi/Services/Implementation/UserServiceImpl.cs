@@ -28,20 +28,27 @@ namespace NeuroPi.UserManagment.Services.Implementation
         // login
         public UserLogInSucessVM LogIn(string username, string password)
         {
+            Console.WriteLine($"[INFO] Login attempt for username: {username}");
+
             var user = _context.Users.FirstOrDefault(u =>
                 !u.IsDeleted && u.Username == username && u.Password == password);
-            MUserRole Role = null;
-            MUserDepartment department = null;
 
-            if (user != null)
+            if (user == null)
             {
-                Role = _context.UserRoles.Include(r => r.Role).FirstOrDefault(r => !r.IsDeleted && r.UserId == user.UserId && r.TenantId == user.TenantId);
-                department=_context.UserDepartments.FirstOrDefault(d=>d.UserId == user.UserId && !d.IsDeleted);
-
+                Console.WriteLine($"[WARN] Login failed: User not found or incorrect password for username: {username}");
+                return null;
             }
 
+            Console.WriteLine($"[INFO] User found: UserId = {user.UserId}, fetching roles and departments...");
 
-            if (user == null) return null;
+            var role = _context.UserRoles
+                .Include(r => r.Role)
+                .FirstOrDefault(r => !r.IsDeleted && r.UserId == user.UserId && r.TenantId == user.TenantId);
+
+            var department = _context.UserDepartments
+                .FirstOrDefault(d => d.UserId == user.UserId && !d.IsDeleted);
+
+            Console.WriteLine($"[INFO] Login successful: Role = {role?.Role?.Name}, DepartmentId = {department?.DepartmentId}");
 
             return new UserLogInSucessVM
             {
@@ -50,10 +57,9 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 UserId = user.UserId,
                 token = GenerateJwtToken(user),
                 UserProfile = UserResponseVM.ToViewModel(user),
-                RoleName = Role.Role.Name != null ? Role.Role.Name : null,
-                departmentId = department.DepartmentId!=null ? department.DepartmentId:0,
-                UserImageUrl = user.UserImageUrl ?? null
-
+                RoleName = role?.Role?.Name,
+                departmentId = department?.DepartmentId ?? 0,
+                UserImageUrl = user.UserImageUrl
             };
         }
 
