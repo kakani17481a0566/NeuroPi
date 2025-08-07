@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Data;
+using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
+using SchoolManagement.ViewModel.CourseTeacher;
 using SchoolManagement.ViewModel.ParentStudents;
 
 namespace SchoolManagement.Services.Implementation
@@ -94,6 +96,31 @@ namespace SchoolManagement.Services.Implementation
                 StudentId = model.StudentId,
                 TenantId = model.TenantId
             };
+        }
+        public CourseTeacherVM GetParentDetails(int userId, int tenantId)
+        {
+            CourseTeacherVM courseTeacherVM=new CourseTeacherVM();
+            var parentId=_db.Parents.Where(p=>p.UserId==userId && p.TenantId==tenantId).FirstOrDefault();
+            var result=_db.ParentStudents.Where(t=>t.TenantId==tenantId && t.ParentId== parentId.Id).Include(s=>s.Student).Include(c=>c.Student.Course).FirstOrDefault();
+            List<Course> courses = new List<Course>();
+            if (result != null)
+            {
+                courseTeacherVM.branchId = result.Student.BranchId;
+                
+                    var courseObj = new Course()
+                    {
+                        id = result.Student.Course.Id,
+                        name = result.Student.Course.Name,
+                    };
+                    courses.Add(courseObj);
+
+            }
+            courseTeacherVM.courses = courses;
+            DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
+            var week = _db.Weeks.Where(w => w.StartDate <= today && w.EndDate >= today && !w.IsDeleted).FirstOrDefault();
+            courseTeacherVM.weekId = week != null ? week.Id : 0;
+            courseTeacherVM.termId = week != null ? week.TermId : 0;
+            return courseTeacherVM;
         }
 
 

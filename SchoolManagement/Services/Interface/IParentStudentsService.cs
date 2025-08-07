@@ -1,4 +1,5 @@
-﻿using SchoolManagement.ViewModel.ParentStudents;
+﻿using SchoolManagement.ViewModel.CourseTeacher;
+using SchoolManagement.ViewModel.ParentStudents;
 using System.Collections.Generic;
 
 namespace SchoolManagement.Services.Interface
@@ -18,5 +19,7 @@ namespace SchoolManagement.Services.Interface
         ParentWithStudentsResponseVM GetFullParentDetailsByUserId(int userId, int tenantId);
 
 
+
+        CourseTeacherVM GetParentDetails(int userId, int tenantId);
     }
 }

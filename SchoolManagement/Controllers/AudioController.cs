@@ -66,6 +66,17 @@ public class AudioController : ControllerBase
 
         });
     }
+    [HttpPost("/{text}")]
+    public string TestPronounciation(IFormFile audioFile, string text)
+    {
+        using var ms = new MemoryStream();
+        audioFile.CopyTo(ms);
+        byte[] audioBytes = ms.ToArray();
+        return  _transcriptionService.CheckPronounciation(audioBytes,text);
+
+
+
+    }
 
 
 }

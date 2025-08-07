@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Response;
 using SchoolManagement.Services.Interface;
+using SchoolManagement.ViewModel.CourseTeacher;
 using SchoolManagement.ViewModel.ParentStudents;
 using System.Collections.Generic;
 using System.Net;
@@ -73,6 +74,16 @@ namespace SchoolManagement.Controllers
             return result == null
                 ? new ResponseResult<ParentStudentResponseVM>(HttpStatusCode.NotFound, null, "Delete failed")
                 : new ResponseResult<ParentStudentResponseVM>(HttpStatusCode.OK, result, "Deleted successfully");
+        }
+        [HttpGet("/parent/{userId}/tenant/{tenantId}")]
+        public ResponseResult<CourseTeacherVM> GetAllDetailsOfParents(int userId,int tenantId)
+        {
+            var result=_service.GetParentDetails(userId,tenantId);
+            if (result != null)
+            {
+                return new ResponseResult<CourseTeacherVM>(HttpStatusCode.OK, result, "Fetched the parent details");
+            }
+            return new ResponseResult<CourseTeacherVM>(HttpStatusCode.NoContent, null);
         }
 
         [HttpGet("full-details/user/{userId}/tenant/{tenantId}")]
