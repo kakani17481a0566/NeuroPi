@@ -95,5 +95,20 @@ namespace SchoolManagement.Controllers
                 ? new ResponseResult<CourseTeacherVM>(HttpStatusCode.NotFound, null, "Branch not found")
                 : new ResponseResult<CourseTeacherVM>(HttpStatusCode.OK, branch, "Ids  Fetched  successfully");
         }
+
+
+
+
+        [HttpGet("dropdown-options/{tenantId:int}")]
+        public ResponseResult<List<BranchDropDownOptionVm>> GetBranchDropDownOptions(int tenantId)
+        {
+            var options = _branchService.GetBranchDropDownOptions(tenantId);
+            // List<T> won’t be null; return OK with empty list if no matches
+            return new ResponseResult<List<BranchDropDownOptionVm>>(
+                HttpStatusCode.OK,
+                options,
+                "Branch dropdown options retrieved successfully"
+            );
+        }
     }
 }

@@ -144,7 +144,25 @@ namespace NeuroPi.UserManagment.Services.Implementation
             return courseTeacherVM;
         }
 
-    
-    
+        // Returns: id, name, tenant_id, tenant_name for dropdowns
+        public List<BranchDropDownOptionVm> GetBranchDropDownOptions(int tenantId)
+        {
+            return _context.Branches
+                .AsNoTracking()
+                .Include(b => b.Tenant) 
+                .Where(b => !b.IsDeleted && b.TenantId == tenantId)
+                .Select(b => new BranchDropDownOptionVm
+                {
+                    Id = b.Id,
+                    Name = b.Name,
+                    TenantId = b.TenantId,
+                    TenantName = b.Tenant != null ? b.Tenant.Name : string.Empty
+                })
+                .OrderBy(x => x.Name)
+                .ToList();
+        }
+
+
+
     }
 }

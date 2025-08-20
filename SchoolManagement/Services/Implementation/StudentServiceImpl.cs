@@ -297,5 +297,32 @@ namespace SchoolManagement.Services.Implementation
 
 
 
+        public List<StudentCourseTenantVm> GetStudentDropDownOptions(int tenantId, int courseId, int branchId)
+        {
+            return _context.Students
+                .AsNoTracking()
+                .Include(s => s.Course)
+                .Include(s => s.Tenant)
+                .Where(s => !s.IsDeleted
+                         && s.TenantId == tenantId
+                         && s.CourseId == courseId
+                         && s.BranchId == branchId)
+                .OrderBy(s => s.Name)
+                .Select(s => new StudentCourseTenantVm
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    CourseId = s.CourseId,
+                    CourseName = s.Course.Name,
+                    TenantId = s.TenantId,
+                    TenantName = s.Tenant.Name
+                })
+                .ToList();
+        }
+
+
+
+
+
     }
 }

@@ -65,4 +65,16 @@ public class CourseController : ControllerBase
 
         return new ResponseResult<string>(HttpStatusCode.OK, "Deleted", "Course deleted successfully");
     }
+
+
+    [HttpGet("dropdown-options-course/{tenantId:int}")]
+    public ResponseResult<List<CourseDropDownOptionsVm>> GetCourseDropdownOptions(int tenantId)
+    {
+        var options = _courseService.GetCourseDropDownOptions(tenantId);
+        return new ResponseResult<List<CourseDropDownOptionsVm>>(
+            HttpStatusCode.OK,
+            options,
+            "Course dropdown options retrieved successfully"
+        );
+    }
 }
