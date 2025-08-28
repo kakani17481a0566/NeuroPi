@@ -483,6 +483,132 @@ namespace SchoolManagement.Services.Implementation
             };
         }
 
+        public StudentPerformanceDashboard GetStudentPerformanceDashboard(int studentId, int tenantId)
+        {
+            var student = _context.Students
+                .Where(s => s.Id == studentId && s.TenantId == tenantId && !s.IsDeleted)
+                .Select(s => new { s.Id, s.Name, s.StudentImageUrl })
+                .FirstOrDefault();
+
+            if (student == null) return null;
+
+            var assessments = _context.DailyAssessments
+                .Where(a => !a.IsDeleted && a.StudentId == studentId && a.TenantId == tenantId)
+                .Include(a => a.Assessment).ThenInclude(x => x.AssessmentSkill).ThenInclude(x => x.Subject)
+                .Include(a => a.Grade)
+                .Include(a => a.TimeTable).ThenInclude(t => t.Week)
+                .ToList();
+
+            // DAILY
+            var today = DateOnly.FromDateTime(DateTime.Today);
+            var dailyResults = assessments
+                .Where(a => DateOnly.FromDateTime(a.AssessmentDate) == today)
+                .Select(a => new AssessmentResult
+                {
+                    AssessmentName = a.Assessment?.Name,
+                    SkillName = a.Assessment?.AssessmentSkill?.Name,
+                    SubjectName = a.Assessment?.AssessmentSkill?.Subject?.Name,
+                    Grade = a.Grade?.Name ?? "N/A",
+                    MinPercentage = a.Grade?.MinPercentage,
+                    MaxPercentage = a.Grade?.MaxPercentage,
+                    TimeTableDay = a.TimeTable?.Name,
+                    AssessmentDate = a.AssessmentDate
+                }).ToList();
+
+            // WEEKLY – All Weeks
+            var weekGroups = assessments
+                .Where(a => a.TimeTable?.Week != null)
+                .GroupBy(a => a.TimeTable.Week)
+                .Select(g => new PerformanceBreakdown
+                {
+                    Period = $"{g.Key.Name} ({g.Key.StartDate:dd MMM} - {g.Key.EndDate:dd MMM})",
+                    Results = g.Select(a => new AssessmentResult
+                    {
+                        AssessmentName = a.Assessment?.Name,
+                        SkillName = a.Assessment?.AssessmentSkill?.Name,
+                        SubjectName = a.Assessment?.AssessmentSkill?.Subject?.Name,
+                        Grade = a.Grade?.Name ?? "N/A",
+                        MinPercentage = a.Grade?.MinPercentage,
+                        MaxPercentage = a.Grade?.MaxPercentage,
+                        TimeTableDay = a.TimeTable?.Name,
+                        AssessmentDate = a.AssessmentDate
+                    }).ToList()
+                }).ToList();
+
+            // MONTHLY
+            var currentMonth = DateTime.Today.Month;
+            var currentYear = DateTime.Today.Year;
+            var monthlyResults = assessments
+                .Where(a => a.AssessmentDate.Month == currentMonth && a.AssessmentDate.Year == currentYear)
+                .Select(a => new AssessmentResult
+                {
+                    AssessmentName = a.Assessment?.Name,
+                    SkillName = a.Assessment?.AssessmentSkill?.Name,
+                    SubjectName = a.Assessment?.AssessmentSkill?.Subject?.Name,
+                    Grade = a.Grade?.Name ?? "N/A",
+                    MinPercentage = a.Grade?.MinPercentage,
+                    MaxPercentage = a.Grade?.MaxPercentage,
+                    TimeTableDay = a.TimeTable?.Name,
+                    AssessmentDate = a.AssessmentDate
+                }).ToList();
+
+            // YEARLY
+            var yearlyResults = assessments
+                .Where(a => a.AssessmentDate.Year == currentYear)
+                .Select(a => new AssessmentResult
+                {
+                    AssessmentName = a.Assessment?.Name,
+                    SkillName = a.Assessment?.AssessmentSkill?.Name,
+                    SubjectName = a.Assessment?.AssessmentSkill?.Subject?.Name,
+                    Grade = a.Grade?.Name ?? "N/A",
+                    MinPercentage = a.Grade?.MinPercentage,
+                    MaxPercentage = a.Grade?.MaxPercentage,
+                    TimeTableDay = a.TimeTable?.Name,
+                    AssessmentDate = a.AssessmentDate
+                }).ToList();
+
+            // GROUP BY ASSESSMENTS
+            var groupedAssessments = assessments
+                .Where(a => a.Assessment != null)
+                .GroupBy(a => a.Assessment.Id)
+                .Select(g => new AssessmentGroup
+                {
+                    AssessmentName = g.First().Assessment?.Name,
+                    SkillName = g.First().Assessment?.AssessmentSkill?.Name,
+                    SubjectName = g.First().Assessment?.AssessmentSkill?.Subject?.Name,
+                    Grade = g.First().Grade?.Name ?? "N/A",
+                    MinPercentage = g.First().Grade?.MinPercentage,
+                    MaxPercentage = g.First().Grade?.MaxPercentage,
+                    TimeTableDay = g.First().TimeTable?.Name,
+                    AssessmentDate = g.First().AssessmentDate
+                }).ToList();
+
+            return new StudentPerformanceDashboard
+            {
+                StudentId = student.Id,
+                StudentName = student.Name,
+                ImageUrl = student.StudentImageUrl,
+
+                Daily = new PerformanceBreakdown
+                {
+                    Period = today.ToString("yyyy-MM-dd"),
+                    Results = dailyResults
+                },
+                Weekly = null, // If needed, you can assign the first or current week here
+                Monthly = new PerformanceBreakdown
+                {
+                    Period = $"{DateTime.Today:MMMM yyyy}",
+                    Results = monthlyResults
+                },
+                Yearly = new PerformanceBreakdown
+                {
+                    Period = $"{DateTime.Today:yyyy}",
+                    Results = yearlyResults
+                },
+
+                AssessmentWise = groupedAssessments
+            };
+        }
 
 
 

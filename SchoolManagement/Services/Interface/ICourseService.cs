@@ -25,5 +25,9 @@ namespace SchoolManagement.Services.Interface
 
         // Get all courses for a tenant
         List<CourseVm> GetCoursesByTenantId(int tenantId);
+
+        List<CourseDropDownOptionsVm> GetCourseDropDownOptions(int tenantId);
+
+
     }
 }

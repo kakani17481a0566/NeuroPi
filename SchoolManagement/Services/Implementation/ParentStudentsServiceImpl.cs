@@ -3,6 +3,7 @@ using SchoolManagement.Data;
 using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.CourseTeacher;
+using SchoolManagement.ViewModel.ParentStudents;
 
 namespace SchoolManagement.Services.Implementation
 {
@@ -121,5 +122,56 @@ namespace SchoolManagement.Services.Implementation
             courseTeacherVM.termId = week != null ? week.TermId : 0;
             return courseTeacherVM;
         }
+
+
+        public ParentWithStudentsResponseVM GetFullParentDetailsByUserId(int userId, int tenantId)
+        {
+            // Step 1: Get the parent using UserId + TenantId
+            var parent = _db.Parents
+                .Include(p => p.User)
+                .FirstOrDefault(p => p.UserId == userId && p.TenantId == tenantId && !p.IsDeleted);
+
+            if (parent == null)
+                return null;
+
+            // Step 2: Fetch all student links for this parent
+            var studentLinks = _db.ParentStudents
+                .Where(ps => ps.ParentId == parent.Id && ps.TenantId == tenantId && !ps.IsDeleted)
+                .Include(ps => ps.Student)
+                    .ThenInclude(s => s.Course)
+                .Include(ps => ps.Student)
+                    .ThenInclude(s => s.Branch)
+                .ToList();
+
+            // Step 3: Map to ViewModel
+            var response = new ParentWithStudentsResponseVM
+            {
+                Parent = new ParentVM
+                {
+                    ParentId = parent.Id,
+                    UserId = parent.UserId,
+                    ParentName = parent.User?.Username,
+                    Email = parent.User?.Email,
+                    MobileNumber = parent.User?.MobileNumber,
+                    TenantId = parent.TenantId
+                },
+                Students = studentLinks
+                    .Where(x => x.Student != null)
+                    .Select(x => new StudentVM
+                    {
+                        StudentId = x.Student.Id,
+                        Name = x.Student.Name,
+                        CourseName = x.Student.Course?.Name,
+                        BranchName = x.Student.Branch?.Name,
+                        StudentImageUrl = x.Student.StudentImageUrl
+                    })
+                    .ToList()
+            };
+
+            return response;
+        }
+
+
+
     }
 }

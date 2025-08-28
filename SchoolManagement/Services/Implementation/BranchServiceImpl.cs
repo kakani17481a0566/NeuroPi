@@ -111,23 +111,43 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 List<Course> courses = new List<Course>();
                 foreach (MCourseTeacher course in courseTeacher)
                 {
-                    var courseObj = new Course()
-                    {
-                        id = course.Course.Id,
-                        name = course.Course.Name,
-                    };
-                    courses.Add(courseObj);
+                Course ct = new Course() {
+                    id = course.Id ,
+                    name=course.Course.Name
+                };
+                courses.Add(ct);
 
                 }
-                courseTeacherVM.courses = courses;
-            courseTeacherVM.branchId = courseTeacher[0].BranchId;
 
-                var week = _context.Weeks.Where(w => w.StartDate <= today && w.EndDate >= today && !w.IsDeleted).FirstOrDefault();
-                courseTeacherVM.weekId = week != null ? week.Id : 0;
-                courseTeacherVM.termId = week != null ? week.TermId : 0;
+                courseTeacherVM.courses = courses;
+                courseTeacherVM.branchId = courseTeacher[0].BranchId;
+                var currentWeek = _context.Weeks.FirstOrDefault(w => w.StartDate <= today && w.EndDate >= today && !w.IsDeleted);
+
+                courseTeacherVM.weekId = currentWeek?.Id ?? 0;
+                courseTeacherVM.termId = currentWeek?.TermId ?? 0;
 
                return courseTeacherVM;
         
         }
+        public List<BranchDropDownOptionVm> GetBranchDropDownOptions(int tenantId)
+        {
+            return _context.Branches
+                .AsNoTracking()
+                .Include(b => b.Tenant)
+                .Where(b => !b.IsDeleted && b.TenantId == tenantId)
+                .Select(b => new BranchDropDownOptionVm
+                {
+                    Id = b.Id,
+                    Name = b.Name,
+                    TenantId = b.TenantId,
+                    TenantName = b.Tenant != null ? b.Tenant.Name : string.Empty
+                })
+                .OrderBy(x => x.Name)
+                .ToList();
+        }
+
+
+
+
     }
 }

@@ -85,5 +85,23 @@ namespace SchoolManagement.Controllers
             }
             return new ResponseResult<CourseTeacherVM>(HttpStatusCode.NoContent, null);
         }
+
+        [HttpGet("full-details/user/{userId}/tenant/{tenantId}")]
+        public ResponseResult<ParentWithStudentsResponseVM> GetFullDetailsByUser(int userId, int tenantId)
+        {
+            var result = _service.GetFullParentDetailsByUserId(userId, tenantId);
+
+            return result == null
+                ? new ResponseResult<ParentWithStudentsResponseVM>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    "Parent not found for given user and tenant")
+                : new ResponseResult<ParentWithStudentsResponseVM>(
+                    HttpStatusCode.OK,
+                    result,
+                    "Fetched parent and linked students successfully");
+        }
+
+
     }
 }

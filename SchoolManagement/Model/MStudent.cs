@@ -17,6 +17,12 @@ namespace SchoolManagement.Model
         [Column("name")]
         public string Name { get; set; }
 
+        [Column("surname")]
+        public string Surname { get; set; }
+
+        [Column("dob")]
+        public DateOnly? DateOfBirth { get; set; }
+
         [Column("course_id")]
         public int CourseId { get; set; }
 
@@ -50,6 +56,6 @@ namespace SchoolManagement.Model
 
         public virtual ICollection<MParentStudent> ParentStudents { get; set; }
 
-        // Audit properties might be in MBaseModel
+        public virtual ICollection<MDailyAssessment> DailyAssessments { get; set; } = new List<MDailyAssessment>();
     }
 }

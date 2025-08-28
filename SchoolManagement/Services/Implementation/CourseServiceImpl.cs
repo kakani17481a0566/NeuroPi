@@ -1,4 +1,5 @@
-﻿using NeuroPi.UserManagment.Model;
+﻿using Microsoft.EntityFrameworkCore;
+using NeuroPi.UserManagment.Model;
 using SchoolManagement.Data;
 using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
@@ -136,5 +137,27 @@ namespace SchoolManagement.Services.Implementation
                     TenantId = c.TenantId
                 }).ToList();
         }
+
+
+        public List<CourseDropDownOptionsVm> GetCourseDropDownOptions(int tenantId)
+        {
+            return _dbContext.Courses
+                .AsNoTracking()
+                .Include(c => c.Tenant)
+                .Where(c => !c.IsDeleted && c.TenantId == tenantId)
+                .OrderBy(c => c.Name)
+                .Select(c => new CourseDropDownOptionsVm
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    TenantId = c.TenantId,
+                    TenantName = c.Tenant.Name
+                })
+                .ToList();
+        }
+
+
+
+
     }
 }

@@ -28,5 +28,13 @@ namespace SchoolManagement.Model
 
         [ForeignKey(nameof(TenantId))]
         public virtual MTenant Tenant { get; set; }
+
+        // Navigation for CreatedBy
+        [ForeignKey(nameof(CreatedBy))]
+        public virtual MUser CreatedByUser { get; set; }
+
+        // Navigation for UpdatedBy (nullable)
+        [ForeignKey(nameof(UpdatedBy))]
+        public virtual MUser? UpdatedByUser { get; set; }
     }
 }

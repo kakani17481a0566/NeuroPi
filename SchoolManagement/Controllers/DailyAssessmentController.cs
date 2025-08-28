@@ -142,6 +142,25 @@ namespace SchoolManagement.Controllers
                 "Performance summary fetched successfully.");
         }
 
+        [HttpGet("performance-dashboard-studentbyid/{studentId}/{tenantId}")]
+        public ResponseResult<StudentPerformanceDashboard> GetStudentPerformanceDashboard(int studentId, int tenantId)
+        {
+            var result = _service.GetStudentPerformanceDashboard(studentId, tenantId);
+
+            if (result == null)
+                return new ResponseResult<StudentPerformanceDashboard>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    "No performance data found for the student."
+                );
+
+            return new ResponseResult<StudentPerformanceDashboard>(
+                HttpStatusCode.OK,
+                result,
+                "Student performance dashboard fetched successfully."
+            );
+        }
+
 
 
 
