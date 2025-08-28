@@ -107,12 +107,12 @@ namespace NeuroPi.UserManagment.Services.Implementation
             DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
             //var branch = _context.Branches.FirstOrDefault(b => b.DepartmentId == departmentId && !b.IsDeleted);
             CourseTeacherVM courseTeacherVM = new CourseTeacherVM();
-                var courseTeacher = _context.CourseTeachers.Where(c => c.TeacherId==userId && !c.IsDeleted).Include(c => c.Course).ToList();
+                var courseTeacher = _context.CourseTeachers.Where(c => c.TeacherId==userId && !c.IsDeleted && c.TenantId==tenanatId).Include(c => c.Course).ToList();
                 List<Course> courses = new List<Course>();
                 foreach (MCourseTeacher course in courseTeacher)
                 {
                 Course ct = new Course() {
-                    id = course.Id ,
+                    id = course.CourseId ,
                     name=course.Course.Name
                 };
                 courses.Add(ct);
