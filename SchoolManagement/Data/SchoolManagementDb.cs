@@ -76,6 +76,12 @@ namespace SchoolManagement.Data
 
         public DbSet<MVTermTable> VTermTable { get; set; }
 
+        public DbSet<MImage> images { get; set; }
+
+        public DbSet<MTestContent> tests { get; set; }
+
+        public DbSet<MTest> test { get; set; }
+
 
 
 

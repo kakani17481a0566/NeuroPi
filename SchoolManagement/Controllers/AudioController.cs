@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Response;
 using SchoolManagement.Services.Implementation;
 using SchoolManagement.Services.Interface;
+using SchoolManagement.ViewModel.Audio;
+using System.Threading.Channels;
 
 //[EnableCors("AllowAll")]
 [Route("api/[controller]")]
@@ -53,18 +55,23 @@ public class AudioController : ControllerBase
         }
     }
     [HttpGet("/getImages")]
-    public ResponseResult<List<string>>GetAllText()
+    public List<ImageDb> GetAllText()
     {
         //List<string> response = new List<string>()
         //{
         //     "Apple",
         //     "Ball"
         //};
-        return new ResponseResult<List<string>>(System.Net.HttpStatusCode.OK, new List<string>()
-        {
-             "Armadillo","Ball","Cat","Dog","Egg","Fish"
-
-        });
+        List<ImageDb> images = new List<ImageDb>();
+        //Chapel, grapple, dapple, and scrapple.
+        ImageDb img1 = new ImageDb("Chapel", new byte[0]);
+        ImageDb img2 = new ImageDb("grapple", new byte[0]);
+        ImageDb img3 = new ImageDb("dapple", new byte[0]);
+        images.Add(img1);
+        images.Add(img2);
+        images.Add(img3);
+        return  images;
+        
     }
     [HttpPost("/{text}")]
     public string TestPronounciation(IFormFile audioFile, string text)
@@ -73,9 +80,49 @@ public class AudioController : ControllerBase
         audioFile.CopyTo(ms);
         byte[] audioBytes = ms.ToArray();
         return  _transcriptionService.CheckPronounciation(audioBytes,text);
+    }
 
+    [HttpGet("/images/{text}")]
+    public List<ImageDb> GetImages(string text)
+    {
+        if (text.ToLower() == "abc") {
+            return _transcriptionService.GetImage();
+        }
+        else
+        {
+            List<ImageDb> images = new List<ImageDb>();
+            //ImageDb img1 = new ImageDb("call", "");
+            //ImageDb img2 = new ImageDb("tall", "");
+            //ImageDb img3 = new ImageDb("bell", "");
+            //images.Add(img1);
+            //images.Add(img2);
+            //images.Add(img3);
+            return images;
+        }
+    }
+    [HttpGet("/response")]
+    public IActionResult GetStudentResult()
+    {
+        List<StudentResultVM> response= new List<StudentResultVM>();
+        StudentResultVM student = new StudentResultVM("APPLE", "correct", "https://drive.google.com/file/d/1ooP_MQe2Q3BLwRijoojtWf77GknLHS_y/preview");
+        StudentResultVM student1 = new StudentResultVM("CAT", "InCorrect", "https://drive.google.com/file/d/1FXryj9uhjCGXOaNnOwTXIDKQnxZWo8uN/preview");
+        StudentResultVM student3 = new StudentResultVM("CAT", "InCorrect", "https://drive.google.com/file/d/1FXryj9uhjCGXOaNnOwTXIDKQnxZWo8uN/preview");
+        response.Add(student1);
+        response.Add(student);
+        response.Add(student3);
+        return Ok( response);
 
+    }
+    [HttpPost("/image/{text}")]
+    public string AddImage(IFormFile file,string text)
+    {
+        string result = _transcriptionService.AddImage(file, text);
+        if(result != null)
+        {
+            return result;
 
+        }
+        return null;
     }
 
 

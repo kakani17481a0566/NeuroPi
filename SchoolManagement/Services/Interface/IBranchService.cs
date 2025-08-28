@@ -1,4 +1,5 @@
-﻿using SchoolManagement.ViewModel.Branch;
+﻿using Microsoft.CognitiveServices.Speech.Transcription;
+using SchoolManagement.ViewModel.Branch;
 using SchoolManagement.ViewModel.CourseTeacher;
 
 namespace SchoolManagement.Services.Interface
@@ -19,6 +20,6 @@ namespace SchoolManagement.Services.Interface
 
         bool DeleteBranch(int id,int tenantId);
 
-        CourseTeacherVM GetBranchByDepartmentId(int departmentId,int userId);
+        CourseTeacherVM GetBranchByDepartmentId(int userId, int tenanatId);
     }
 }

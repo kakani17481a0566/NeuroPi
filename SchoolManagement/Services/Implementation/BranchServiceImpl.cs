@@ -102,16 +102,12 @@ namespace NeuroPi.UserManagment.Services.Implementation
             return BranchResponseVM.ToViewModel(existingBranch);
         }
         //sai vardhan
-        public CourseTeacherVM GetBranchByDepartmentId(int departmentId, int userId)
+        public CourseTeacherVM GetBranchByDepartmentId( int userId,int tenanatId)
         {
             DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
-            var branch = _context.Branches.FirstOrDefault(b => b.DepartmentId == departmentId && !b.IsDeleted);
+            //var branch = _context.Branches.FirstOrDefault(b => b.DepartmentId == departmentId && !b.IsDeleted);
             CourseTeacherVM courseTeacherVM = new CourseTeacherVM();
-
-            if (branch != null)
-            {
-                courseTeacherVM.branchId = branch.Id;
-                var courseTeacher = _context.CourseTeachers.Where(c => c.BranchId == branch.Id && c.TeacherId==userId && !c.IsDeleted).Include(c => c.Course).ToList();
+                var courseTeacher = _context.CourseTeachers.Where(c => c.TeacherId==userId && !c.IsDeleted).Include(c => c.Course).ToList();
                 List<Course> courses = new List<Course>();
                 foreach (MCourseTeacher course in courseTeacher)
                 {
@@ -124,14 +120,14 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
                 }
                 courseTeacherVM.courses = courses;
+            courseTeacherVM.branchId = courseTeacher[0].BranchId;
 
                 var week = _context.Weeks.Where(w => w.StartDate <= today && w.EndDate >= today && !w.IsDeleted).FirstOrDefault();
                 courseTeacherVM.weekId = week != null ? week.Id : 0;
                 courseTeacherVM.termId = week != null ? week.TermId : 0;
 
-                return courseTeacherVM;
-            }
-            return null;
+               return courseTeacherVM;
+        
         }
     }
 }

@@ -37,6 +37,7 @@ builder.Services.AddScoped<IUserRolesService, UserRolesServiceImpl>();
 builder.Services.AddScoped<IUserService, UserServiceImpl>();
 builder.Services.AddScoped<IAudioTranscriptionService, AudioTranscriptionServiceImpl>();
 builder.Services.AddScoped<ApiKeyService>();
+builder.Services.AddScoped<TestContentInterface,TestContentServiceImpl>();
 
 // Shared / Core Services
 builder.Services.AddScoped<IContactService, ContactServiceImpl>();

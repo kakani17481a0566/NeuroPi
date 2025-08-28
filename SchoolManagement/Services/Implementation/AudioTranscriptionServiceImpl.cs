@@ -1,6 +1,8 @@
 ﻿using Microsoft.CognitiveServices.Speech;
 using Microsoft.CognitiveServices.Speech.Audio;
 using Microsoft.CognitiveServices.Speech.PronunciationAssessment;
+using SchoolManagement.Data;
+using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.Audio;
 using System.Text.Json;
@@ -12,9 +14,11 @@ namespace SchoolManagement.Services.Implementation
     {
 
         private readonly ApiKeyService apiKeyService;
-        public AudioTranscriptionServiceImpl(ApiKeyService _apiKeyService)
+        private readonly SchoolManagementDb schoolManagementDb;
+        public AudioTranscriptionServiceImpl(ApiKeyService _apiKeyService,SchoolManagementDb schoolManagementDb)
         {
             apiKeyService = _apiKeyService;
+            this.schoolManagementDb = schoolManagementDb;
         }
         public async Task<byte[]> TranscribeAudioAsync(byte[] audioBytes, string fileExtension, string text)
         {
@@ -237,34 +241,138 @@ namespace SchoolManagement.Services.Implementation
             var config = SpeechConfig.FromSubscription(_subscriptionKey, _region);
             string tempFilePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N") );
             await File.WriteAllBytesAsync(tempFilePath, audioBytes);
-            var pronunciationConfig = new PronunciationAssessmentConfig(
-               text,
-               GradingSystem.HundredMark,
-               Granularity.Word,
-               enableMiscue: true);
-            using (var audioInput = AudioConfig.FromWavFileInput(tempFilePath))
-            using (var recognizer = new SpeechRecognizer(config, audioInput))
+            //near rhymes pronounciation 
+            //var pronunciationConfig = new PronunciationAssessmentConfig(
+            //   text,
+            //   GradingSystem.HundredMark,
+            //   Granularity.Word,
+            //   enableMiscue: true);
+            //using (var audioInput = AudioConfig.FromWavFileInput(tempFilePath))
+            //using (var recognizer = new SpeechRecognizer(config, audioInput))
+            //{
+            //    pronunciationConfig.ApplyTo(recognizer);
+            //    var result = await recognizer.RecognizeOnceAsync();
+            //    result.Properties.GetProperty(PropertyId.SpeechServiceResponse_JsonResult);
+            //    double score=  PronunciationAssessmentResult.FromResult(result).AccuracyScore;
+            //    if (score >= 90.0)
+            //    {
+            //        return " correct word match";
+
+            //    }
+            //    else
+            //    {
+            //        var aiHelper = new AiPronunciationHelper(apiKeyService);
+            //        var textHelp = await aiHelper.GetKidFriendlyRhymesAsync(text);
+            //        return textHelp;
+
+            //    }
+
+            //}
+            var audioConfig=AudioConfig.FromWavFileOutput(tempFilePath);
+            using (var recognizer = new SpeechRecognizer(config, audioConfig))
             {
-                pronunciationConfig.ApplyTo(recognizer);
                 var result = await recognizer.RecognizeOnceAsync();
-                result.Properties.GetProperty(PropertyId.SpeechServiceResponse_JsonResult);
-                double score=  PronunciationAssessmentResult.FromResult(result).AccuracyScore;
-                if (score >= 90.0)
+                if (result != null)
                 {
-                    return " correct word match";
+                    string resultText = result.Text.ToLower();
+                    string response = text.ToLower()+".";
+                    bool res = response.Equals(resultText, StringComparison.OrdinalIgnoreCase);
+                    
+                    if(res)
+                    {
+                        return "correct word";
 
+                    }
+                    else
+                    {
+
+                        var aiHelper = new AiPronunciationHelper(apiKeyService);
+                        var textHelp = await aiHelper.GetKidFriendlyRhymesAsync(text);
+                        //Console.WriteLine(textHelp);
+                        string[] rhymeWords = textHelp.Split(",");
+                        var testResponse=schoolManagementDb.tests.Where(t=>!t.isDeleted && t.name.ToLower()==text.ToLower()).FirstOrDefault();
+                        if (testResponse != null)
+                        {
+                            List<MTestContent> list=new List<MTestContent>();
+                            foreach (string word in rhymeWords)
+                            {
+                                bool isWordPresent = schoolManagementDb.tests.Any(t => t.name.ToLower() == word.ToLower() && !t.isDeleted);
+                                if (!isWordPresent)
+                                {
+
+
+                                    MTestContent model = new MTestContent()
+                                    {
+                                        name = word,
+                                        testId = 1,
+                                        relationId = testResponse.id,
+                                        tenantId = testResponse.tenantId,
+                                    };
+                                    list.Add(model);
+                                }
+                                
+                            }
+                            schoolManagementDb.tests.AddRange(list);
+                            schoolManagementDb.SaveChangesAsync();
+                           
+
+                        }
+
+                        return textHelp;
+
+                    }
                 }
-                else
-                {
-                    var aiHelper = new AiPronunciationHelper(apiKeyService);
-                    var textHelp = await aiHelper.GetKidFriendlyRhymesAsync(text);
-                    return textHelp;
-
-                }
-
             }
-            ;
             return "InCorrect word match ";
+        }
+
+        public string AddImage(IFormFile file, string text)
+        {
+            MImage mImage = new MImage()
+            {
+                url = ConvertIFormFileToBytes(file)
+            };
+            schoolManagementDb.images.Add(mImage);
+            schoolManagementDb.SaveChanges();
+            if (mImage != null)
+            {
+                return "inserted";
+            }
+            return "Not Inserted";
+            
+            
+        }
+        public List<ImageDb> GetImage()
+        {
+            var result = schoolManagementDb.images.ToList();
+            if (result != null)
+            {
+                List<ImageDb> images = new List<ImageDb>();
+                //foreach(var r in result)
+                //{
+                //    ImageDb image = new ImageDb();
+
+                //    image.url = Convert.ToBase64String(r.url);
+                //    image.name = "Apple";
+                //    images.Add(image);
+                //}
+                return images;
+            }
+            return null;
+        }
+
+        public byte[] ConvertIFormFileToBytes(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return null; 
+            }
+
+            using (var memoryStream = new MemoryStream())
+            {
+                file.CopyTo(memoryStream);
+                return memoryStream.ToArray();
+            }
         }
     }
 
