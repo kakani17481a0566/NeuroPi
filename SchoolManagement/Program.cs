@@ -74,6 +74,8 @@ builder.Services.AddScoped<IStudentAttendanceService, StudentAttendanceServiceIm
 builder.Services.AddScoped<IWorkSheetService, WorkSheetServiceImpl>();
 builder.Services.AddScoped<IPublicHolidayService, PublicHolidayServiceImpl>();
 builder.Services.AddScoped<IAssessmentMatrixService, AssessmentMatrixService>();
+builder.Services.AddScoped<IItemsService, ItemsServiceImpl>();
+builder.Services.AddScoped<IItemCategoryService, ItemCategoryServiceImpl>();
 
 // ViewModel-based Services
 builder.Services.AddScoped<IVwComprehensiveTimeTablesService, VwComprehensiveTimeTablesService>();

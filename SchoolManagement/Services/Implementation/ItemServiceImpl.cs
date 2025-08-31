@@ -21,7 +21,7 @@ namespace SchoolManagement.Services.Implementation
         // HttpGet: api/item
         public List<ItemVM> GetAll()
         {
-            return _context.Items
+            return _context.item
                 .Where(i => !i.IsDeleted)
                 .Select(i => new ItemVM
                 {
@@ -38,7 +38,7 @@ namespace SchoolManagement.Services.Implementation
         // HttpGet: api/item/tenant/{tenantId}
         public List<ItemVM> GetAllByTenantId(int tenantId)
         {
-            return _context.Items
+            return _context.item
                 .Where(i => !i.IsDeleted && i.TenantId == tenantId)
                 .Select(i => new ItemVM
                 {
@@ -55,7 +55,7 @@ namespace SchoolManagement.Services.Implementation
         // HttpGet: api/item/tenant/{tenantId}/header/{itemHeaderId}
         public ItemVM GetById(int id)
         {
-            var item = _context.Items.FirstOrDefault(i => !i.IsDeleted && i.Id == id);
+            var item = _context.item.FirstOrDefault(i => !i.IsDeleted && i.Id == id);
             if (item == null) return null;
 
             return new ItemVM
@@ -72,7 +72,7 @@ namespace SchoolManagement.Services.Implementation
         // HttpGet: api/item/{id}/tenant/{tenantId}
         public ItemVM GetByIdAndTenantId(int id, int tenantId)
         {
-            var item = _context.Items.FirstOrDefault(i => !i.IsDeleted && i.Id == id && i.TenantId == tenantId);
+            var item = _context.item.FirstOrDefault(i => !i.IsDeleted && i.Id == id && i.TenantId == tenantId);
             if (item == null) return null;
 
             return new ItemVM
@@ -90,7 +90,7 @@ namespace SchoolManagement.Services.Implementation
         // HttpPut: api/item/{id}/tenant/{tenantId}
         public ItemVM UpdateByIdAndTenantId(int id, int tenantId, UpdateItemVM request)
         {
-            var item = _context.Items.FirstOrDefault(i => i.Id == id && i.TenantId == tenantId && !i.IsDeleted);
+            var item = _context.item.FirstOrDefault(i => i.Id == id && i.TenantId == tenantId && !i.IsDeleted);
             if (item == null) return null;
 
             item.BookCondition = request.BookCondition;
@@ -105,7 +105,7 @@ namespace SchoolManagement.Services.Implementation
         // HttpDelete: api/item/{id}/tenant/{tenantId}
         public ItemVM DeleteByIdAndTenantId(int id, int tenantId)
         {
-            var item = _context.Items.FirstOrDefault(i => i.Id == id && i.TenantId == tenantId && !i.IsDeleted);
+            var item = _context.item.FirstOrDefault(i => i.Id == id && i.TenantId == tenantId && !i.IsDeleted);
             if (item == null) return null;
 
             item.IsDeleted = true;
@@ -134,7 +134,7 @@ namespace SchoolManagement.Services.Implementation
                 CreatedOn = DateTime.UtcNow
             };
 
-            _context.Items.Add(item);
+            _context.item.Add(item);
             _context.SaveChanges();
 
             return GetById(item.Id);

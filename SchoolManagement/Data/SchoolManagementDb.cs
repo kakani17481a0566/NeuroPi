@@ -22,7 +22,7 @@ namespace SchoolManagement.Data
         public DbSet<MMasterType> MasterTypes { get; set; }
         public DbSet<MMaster> Masters { get; set; }
         public DbSet<MItemHeader> ItemHeaders { get; set; }
-        public DbSet<MItem> Items { get; set; }
+        public DbSet<MItems> Items { get; set; }
         public DbSet<MLibBookRecord> LibBookRecords { get; set; }
         public DbSet<MBook> Books { get; set; }
         public DbSet<MAccount> Accounts { get; set; }
@@ -66,6 +66,12 @@ namespace SchoolManagement.Data
 
         public DbSet<MCourseTeacher> CourseTeachers { get; set; }
 
+        public DbSet<MItems> items { get; set; }
+
+        public DbSet<MItem> item { get; set; }
+
+        public DbSet<MItemCategory> ItemCategory { get; set; }
+
 
 
         // views
@@ -105,6 +111,8 @@ namespace SchoolManagement.Data
                     v => DateTime.SpecifyKind(v, DateTimeKind.Utc)
                 ));
             }
+
+
 
             // ✅ 2. Configure views
             modelBuilder.Entity<MVwComprehensiveTimeTable>()
