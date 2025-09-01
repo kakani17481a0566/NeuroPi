@@ -72,6 +72,10 @@ namespace SchoolManagement.Data
 
         public DbSet<MItemCategory> ItemCategory { get; set; }
 
+        public DbSet<MItemLocation> ItemLocation { get; set; }
+
+        public DbSet<MItemBranch> ItemBranch { get; set; }
+
 
 
         // views

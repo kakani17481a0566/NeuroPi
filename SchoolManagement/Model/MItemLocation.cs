@@ -4,6 +4,7 @@ using NeuroPi.UserManagment.Model;
 
 namespace SchoolManagement.Model
 {
+    [Table("item_location")]
     public class MItemLocation : MBaseModel
     {
         [Column("id")]
@@ -12,11 +13,9 @@ namespace SchoolManagement.Model
         [Column("name")]
         public string Name { get; set; }
 
-        
+        [ForeignKey("BranchId")]
         [Column("branch_id")]
         public int BranchId { get; set; }
-        [ForeignKey("BranchId")]
-        public MBranch Branch { get; set; }
 
         [Required]
         [ForeignKey("Tenant")]
@@ -24,6 +23,7 @@ namespace SchoolManagement.Model
         public int TenantId { get; set; }
 
         public virtual MTenant Tenant { get; set; }
+        public virtual MBranch Branch { get; set; }
     }
 
 }

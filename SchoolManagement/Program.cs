@@ -76,6 +76,8 @@ builder.Services.AddScoped<IPublicHolidayService, PublicHolidayServiceImpl>();
 builder.Services.AddScoped<IAssessmentMatrixService, AssessmentMatrixService>();
 builder.Services.AddScoped<IItemsService, ItemsServiceImpl>();
 builder.Services.AddScoped<IItemCategoryService, ItemCategoryServiceImpl>();
+builder.Services.AddScoped<IItemLocationService, ItemLocationServiceImpl>();
+builder.Services.AddScoped<IItemBranchService, ItemBranchServiceImpl>();
 
 // ViewModel-based Services
 builder.Services.AddScoped<IVwComprehensiveTimeTablesService, VwComprehensiveTimeTablesService>();

@@ -4,25 +4,27 @@ using NeuroPi.UserManagment.Model;
 
 namespace SchoolManagement.Model
 {
-    public class MItemBranch:MBaseModel
-
+    [Table("item_branch")] // <-- change if your actual table name differs
+    public class MItemBranch : MBaseModel
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("id")]
-        public int Id { get; set; }
+        public int Id { get; set; }                  
 
-        [Column("id")]
-        public int ItemId { get; set; }
-        [ForeignKey("ItemId")]
+        [Column("item_id")]
+        public int ItemId { get; set; }               
         public MItems Item { get; set; }
 
-        [Column("id")]
-        public int BranchId { get; set; }
-        [ForeignKey("BranchId")]
+        [Column("branch_id")]
+        public int BranchId { get; set; }            
+        [ForeignKey(nameof(BranchId))]
         public MBranch Branch { get; set; }
 
         [Column("item_quantity")]
         public int ItemQuantity { get; set; }
 
+        
         [Column("item_price")]
         public int ItemPrice { get; set; }
 
@@ -34,18 +36,13 @@ namespace SchoolManagement.Model
 
         [Column("item_location_id")]
         public int ItemLocationId { get; set; }
-        [ForeignKey("ItemLocationId")]
+        [ForeignKey(nameof(ItemLocationId))]
         public MItemLocation ItemLocation { get; set; }
 
         [Required]
-        [ForeignKey("Tenant")]
         [Column("tenant_id")]
         public int TenantId { get; set; }
-
-        public virtual MTenant Tenant { get; set; }
-
-
-
-
+        [ForeignKey(nameof(TenantId))]
+        public MTenant Tenant { get; set; }
     }
 }

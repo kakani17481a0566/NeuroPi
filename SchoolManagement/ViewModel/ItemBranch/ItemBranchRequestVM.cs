@@ -4,7 +4,6 @@ namespace SchoolManagement.ViewModel.ItemBranch
 {
     public class ItemBranchRequestVM
     {
-        public int Id { get; set; }
         public int ItemId { get; set; }
         public int BranchId { get; set; }
         public int ItemQuantity { get; set; }
@@ -21,7 +20,6 @@ namespace SchoolManagement.ViewModel.ItemBranch
         {
             return new MItemBranch
             {
-                Id = this.Id,
                 ItemId = this.ItemId,
                 BranchId = this.BranchId,
                 ItemQuantity = this.ItemQuantity,

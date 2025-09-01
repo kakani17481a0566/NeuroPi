@@ -4,7 +4,7 @@
     {
         public string Name { get; set; }
 
-        public string BranchId { get; set; }
+        public int BranchId { get; set; }
 
         public int TenantId { get; set; }
 
