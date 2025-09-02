@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Data;
 using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
@@ -17,41 +20,46 @@ namespace SchoolManagement.Services.Implementation
 
         public List<ItemSupplierResponseVM> GetAll()
         {
-            return _db.ItemSuppliers
-                      .Where(x => !x.IsDeleted)
-                      .Select(ItemSupplierResponseVM.FromModel)
-                      .ToList();
+            var list = _db.ItemSuppliers
+                          .AsNoTracking()
+                          .Where(x => !x.IsDeleted)
+                          .ToList();
+
+            return list.Select(ItemSupplierResponseVM.FromModel).ToList();
         }
 
         public List<ItemSupplierResponseVM> GetAllByTenantId(int tenantId)
         {
-            return _db.ItemSuppliers
-                      .Where(x => !x.IsDeleted && x.TenantId == tenantId)
-                      .Select(ItemSupplierResponseVM.FromModel)
-                      .ToList();
+            var list = _db.ItemSuppliers
+                          .AsNoTracking()
+                          .Where(x => !x.IsDeleted && x.TenantId == tenantId)
+                          .ToList();
+
+            return list.Select(ItemSupplierResponseVM.FromModel).ToList();
         }
 
         public ItemSupplierResponseVM? GetById(int id)
         {
             var entity = _db.ItemSuppliers
+                            .AsNoTracking()
                             .FirstOrDefault(x => !x.IsDeleted && x.Id == id);
-            return entity == null ? null : ItemSupplierResponseVM.FromModel(entity);
+
+            return ItemSupplierResponseVM.FromModel(entity);
         }
 
         public ItemSupplierResponseVM? GetByIdAndTenantId(int id, int tenantId)
         {
             var entity = _db.ItemSuppliers
+                            .AsNoTracking()
                             .FirstOrDefault(x => !x.IsDeleted && x.Id == id && x.TenantId == tenantId);
-            return entity == null ? null : ItemSupplierResponseVM.FromModel(entity);
+
+            return ItemSupplierResponseVM.FromModel(entity);
         }
 
         public ItemSupplierResponseVM CreateItemSupplier(ItemSupplierRequestVM request)
         {
-            // If you already have a static mapper, fine; otherwise map inline:
-            var model = ItemSupplierRequestVM.ToModel(request); // or map manually, see note below.
-
+            var model = request.ToModel();
             model.CreatedOn = DateTime.UtcNow;
-            // model.CreatedBy = request.CreatedBy; // if available in your VM
 
             _db.ItemSuppliers.Add(model);
             _db.SaveChanges();
@@ -66,18 +74,12 @@ namespace SchoolManagement.Services.Implementation
 
             if (entity == null) return null;
 
-            // Map the updatable fields from request -> entity
-            // Adjust to your real fields (examples shown):
-            // entity.Name = request.Name;
-            // entity.ContactPerson = request.ContactPerson;
-            // entity.Phone = request.Phone;
-            // entity.Email = request.Email;
-            // entity.Address = request.Address;
-            // entity.GstNumber = request.GstNumber;
-            // entity.Notes = request.Notes;
-
+            // update allowed fields
+            entity.ItemId = request.ItemId;
+            entity.BranchId = request.BranchId;
+            entity.Adt = request.Adt;
             entity.UpdatedOn = DateTime.UtcNow;
-            // entity.UpdatedBy = request.UpdatedBy; // if available
+            entity.UpdatedBy = request.UpdatedBy;
 
             _db.SaveChanges();
             return ItemSupplierResponseVM.FromModel(entity);
@@ -90,10 +92,8 @@ namespace SchoolManagement.Services.Implementation
 
             if (entity == null) return null;
 
-            // Soft delete (recommended)
             entity.IsDeleted = true;
             entity.UpdatedOn = DateTime.UtcNow;
-            // entity.UpdatedBy = ...;
 
             _db.SaveChanges();
             return ItemSupplierResponseVM.FromModel(entity);

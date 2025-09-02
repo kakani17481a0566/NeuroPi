@@ -6,7 +6,7 @@ namespace SchoolManagement.Services.Interface
     {
         List<ItemSupplierResponseVM> GetAll();
         List<ItemSupplierResponseVM> GetAllByTenantId(int tenantId);
-        ItemSupplierResponseVM GetById(int id);
+        ItemSupplierResponseVM? GetById(int id); // <- make nullable for consistency
         ItemSupplierResponseVM? GetByIdAndTenantId(int id, int tenantId);
 
         ItemSupplierResponseVM CreateItemSupplier(ItemSupplierRequestVM request);

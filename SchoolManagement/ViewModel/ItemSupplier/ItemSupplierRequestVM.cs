@@ -1,32 +1,34 @@
-﻿using SchoolManagement.Model;
-
-// SchoolManagement.ViewModel.ItemSupplier/ItemSupplierRequestVM.cs
+﻿// SchoolManagement.ViewModel.ItemSupplier/ItemSupplierRequestVM.cs
+using System;
 using SchoolManagement.Model;
 
 namespace SchoolManagement.ViewModel.ItemSupplier
 {
     public class ItemSupplierRequestVM
     {
-        public int Id { get; set; }
+        //public int Id { get; set; }              // optional for update
         public int ItemId { get; set; }
         public int BranchId { get; set; }
         public int TenantId { get; set; }
-        public string Adt { get; set; }
-        public int CreatedBy { get; set; }
-        public int? UpdatedBy { get; set; }
+        public int? Adt { get; set; }            // nullable to match DB
+        public int CreatedBy { get; set; }       // required on create
+        public int? UpdatedBy { get; set; }      // set on update
 
-
-        public static MItemSupplier ToModel(ItemSupplierRequestVM request)
+        public MItemSupplier ToModel()
         {
-            return new MItemSupplier
+            var entity = new MItemSupplier
             {
-                Id = request.Id,
-                ItemId = request.ItemId,
-                BranchId = request.BranchId,
-                TenantId = request.TenantId,
-                Adt = request.Adt,
-                CreatedBy = request.CreatedBy
+                ItemId = this.ItemId,
+                BranchId = this.BranchId,
+                TenantId = this.TenantId,
+                Adt = this.Adt,
+                CreatedBy = this.CreatedBy,
+                UpdatedBy = this.UpdatedBy
             };
+
+          
+
+            return entity;
         }
     }
 }

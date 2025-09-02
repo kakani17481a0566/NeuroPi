@@ -1,20 +1,20 @@
-﻿using SchoolManagement.Model;
+﻿using System;
 
 namespace SchoolManagement.ViewModel.ItemSupplier
 {
+    // Flat DTO for listings/grids
     public class ItemSupplierVM
     {
         public int Id { get; set; }
-        public int item_id { get; set; }
-        public int branch_id { get; set; }
-        public int adt { get; set; }
-        public int tenant_id { get; set; }
-        public int Created_by { get; set; }
+        public int ItemId { get; set; }
+        public int BranchId { get; set; }
+        public int? Adt { get; set; }
+        public int TenantId { get; set; }
 
-        public int Updated_by { get; set; }
-        public DateTime Created_on { get; set; }
-        public DateTime Updated_on { get; set; }
-        public bool is_delete { get; set; }
-
+        public int CreatedBy { get; set; }
+        public int? UpdatedBy { get; set; }
+        public DateTime CreatedOn { get; set; }
+        public DateTime? UpdatedOn { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }
