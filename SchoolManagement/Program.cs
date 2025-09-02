@@ -37,6 +37,7 @@ builder.Services.AddScoped<IUserRolesService, UserRolesServiceImpl>();
 builder.Services.AddScoped<IUserService, UserServiceImpl>();
 builder.Services.AddScoped<IAudioTranscriptionService, AudioTranscriptionServiceImpl>();
 builder.Services.AddScoped<ApiKeyService>();
+
 builder.Services.AddScoped<VisitorInterface, VisitorServiceImpl>();
 builder.Services.AddScoped<IPhoneLogService, PhoneLogServiceImpl>();
 builder.Services.AddScoped<ISupplierBranchService, SupplierBranchImpl>();
@@ -45,6 +46,7 @@ builder.Services.AddScoped<IItemService, ItemServiceImpl>();
 builder.Services.AddScoped<IItemSupplierService, ItemSupplierServiceImpl>();
 builder.Services.AddScoped<IOrders, OrderServiceImpl>();
 
+builder.Services.AddScoped<TestContentInterface,TestContentServiceImpl>();
 
 // Shared / Core Services
 builder.Services.AddScoped<IContactService, ContactServiceImpl>();
@@ -81,6 +83,10 @@ builder.Services.AddScoped<IStudentAttendanceService, StudentAttendanceServiceIm
 builder.Services.AddScoped<IWorkSheetService, WorkSheetServiceImpl>();
 builder.Services.AddScoped<IPublicHolidayService, PublicHolidayServiceImpl>();
 builder.Services.AddScoped<IAssessmentMatrixService, AssessmentMatrixService>();
+builder.Services.AddScoped<IItemsService, ItemsServiceImpl>();
+builder.Services.AddScoped<IItemCategoryService, ItemCategoryServiceImpl>();
+builder.Services.AddScoped<IItemLocationService, ItemLocationServiceImpl>();
+builder.Services.AddScoped<IItemBranchService, ItemBranchServiceImpl>();
 
 // ViewModel-based Services
 builder.Services.AddScoped<IVwComprehensiveTimeTablesService, VwComprehensiveTimeTablesService>();

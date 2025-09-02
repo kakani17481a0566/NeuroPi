@@ -102,49 +102,52 @@ namespace NeuroPi.UserManagment.Services.Implementation
             return BranchResponseVM.ToViewModel(existingBranch);
         }
         //sai vardhan
-        public CourseTeacherVM GetBranchByDepartmentId(int departmentId, int userId)
+        public CourseTeacherVM GetBranchByDepartmentId( int userId,int tenanatId)
         {
             DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
-
-            // Get branch by department
-            var branch = _context.Branches
-                .FirstOrDefault(b => b.DepartmentId == departmentId && !b.IsDeleted);
-
-            if (branch == null)
-                return null;
-
-            var courseTeacherVM = new CourseTeacherVM
-            {
-                branchId = branch.Id
-            };
-
-            // Get course-teacher mappings
-            var courseTeachers = _context.CourseTeachers
-                .Where(ct => ct.BranchId == branch.Id && ct.TeacherId == userId && !ct.IsDeleted)
-                .Include(ct => ct.Course)
-                .ToList();
-
-            // Map courses
-            courseTeacherVM.courses = courseTeachers
-                .Where(ct => ct.Course != null) // avoid null reference
-                .Select(ct => new Course
+            //var branch = _context.Branches.FirstOrDefault(b => b.DepartmentId == departmentId && !b.IsDeleted);
+            CourseTeacherVM courseTeacherVM = new CourseTeacherVM();
+                var courseTeacher = _context.CourseTeachers.Where(c => c.TeacherId==userId && !c.IsDeleted && c.TenantId==tenanatId).Include(c => c.Course).ToList();
+                List<Course> courses = new List<Course>();
+                foreach (MCourseTeacher course in courseTeacher)
                 {
-                    id = ct.Course.Id,
-                    name = ct.Course.Name
+                Course ct = new Course() {
+                    id = course.CourseId ,
+                    name=course.Course.Name
+                };
+                courses.Add(ct);
+
+                }
+
+                courseTeacherVM.courses = courses;
+                courseTeacherVM.branchId = courseTeacher[0].BranchId;
+                var currentWeek = _context.Weeks.FirstOrDefault(w => w.StartDate <= today && w.EndDate >= today && !w.IsDeleted);
+
+                courseTeacherVM.weekId = currentWeek?.Id ?? 0;
+                courseTeacherVM.termId = currentWeek?.TermId ?? 0;
+
+               return courseTeacherVM;
+        
+        }
+        public List<BranchDropDownOptionVm> GetBranchDropDownOptions(int tenantId)
+        {
+            return _context.Branches
+                .AsNoTracking()
+                .Include(b => b.Tenant)
+                .Where(b => !b.IsDeleted && b.TenantId == tenantId)
+                .Select(b => new BranchDropDownOptionVm
+                {
+                    Id = b.Id,
+                    Name = b.Name,
+                    TenantId = b.TenantId,
+                    TenantName = b.Tenant != null ? b.Tenant.Name : string.Empty
                 })
+                .OrderBy(x => x.Name)
                 .ToList();
-
-            // Get current week
-            var currentWeek = _context.Weeks
-                .FirstOrDefault(w => w.StartDate <= today && w.EndDate >= today && !w.IsDeleted);
-
-            courseTeacherVM.weekId = currentWeek?.Id ?? 0;
-            courseTeacherVM.termId = currentWeek?.TermId ?? 0;
-
-            return courseTeacherVM;
         }
 
-    
-    
+
+
+
     }
 }

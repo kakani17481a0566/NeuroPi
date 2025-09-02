@@ -10,5 +10,8 @@ namespace SchoolManagement.Services.Interface
 
         String CheckPronounciation(byte[] audioBytes,string text);
 
+        string AddImage(IFormFile file, string text);
+        List<ImageDb> GetImage();
+
     }
 }

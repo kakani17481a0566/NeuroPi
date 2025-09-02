@@ -122,6 +122,22 @@ namespace SchoolManagement.Controllers
         }
 
 
+        // GET: api/student/dropdown-options?tenantId=1&courseId=1&branchId=1
+        [HttpGet("dropdown-options-students")]
+        public ResponseResult<List<StudentCourseTenantVm>> GetStudentDropDownOptions(
+            [FromQuery] int tenantId,
+            [FromQuery] int courseId,
+            [FromQuery] int branchId)
+        {
+            var data = _studentService.GetStudentDropDownOptions(tenantId, courseId, branchId) ?? new List<StudentCourseTenantVm>();
+            return new ResponseResult<List<StudentCourseTenantVm>>(
+                HttpStatusCode.OK,
+                data,
+                "Student dropdown options retrieved successfully"
+            );
+        }
+
+
 
 
     }

@@ -23,6 +23,9 @@ namespace SchoolManagement.Services.Interface
 
         VStudentPerformanceChartVM GetStudentPerformanceChartData(int tenantId, int courseId, int branchId);
 
+        List<StudentCourseTenantVm> GetStudentDropDownOptions(int tenantId, int courseId, int branchId);
+
+
 
     }
 }
