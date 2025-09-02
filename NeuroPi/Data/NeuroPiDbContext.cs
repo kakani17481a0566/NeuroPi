@@ -23,6 +23,8 @@ namespace NeuroPi.UserManagment.Data
         public DbSet<MAuditLog> AuditLogs { get; set; }
         public DbSet<MConfig> Configs { get; set; }
 
+        
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // User-Tenant relationship (MTenant to MUser, which is the reverse relationship)

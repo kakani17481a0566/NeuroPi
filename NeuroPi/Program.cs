@@ -1,4 +1,5 @@
 using System.Text;
+using CloudinaryDotNet;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -6,7 +7,6 @@ using Microsoft.OpenApi.Models;
 using NeuroPi.UserManagment.Data;
 using NeuroPi.UserManagment.Services.Implementation;
 using NeuroPi.UserManagment.Services.Interface;
-using CloudinaryDotNet;
 
 var builder = WebApplication.CreateBuilder(args);
 

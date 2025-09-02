@@ -10,7 +10,7 @@ namespace SchoolManagement.Services.Implementation
 {
     public class ItemServiceImpl : IItemService
     {
-        private readonly SchoolManagementDb _context;
+        private SchoolManagementDb _context;
 
         public ItemServiceImpl(SchoolManagementDb context)
         {

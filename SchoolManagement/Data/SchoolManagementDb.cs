@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NeuroPi.UserManagment.Model;
 using SchoolManagement.Model;
+using SchoolManagement.ViewModel.ItemSupplier;
 using SchoolManagement.ViewModel.VwTermPlanDetails;
 using static SchoolManagement.Model.MTableFiles;
 
@@ -9,6 +10,8 @@ namespace SchoolManagement.Data
 {
     public class SchoolManagementDb : DbContext
     {
+        internal object visitor;
+
         public SchoolManagementDb(DbContextOptions<SchoolManagementDb> options) : base(options) { }
 
         public DbSet<MTenant> Tenants { get; set; }
@@ -65,7 +68,12 @@ namespace SchoolManagement.Data
         public DbSet<MStudentAttendance> StudentAttendance { get; set; }
 
         public DbSet<MCourseTeacher> CourseTeachers { get; set; }
-
+        public DbSet<MVisitor> Visitors { get; set; } 
+        public DbSet<MPhoneLog> PhoneLogs { get; set; }
+        public DbSet<MSupplier> Supplier{ get; set; }
+        public DbSet<MSupplierBranch> SupplierBranches { get; set; }
+        public DbSet<MItemSupplier> ItemSuppliers { get; set; }
+        public DbSet<MOrders> Orders { get; set; }
 
 
         // views

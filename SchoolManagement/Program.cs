@@ -37,6 +37,14 @@ builder.Services.AddScoped<IUserRolesService, UserRolesServiceImpl>();
 builder.Services.AddScoped<IUserService, UserServiceImpl>();
 builder.Services.AddScoped<IAudioTranscriptionService, AudioTranscriptionServiceImpl>();
 builder.Services.AddScoped<ApiKeyService>();
+builder.Services.AddScoped<VisitorInterface, VisitorServiceImpl>();
+builder.Services.AddScoped<IPhoneLogService, PhoneLogServiceImpl>();
+builder.Services.AddScoped<ISupplierBranchService, SupplierBranchImpl>();
+builder.Services.AddScoped<SupplierInterface, SupplierServiceImpl>();
+builder.Services.AddScoped<IItemService, ItemServiceImpl>();
+builder.Services.AddScoped<IItemSupplierService, ItemSupplierServiceImpl>();
+builder.Services.AddScoped<IOrders, OrderServiceImpl>();
+
 
 // Shared / Core Services
 builder.Services.AddScoped<IContactService, ContactServiceImpl>();

@@ -14,7 +14,7 @@ namespace SchoolManagement.Model
 
         [Required]
         [Column("name", TypeName = "varchar(100)")]
-        public string Name { get; set; } = string.Empty;
+        public string Name { get; set; } 
 
         [Column("contact_id")]
         public int? ContactId { get; set; }
