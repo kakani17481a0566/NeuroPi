@@ -103,6 +103,11 @@ namespace SchoolManagement.Data
 
 
 
+        //Registrationform
+
+        public DbSet<MStudentRegistration> StudentRegistrations { get; set; } = null!;
+
+
 
 
 
@@ -143,7 +148,28 @@ namespace SchoolManagement.Data
             modelBuilder.Entity<MVTermTable>()
                 .HasNoKey()
                 .ToView("v_term_table");
+
+
+            // Map + indexes for student_registration
+            modelBuilder.Entity<MStudentRegistration>(entity =>
+            {
+                entity.ToTable("student_registration");
+
+                // Ensure DATE (not timestamp) for these two
+                entity.Property(e => e.RegDate).HasColumnType("date");
+                entity.Property(e => e.StuDob).HasColumnType("date");
+
+                // Unique per-tenant reg_number for active rows (matches DB index)
+                entity.HasIndex(e => new { e.TenantId, e.RegNumber })
+                      .HasDatabaseName("uq_sr_reg_number_per_tenant")
+                      .IsUnique()
+                      .HasFilter("is_deleted = false");
+            });
+
         }
+
+
+
 
     }
 }
