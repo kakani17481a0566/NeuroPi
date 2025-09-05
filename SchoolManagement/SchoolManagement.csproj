@@ -9,9 +9,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Model\NewFolder\**" />
     <Compile Remove="ViewModels\**" />
+    <Content Remove="Model\NewFolder\**" />
     <Content Remove="ViewModels\**" />
+    <EmbeddedResource Remove="Model\NewFolder\**" />
     <EmbeddedResource Remove="ViewModels\**" />
+    <None Remove="Model\NewFolder\**" />
     <None Remove="ViewModels\**" />
   </ItemGroup>
 

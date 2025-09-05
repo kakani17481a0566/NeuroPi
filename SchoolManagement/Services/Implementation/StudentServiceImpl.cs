@@ -133,7 +133,7 @@ namespace SchoolManagement.Services.Implementation
 
         public StudentsData GetStudentDetails(int courseId, int branchId, DateOnly date,int tenantId)
         {
-            int totalStudents = 0;
+           // int totalStudents = 0;
             int checkedIn = 0;
             int checkedOut = 0;
             List<StudentDetails> studentDetails = new List<StudentDetails>();
