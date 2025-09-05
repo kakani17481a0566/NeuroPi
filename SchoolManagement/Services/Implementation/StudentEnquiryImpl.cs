@@ -3,6 +3,8 @@ using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.StudentsEnquiry;
 using System;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace SchoolManagement.Services.Implementation
 {
@@ -17,12 +19,30 @@ namespace SchoolManagement.Services.Implementation
 
         public long CreateStudentEnquiry(StudentEnquiryRequestDataVM vm)
         {
-            // Create Parent Contact
+            // STEP 1: Check if enquiry already exists for same student & phone
+            var existingEnquiry = _db.StudentsEnquiries
+                .Include(e => e.ParentContact)
+                .FirstOrDefault(e =>
+                    e.StudentFirstName == vm.StudentFirstName &&
+                    e.StudentLastName == vm.StudentLastName &&
+                    e.Dob == vm.Dob &&
+                    e.TenantId == vm.TenantId &&
+                    !e.IsDeleted &&
+                    e.ParentContact.PriNumber == vm.ParentPhone
+                );
+
+            if (existingEnquiry != null)
+            {
+                // Skip insert if already exists
+                return existingEnquiry.Id;
+            }
+
+            // STEP 2: Insert Parent Contact
             var parentContact = vm.ToParentContact();
             _db.Contacts.Add(parentContact);
             _db.SaveChanges();
 
-            // Create Mother Contact (optional)
+            // STEP 3: Insert Mother Contact (optional)
             int? motherContactId = null;
             var motherContact = vm.ToMotherContact();
             if (motherContact != null)
@@ -32,8 +52,8 @@ namespace SchoolManagement.Services.Implementation
                 motherContactId = motherContact.Id;
             }
 
-            // Create Student Enquiry
-            var enquiry = new MsStudentsEnquiry
+            // STEP 4: Insert Student Enquiry
+            var newEnquiry = new MsStudentsEnquiry
             {
                 StudentFirstName = vm.StudentFirstName,
                 StudentMiddleName = vm.StudentMiddleName,
@@ -60,10 +80,10 @@ namespace SchoolManagement.Services.Implementation
                 IsDeleted = false
             };
 
-            _db.StudentsEnquiries.Add(enquiry);
+            _db.StudentsEnquiries.Add(newEnquiry);
             _db.SaveChanges();
 
-            return enquiry.Id;
+            return newEnquiry.Id;
         }
     }
 }

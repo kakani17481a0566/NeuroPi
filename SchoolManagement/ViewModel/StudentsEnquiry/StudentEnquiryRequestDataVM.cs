@@ -36,6 +36,9 @@ namespace SchoolManagement.ViewModel.StudentsEnquiry
         public string? ParentState { get; set; }
         public string? ParentPincode { get; set; }
 
+        public string? ParentQualification { get; set; }     // ✅ NEW
+        public string? ParentProfession { get; set; }        // ✅ NEW
+
         // ----------------------------
         // Mother Contact (Optional)
         // ----------------------------
@@ -44,6 +47,9 @@ namespace SchoolManagement.ViewModel.StudentsEnquiry
         public string? MotherLastName { get; set; }
         public string? MotherPhone { get; set; }
         public string? MotherEmail { get; set; }
+        public string? MotherQualification { get; set; }
+        public string? MotherProfession { get; set; }
+
 
         // ----------------------------
         // Additional Info
@@ -57,8 +63,8 @@ namespace SchoolManagement.ViewModel.StudentsEnquiry
         // Context Info
         // ----------------------------
         public int TenantId { get; set; }
-        public int? BranchId { get; set; }
         public int CreatedBy { get; set; }
+        public int? BranchId { get; set; }
 
         // ----------------------------
         // Mapping Helpers
@@ -77,6 +83,8 @@ namespace SchoolManagement.ViewModel.StudentsEnquiry
                 City = ParentCity,
                 State = ParentState,
                 Pincode = ParentPincode,
+                Qualification = ParentQualification,
+                Profession = ParentProfession,
                 TenantId = TenantId,
                 CreatedBy = CreatedBy,
                 CreatedOn = DateTime.UtcNow,
@@ -99,11 +107,14 @@ namespace SchoolManagement.ViewModel.StudentsEnquiry
                 City = ParentCity,
                 State = ParentState,
                 Pincode = ParentPincode,
+                Qualification = MotherQualification,  // ✅ add this
+                Profession = MotherProfession,        // ✅ add this
                 TenantId = TenantId,
                 CreatedBy = CreatedBy,
                 CreatedOn = DateTime.UtcNow,
                 IsDeleted = false
             };
         }
+
     }
 }
