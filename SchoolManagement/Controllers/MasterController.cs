@@ -145,5 +145,8 @@ namespace SchoolManagement.Controllers
             return new ResponseResult<List<Object>>(HttpStatusCode.OK, response, "Master types fetched successfully");
         }
 
+        // GET: api/master/by-type/{masterTypeId}/tenant/{tenantId}
+      
+
     }
 }

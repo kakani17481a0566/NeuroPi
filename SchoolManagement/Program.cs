@@ -93,6 +93,14 @@ builder.Services.AddScoped<IVwComprehensiveTimeTablesService, VwComprehensiveTim
 builder.Services.AddScoped<IVwTermPlanDetailsService, VwTermPlanDetailsViewServiceImpl>();
 builder.Services.AddScoped<IMVTermTableService, VTermTableServiceImpl>();
 
+
+//RegistrationForm
+builder.Services.AddScoped<IStudentRegistration, StudentRegistrationImpl>();
+builder.Services.AddScoped<IStudentsEnquiry, StudentEnquiryImpl>();
+
+
+
+
 // EF DbContexts
 builder.Services.AddDbContext<NeuroPiDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));

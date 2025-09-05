@@ -108,6 +108,7 @@ namespace SchoolManagement.Data
         public DbSet<MStudentRegistration> StudentRegistrations { get; set; } = null!;
 
 
+        public DbSet<MsStudentsEnquiry> StudentsEnquiries { get; set; }
 
 
 

@@ -22,5 +22,7 @@ namespace SchoolManagement.Services.Interface
 
         List<MasterResponseVM> GetAllByMasterTypeId(int id,int tenantId);
 
+
+
     }
 }

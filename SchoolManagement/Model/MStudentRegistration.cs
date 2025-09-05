@@ -8,36 +8,35 @@ namespace SchoolManagement.Model
     [Table("student_registration")]
     public class MStudentRegistration : MBaseModel
     {
+        // PK
         [Key]
         [Column("id")]
         public int Id { get; set; }
 
-        // FKs (required/optional per schema)
+        // ---- Foreign keys (required per domain) ----
         [Required]
         [Column("tenant_id")]
-        public int TenantId { get; set; }
+        public int TenantId { get; set; }               // FK -> tenants.tenant_id (fk_sr_tenant)
 
         [Required]
         [Column("branch_id")]
-        public int BranchId { get; set; }
+        public int BranchId { get; set; }               // FK -> branch.id (fk_sr_branch)
 
         [Column("course_id")]
-        public int? CourseId { get; set; }
+        public int? CourseId { get; set; }              // FK -> course.id (fk_sr_course)
 
         [Required]
         [Column("reg_type_id")]
-        public int RegTypeId { get; set; }       // masters[REG_TYPE]
+        public int RegTypeId { get; set; }              // FK -> masters.id (fk_sr_regtype)
 
-        // Registration details
-        [Required]
+        // ---- Registration details ----
         [Column("reg_date")]
-        public DateTime RegDate { get; set; } = DateTime.UtcNow.Date;
+        public DateTime? RegDate { get; set; }          // DB has default CURRENT_DATE
 
-        [Required]
         [Column("reg_number")]
-        public string RegNumber { get; set; } = string.Empty;
+        public string? RegNumber { get; set; }          // Nullable in schema
 
-        // Previous schooling
+        // ---- Previous schooling ----
         [Required]
         [Column("att_pre_school")]
         public bool AttPreSchool { get; set; } = false;
@@ -52,7 +51,7 @@ namespace SchoolManagement.Model
         [Column("prev_kindergarten1_nsc")]
         public string? PrevKindergarten1Nsc { get; set; }
 
-        // Student identity
+        // ---- Student identity ----
         [Required]
         [Column("stu_last_name")]
         public string StuLastName { get; set; } = string.Empty;
@@ -67,20 +66,20 @@ namespace SchoolManagement.Model
 
         [Required]
         [Column("gender_id")]
-        public int GenderId { get; set; }        // masters[GENDER]
+        public int GenderId { get; set; }               // FK -> masters.id (fk_sr_gender)
 
-        // Transport
+        // ---- Transport ----
         [Required]
         [Column("reg_transport_id")]
-        public int RegTransportId { get; set; }  // masters[TRANSPORT_MODE]
+        public int RegTransportId { get; set; }         // FK -> masters.id (fk_sr_transport)
 
         [Column("alt_transport_id")]
-        public int? AltTransportId { get; set; } // masters[TRANSPORT_MODE]
+        public int? AltTransportId { get; set; }        // FK -> masters.id (fk_sr_alttransport)
 
         [Column("other_transport_text")]
         public string? OtherTransportText { get; set; }
 
-        // Misc flags
+        // ---- Misc ----
         [Required]
         [Column("speech_therapy")]
         public bool SpeechTherapy { get; set; } = false;
@@ -90,12 +89,12 @@ namespace SchoolManagement.Model
         public bool Custody { get; set; } = false;
 
         [Column("custody_of_id")]
-        public int? CustodyOfId { get; set; }    // masters[CUSTODY_OF]
+        public int? CustodyOfId { get; set; }           
 
         [Column("lives_with_id")]
-        public int? LivesWithId { get; set; }    // masters[LIVES_WITH]
+        public int? LivesWithId { get; set; }           
 
-        // Siblings
+        // ---- Siblings ----
         [Required]
         [Column("siblings_in_this_school")]
         public bool SiblingsInThisSchool { get; set; } = false;

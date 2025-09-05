@@ -33,4 +33,8 @@
     <ProjectReference Include="..\NeuroPi\NeuroPi.UserManagment.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="ViewModel\NewFolder1\" />
+  </ItemGroup>
+
 </Project>
