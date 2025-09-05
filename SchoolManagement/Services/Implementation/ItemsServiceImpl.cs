@@ -43,10 +43,10 @@ namespace SchoolManagement.Services.Implementation
                     Depth = i.Depth,
                     Name = i.Name,
                     TenantId = i.TenantId,
-                    createdBy = i.CreatedBy,
-                    createdOn = i.CreatedOn,
-                    updatedBy = i.UpdatedBy,
-                    updatedOn = i.UpdatedOn
+                    CreatedBy = i.CreatedBy,
+                    CreatedOn = i.CreatedOn,
+                    UpdatedBy = i.UpdatedBy,
+                    UpdatedOn = i.UpdatedOn
                 }).ToList();
         }
 
@@ -63,10 +63,10 @@ namespace SchoolManagement.Services.Implementation
                 Depth = items.Depth,
                 Name = items.Name,
                 TenantId = items.TenantId,
-                createdBy = items.CreatedBy,
-                createdOn = items.CreatedOn,
-                updatedBy = items.UpdatedBy,
-                updatedOn = items.UpdatedOn
+                CreatedBy = items.CreatedBy,
+                CreatedOn = items.CreatedOn,
+                UpdatedBy = items.UpdatedBy,
+                UpdatedOn = items.UpdatedOn
             };
         }
 
@@ -83,10 +83,10 @@ namespace SchoolManagement.Services.Implementation
                 Depth = items.Depth,
                 Name = items.Name,
                 TenantId = items.TenantId,
-                createdBy = items.CreatedBy,
-                createdOn = items.CreatedOn,
-                updatedBy = items.UpdatedBy,
-                updatedOn = items.UpdatedOn
+                CreatedBy = items.CreatedBy,
+                CreatedOn = items.CreatedOn,
+                UpdatedBy = items.UpdatedBy,
+                UpdatedOn = items.UpdatedOn
             };
         }
 
@@ -103,10 +103,10 @@ namespace SchoolManagement.Services.Implementation
                     Depth = i.Depth,
                     Name = i.Name,
                     TenantId = i.TenantId,
-                    createdBy = i.CreatedBy,
-                    createdOn = i.CreatedOn,
-                    updatedBy = i.UpdatedBy,
-                    updatedOn = i.UpdatedOn
+                    CreatedBy = i.CreatedBy,
+                    CreatedOn = i.CreatedOn,
+                    UpdatedBy = i.UpdatedBy,
+                    UpdatedOn = i.UpdatedOn
                 }).ToList();
         }
 

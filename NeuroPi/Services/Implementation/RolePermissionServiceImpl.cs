@@ -98,5 +98,15 @@ namespace NeuroPi.UserManagment.Services.Implementation
             }
             return null;
         }
+
+        public List<RolePermissionDescVM> GetRolePermissionByRoleIdAndTenantId(int roleId, int tenantId)
+        {
+            var rolePermission = _context.RolePermissions.Where(r => r.RoleId == roleId && r.TenantId == tenantId && !r.IsDeleted).Include(r=>r.Permission).ToList();
+            if (rolePermission != null)
+            {
+                return RolePermissionDescVM.ToViewModelList(rolePermission);
+            }
+            return null;
+        }
     }
 }

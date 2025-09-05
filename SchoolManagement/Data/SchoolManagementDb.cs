@@ -85,6 +85,8 @@ namespace SchoolManagement.Data
 
         public DbSet<MItemBranch> ItemBranch { get; set; }
 
+        public DbSet<MOrderItem> OrderItem { get; set; }
+
 
 
         // views
@@ -166,6 +168,8 @@ namespace SchoolManagement.Data
                       .IsUnique()
                       .HasFilter("is_deleted = false");
             });
+
+
 
         }
 

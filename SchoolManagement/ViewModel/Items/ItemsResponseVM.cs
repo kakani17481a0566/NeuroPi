@@ -17,11 +17,11 @@ namespace SchoolManagement.ViewModel.Items
         public string Name { get; set; }
 
         public int TenantId { get; set; }
-        public int createdBy { get; set; }
-        public DateTime createdOn { get; set; }
+        public int CreatedBy { get; set; }
+        public DateTime CreatedOn { get; set; }
 
-        public int? updatedBy { get; set; }
-        public DateTime? updatedOn { get; set; }
+        public int? UpdatedBy { get; set; }
+        public DateTime? UpdatedOn { get; set; }
 
 
         public static ItemsResponseVM ToViewModel(MItems items)
@@ -35,10 +35,10 @@ namespace SchoolManagement.ViewModel.Items
                 Depth = items.Depth,
                 Name = items.Name,
                 TenantId = items.TenantId,
-                createdBy = items.CreatedBy,
-                createdOn = items.CreatedOn,
-                updatedBy = items.UpdatedBy,
-                updatedOn = items.UpdatedOn
+                CreatedBy = items.CreatedBy,
+                CreatedOn = items.CreatedOn,
+                UpdatedBy = items.UpdatedBy,
+                UpdatedOn = items.UpdatedOn
             };
         }
 
