@@ -80,7 +80,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 _configuration["Jwt:Issuer"],
                 _configuration["Jwt:Audience"],
                 claims,
-                expires: DateTime.UtcNow.AddMinutes(10),
+                expires: DateTime.UtcNow.AddMinutes(30),
                 signingCredentials: creds);
 
             return "bearer " + new JwtSecurityTokenHandler().WriteToken(token);
