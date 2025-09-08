@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace SchoolManagement.Model
 {
     [Table("students_enquiry")]
-    public class MsStudentsEnquiry : MBaseModel
+    public class MStudentsEnquiry : MBaseModel
     {
         [Key]
         [Column("id")]

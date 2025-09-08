@@ -53,7 +53,7 @@ namespace SchoolManagement.Services.Implementation
             }
 
             // STEP 4: Insert Student Enquiry
-            var newEnquiry = new MsStudentsEnquiry
+            var newEnquiry = new MStudentsEnquiry
             {
                 StudentFirstName = vm.StudentFirstName,
                 StudentMiddleName = vm.StudentMiddleName,

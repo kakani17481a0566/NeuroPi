@@ -110,7 +110,7 @@ namespace SchoolManagement.Data
         public DbSet<MStudentRegistration> StudentRegistrations { get; set; } = null!;
 
 
-        public DbSet<MsStudentsEnquiry> StudentsEnquiries { get; set; }
+        public DbSet<MStudentsEnquiry> StudentsEnquiries { get; set; }
 
 
 
