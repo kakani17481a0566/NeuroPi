@@ -139,17 +139,13 @@ namespace NeuroPi.UserManagment.Controllers
         [HttpGet("{roleId}/tenant/{tenantId}")]
         public ResponseResult<List<RolePermissionDescVM>> GetRolePermissionByRoleIdAndTenantId(int roleId, int tenantId)
         {
-            //try
-            //{
+            
                 var result = _rolePermissionService.GetRolePermissionByRoleIdAndTenantId(roleId, tenantId);
                 return result != null
                     ? new ResponseResult<List<RolePermissionDescVM>>(HttpStatusCode.OK, result, "Role Permission Description Found")
                     : new ResponseResult<List<RolePermissionDescVM>>(HttpStatusCode.NotFound, null, $"No Role Description found with role id{roleId} for tenant id {tenantId}");
             
-            //catch(Exception ex)
-            //{
-            //    return new ResponseResult<List<RolePermissionDescVM>>(HttpStatusCode.InternalServerError, null, $"Error retrieving role permission Description: {ex.Message}");
-            //}
+           
         }
         
 
