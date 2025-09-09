@@ -6,6 +6,7 @@ using System;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 
 namespace SchoolManagement.Services.Implementation
 {
@@ -20,7 +21,6 @@ namespace SchoolManagement.Services.Implementation
 
         public long CreateStudentEnquiry(StudentEnquiryRequestDataVM vm)
         {
-            
             var existingEnquiry = _db.StudentsEnquiries
                 .Include(e => e.ParentContact)
                 .FirstOrDefault(e =>
@@ -34,16 +34,13 @@ namespace SchoolManagement.Services.Implementation
 
             if (existingEnquiry != null)
             {
-                
                 return existingEnquiry.Id;
             }
 
-            
             var parentContact = vm.ToParentContact();
             _db.Contacts.Add(parentContact);
             _db.SaveChanges();
 
-            
             int? motherContactId = null;
             var motherContact = vm.ToMotherContact();
             if (motherContact != null)
@@ -53,7 +50,6 @@ namespace SchoolManagement.Services.Implementation
                 motherContactId = motherContact.Id;
             }
 
-            
             var newEnquiry = new MStudentsEnquiry
             {
                 StudentFirstName = vm.StudentFirstName,
@@ -72,7 +68,10 @@ namespace SchoolManagement.Services.Implementation
                 MotherContactId = motherContactId,
                 HearAboutUsTypeId = vm.HearAboutUsTypeId,
                 IsAgreedToTerms = vm.IsAgreedToTerms,
-                Signature = vm.Signature,
+
+                // string (data URL / base64) -> byte[]
+                Signature = DecodeBase64DataUrl(vm.Signature),
+
                 StatusId = vm.StatusId,
                 TenantId = vm.TenantId,
                 BranchId = vm.BranchId,
@@ -89,51 +88,25 @@ namespace SchoolManagement.Services.Implementation
 
         public bool DeleteStudentEnquiryByIdAndTenant(long id, int tenantId)
         {
-            var studentEnquiry = _db.StudentsEnquiries.FirstOrDefault(e => !e.IsDeleted && e.Id == id && e.TenantId == tenantId);
-                if (studentEnquiry == null)
-            {
-                return false;
-            }
+            var studentEnquiry = _db.StudentsEnquiries
+                .FirstOrDefault(e => !e.IsDeleted && e.Id == id && e.TenantId == tenantId);
+
+            if (studentEnquiry == null) return false;
+
             studentEnquiry.IsDeleted = true;
             studentEnquiry.UpdatedOn = DateTime.UtcNow;
             _db.SaveChanges();
             return true;
-                
         }
 
         public List<StudentEnquiryResponseVM> GetAllStudentEnquiries()
         {
-            return _db.StudentsEnquiries.Include(m => m.Gender)
+            return _db.StudentsEnquiries
+                .Include(m => m.Gender)
                 .Where(e => !e.IsDeleted)
-                .Select(e => new StudentEnquiryResponseVM
-                {
-                    Id = e.Id,
-                    StudentFirstName = e.StudentFirstName,
-                    StudentMiddleName = e.StudentMiddleName,
-                    StudentLastName = e.StudentLastName,
-                    Dob = e.Dob,
-                    GenderId = e.GenderId,
-                    GenderName=e.Gender.Name,
-                    AdmissionCourseId = e.AdmissionCourseId,
-                    PreviousSchoolName = e.PreviousSchoolName,
-                    FromCourseId = e.FromCourseId,
-                    FromYear = e.FromYear,
-                    ToCourseId = e.ToCourseId,
-                    ToYear = e.ToYear,
-                    IsGuardian = e.IsGuardian,
-                    ParentContactId = e.ParentContactId,
-                    MotherContactId = e.MotherContactId,
-                    HearAboutUsTypeId = e.HearAboutUsTypeId,
-                    IsAgreedToTerms = e.IsAgreedToTerms,
-                    Signature = e.Signature,
-                    StatusId = e.StatusId,
-                    TenantId = e.TenantId,
-                    BranchId = e.BranchId,
-                    CreatedBy = e.CreatedBy,
-                    CreatedOn = e.CreatedOn,
-                    UpdatedBy = e.UpdatedBy,
-                    UpdatedOn = e.UpdatedOn
-                }).ToList();
+                .AsEnumerable() // switch to in-memory so we can call ToViewModel (byte[]->string)
+                .Select(StudentEnquiryResponseVM.ToViewModel)
+                .ToList();
         }
 
         public List<StudentEnquiryResponseVM> GetStudentEnquiriesByTenant(int tenantId)
@@ -141,44 +114,19 @@ namespace SchoolManagement.Services.Implementation
             return _db.StudentsEnquiries
                 .Include(m => m.Gender)
                 .Where(e => !e.IsDeleted && e.TenantId == tenantId)
-                .Select(e => new StudentEnquiryResponseVM
-                {
-                    Id = e.Id,
-                    StudentFirstName = e.StudentFirstName,
-                    StudentMiddleName = e.StudentMiddleName,
-                    StudentLastName = e.StudentLastName,
-                    Dob = e.Dob,
-                    GenderId = e.GenderId,
-                    GenderName = e.Gender.Name,
-                    AdmissionCourseId = e.AdmissionCourseId,
-                    PreviousSchoolName = e.PreviousSchoolName,
-                    FromCourseId = e.FromCourseId,
-                    FromYear = e.FromYear,
-                    ToCourseId = e.ToCourseId,
-                    ToYear = e.ToYear,
-                    IsGuardian = e.IsGuardian,
-                    ParentContactId = e.ParentContactId,
-                    MotherContactId = e.MotherContactId,
-                    HearAboutUsTypeId = e.HearAboutUsTypeId,
-                    IsAgreedToTerms = e.IsAgreedToTerms,
-                    Signature = e.Signature,
-                    StatusId = e.StatusId,
-                    TenantId = e.TenantId,
-                    BranchId = e.BranchId,
-                    CreatedBy = e.CreatedBy,
-                    CreatedOn = e.CreatedOn,
-                    UpdatedBy = e.UpdatedBy,
-                    UpdatedOn = e.UpdatedOn
-                }).ToList();
+                .AsEnumerable()
+                .Select(StudentEnquiryResponseVM.ToViewModel)
+                .ToList();
         }
 
         public StudentEnquiryResponseVM GetStudentEnquiryById(long id)
         {
             var enquiry = _db.StudentsEnquiries
-                .Include(m =>m.Gender)
+                .Include(m => m.Gender)
                 .Include(e => e.ParentContact)
                 .Include(e => e.MotherContact)
                 .FirstOrDefault(e => !e.IsDeleted && e.Id == id);
+
             if (enquiry == null) return null;
             return StudentEnquiryResponseVM.ToViewModel(enquiry);
         }
@@ -190,18 +138,20 @@ namespace SchoolManagement.Services.Implementation
                 .Include(e => e.ParentContact)
                 .Include(e => e.MotherContact)
                 .FirstOrDefault(e => !e.IsDeleted && e.Id == id && e.TenantId == tenantId);
+
             if (enquiry == null) return null;
             return StudentEnquiryResponseVM.ToViewModel(enquiry);
         }
 
-        public StudentEnquiryResponseVM UpdateStudentEnquiry(long id, int tenantId,[FromBody] StudentEnquiryUpdateVM vm)
+        public StudentEnquiryResponseVM UpdateStudentEnquiry(long id, int tenantId, [FromBody] StudentEnquiryUpdateVM vm)
         {
             var enquiry = _db.StudentsEnquiries
                 .Include(e => e.ParentContact)
                 .Include(e => e.MotherContact)
-                
                 .FirstOrDefault(e => !e.IsDeleted && e.Id == id && e.TenantId == tenantId);
+
             if (enquiry == null) return null;
+
             enquiry.StudentFirstName = vm.StudentFirstName;
             enquiry.StudentMiddleName = vm.StudentMiddleName;
             enquiry.StudentLastName = vm.StudentLastName;
@@ -218,13 +168,37 @@ namespace SchoolManagement.Services.Implementation
             enquiry.MotherContactId = vm.MotherContactId;
             enquiry.HearAboutUsTypeId = vm.HearAboutUsTypeId;
             enquiry.IsAgreedToTerms = vm.IsAgreedToTerms;
-            enquiry.Signature = vm.Signature;
+
+            // string (data URL / base64) -> byte[]
+            enquiry.Signature = DecodeBase64DataUrl(vm.Signature);
+
             enquiry.StatusId = vm.StatusId;
             enquiry.BranchId = vm.BranchId;
             enquiry.UpdatedBy = vm.UpdatedBy;
             enquiry.UpdatedOn = DateTime.UtcNow;
+
             _db.SaveChanges();
             return StudentEnquiryResponseVM.ToViewModel(enquiry);
+        }
+
+        // -------- Helpers --------
+
+        private static byte[]? DecodeBase64DataUrl(string? input)
+        {
+            if (string.IsNullOrWhiteSpace(input)) return null;
+
+            // Accept both data URLs and raw base64
+            var commaIndex = input.IndexOf(',');
+            var base64 = commaIndex >= 0 ? input.Substring(commaIndex + 1) : input;
+
+            try
+            {
+                return Convert.FromBase64String(base64);
+            }
+            catch
+            {
+                return null; // or throw/log
+            }
         }
     }
 }

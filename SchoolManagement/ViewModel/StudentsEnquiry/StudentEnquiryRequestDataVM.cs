@@ -36,8 +36,8 @@ namespace SchoolManagement.ViewModel.StudentsEnquiry
         public string? ParentState { get; set; }
         public string? ParentPincode { get; set; }
 
-        public string? ParentQualification { get; set; }     // ✅ NEW
-        public string? ParentProfession { get; set; }        // ✅ NEW
+        public string? ParentQualification { get; set; }
+        public string? ParentProfession { get; set; }
 
         // ----------------------------
         // Mother Contact (Optional)
@@ -50,13 +50,15 @@ namespace SchoolManagement.ViewModel.StudentsEnquiry
         public string? MotherQualification { get; set; }
         public string? MotherProfession { get; set; }
 
-
         // ----------------------------
         // Additional Info
         // ----------------------------
         public int? HearAboutUsTypeId { get; set; }
         public bool IsAgreedToTerms { get; set; }
-        public byte[]? Signature { get; set; }
+
+        // UI sends a data URL or base64 string; service decodes to byte[] (DB bytea)
+        public string? Signature { get; set; }  // <-- CHANGED from byte[]? to string?
+
         public int StatusId { get; set; }
 
         // ----------------------------
@@ -69,7 +71,6 @@ namespace SchoolManagement.ViewModel.StudentsEnquiry
         // ----------------------------
         // Mapping Helpers
         // ----------------------------
-
         public MContact ToParentContact()
         {
             return new MContact
@@ -107,14 +108,13 @@ namespace SchoolManagement.ViewModel.StudentsEnquiry
                 City = ParentCity,
                 State = ParentState,
                 Pincode = ParentPincode,
-                Qualification = MotherQualification,  // ✅ add this
-                Profession = MotherProfession,        // ✅ add this
+                Qualification = MotherQualification,
+                Profession = MotherProfession,
                 TenantId = TenantId,
                 CreatedBy = CreatedBy,
                 CreatedOn = DateTime.UtcNow,
                 IsDeleted = false
             };
         }
-
     }
 }
