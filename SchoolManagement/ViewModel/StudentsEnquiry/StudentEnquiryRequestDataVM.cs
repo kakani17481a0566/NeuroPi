@@ -56,7 +56,7 @@ namespace SchoolManagement.ViewModel.StudentsEnquiry
         // ----------------------------
         public int? HearAboutUsTypeId { get; set; }
         public bool IsAgreedToTerms { get; set; }
-        public string? Signature { get; set; }
+        public byte[]? Signature { get; set; }
         public int StatusId { get; set; }
 
         // ----------------------------

@@ -70,7 +70,8 @@ namespace SchoolManagement.Model
         public bool IsAgreedToTerms { get; set; } = false;
 
         [Column("signature")]
-        public string? Signature { get; set; }
+        public byte[]? Signature { get; set; }
+
 
         [Required]
         [Column("status_id")]
