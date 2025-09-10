@@ -298,6 +298,7 @@ namespace SchoolManagement.Services.Implementation
                 };
             }).ToList();
 
+
             var distinctCourses = records
                 .GroupBy(r => new { r.CourseId, r.ClassName })
                 .Select(g => new CourseVm
@@ -404,8 +405,8 @@ namespace SchoolManagement.Services.Implementation
             return query
                 .OrderBy(s => s.Date)
                 .ThenBy(s => s.FromTime)
-                .Include(m=>m.Student)
-                .Include(m=>m.Student.Course)
+                .Include(m => m.Student)
+                .Include(m => m.Student.Course)
                 .Select(s => new StudentAttendanceGraphVM
                 {
                     StudentId = s.StudentId,
