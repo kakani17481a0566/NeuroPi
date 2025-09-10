@@ -143,6 +143,31 @@ namespace SchoolManagement.Controllers
             });
         }
 
+        [HttpGet("30daysGraph")]
+        public IActionResult GetLast30DaysGraph(int studentId, int tenantId, int? branchId, string selectedDate)
+        {
+            var data = _studentAttendanceService.GetLast30DaysGraph(studentId, tenantId, branchId, selectedDate);
+            return Ok(new {
+
+                statusCode = 200,
+                message = $"Last 30 days attendance ending on {selectedDate} fetched successfully.",
+                data = data
+            });
+
+        }
+
+        [HttpGet("GraphDateRange")]
+        public IActionResult GetAttendanceDateRange(int studentId, int tenantId, int? branchId, string fromDatestr, string toDatestr)
+        {
+            var data =_studentAttendanceService.GetAttendanceDateRange(studentId, tenantId,branchId,fromDatestr,toDatestr);
+            return Ok(new { 
+                statusCode = 200,
+                message = $"Graph Fetched successfully from date {fromDatestr} to date {toDatestr}",
+                data = data
+            });
+
+
+        }
 
 
     }

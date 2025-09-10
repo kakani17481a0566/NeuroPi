@@ -18,6 +18,14 @@ namespace SchoolManagement.Model
         public int StudentId { get; set; }
         public virtual MStudent Student { get; set; }
 
+        [Column("first_name")]
+        public string StudentName { get; set; }
+        
+
+        [Column("name")]
+        public string CourseName { get; set; }
+        public virtual MCourse Course { get; set; }
+
         [Required]
         [Column("user_id")]
         [ForeignKey("User")]

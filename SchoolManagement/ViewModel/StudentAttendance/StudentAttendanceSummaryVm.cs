@@ -43,6 +43,6 @@
         public int NotMarkedCount { get; set; }
         public int UnknownCount { get; set; }
 
-        public List<string> Headers { get; set; } = new(); // ✅ Add this line
+        public List<string> Headers { get; set; } = new(); 
     }
 }

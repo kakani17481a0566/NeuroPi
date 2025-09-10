@@ -2,9 +2,17 @@
 {
     public class StudentAttendanceGraphVM
     {
-        public string Date { get; set; } // "2025-07-07"
-        public string InTime { get; set; } // "09:00"
-        public string OutTime { get; set; } // "12:00"
+        public int StudentId { get; set; }
+        public string StudentName { get; set; }
+
+        public string CourseName { get; set; }
+        public string Date { get; set; } 
+        public string InTime { get; set; } 
+        public string OutTime { get; set; } 
+
+        public string? TotalTime { get; set; }
+
+        
     }
 
 }

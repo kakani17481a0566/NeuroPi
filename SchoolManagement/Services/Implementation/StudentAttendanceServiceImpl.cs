@@ -5,6 +5,7 @@ using SchoolManagement.Data;
 using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.StudentAttendance;
+using System.Globalization;
 
 namespace SchoolManagement.Services.Implementation
 {
@@ -20,6 +21,19 @@ namespace SchoolManagement.Services.Implementation
             _context = context;
             _userContext = userContext;
         }
+        private static readonly string[] AcceptFormats =
+   {
+        "dd-MM-yyyy", "d-M-yyyy", "dd/MM/yyyy", "d/M/yyyy", "yyyy-MM-dd"
+    };
+
+        private static DateOnly ParseDateOnly(string s)
+        {
+            if (!DateOnly.TryParseExact(s?.Trim(), AcceptFormats, CultureInfo.InvariantCulture,
+                                        DateTimeStyles.None, out var d))
+                throw new ArgumentException($"Invalid date '{s}'. Use dd-MM-yyyy (e.g., 01-08-2025).");
+            return d;
+        }
+
 
         public StudentAttendanceResponseVm AddStudentAttendance(StudentAttendanceRequestVM request)
         {
@@ -265,8 +279,8 @@ namespace SchoolManagement.Services.Implementation
                     StudentName = x.Name,
                     ClassName = x.CourseName,
                     ImageUrl = x.StudentImageUrl,
-                    Gender=x.Gender,
-                    BloodGroup=x.BloodGroup,       
+                    Gender = x.Gender,
+                    BloodGroup = x.BloodGroup,
                     CourseId = x.CourseId,
                     ParentId = x.Parent?.ParentId ?? 0,
                     ParentName = x.Parent?.ParentName ?? "Not Assigned",
@@ -345,23 +359,108 @@ namespace SchoolManagement.Services.Implementation
                             s.Date >= fromDate);
 
             if (branchId.HasValue)
-                query = query.Where(s => s.BranchId == branchId.Value); // Safe nullable filter
+                query = query.Where(s => s.BranchId == branchId.Value);
 
             return query
                 .OrderBy(s => s.Date)
                 .ThenBy(s => s.FromTime)
+                .Include(m => m.Student)
+                .Include(m => m.Student.Course)
                 .Select(s => new StudentAttendanceGraphVM
                 {
+                    StudentId = s.StudentId,
+                    StudentName = s.Student.Name,
+                    CourseName = s.Student.Course.Name,
                     Date = s.Date.ToString("yyyy-MM-dd"),
                     InTime = TimeOnly.FromTimeSpan(s.FromTime).ToString("HH:mm"),
-                    OutTime = TimeOnly.FromTimeSpan(s.ToTime).ToString("HH:mm")
+                    OutTime = TimeOnly.FromTimeSpan(s.ToTime).ToString("HH:mm"),
+
+                    TotalTime = (s.FromTime != TimeSpan.Zero && s.ToTime != TimeSpan.Zero && s.ToTime >= s.FromTime)
+                        ? (s.ToTime - s.FromTime).ToString(@"hh\:mm")
+                        : null
+
                 })
                 .ToList();
         }
 
+        public List<StudentAttendanceGraphVM> GetLast30DaysGraph(
+    int studentId, int tenantId, int? branchId, string selectedDate, string outputFormat = "yyyy-MM-dd")
+        {
+
+            var endDay = ParseDateOnly(selectedDate);
+            var fromDay = endDay.AddDays(-29);
+
+            var query = _context.StudentAttendance
+                .AsNoTracking()
+                .Where(s => !s.IsDeleted
+                            && s.StudentId == studentId
+                            && s.TenantId == tenantId
+                            && s.Date >= fromDay
+                            && s.Date <= endDay);
+
+            if (branchId.HasValue)
+                query = query.Where(s => s.BranchId == branchId.Value);
+
+            return query
+                .OrderBy(s => s.Date)
+                .ThenBy(s => s.FromTime)
+                .Include(m=>m.Student)
+                .Include(m=>m.Student.Course)
+                .Select(s => new StudentAttendanceGraphVM
+                {
+                    StudentId = s.StudentId,
+                    StudentName = s.Student.Name,
+                    CourseName = s.Student.Course.Name,
+                    Date = s.Date.ToString(outputFormat),
+                    InTime = s.FromTime != TimeSpan.Zero ? TimeOnly.FromTimeSpan(s.FromTime).ToString("HH:mm") : null,
+                    OutTime = s.ToTime != TimeSpan.Zero ? TimeOnly.FromTimeSpan(s.ToTime).ToString("HH:mm") : null,
+
+                    TotalTime = (s.FromTime != TimeSpan.Zero && s.ToTime != TimeSpan.Zero && s.ToTime >= s.FromTime)
+                        ? (s.ToTime - s.FromTime).ToString(@"hh\:mm")
+                        : null
 
 
+                })
+                .ToList();
+        }
 
+        public List<StudentAttendanceGraphVM> GetAttendanceDateRange(int studentId, int tenantId, int? branchId, string fromDatestr, string toDatestr, string outputFormat = "dd-MMM-yyyy")
+        {
 
+            var startDay = ParseDateOnly(fromDatestr);
+            var endDay = ParseDateOnly(toDatestr);
+
+            if (endDay < startDay)
+                throw new ArgumentException("End date cannot be earlier than start date.");
+
+            var report = _context.StudentAttendance
+                .AsNoTracking()
+                .Where(s => !s.IsDeleted
+                            && s.StudentId == studentId
+                            && s.TenantId == tenantId
+                            && s.Date >= startDay
+                            && s.Date <= endDay);
+            if (branchId.HasValue)
+                report = report.Where(s => s.BranchId == branchId.Value);
+
+            return report
+                .OrderBy(s => s.Date)
+                .ThenBy(s => s.FromTime)
+                .Include(m => m.Student)
+                .Include(m => m.Student.Course)
+                .Select(s => new StudentAttendanceGraphVM
+                {
+                    StudentId = s.StudentId,
+                    StudentName = s.Student.Name,
+                    CourseName = s.Student.Course.Name,
+                    Date = s.Date.ToString(outputFormat),
+                    InTime = s.FromTime != TimeSpan.Zero ? TimeOnly.FromTimeSpan(s.FromTime).ToString("HH:mm") : null,
+                    OutTime = s.ToTime != TimeSpan.Zero ? TimeOnly.FromTimeSpan(s.ToTime).ToString("HH:mm") : null,
+                    TotalTime = (s.FromTime != TimeSpan.Zero && s.ToTime != TimeSpan.Zero && s.ToTime >= s.FromTime)
+                        ? (s.ToTime - s.FromTime).ToString(@"hh\:mm")
+                        : null
+                })
+                .ToList();
+        }
     }
 }

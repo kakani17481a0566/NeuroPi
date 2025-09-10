@@ -24,6 +24,13 @@ namespace SchoolManagement.Services.Interface
 
         List<StudentAttendanceGraphVM> GetStudentAttendanceGraph(int studentId, int tenantId, int? branchId, int days = 7);
 
+        List<StudentAttendanceGraphVM> GetLast30DaysGraph(int studentId, int tenantId, int? branchId, string selectedDate,string outputFormat = "dd-MMM-yyyy");
 
+        List<StudentAttendanceGraphVM> GetAttendanceDateRange(int studentId, int tenantId, int? branchId, string fromDateStr, string toDateStr,string outputFormat = "dd-MMM-yyyy");
     }
+
+
+
+
 }
+
