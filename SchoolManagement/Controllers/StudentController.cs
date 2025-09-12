@@ -137,6 +137,38 @@ namespace SchoolManagement.Controllers
             );
         }
 
+        // POST: api/student/register
+        [HttpPost("register")]
+        public ResponseResult<SRStudentRegistrationResponseVM> Register([FromBody] SRStudentRegistrationRequestVM request)
+        {
+            try
+            {
+                var result = _studentService.Register(request);
+
+                return new ResponseResult<SRStudentRegistrationResponseVM>(
+                    HttpStatusCode.OK,
+                    result,
+                    "Student registered successfully."
+                );
+            }
+            catch (InvalidOperationException ex) // thrown when duplicate detected
+            {
+                return new ResponseResult<SRStudentRegistrationResponseVM>(
+                    HttpStatusCode.Conflict,
+                    null,
+                    ex.Message
+                );
+            }
+            catch (Exception ex)
+            {
+                return new ResponseResult<SRStudentRegistrationResponseVM>(
+                    HttpStatusCode.InternalServerError,
+                    null,
+                    $"Registration failed: {ex.Message}"
+                );
+            }
+        }
+
 
 
 

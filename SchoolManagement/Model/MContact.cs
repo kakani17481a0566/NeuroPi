@@ -13,13 +13,11 @@ namespace SchoolManagement.Model
         [Column("id")]
         public int Id { get; set; }
 
-        [Required]
         [Column("name", TypeName = "varchar(100)")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
-        [Required]
         [Column("pri_number", TypeName = "varchar(20)")]
-        public string PriNumber { get; set; }
+        public string? PriNumber { get; set; }
 
         [Column("sec_number", TypeName = "varchar(20)")]
         public string? SecNumber { get; set; }
@@ -27,9 +25,8 @@ namespace SchoolManagement.Model
         [Column("email", TypeName = "varchar(100)")]
         public string? Email { get; set; }
 
-        [Required]
         [Column("address_1", TypeName = "varchar(200)")]
-        public string Address1 { get; set; }
+        public string? Address1 { get; set; }
 
         [Column("address_2", TypeName = "varchar(200)")]
         public string? Address2 { get; set; }
@@ -37,27 +34,50 @@ namespace SchoolManagement.Model
         [Column("state", TypeName = "varchar(50)")]
         public string? State { get; set; }
 
-        [Required]
         [Column("city", TypeName = "varchar(50)")]
-        public string City { get; set; }
+        public string? City { get; set; }
 
         [Column("pincode", TypeName = "varchar(20)")]
         public string? Pincode { get; set; }
 
-        [Required]
         [Column("tenant_id")]
         public int TenantId { get; set; }
 
-        // ✅ NEW: Qualification
+        [Column("contact_person", TypeName = "varchar(150)")]
+        public string? ContactPerson { get; set; }
+
+        [Column("contact_type", TypeName = "varchar(150)")]
+        public string? ContactType { get; set; }
+
         [Column("qualification", TypeName = "varchar(150)")]
         public string? Qualification { get; set; }
 
-        // ✅ NEW: Profession
         [Column("profession", TypeName = "varchar(150)")]
         public string? Profession { get; set; }
 
-        public virtual ICollection<MInstitution> Institutions { get; set; } = new List<MInstitution>();
+        [Column("user_id")]
+        public int? UserId { get; set; }
 
-        public virtual MTenant Tenant { get; set; }
+        [Column("relationship_id")]
+        public int? RelationshipId { get; set; }
+
+        // ----------------------------
+        // Navigation Properties
+        // ----------------------------
+        [ForeignKey(nameof(TenantId))]
+        public virtual MTenant Tenant { get; set; } = default!;
+
+        [ForeignKey(nameof(UserId))]
+        public virtual MUser? User { get; set; }
+
+        [ForeignKey(nameof(RelationshipId))]
+        public virtual MMaster? Relationship { get; set; }
+
+        [ForeignKey(nameof(CreatedBy))]
+        public virtual MUser? CreatedByUser { get; set; }
+
+        [ForeignKey(nameof(UpdatedBy))]
+        public virtual MUser? UpdatedByUser { get; set; }
+
     }
 }

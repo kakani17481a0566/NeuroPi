@@ -1,25 +1,33 @@
 ﻿using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.CognitiveServices.Speech.Transcription;
 using Microsoft.EntityFrameworkCore;
+using NeuroPi.UserManagment.Data;
+using NeuroPi.UserManagment.Model;
 using SchoolManagement.Data;
 using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.Student;
+using SchoolManagement.ViewModel.StudentRegistration;
 using SchoolManagement.ViewModel.Students;
 using SchoolManagement.ViewModel.Subject;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Transactions;
 
 namespace SchoolManagement.Services.Implementation
 {
     public class StudentServiceImpl : IStudentService
     {
         private readonly SchoolManagementDb _context;
+        private readonly NeuroPiDbContext _userContext;
 
-        public StudentServiceImpl(SchoolManagementDb context)
+        public StudentServiceImpl(SchoolManagementDb schoolContext, NeuroPiDbContext userContext)
         {
-            _context = context;
+            _context = schoolContext;
+            _userContext = userContext;
         }
+
 
         public List<StudentResponseVM> GetAll()
         {
@@ -320,8 +328,207 @@ namespace SchoolManagement.Services.Implementation
                 .ToList();
         }
 
+        public SRStudentRegistrationResponseVM Register(SRStudentRegistrationRequestVM request)
+        {
+            try
+            {
+                // ---------------------------
+                // 1. Handle User in NeuroPiDb
+                // ---------------------------
+                using (var userTransaction = _userContext.Database.BeginTransaction())
+                {
+                    var user = _userContext.Users.FirstOrDefault(u =>
+                        u.Username == request.User.Username ||
+                        u.Email == request.User.Email ||
+                        u.MobileNumber == request.User.MobileNumber);
+
+                    if (user == null)
+                    {
+                        user = new MUser
+                        {
+                            Username = request.User.Username,
+                            FirstName = request.User.FirstName,
+                            LastName = request.User.LastName,
+                            Email = request.User.Email,
+                            Password = request.User.Password, // ⚠️ plain-text
+                            MobileNumber = request.User.MobileNumber,
+                            RoleTypeId = request.User.RoleTypeId,
+                            TenantId = request.TenantId,
+                            UserImageUrl = request.User.UserImageUrl,
+                            DateOfBirth = DateOnly.FromDateTime(request.User.Dob),
+                            CreatedOn = DateTime.UtcNow,
+                            CreatedBy = 1
+                        };
+
+                        _userContext.Users.Add(user);
+                        _userContext.SaveChanges();
+
+                        // assign parent role
+                        var parentRole = _userContext.Roles.First(r => r.Name == "PARENT");
+                        _userContext.UserRoles.Add(new MUserRole
+                        {
+                            UserId = user.UserId,
+                            RoleId = parentRole.RoleId,
+                            TenantId = request.TenantId,
+                            CreatedBy = user.UserId,
+                            CreatedOn = DateTime.UtcNow
+                        });
+                        _userContext.SaveChanges();
+                    }
+                    else
+                    {
+                        if (!_userContext.UserRoles.Any(ur => ur.UserId == user.UserId))
+                        {
+                            var parentRole = _userContext.Roles.First(r => r.Name == "PARENT");
+                            _userContext.UserRoles.Add(new MUserRole
+                            {
+                                UserId = user.UserId,
+                                RoleId = parentRole.RoleId,
+                                TenantId = request.TenantId,
+                                CreatedBy = user.UserId,
+                                CreatedOn = DateTime.UtcNow
+                            });
+                            _userContext.SaveChanges();
+                        }
+                    }
+
+                    userTransaction.Commit();
+                }
+
+                // ---------------------------
+                // 2. Handle Parent/Student in SchoolManagementDb
+                // ---------------------------
+                using (var schoolTransaction = _context.Database.BeginTransaction())
+                {
+                    var user = _userContext.Users.First(u => u.Username == request.User.Username);
+
+                    // Parent
+                    var parent = _context.Parents
+                        .FirstOrDefault(p => p.UserId == user.UserId && p.TenantId == request.TenantId);
+
+                    if (parent == null)
+                    {
+                        parent = new MParent
+                        {
+                            UserId = user.UserId,
+                            TenantId = request.TenantId,
+                            CreatedBy = user.UserId,
+                            CreatedOn = DateTime.UtcNow
+                        };
+                        _context.Parents.Add(parent);
+                        _context.SaveChanges();
+                    }
+
+                    // Student
+                    var duplicateStudent = _context.Students.FirstOrDefault(s =>
+                        s.Name == request.Student.FirstName &&
+                        s.LastName == request.Student.LastName &&
+                        s.DateOfBirth == DateOnly.FromDateTime(request.Student.Dob) &&
+                        s.TenantId == request.TenantId &&
+                        !s.IsDeleted);
+
+                    if (duplicateStudent != null)
+                        throw new InvalidOperationException("Student already exists with same name and DOB");
+
+                    var student = new MStudent
+                    {
+                        Name = request.Student.FirstName,
+                        LastName = request.Student.LastName,
+                        MiddleName = request.Student.MiddleName,
+                        DateOfBirth = DateOnly.FromDateTime(request.Student.Dob),
+                        Gender = request.Student.Gender,
+                        BloodGroup = request.Student.BloodGroup,
+                        AdmissionGrade = request.Student.AdmissionGrade,
+                        DateOfJoining = DateOnly.FromDateTime(request.Student.DateOfJoining),
+                        CourseId = request.Student.CourseId,
+                        BranchId = request.Student.BranchId,
+                        TenantId = request.TenantId,
+                        StudentImageUrl = request.Student.StudentImageUrl,
+                        StudentImage = request.Student.StudentImage,
+                        FatherPhoto = request.Student.FatherPhoto,
+                        MotherPhoto = request.Student.MotherPhoto,
+                        JointPhoto = request.Student.JointPhoto,
+                        RegistrationChannel = request.Student.RegistrationChannel,
+                        CreatedBy = user.UserId,
+                        CreatedOn = DateTime.UtcNow
+                    };
+                    _context.Students.Add(student);
+                    _context.SaveChanges();
+
+                    // RegNumber
+                    // ✅ Safely handle nullable DateOfJoining
+                    var year = student.DateOfJoining.HasValue
+                        ? student.DateOfJoining.Value.Year
+                        : DateTime.UtcNow.Year;
+
+                    var lastReg = _context.Students
+                        .Where(s => s.TenantId == request.TenantId &&
+                                    s.BranchId == student.BranchId &&
+                                    s.CourseId == student.CourseId &&
+                                    s.DateOfJoining.HasValue &&           // ✅ check before using Value
+                                    s.DateOfJoining.Value.Year == year)
+                        .OrderByDescending(s => s.RegNumber)
+                        .Select(s => s.RegNumber)
+                        .FirstOrDefault();
+
+                    var seq = 1;
+                    if (!string.IsNullOrEmpty(lastReg) && int.TryParse(lastReg[^3..], out var lastSeq))
+                        seq = lastSeq + 1;
+
+                    // ✅ Build RegNumber (YY + BranchId + CourseId + Seq)
+                    student.RegNumber = $"{year % 100:D2}{student.BranchId:D2}{student.CourseId:D2}{seq:D3}";
+
+                    // Update student record
+                    _context.Students.Update(student);
 
 
+                    // StudentCourse
+                    _context.StudentCourses.Add(new MStudentCourse
+                    {
+                        StudentId = student.Id,
+                        CourseId = student.CourseId,
+                        BranchId = student.BranchId,
+                        TenantId = request.TenantId,
+                        IsCurrentYear = true,
+                        CreatedBy = user.UserId,
+                        CreatedOn = DateTime.UtcNow
+                    });
+
+                    // Contacts (same as your existing contact handling)
+                    // ...
+
+                    // ParentStudent link
+                    if (!_context.ParentStudents.Any(ps => ps.ParentId == parent.Id && ps.StudentId == student.Id))
+                    {
+                        _context.ParentStudents.Add(new MParentStudent
+                        {
+                            ParentId = parent.Id,
+                            StudentId = student.Id,
+                            TenantId = request.TenantId,
+                            CreatedBy = user.UserId,
+                            CreatedOn = DateTime.UtcNow
+                        });
+                    }
+
+                    _context.SaveChanges();
+                    schoolTransaction.Commit();
+
+                    return new SRStudentRegistrationResponseVM
+                    {
+                        StudentId = student.Id,
+                        UserId = user.UserId,
+                        ParentId = parent.Id,
+                        RegNumber = student.RegNumber,
+                        Username = user.Username,
+                        Password = user.Password
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Registration failed: {ex.InnerException?.Message ?? ex.Message}", ex);
+            }
+        }
 
 
     }

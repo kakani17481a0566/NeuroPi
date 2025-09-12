@@ -10,6 +10,7 @@ namespace SchoolManagement.Model
     {
         [Key]
         [Column("id")]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         [Required]
@@ -17,15 +18,27 @@ namespace SchoolManagement.Model
         public int UserId { get; set; }
 
         [ForeignKey(nameof(UserId))]
-        public virtual MUser User { get; set; }
+        public virtual MUser User { get; set; } = default!;
 
         [Required]
         [Column("tenant_id")]
         public int TenantId { get; set; }
 
         [ForeignKey(nameof(TenantId))]
-        public virtual MTenant Tenant { get; set; }
+        public virtual MTenant Tenant { get; set; } = default!;
 
+        // ----------------------------
+        // Audit Navigation (from MBaseModel)
+        // ----------------------------
+        [ForeignKey(nameof(CreatedBy))]
+        public virtual MUser? CreatedByUser { get; set; }
+
+        [ForeignKey(nameof(UpdatedBy))]
+        public virtual MUser? UpdatedByUser { get; set; }
+
+        // ----------------------------
+        // Relationships
+        // ----------------------------
         public virtual ICollection<MParentStudent> ParentStudents { get; set; } = new List<MParentStudent>();
     }
 }

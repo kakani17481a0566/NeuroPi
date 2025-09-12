@@ -68,9 +68,9 @@ namespace SchoolManagement.Data
         public DbSet<MStudentAttendance> StudentAttendance { get; set; }
 
         public DbSet<MCourseTeacher> CourseTeachers { get; set; }
-        public DbSet<MVisitor> Visitors { get; set; } 
+        public DbSet<MVisitor> Visitors { get; set; }
         public DbSet<MPhoneLog> PhoneLogs { get; set; }
-        public DbSet<MSupplier> Supplier{ get; set; }
+        public DbSet<MSupplier> Supplier { get; set; }
         public DbSet<MSupplierBranch> SupplierBranches { get; set; }
         public DbSet<MItemSupplier> ItemSuppliers { get; set; }
         public DbSet<MOrders> Orders { get; set; }
@@ -111,6 +111,9 @@ namespace SchoolManagement.Data
 
 
         public DbSet<MStudentsEnquiry> StudentsEnquiries { get; set; }
+
+
+        public DbSet<MStudentCourse> StudentCourses { get; set; }
 
 
 

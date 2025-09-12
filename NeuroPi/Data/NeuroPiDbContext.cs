@@ -23,16 +23,19 @@ namespace NeuroPi.UserManagment.Data
         public DbSet<MAuditLog> AuditLogs { get; set; }
         public DbSet<MConfig> Configs { get; set; }
 
-        
+
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // User-Tenant relationship (MTenant to MUser, which is the reverse relationship)
+            base.OnModelCreating(modelBuilder);
+
+            // User ↔ Tenant
             modelBuilder.Entity<MUser>()
                 .HasOne(user => user.Tenant)
-                .WithMany(tenant => tenant.Users) // Ensuring MTenant has a collection of MUser
+                .WithMany(tenant => tenant.Users)
                 .HasForeignKey(user => user.TenantId)
-                .OnDelete(DeleteBehavior.Restrict); // Optionally prevent cascading deletes
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Composite indexes
             modelBuilder.Entity<MRolePermission>()
@@ -54,6 +57,23 @@ namespace NeuroPi.UserManagment.Data
             modelBuilder.Entity<MUserDepartment>()
                 .HasIndex(ud => new { ud.UserId, ud.DepartmentId })
                 .IsUnique();
+
+            // ✅ User ↔ UserRole
+            modelBuilder.Entity<MUser>()
+                .HasMany(u => u.UserRoles)
+                .WithOne(ur => ur.User)
+                .HasForeignKey(ur => ur.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // ✅ Role ↔ UserRole
+            modelBuilder.Entity<MRole>()
+                .HasMany(r => r.UserRoles)
+                .WithOne(ur => ur.Role)
+                .HasForeignKey(ur => ur.RoleId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
+
+
+
     }
 }

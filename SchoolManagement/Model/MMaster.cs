@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using NeuroPi.UserManagment.Model;
 
+
 namespace SchoolManagement.Model
 {
     [Table("masters")]

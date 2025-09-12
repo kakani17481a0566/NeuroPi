@@ -9,31 +9,33 @@ namespace SchoolManagement.Model
     {
         [Key]
         [Column("id")]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         [Column("parent_id")]
         public int ParentId { get; set; }
 
         [ForeignKey(nameof(ParentId))]
-        public virtual MParent Parent { get; set; }
+        public virtual MParent Parent { get; set; } = default!;
 
         [Column("student_id")]
         public int StudentId { get; set; }
 
         [ForeignKey(nameof(StudentId))]
-        public virtual MStudent Student { get; set; }
+        public virtual MStudent Student { get; set; } = default!;
 
         [Column("tenant_id")]
         public int TenantId { get; set; }
 
         [ForeignKey(nameof(TenantId))]
-        public virtual MTenant Tenant { get; set; }
+        public virtual MTenant Tenant { get; set; } = default!;
 
-        // Navigation for CreatedBy
+        // ----------------------------
+        // Audit Navigation (from MBaseModel)
+        // ----------------------------
         [ForeignKey(nameof(CreatedBy))]
-        public virtual MUser CreatedByUser { get; set; }
+        public virtual MUser? CreatedByUser { get; set; }   // ✅ make nullable
 
-        // Navigation for UpdatedBy (nullable)
         [ForeignKey(nameof(UpdatedBy))]
         public virtual MUser? UpdatedByUser { get; set; }
     }
