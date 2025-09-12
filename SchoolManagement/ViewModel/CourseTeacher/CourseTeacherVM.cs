@@ -8,7 +8,7 @@
 
         public int weekId { get; set; }
 
-        public int termId {  get; set; }
+        public int termId { get; set; }
 
 
     }

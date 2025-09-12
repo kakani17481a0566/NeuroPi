@@ -88,6 +88,7 @@ builder.Services.AddScoped<IItemCategoryService, ItemCategoryServiceImpl>();
 builder.Services.AddScoped<IItemLocationService, ItemLocationServiceImpl>();
 builder.Services.AddScoped<IItemBranchService, ItemBranchServiceImpl>();
 builder.Services.AddScoped<IOrderItemService, OrderItemServiceImpl>();
+builder.Services.AddScoped<ICourseTeacherService, CourseTeacherServiceImpl>();
 
 // ViewModel-based Services
 builder.Services.AddScoped<IVwComprehensiveTimeTablesService, VwComprehensiveTimeTablesService>();
