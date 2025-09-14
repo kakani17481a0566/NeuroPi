@@ -126,7 +126,7 @@ namespace SchoolManagement.Services.Implementation
 
         public ParentWithStudentsResponseVM GetFullParentDetailsByUserId(int userId, int tenantId)
         {
-            // Step 1: Get the parent using UserId + TenantId
+            // Step 1: Get the parent with linked User
             var parent = _db.Parents
                 .Include(p => p.User)
                 .FirstOrDefault(p => p.UserId == userId && p.TenantId == tenantId && !p.IsDeleted);
@@ -134,7 +134,17 @@ namespace SchoolManagement.Services.Implementation
             if (parent == null)
                 return null;
 
-            // Step 2: Fetch all student links for this parent
+            // Step 2: Resolve RoleType name (from masters table in SchoolManagementDb)
+            string? roleTypeName = null;
+            if (parent.User?.RoleTypeId != null)
+            {
+                roleTypeName = _db.Masters
+                    .Where(m => m.Id == parent.User.RoleTypeId && m.TenantId == tenantId && !m.IsDeleted)
+                    .Select(m => m.Name)
+                    .FirstOrDefault();
+            }
+
+            // Step 3: Fetch all student links
             var studentLinks = _db.ParentStudents
                 .Where(ps => ps.ParentId == parent.Id && ps.TenantId == tenantId && !ps.IsDeleted)
                 .Include(ps => ps.Student)
@@ -143,7 +153,7 @@ namespace SchoolManagement.Services.Implementation
                     .ThenInclude(s => s.Branch)
                 .ToList();
 
-            // Step 3: Map to ViewModel
+            // Step 4: Map to ViewModel
             var response = new ParentWithStudentsResponseVM
             {
                 Parent = new ParentVM
@@ -153,7 +163,9 @@ namespace SchoolManagement.Services.Implementation
                     ParentName = parent.User?.Username,
                     Email = parent.User?.Email,
                     MobileNumber = parent.User?.MobileNumber,
-                    TenantId = parent.TenantId
+                    TenantId = parent.TenantId,
+                    RoleTypeId = parent.User?.RoleTypeId,
+                    RoleTypeName = roleTypeName   // ✅ Now included
                 },
                 Students = studentLinks
                     .Where(x => x.Student != null)
