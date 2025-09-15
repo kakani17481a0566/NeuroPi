@@ -50,7 +50,7 @@ namespace SchoolManagement.Model
         public string? StudentImageUrl { get; set; }
 
         [Column("student_image")]
-        public string? StudentImage { get; set; }
+        public byte[]? StudentImage { get; set; }   // changed to bytea
 
         [Column("bloodgroup")]
         public string? BloodGroup { get; set; }
@@ -102,6 +102,9 @@ namespace SchoolManagement.Model
 
         [Column("alt_transport_text")]
         public string? AlternateTransportText { get; set; }
+
+        [Column("other_transport_text")]
+        public string? OtherTransportText { get; set; }   // ✅ added missing column
 
         // ----------------------------
         // Custody & Family
@@ -184,47 +187,45 @@ namespace SchoolManagement.Model
         // ----------------------------
         // Documents & Forms
         // ----------------------------
-        [Column("signature", TypeName = "text")]
-        public string? Signature { get; set; }
+        [Column("signature")]
+        public byte[]? Signature { get; set; }   // changed to bytea
 
         [Column("birth_certificate")]
-        public string? BirthCertificate { get; set; }
+        public byte[]? BirthCertificate { get; set; }
 
         [Column("kid_passport")]
-        public string? KidPassport { get; set; }
+        public byte[]? KidPassport { get; set; }
 
         [Column("adhar")]
-        public string? Adhar { get; set; }
+        public byte[]? Adhar { get; set; }
 
         [Column("parent_adhar")]
-        public string? ParentAdhar { get; set; }
+        public byte[]? ParentAdhar { get; set; }
 
         [Column("mother_adhar")]
-        public string? MotherAdhar { get; set; }
+        public byte[]? MotherAdhar { get; set; }
 
         [Column("mother_photo")]
-        public string? MotherPhoto { get; set; }
+        public byte[]? MotherPhoto { get; set; }
 
         [Column("father_photo")]
-        public string? FatherPhoto { get; set; }
+        public byte[]? FatherPhoto { get; set; }
 
         [Column("joint_photo")]
-        public string? JointPhoto { get; set; }
+        public byte[]? JointPhoto { get; set; }
 
         [Column("health_form")]
-        public string? HealthForm { get; set; }
+        public byte[]? HealthForm { get; set; }
 
         [Column("privacy_form")]
-        public string? PrivacyForm { get; set; }
+        public byte[]? PrivacyForm { get; set; }
 
         [Column("liability_form")]
-        public string? LiabilityForm { get; set; }
-
+        public byte[]? LiabilityForm { get; set; }
 
         [Column("registration_channel")]
         [MaxLength(20)]
         public string? RegistrationChannel { get; set; }
-
 
         // ----------------------------
         // Navigation Properties
