@@ -100,6 +100,9 @@ builder.Services.AddScoped<IMVTermTableService, VTermTableServiceImpl>();
 builder.Services.AddScoped<IStudentRegistration, StudentRegistrationImpl>();
 builder.Services.AddScoped<IStudentsEnquiry, StudentEnquiryImpl>();
 
+builder.Services.AddScoped<ICountingTestContentService, CountingTestContentImpl>();
+
+
 
 
 

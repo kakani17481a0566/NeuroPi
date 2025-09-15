@@ -115,6 +115,9 @@ namespace SchoolManagement.Data
 
         public DbSet<MStudentCourse> StudentCourses { get; set; }
 
+        public DbSet<MCountingTestContent> CountingTestContents { get; set; }
+
+
 
 
 
