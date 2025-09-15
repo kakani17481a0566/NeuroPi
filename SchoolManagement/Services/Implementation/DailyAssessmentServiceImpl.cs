@@ -483,6 +483,8 @@ namespace SchoolManagement.Services.Implementation
             };
         }
 
+
+
         public StudentPerformanceDashboard GetStudentPerformanceDashboard(int studentId, int tenantId)
         {
             var student = _context.Students
@@ -607,6 +609,211 @@ namespace SchoolManagement.Services.Implementation
                 },
 
                 AssessmentWise = groupedAssessments
+            };
+        }
+
+
+        public DailyAssessmentPerformanceSummaryResponse GetPerformanceSummaryForStudent(
+    int tenantId,
+    int courseId,
+    int branchId,
+    int weekId,
+    int studentId)
+        {
+            var student = _context.Students
+                .AsNoTracking()
+                .Where(s => !s.IsDeleted &&
+                            s.TenantId == tenantId &&
+                            s.BranchId == branchId &&
+                            s.CourseId == courseId &&
+                            s.Id == studentId)
+                .Select(s => new StudentInfoVm
+                {
+                    StudentId = s.Id,
+                    StudentName = s.Name
+                })
+                .FirstOrDefault();
+
+            if (student == null)
+            {
+                return new DailyAssessmentPerformanceSummaryResponse
+                {
+                    Headers = new List<string>(),
+                    Students = new List<StudentInfoVm>(),
+                    AssessmentGrades = new Dictionary<string, Dictionary<int, AssessmentScoreVm>>(),
+                    AssessmentStatusCode = new List<string>(),
+                    HeaderDetails = new List<AssessmentHeaderVm>(),
+                    SubjectWiseAssessments = new List<SubjectGroupedAssessmentVm>(),
+                    StudentDictionary = new Dictionary<int, string>(),
+                    SubjectDictionary = new Dictionary<int, string>(),
+                    WeekDictionary = new Dictionary<int, string>(),
+                    AssessmentSchedule = new List<AssessmentScheduleVm>()
+                };
+            }
+
+            DateOnly today = DateOnly.FromDateTime(DateTime.Today);
+            int? effectiveWeekId = weekId switch
+            {
+                -1 => _context.Weeks
+                        .AsNoTracking()
+                        .Where(w => !w.IsDeleted && w.StartDate <= today && w.EndDate >= today)
+                        .Select(w => (int?)w.Id)
+                        .FirstOrDefault(),
+                0 => null,
+                > 0 => weekId,
+                _ => null
+            };
+
+            // ✅ Project instead of Include (lighter query)
+            var dailyAssessments = _context.DailyAssessments
+                .AsNoTracking()
+                .Where(d => !d.IsDeleted &&
+                            d.TenantId == tenantId &&
+                            d.BranchId == branchId &&
+                            d.StudentId == studentId &&
+                            (effectiveWeekId == null || d.TimeTable.WeekId == effectiveWeekId))
+                .Select(d => new
+                {
+                    d.StudentId,
+                    d.AssessmentId,
+                    AssessmentName = d.Assessment.Name,
+                    SkillId = d.Assessment.AssessmentSkill.Id,
+                    SkillName = d.Assessment.AssessmentSkill.Name,
+                    SubjectId = d.Assessment.AssessmentSkill.Subject.Id,
+                    SubjectName = d.Assessment.AssessmentSkill.Subject.Name,
+                    SubjectCode = d.Assessment.AssessmentSkill.Subject.Code,
+                    GradeName = d.Grade.Name,
+                    MaxPercentage = (decimal?)d.Grade.MaxPercentage, // ✅ ensure nullable
+                    d.AssessmentDate,
+                    TimeTableId = d.TimeTable.Id,
+                    TimeTableName = d.TimeTable.Name,
+                    Date = d.TimeTable.Date,
+                    WeekId = d.TimeTable.Week.Id,
+                    WeekName = d.TimeTable.Week.Name,
+                    WeekStart = d.TimeTable.Week.StartDate,
+                    WeekEnd = d.TimeTable.Week.EndDate
+                })
+                .ToList();
+
+            var weekDictionary = _context.Weeks
+                .AsNoTracking()
+                .Where(w => !w.IsDeleted)
+                .OrderBy(w => w.StartDate)
+                .ToDictionary(
+                    w => w.Id,
+                    w => $"{w.Name} ({w.StartDate:dd MMM} - {w.EndDate:dd MMM})");
+
+            // ✅ Build response directly
+            var headerDetails = dailyAssessments
+                .GroupBy(d => d.AssessmentId)
+                .Select(g => new AssessmentHeaderVm
+                {
+                    AssessmentId = g.Key,
+                    Name = g.First().AssessmentName,
+                    SkillId = g.First().SkillId,
+                    SkillName = g.First().SkillName,
+                    SubjectId = g.First().SubjectId,
+                    SubjectName = g.First().SubjectName,
+                    SubjectCode = g.First().SubjectCode
+                })
+                .OrderBy(h => h.AssessmentId)
+                .ToList();
+
+            var headers = headerDetails.Select(h => h.Name).ToList();
+            var gradesUsed = dailyAssessments.Select(d => d.GradeName ?? "Not Graded").Distinct().ToList();
+
+            // ✅ Latest score per header
+            var assessmentGrades = headers.ToDictionary(
+                header => header,
+                header => new Dictionary<int, AssessmentScoreVm>
+                {
+                    [student.StudentId] = dailyAssessments
+                        .Where(d => d.AssessmentName == header)
+                        .OrderByDescending(d => d.AssessmentDate)
+                        .Select(d => new AssessmentScoreVm
+                        {
+                            Grade = d.GradeName ?? "Not Graded",
+                            Score = d.MaxPercentage,
+                            AssessmentDate = d.AssessmentDate
+                        })
+                        .FirstOrDefault() ?? new AssessmentScoreVm()
+                });
+
+            // ✅ Calculate average & std dev
+            var scores = dailyAssessments
+                .Where(d => d.MaxPercentage.HasValue)
+                .Select(d => d.MaxPercentage.Value)
+                .ToList();
+
+            if (scores.Any())
+            {
+                var avg = scores.Average();
+                var variance = scores.Sum(s => (decimal)Math.Pow((double)(s - avg), 2)) / scores.Count;
+                var stdDev = Math.Sqrt((double)variance);
+
+                student.AverageScore = Math.Round(avg, 2);
+                student.StandardDeviation = Math.Round((decimal)stdDev, 2);
+            }
+
+            var subjectWiseAssessments = headerDetails
+                .GroupBy(h => new { h.SubjectId, h.SubjectName, h.SubjectCode })
+                .Select(subjectGroup => new SubjectGroupedAssessmentVm
+                {
+                    SubjectId = subjectGroup.Key.SubjectId,
+                    SubjectName = subjectGroup.Key.SubjectName,
+                    SubjectCode = subjectGroup.Key.SubjectCode,
+                    Skills = subjectGroup.Select(header => new SkillAssessmentVm
+                    {
+                        AssessmentId = header.AssessmentId,
+                        Name = header.Name,
+                        SkillId = header.SkillId,
+                        SkillName = header.SkillName,
+                        StudentScores = new List<StudentScoreEntryVm>
+                        {
+                    assessmentGrades.TryGetValue(header.Name, out var map) && map.TryGetValue(student.StudentId, out var score)
+                        ? new StudentScoreEntryVm
+                        {
+                            StudentId = student.StudentId,
+                            Grade = score.Grade,
+                            Score = score.Score,
+                            AssessmentDate = score.AssessmentDate
+                        }
+                        : new StudentScoreEntryVm { StudentId = student.StudentId }
+                        }
+                    }).ToList()
+                }).ToList();
+
+            var assessmentSchedule = dailyAssessments
+                .GroupBy(d => d.TimeTableId)
+                .Select(g => new AssessmentScheduleVm
+                {
+                    TimeTableId = g.Key,
+                    Name = g.First().TimeTableName,
+                    Date = DateOnly.FromDateTime(g.First().Date)
+                })
+                .OrderBy(s => s.Date)
+                .ToList();
+
+            var selectedWeek = dailyAssessments.FirstOrDefault();
+            string? weekName = selectedWeek?.WeekName;
+            DateOnly? weekStartDate = selectedWeek?.WeekStart;
+            DateOnly? weekEndDate = selectedWeek?.WeekEnd;
+
+            return new DailyAssessmentPerformanceSummaryResponse
+            {
+                Headers = headers,
+                Students = new List<StudentInfoVm> { student },
+                AssessmentGrades = assessmentGrades,
+                AssessmentStatusCode = gradesUsed,
+                HeaderDetails = headerDetails,
+                SubjectWiseAssessments = subjectWiseAssessments,
+                StudentDictionary = new Dictionary<int, string> { [student.StudentId] = student.StudentName },
+                SubjectDictionary = subjectWiseAssessments.ToDictionary(s => s.SubjectId, s => s.SubjectName),
+                WeekDictionary = weekDictionary,
+                WeekName = weekName,
+                WeekStartDate = weekStartDate,
+                WeekEndDate = weekEndDate,
+                AssessmentSchedule = assessmentSchedule
             };
         }
 

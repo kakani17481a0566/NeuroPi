@@ -11,7 +11,7 @@
             { "email", "Email Address" },
             { "mobileNumber", "Mobile Number" },
             { "tenantId", "Tenant ID" },
-            { "roleName", "Role" },            // ✅ new
+            { "roleName", "Role" },
             { "students", "Linked Children" }
         };
 
@@ -29,19 +29,46 @@
         public int TenantId { get; set; }
         public int? RoleTypeId { get; set; }
         public string? RoleTypeName { get; set; }
+
+        // 🔹 Additional fields from MUser
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public string? MiddleName { get; set; }
+        public string? Gender { get; set; }
+        public string? UserImageUrl { get; set; }
+        public string? AlternateNumber { get; set; }
+        public string? Address { get; set; }
+        public DateOnly? DateOfBirth { get; set; }
+
+        // Extended profile
+        public string? FatherName { get; set; }
+        public string? MotherName { get; set; }
+        public string? SpouseName { get; set; }
+        public string? MaritalStatus { get; set; }
+        public DateOnly? WeddingAnniversaryDate { get; set; }
+        public DateOnly? JoiningDate { get; set; }
+        public TimeOnly? WorkingStartTime { get; set; }
+        public TimeOnly? WorkingEndTime { get; set; }
     }
 
     public class StudentVM
     {
         public int StudentId { get; set; }
         public string Name { get; set; }
+        public string? MiddleName { get; set; }
+        public string? LastName { get; set; }
+
         public string CourseName { get; set; }
         public string BranchName { get; set; }
-        public string StudentImageUrl { get; set; }
+        public string? StudentImageUrl { get; set; }
 
-        // ✅ Additional details for richer profile
-        public DateOnly? Dob { get; set; }
-        public int? Age { get; set; }
+        // 🔹 Fields actually available in MStudent
+        public DateOnly? Dob { get; set; }               // maps to DateOfBirth
+        public int? Age { get; set; }                    // calculated from DateOfBirth
+        public string? Gender { get; set; }
         public string? BloodGroup { get; set; }
+        public string? AdmissionNumber { get; set; }     // maps to RegNumber
+        public string? AdmissionGrade { get; set; }
+        public DateOnly? DateOfJoining { get; set; }
     }
 }

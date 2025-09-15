@@ -18,7 +18,20 @@ namespace SchoolManagement.Services.Interface
 
         DailyAssessmentPerformanceSummaryResponse GetPerformanceSummary(int tenantId, int courseId, int branchId, int weekId);
 
+        DailyAssessmentPerformanceSummaryResponse GetPerformanceSummaryForStudent(
+          int tenantId,
+          int courseId,
+          int branchId,
+          int weekId,
+          int studentId
+      );
+
         StudentPerformanceDashboard GetStudentPerformanceDashboard(int studentId, int tenantId);
+
+
+
+     
+
 
 
 

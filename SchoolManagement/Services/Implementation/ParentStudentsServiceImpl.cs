@@ -144,7 +144,7 @@ namespace SchoolManagement.Services.Implementation
                     .FirstOrDefault();
             }
 
-            // Step 3: Fetch all student links
+            // Step 3: Fetch all student links with navigation props
             var studentLinks = _db.ParentStudents
                 .Where(ps => ps.ParentId == parent.Id && ps.TenantId == tenantId && !ps.IsDeleted)
                 .Include(ps => ps.Student)
@@ -165,24 +165,54 @@ namespace SchoolManagement.Services.Implementation
                     MobileNumber = parent.User?.MobileNumber,
                     TenantId = parent.TenantId,
                     RoleTypeId = parent.User?.RoleTypeId,
-                    RoleTypeName = roleTypeName   // ✅ Now included
+                    RoleTypeName = roleTypeName,
+
+                    // 🔹 New fields from MUser
+                    FirstName = parent.User?.FirstName,
+                    LastName = parent.User?.LastName,
+                    MiddleName = parent.User?.MiddleName,
+                    Gender = parent.User?.Gender,
+                    UserImageUrl = parent.User?.UserImageUrl,
+                    AlternateNumber = parent.User?.AlternateNumber,
+                    Address = parent.User?.Address,
+                    DateOfBirth = parent.User?.DateOfBirth,
+                    FatherName = parent.User?.FatherName,
+                    MotherName = parent.User?.MotherName,
+                    SpouseName = parent.User?.SpouseName,
+                    MaritalStatus = parent.User?.MaritalStatus,
+                    WeddingAnniversaryDate = parent.User?.WeddingAnniversaryDate,
+                    JoiningDate = parent.User?.JoiningDate,
+                    WorkingStartTime = parent.User?.WorkingStartTime,
+                    WorkingEndTime = parent.User?.WorkingEndTime
                 },
                 Students = studentLinks
                     .Where(x => x.Student != null)
                     .Select(x => new StudentVM
                     {
                         StudentId = x.Student.Id,
-                        Name = x.Student.Name,
+                        Name = x.Student.Name, // maps to [first_name] column
+                        MiddleName = x.Student.MiddleName,
+                        LastName = x.Student.LastName,
                         CourseName = x.Student.Course?.Name,
                         BranchName = x.Student.Branch?.Name,
-                        StudentImageUrl = x.Student.StudentImageUrl
+                        StudentImageUrl = x.Student.StudentImageUrl,
+
+                        // 🔹 Fixed fields
+                        Dob = x.Student.DateOfBirth,
+                        Age = x.Student.DateOfBirth.HasValue
+                            ? (int?)((DateTime.Today - x.Student.DateOfBirth.Value.ToDateTime(TimeOnly.MinValue)).Days / 365)
+                            : null,
+                        Gender = x.Student.Gender,
+                        BloodGroup = x.Student.BloodGroup,
+                        AdmissionNumber = x.Student.RegNumber,   // maps correctly
+                        AdmissionGrade = x.Student.AdmissionGrade,
+                        DateOfJoining = x.Student.DateOfJoining
                     })
                     .ToList()
             };
 
             return response;
         }
-
 
 
     }
