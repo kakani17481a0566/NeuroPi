@@ -6,8 +6,8 @@ namespace SchoolManagement.ViewModel.Student
     public class SRStudentRegistrationRequestVM
     {
         public int TenantId { get; set; }
-        public SRUserVM User { get; set; }
-        public SRStudentVM Student { get; set; }
+        public SRUserVM User { get; set; } = default!;
+        public SRStudentVM Student { get; set; } = default!;
         public List<SRContactVM> Contacts { get; set; } = new();
     }
 
@@ -16,17 +16,15 @@ namespace SchoolManagement.ViewModel.Student
     // -----------------------
     public class SRUserVM
     {
-        public string Username { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Email { get; set; }
-        public string Password { get; set; }
-        public string MobileNumber { get; set; }
+        public string Username { get; set; } = default!;
+        public string FirstName { get; set; } = default!;
+        public string LastName { get; set; } = default!;
+        public string Email { get; set; } = default!;
+        public string Password { get; set; } = default!;  // hash on save
+        public string MobileNumber { get; set; } = default!;
         public int RoleTypeId { get; set; }
         public string? UserImageUrl { get; set; }
         public DateTime Dob { get; set; }
-
-
     }
 
     // -----------------------
@@ -34,44 +32,43 @@ namespace SchoolManagement.ViewModel.Student
     // -----------------------
     public class SRStudentVM
     {
-        public string FirstName { get; set; }
+        public string FirstName { get; set; } = default!;
         public string? LastName { get; set; }
         public string? MiddleName { get; set; }
         public DateTime Dob { get; set; }
-        public string Gender { get; set; }
+        public string Gender { get; set; } = default!;
         public string? BloodGroup { get; set; }
-        public string AdmissionGrade { get; set; }
+        public string AdmissionGrade { get; set; } = default!;
         public DateTime DateOfJoining { get; set; }
         public int CourseId { get; set; }
         public int BranchId { get; set; }
 
         public string? RegistrationChannel { get; set; }  // "By Post", "In Person", "Online"
 
-
-        // Images
+        // Images (bytea)
         public string? StudentImageUrl { get; set; }
-        public string? StudentImage { get; set; }
-        public string? MotherPhoto { get; set; }
-        public string? FatherPhoto { get; set; }
-        public string? JointPhoto { get; set; }
+        public byte[]? StudentImage { get; set; }
+        public byte[]? MotherPhoto { get; set; }
+        public byte[]? FatherPhoto { get; set; }
+        public byte[]? JointPhoto { get; set; }
 
         // Transport
-        public SRTransportVM Transport { get; set; }
+        public SRTransportVM Transport { get; set; } = default!;
 
         // Custody & Family
-        public SRCustodyFamilyVM CustodyFamily { get; set; }
+        public SRCustodyFamilyVM CustodyFamily { get; set; } = default!;
 
         // Medical Info
-        public SRMedicalInfoVM MedicalInfo { get; set; }
+        public SRMedicalInfoVM MedicalInfo { get; set; } = default!;
 
         // Languages
-        public SRLanguagesVM Languages { get; set; }
+        public SRLanguagesVM Languages { get; set; } = default!;
 
         // English Skills
-        public SREnglishSkillsVM EnglishSkills { get; set; }
+        public SREnglishSkillsVM EnglishSkills { get; set; } = default!;
 
         // Documents
-        public SRDocumentsVM Documents { get; set; }
+        public SRDocumentsVM Documents { get; set; } = default!;
     }
 
     // -----------------------
@@ -79,8 +76,8 @@ namespace SchoolManagement.ViewModel.Student
     // -----------------------
     public class SRTransportVM
     {
-        public SRTransportOptionVM Regular { get; set; }
-        public SRTransportOptionVM Alternate { get; set; }
+        public SRTransportOptionVM Regular { get; set; } = default!;
+        public SRTransportOptionVM Alternate { get; set; } = default!;
         public string? OtherTransportText { get; set; }
     }
 
@@ -142,19 +139,19 @@ namespace SchoolManagement.ViewModel.Student
     }
 
     // -----------------------
-    // Documents
+    // Documents (bytea)
     // -----------------------
     public class SRDocumentsVM
     {
-        public string? Signature { get; set; }
-        public string? BirthCertificate { get; set; }
-        public string? KidPassport { get; set; }
-        public string? Adhar { get; set; }
-        public string? ParentAdhar { get; set; }
-        public string? MotherAdhar { get; set; }
-        public string? HealthForm { get; set; }
-        public string? PrivacyForm { get; set; }
-        public string? LiabilityForm { get; set; }
+        public byte[]? Signature { get; set; }
+        public byte[]? BirthCertificate { get; set; }
+        public byte[]? KidPassport { get; set; }
+        public byte[]? Adhar { get; set; }
+        public byte[]? ParentAdhar { get; set; }
+        public byte[]? MotherAdhar { get; set; }
+        public byte[]? HealthForm { get; set; }
+        public byte[]? PrivacyForm { get; set; }
+        public byte[]? LiabilityForm { get; set; }
     }
 
     // -----------------------
@@ -162,15 +159,15 @@ namespace SchoolManagement.ViewModel.Student
     // -----------------------
     public class SRContactVM
     {
-        public string Name { get; set; }
-        public string PriNumber { get; set; }
+        public string Name { get; set; } = default!;
+        public string PriNumber { get; set; } = default!;
         public string? SecNumber { get; set; }
         public string? Email { get; set; }
-        public string Address1 { get; set; }
+        public string Address1 { get; set; } = default!;
         public string? Address2 { get; set; }
-        public string City { get; set; }
-        public string State { get; set; }
-        public string Pincode { get; set; }
+        public string City { get; set; } = default!;
+        public string State { get; set; } = default!;
+        public string Pincode { get; set; } = default!;
         public string? Qualification { get; set; }
         public string? Profession { get; set; }
         public int RelationshipId { get; set; }

@@ -104,6 +104,9 @@ builder.Services.AddScoped<ITestService, TestServiceImpl>();
 builder.Services.AddScoped<IStudentRegistration, StudentRegistrationImpl>();
 builder.Services.AddScoped<IStudentsEnquiry, StudentEnquiryImpl>();
 
+builder.Services.AddScoped<ICountingTestContentService, CountingTestContentImpl>();
+
+
 
 
 
