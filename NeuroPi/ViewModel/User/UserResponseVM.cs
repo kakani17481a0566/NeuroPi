@@ -23,7 +23,8 @@ namespace NeuroPi.UserManagment.ViewModel.User
         public int? CreatedBy { get; set; } // Keep as int? to match MBaseModel
 
         public int? UpdatedBy { get; set; } // Keep as int? to match MBaseModel
-        public string? UserImageUrl { get; set; }
+        public byte[]? UserImageUrl { get; set; }
+
 
 
 
@@ -41,7 +42,7 @@ namespace NeuroPi.UserManagment.ViewModel.User
                 MobileNumber = user.MobileNumber,
                 AlternateNumber = user.AlternateNumber,
                 Address = user.Address,
-                UserImageUrl =user.UserImageUrl,
+                UserImageUrl  =user.UserImageUrl,
                 TenantId = user.TenantId,
                 CreatedOn = user.CreatedOn,
                 CreatedBy = user.CreatedBy,
