@@ -537,23 +537,30 @@ namespace SchoolManagement.Services.Implementation
         public List<StudentListVM> GetStudentsByTenantCourseBranch(int tenantId, int courseId, int branchId)
         {
             var students = _context.Students
-                .Include(s => s.Course)
-                .Include(s => s.Branch)
-                .Where(s => !s.IsDeleted && s.TenantId == tenantId
-                            && !s.Course.IsDeleted && s.Course.TenantId == tenantId && s.Course.Id == courseId
-                            && !s.Branch.IsDeleted && s.Branch.TenantId == tenantId && s.Branch.Id == branchId)
+                .Where(s => !s.IsDeleted
+                            && s.TenantId == tenantId
+                            && !s.Course.IsDeleted
+                            && s.Course.TenantId == tenantId
+                            && (courseId == -1 || s.Course.Id == courseId)
+                            && !s.Branch.IsDeleted
+                            && s.Branch.TenantId == tenantId
+                            && (branchId == -1 || s.Branch.Id == branchId))
                 .Select(s => new StudentListVM
                 {
                     Id = s.Id,
-                    FirstName = s.Name,        // "Name" property is first_name column
+                    FirstName = s.Name,
                     LastName = s.LastName,
                     CourseName = s.Course.Name,
                     BranchName = s.Branch.Name
                 })
+                .OrderBy(s => s.BranchName)   // ✅ sorted in DB, not in memory
+                .ThenBy(s => s.CourseName)
+                .ThenBy(s => s.FirstName)
                 .ToList();
 
             return students;
         }
+
 
 
 
