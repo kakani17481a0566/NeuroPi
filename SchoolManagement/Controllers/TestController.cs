@@ -17,9 +17,9 @@ namespace SchoolManagement.Controllers
             _testService=testService;
         }
         [HttpGet]
-        public ResponseResult<List<TestResponseVM>> GetTest()
+        public ResponseResult<List<TestResponseVM>> GetTest(int masterId)
         {
-            var result=_testService.GetTestResults();
+            var result=_testService.GetTestResults(masterId);
             return new ResponseResult<List<TestResponseVM>>(HttpStatusCode.OK, result,"retreived sucessfully");
 
         }

@@ -13,5 +13,8 @@ namespace SchoolManagement.Model
         public int tenant_id { get; set; }
         [Column("is_deleted")]
         public bool isDeleted { get; set; }
+
+        [Column("master_type_id")]
+        public int MasterTypeId { get; set; }
     }
 }

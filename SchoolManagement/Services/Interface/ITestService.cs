@@ -4,6 +4,6 @@ namespace SchoolManagement.Services.Interface
 {
     public interface ITestService
     {
-        List<TestResponseVM> GetTestResults();
+        List<TestResponseVM> GetTestResults(int masterId);
     }
 }

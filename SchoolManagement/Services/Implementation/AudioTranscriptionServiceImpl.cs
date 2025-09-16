@@ -281,7 +281,7 @@ namespace SchoolManagement.Services.Implementation
 
                     if (res)
                     {
-                        return "correct word";
+                        return "correct";
 
                     }
                     else
@@ -397,7 +397,7 @@ namespace SchoolManagement.Services.Implementation
                         }
                     }
                 }
-                return "InCorrect word match ";
+                return "InCorrect";
             }
         }
          private static string NormalizeWord(string s)

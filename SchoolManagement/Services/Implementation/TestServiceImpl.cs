@@ -11,9 +11,9 @@ namespace SchoolManagement.Services.Implementation
         {
             _context = context;
         }
-        public List<TestResponseVM> GetTestResults()
+        public List<TestResponseVM> GetTestResults(int masterId)
         {
-           var result=_context.test.Where(t=> !t.isDeleted && t.id!=1).ToList();
+           var result=_context.test.Where(t=> !t.isDeleted && t.id!=1 && t.MasterTypeId==masterId).ToList();
             if (result != null)
             {
                 return TestResponseVM.FromModel(result);
