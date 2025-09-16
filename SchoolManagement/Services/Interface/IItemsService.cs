@@ -19,6 +19,14 @@ namespace SchoolManagement.Services.Interface
 
         bool DeleteItemsByIdAndTenant(int id, int tenantId);
 
+        ItemsResponseVM CreateItemWithGroup(ItemInsertVM itemInsertVM);
+
+        ItemWithGroupResponseVM GetItemWithGroup(int id, int tenantId);
+
+
+
+
+
 
     }
 }

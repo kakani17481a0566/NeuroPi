@@ -1,4 +1,5 @@
 ﻿using SchoolManagement.Data;
+using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.Items;
 
@@ -126,5 +127,143 @@ namespace SchoolManagement.Services.Implementation
            return ItemsResponseVM.ToViewModel(existingitems);
 
         }
+
+        public ItemsResponseVM CreateItemWithGroup(ItemInsertVM vm)
+        {
+            using var transaction = _context.Database.BeginTransaction();
+
+            try
+            {
+                // 1️⃣ Validate required fields
+                if (string.IsNullOrWhiteSpace(vm.Name))
+                    throw new ArgumentException("Item name is required.");
+
+                if (vm.TenantId <= 0)
+                    throw new ArgumentException("TenantId is required.");
+
+                if (vm.CreatedBy <= 0)
+                    throw new ArgumentException("CreatedBy (user id) is required.");
+
+                // 2️⃣ Create parent item
+                var parentItem = new MItems
+                {
+                    Name = vm.Name,
+                    CategoryId = vm.CategoryId,
+                    TenantId = vm.TenantId,
+                    Height = vm.Height ?? 0,
+                    Width = vm.Width ?? 0,
+                    Depth = vm.Depth ?? 0,
+                    Description = vm.Description,
+                    ItemCode = vm.ItemCode,
+                    IsGroup = vm.IsGroup || vm.GroupItems.Any(),
+                    CreatedOn = DateTime.UtcNow,
+                    CreatedBy = vm.CreatedBy,   // ✅ correct: userId, not tenantId
+                    IsDeleted = false
+                };
+
+                _context.Items.Add(parentItem);
+                _context.SaveChanges();
+
+                // 3️⃣ Insert child items if this is a group
+                if (parentItem.IsGroup && vm.GroupItems.Any())
+                {
+                    foreach (var child in vm.GroupItems)
+                    {
+                        // validate child item exists
+                        var childExists = _context.Items.Any(i => i.Id == child.ItemId && !i.IsDeleted);
+                        if (!childExists)
+                            throw new ArgumentException($"Child item with Id {child.ItemId} does not exist.");
+
+                        var groupRow = new MItemsGroup
+                        {
+                            SetItemId = parentItem.Id,
+                            ItemId = child.ItemId,
+                            Quantity = child.Quantity ?? 1,
+                            FixedPrice = child.FixedPrice,
+                            DiscountPrice = child.DiscountPrice,
+                            TenantId = vm.TenantId,
+                            CreatedOn = DateTime.UtcNow,
+                            CreatedBy = vm.CreatedBy,   // ✅ same user
+                            IsDeleted = false
+                        };
+
+                        _context.ItemsGroup.Add(groupRow);
+                    }
+
+                    _context.SaveChanges();
+                }
+
+                // 4️⃣ Commit
+                transaction.Commit();
+
+                // 5️⃣ Return response
+                return new ItemsResponseVM
+                {
+                    Id = parentItem.Id,
+                    Name = parentItem.Name,
+                    CategoryId = parentItem.CategoryId,
+                    TenantId = parentItem.TenantId,
+                    Height = parentItem.Height,
+                    Width = parentItem.Width,
+                    Depth = parentItem.Depth,
+                    Description = parentItem.Description,
+                    ItemCode = parentItem.ItemCode,
+                    IsGroup = parentItem.IsGroup,
+                    CreatedBy = parentItem.CreatedBy,
+                    CreatedOn = parentItem.CreatedOn,
+                    UpdatedBy = parentItem.UpdatedBy,
+                    UpdatedOn = parentItem.UpdatedOn
+                };
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
+        }
+
+        public ItemWithGroupResponseVM GetItemWithGroup(int id, int tenantId)
+        {
+            var parent = _context.Items
+                .FirstOrDefault(i => i.Id == id && i.TenantId == tenantId && !i.IsDeleted);
+
+            if (parent == null)
+                return null;
+
+            var response = new ItemWithGroupResponseVM
+            {
+                Id = parent.Id,
+                Name = parent.Name,
+                Description = parent.Description,
+                ItemCode = parent.ItemCode,
+                CategoryId = parent.CategoryId,
+                TenantId = parent.TenantId,
+                IsGroup = parent.IsGroup
+            };
+
+            if (parent.IsGroup)
+            {
+                response.Children = (from ig in _context.ItemsGroup
+                                     join c in _context.Items on ig.ItemId equals c.Id
+                                     where ig.SetItemId == parent.Id
+                                           && ig.TenantId == tenantId
+                                           && !ig.IsDeleted
+                                           && !c.IsDeleted
+                                     select new GroupChildVM
+                                     {
+                                         ItemId = c.Id,
+                                         Name = c.Name,
+                                         Quantity = ig.Quantity,
+                                         FixedPrice = ig.FixedPrice,
+                                         DiscountPrice = ig.DiscountPrice
+                                     }).ToList();
+            }
+
+            return response;
+        }
+
+
+
+
     }
 }

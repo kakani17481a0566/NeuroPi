@@ -120,7 +120,7 @@ namespace SchoolManagement.Data
         public DbSet<MCountingTestContent> CountingTestContents { get; set; }
 
 
-        public DbSet<MItemsGroup> ItemsGroups { get; set; }
+        public DbSet<MItemsGroup> ItemsGroup { get; set; }
         public DbSet<MItemsImage> ItemsImages { get; set; }
 
 
