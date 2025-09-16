@@ -18,7 +18,7 @@ namespace SchoolManagement.Model
         // Student Core Info
         // ----------------------------
         [Column("first_name")]
-        public string Name { get; set; } = default!;   // ✅ keep Name for backward compatibility
+        public string Name { get; set; } = default!;   // ✅ backward compatibility
 
         [Column("last_name")]
         public string? LastName { get; set; }
@@ -41,16 +41,13 @@ namespace SchoolManagement.Model
         [Column("tenant_id")]
         public int TenantId { get; set; }
 
-        // ✅ Registration Number
         [Column("reg_number")]
         [MaxLength(20)]
         public string? RegNumber { get; set; }
 
-        [Column("student_image_url")]
-        public string? StudentImageUrl { get; set; }
-
-        [Column("student_image")]
-        public byte[]? StudentImage { get; set; }   // changed to bytea
+        // ✅ Student Image stored as BYTEA but property name kept as StudentImageUrl
+        [Column("student_image", TypeName = "bytea")]
+        public byte[]? StudentImageUrl { get; set; }
 
         [Column("bloodgroup")]
         public string? BloodGroup { get; set; }
@@ -104,7 +101,7 @@ namespace SchoolManagement.Model
         public string? AlternateTransportText { get; set; }
 
         [Column("other_transport_text")]
-        public string? OtherTransportText { get; set; }   // ✅ added missing column
+        public string? OtherTransportText { get; set; }
 
         // ----------------------------
         // Custody & Family
@@ -188,7 +185,7 @@ namespace SchoolManagement.Model
         // Documents & Forms
         // ----------------------------
         [Column("signature")]
-        public byte[]? Signature { get; set; }   // changed to bytea
+        public byte[]? Signature { get; set; }
 
         [Column("birth_certificate")]
         public byte[]? BirthCertificate { get; set; }
@@ -239,7 +236,7 @@ namespace SchoolManagement.Model
         [ForeignKey(nameof(BranchId))]
         public virtual MBranch Branch { get; set; } = default!;
 
-        // Contact navigations
+        // Contacts
         [ForeignKey(nameof(FatherContactId))]
         public virtual MContact? FatherContact { get; set; }
 
@@ -277,7 +274,7 @@ namespace SchoolManagement.Model
         [ForeignKey(nameof(WriteSkillId))]
         public virtual MMaster? WriteSkill { get; set; }
 
-        // Audit self-references
+        // Audit
         [ForeignKey(nameof(CreatedBy))]
         public virtual MUser? CreatedByUser { get; set; }
 

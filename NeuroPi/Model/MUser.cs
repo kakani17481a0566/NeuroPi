@@ -55,8 +55,9 @@ namespace NeuroPi.UserManagment.Model
         [Column("tenant_id")]
         public int TenantId { get; set; }
 
-        [Column("user_image_url", TypeName = "text")]
-        public string? UserImageUrl { get; set; }
+        [Column("user_image_url", TypeName = "bytea")]
+        public byte[]? UserImageUrl { get; set; }
+
 
         // ----------------------------
         // Extended profile info

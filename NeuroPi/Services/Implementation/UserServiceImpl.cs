@@ -60,7 +60,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 RoleId=role.Role.RoleId,
                 RoleName = role?.Role?.Name,
                 departmentId = department?.DepartmentId ?? 0,
-                UserImageUrl = user.UserImageUrl
+                UserImageUrl  = user.UserImageUrl
             };
         }
 
@@ -172,7 +172,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
             var imageUrl = uploadResult.SecureUrl.AbsoluteUri;
 
-            user.UserImageUrl = imageUrl;
+            //user.UserImageUrl  = imageUrl;
             user.UpdatedBy = request.UpdatedBy;
             user.UpdatedOn = DateTime.UtcNow;
 

@@ -443,8 +443,12 @@ namespace SchoolManagement.Services.Implementation
                         CourseId = request.Student.CourseId,
                         BranchId = request.Student.BranchId,
                         TenantId = request.TenantId,
-                        StudentImageUrl = request.Student.StudentImageUrl,
-                        StudentImage = request.Student.StudentImage,
+
+                        // ✅ fix string → byte[]
+                        StudentImageUrl = string.IsNullOrEmpty(request.Student.StudentImageUrl)
+           ? null
+           : Convert.FromBase64String(request.Student.StudentImageUrl),
+
                         FatherPhoto = request.Student.FatherPhoto,
                         MotherPhoto = request.Student.MotherPhoto,
                         JointPhoto = request.Student.JointPhoto,
@@ -452,8 +456,7 @@ namespace SchoolManagement.Services.Implementation
                         CreatedBy = user.UserId,
                         CreatedOn = DateTime.UtcNow
                     };
-                    _context.Students.Add(student);
-                    _context.SaveChanges();
+
 
                     // RegNumber
                     // ✅ Safely handle nullable DateOfJoining

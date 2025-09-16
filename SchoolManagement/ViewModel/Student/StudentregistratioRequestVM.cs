@@ -23,7 +23,7 @@ namespace SchoolManagement.ViewModel.Student
         public string Password { get; set; } = default!;  // hash on save
         public string MobileNumber { get; set; } = default!;
         public int RoleTypeId { get; set; }
-        public string? UserImageUrl { get; set; }
+        public byte[]? UserImageUrl { get; set; }
         public DateTime Dob { get; set; }
     }
 

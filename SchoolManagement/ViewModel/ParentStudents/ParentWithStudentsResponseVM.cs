@@ -35,7 +35,7 @@
         public string? LastName { get; set; }
         public string? MiddleName { get; set; }
         public string? Gender { get; set; }
-        public string? UserImageUrl { get; set; }
+        public byte[]? UserImageUrl { get; set; }
         public string? AlternateNumber { get; set; }
         public string? Address { get; set; }
         public DateOnly? DateOfBirth { get; set; }
@@ -60,7 +60,7 @@
 
         public string CourseName { get; set; }
         public string BranchName { get; set; }
-        public string? StudentImageUrl { get; set; }
+        public byte[]? StudentImageUrl { get; set; }
 
         // 🔹 Fields actually available in MStudent
         public DateOnly? Dob { get; set; }               // maps to DateOfBirth
