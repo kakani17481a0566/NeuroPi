@@ -169,6 +169,30 @@ namespace SchoolManagement.Controllers
             }
         }
 
+        [HttpGet("students-by-tenant-course-branch")]
+        public ResponseResult<List<StudentListVM>> GetStudentsByTenantCourseBranch(
+    [FromQuery] int tenantId,
+    [FromQuery] int courseId,
+    [FromQuery] int branchId)
+        {
+            var result = _studentService.GetStudentsByTenantCourseBranch(tenantId, courseId, branchId);
+
+            if (result == null || !result.Any())
+            {
+                return new ResponseResult<List<StudentListVM>>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    "No students found for the given tenant, course, and branch."
+                );
+            }
+
+            return new ResponseResult<List<StudentListVM>>(
+                HttpStatusCode.OK,
+                result,
+                "Students fetched successfully."
+            );
+        }
+
 
 
 

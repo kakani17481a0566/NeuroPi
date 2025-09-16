@@ -534,5 +534,29 @@ namespace SchoolManagement.Services.Implementation
         }
 
 
+        public List<StudentListVM> GetStudentsByTenantCourseBranch(int tenantId, int courseId, int branchId)
+        {
+            var students = _context.Students
+                .Include(s => s.Course)
+                .Include(s => s.Branch)
+                .Where(s => !s.IsDeleted && s.TenantId == tenantId
+                            && !s.Course.IsDeleted && s.Course.TenantId == tenantId && s.Course.Id == courseId
+                            && !s.Branch.IsDeleted && s.Branch.TenantId == tenantId && s.Branch.Id == branchId)
+                .Select(s => new StudentListVM
+                {
+                    Id = s.Id,
+                    FirstName = s.Name,        // "Name" property is first_name column
+                    LastName = s.LastName,
+                    CourseName = s.Course.Name,
+                    BranchName = s.Branch.Name
+                })
+                .ToList();
+
+            return students;
+        }
+
+
+
+
     }
 }

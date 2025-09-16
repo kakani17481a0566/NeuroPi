@@ -4,12 +4,12 @@ using NeuroPi.UserManagment.Model;
 
 namespace SchoolManagement.Model
 {
-    [Table("items")] 
+    [Table("items")]
     public class MItems : MBaseModel
     {
         [Key]
         [Column("id")]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)] 
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         [Column("name")]
@@ -18,13 +18,17 @@ namespace SchoolManagement.Model
         [Column("category_id")]
         public int CategoryId { get; set; }
 
-        
         [ForeignKey(nameof(CategoryId))]
         public virtual MItemCategory ItemCategory { get; set; }
 
-        [Column("height")] public int Height { get; set; }
-        [Column("width")] public int Width { get; set; }
-        [Column("depth")] public int Depth { get; set; }
+        [Column("height")]
+        public int Height { get; set; }
+
+        [Column("width")]
+        public int Width { get; set; }
+
+        [Column("depth")]
+        public int Depth { get; set; }
 
         [Required]
         [Column("tenant_id")]
@@ -32,5 +36,15 @@ namespace SchoolManagement.Model
 
         [ForeignKey(nameof(TenantId))]
         public virtual MTenant Tenant { get; set; }
+
+        // 🔹 Extra fields from DB schema
+        [Column("description")]
+        public string? Description { get; set; }
+
+        [Column("is_group")]
+        public bool IsGroup { get; set; } = false;
+
+        [Column("item_code")]
+        public string? ItemCode { get; set; }
     }
 }

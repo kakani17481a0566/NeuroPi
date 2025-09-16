@@ -27,5 +27,9 @@ namespace SchoolManagement.Services.Interface
 
         // ✅ New registration flow
         SRStudentRegistrationResponseVM Register(SRStudentRegistrationRequestVM request);
+
+        List<StudentListVM> GetStudentsByTenantCourseBranch(int tenantId, int courseId, int branchId);
+
+
     }
 }
