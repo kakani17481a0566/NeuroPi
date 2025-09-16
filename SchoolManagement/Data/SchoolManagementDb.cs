@@ -99,9 +99,11 @@ namespace SchoolManagement.Data
 
         public DbSet<MImage> images { get; set; }
 
-        public DbSet<MTestContent> tests { get; set; }
+        public DbSet<MTestContent> TestContent { get; set; }
 
         public DbSet<MTest> test { get; set; }
+        public DbSet<MTestResult> TestResult { get; set; }
+
 
 
 

@@ -10,6 +10,7 @@
         public int TenantId { get; set; }
         public string token { get; set; }
 
+        public int RoleId { get; set; }
 
         public string RoleName { get; set; }
 

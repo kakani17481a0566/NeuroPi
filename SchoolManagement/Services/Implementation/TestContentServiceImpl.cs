@@ -24,7 +24,7 @@ namespace SchoolManagement.Services.Implementation
             model.url= testContentVM!=null ?ConvertIFormFileToBytes(testContentVM.file):new byte[0];
             model.tenantId=testContentVM.tenantId;
 
-            _context.tests.Add(model);
+            _context.TestContent.Add(model);
             _context.SaveChanges();
             if (model != null)
             {
@@ -36,12 +36,12 @@ namespace SchoolManagement.Services.Implementation
         }
         public List<ImageDb> GetImages(int testId,int relationId)
         {
-            var result = _context.tests.Where(t => !t.isDeleted && t.relationId == relationId && t.testId == testId).ToList();
+            var result = _context.TestContent.Where(t => !t.isDeleted && t.relationId == relationId && t.testId == testId).Take(5).ToList();
             List<ImageDb> images = new List<ImageDb>();
             if(result!=null)
             {
                 foreach (var image in result) {
-                    ImageDb imageDb = new ImageDb(image.name, image.url);
+                    ImageDb imageDb = new ImageDb(image.name, image.url,image.testId,image.relationId,image.id);
                     images.Add(imageDb);
                 }
                 return images;
@@ -65,7 +65,7 @@ namespace SchoolManagement.Services.Implementation
 
         public string InsertImage(IFormFile file, string text)
         {
-            var response=_context.tests.Where(t=>t.name.ToLower()==text.ToLower()&& !t.isDeleted).First();
+            var response=_context.TestContent.Where(t=>t.name.ToLower()==text.ToLower()&& !t.isDeleted).First();
             if(response.url == null)
             {
                 response.url = ConvertIFormFileToBytes(file);

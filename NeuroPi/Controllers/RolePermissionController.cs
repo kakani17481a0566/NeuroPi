@@ -135,6 +135,7 @@ namespace NeuroPi.UserManagment.Controllers
                 return new ResponseResult<RolePermissionResponseVM>(HttpStatusCode.InternalServerError, null, $"Error retrieving role permission: {ex.Message}");
             }
         }
+        
 
         [HttpGet("{roleId}/tenant/{tenantId}")]
         public ResponseResult<List<RolePermissionDescVM>> GetRolePermissionByRoleIdAndTenantId(int roleId, int tenantId)

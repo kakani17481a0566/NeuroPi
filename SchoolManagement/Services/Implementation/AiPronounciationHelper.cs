@@ -82,7 +82,7 @@ namespace SchoolManagement.Services.Implementation
 
         public async Task<byte[]> ConvertTextToSpeechAsync(string text)
         {
-            var speechConfig = SpeechConfig.FromSubscription("7TZnnv4r6ijxdVYsHMrDkPYWxVev4XwJBVzuMGWsCXF8Y22SuFnUJQQJ99BGACYeBjFXJ3w3AAAYACOGMuI3", "eastus");
+            var speechConfig = SpeechConfig.FromSubscription("EcnAWTKUvCwDlpE7qxb2g1VKmpnWXamppoUjFOZ5LlBrVMJJoKvXJQQJ99BIACYeBjFXJ3w3AAAYACOGFYBY", "eastus");
             speechConfig.SpeechSynthesisVoiceName = "en-US-JennyNeural"; // or any preferred voice
             speechConfig.SetSpeechSynthesisOutputFormat(SpeechSynthesisOutputFormat.Audio16Khz32KBitRateMonoMp3);
 
@@ -103,7 +103,7 @@ namespace SchoolManagement.Services.Implementation
         }
         public async Task<string> GetKidFriendlyRhymesAsync(string word, CancellationToken ct = default)
         {
-            string _geminiApiKey = "";
+            string _geminiApiKey = "AIzaSyAgAIac62cChPU-sAmfbCjC79kz676dlhU";
             // Defensive: empty/crazy inputs
             if (string.IsNullOrWhiteSpace(word))
                 return "No word given.";
@@ -169,7 +169,7 @@ namespace SchoolManagement.Services.Implementation
         /// </summary>
         public async Task<byte[]> ConvertTextToSpeechAsync(string text, CancellationToken ct = default)
         {
-            string _azureSpeechKey = "7TZnnv4r6ijxdVYsHMrDkPYWxVev4XwJBVzuMGWsCXF8Y22SuFnUJQQJ99BGACYeBjFXJ3w3AAAYACOGMuI3";
+            string _azureSpeechKey = "EcnAWTKUvCwDlpE7qxb2g1VKmpnWXamppoUjFOZ5LlBrVMJJoKvXJQQJ99BIACYeBjFXJ3w3AAAYACOGFYBY";
               string _azureRegion = "eastus";
 
                 var speechConfig = SpeechConfig.FromSubscription(_azureSpeechKey, _azureRegion);

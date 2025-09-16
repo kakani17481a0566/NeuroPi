@@ -1,6 +1,7 @@
 ﻿using Microsoft.CognitiveServices.Speech;
 using Microsoft.CognitiveServices.Speech.Audio;
 using Microsoft.CognitiveServices.Speech.PronunciationAssessment;
+using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Data;
 using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
@@ -22,7 +23,7 @@ namespace SchoolManagement.Services.Implementation
         }
         public async Task<byte[]> TranscribeAudioAsync(byte[] audioBytes, string fileExtension, string text)
         {
-            string _subscriptionKey = "7TZnnv4r6ijxdVYsHMrDkPYWxVev4XwJBVzuMGWsCXF8Y22SuFnUJQQJ99BGACYeBjFXJ3w3AAAYACOGMuI3";
+            string _subscriptionKey = "EcnAWTKUvCwDlpE7qxb2g1VKmpnWXamppoUjFOZ5LlBrVMJJoKvXJQQJ99BIACYeBjFXJ3w3AAAYACOGFYBY";
         string _region = "eastus";
 
         var config = SpeechConfig.FromSubscription(_subscriptionKey, _region);
@@ -99,7 +100,7 @@ namespace SchoolManagement.Services.Implementation
      CancellationToken ct = default)
         {
             //string _subscriptionKey = apiKeyService.GetAzureApiKey();
-            string _subscriptionKey = "7TZnnv4r6ijxdVYsHMrDkPYWxVev4XwJBVzuMGWsCXF8Y22SuFnUJQQJ99BGACYeBjFXJ3w3AAAYACOGMuI3";
+            string _subscriptionKey = "EcnAWTKUvCwDlpE7qxb2g1VKmpnWXamppoUjFOZ5LlBrVMJJoKvXJQQJ99BIACYeBjFXJ3w3AAAYACOGFYBY";
             string _region = "eastus";
             var config = SpeechConfig.FromSubscription(_subscriptionKey, _region);
             string tempFilePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N") + fileExtension);
@@ -236,7 +237,7 @@ namespace SchoolManagement.Services.Implementation
         public async  Task<string> CheckPronounciationAsync(byte[] audioBytes, string text)
         {
             //string fileExtension=Path.GetExtension(audioBytes)
-            string _subscriptionKey = "7TZnnv4r6ijxdVYsHMrDkPYWxVev4XwJBVzuMGWsCXF8Y22SuFnUJQQJ99BGACYeBjFXJ3w3AAAYACOGMuI3";
+            string _subscriptionKey = "EcnAWTKUvCwDlpE7qxb2g1VKmpnWXamppoUjFOZ5LlBrVMJJoKvXJQQJ99BIACYeBjFXJ3w3AAAYACOGFYBY";
             string _region = "eastus";
             var config = SpeechConfig.FromSubscription(_subscriptionKey, _region);
             string tempFilePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N") );
@@ -275,55 +276,147 @@ namespace SchoolManagement.Services.Implementation
                 if (result != null)
                 {
                     string resultText = result.Text.ToLower();
-                    string response = text.ToLower()+".";
+                    string response = text.ToLower() + ".";
                     bool res = response.Equals(resultText, StringComparison.OrdinalIgnoreCase);
-                    
-                    if(res)
+
+                    if (res)
                     {
                         return "correct word";
 
                     }
                     else
                     {
-
-                        var aiHelper = new AiPronunciationHelper(apiKeyService);
-                        var textHelp = await aiHelper.GetKidFriendlyRhymesAsync(text);
-                        //Console.WriteLine(textHelp);
-                        string[] rhymeWords = textHelp.Split(",");
-                        var testResponse=schoolManagementDb.tests.Where(t=>!t.isDeleted && t.name.ToLower()==text.ToLower()).FirstOrDefault();
-                        if (testResponse != null)
+                        var existedWord=schoolManagementDb.TestContent.Where(t => t.name.ToLower() == text.ToLower()).FirstOrDefault();
+                        if (existedWord != null)
                         {
-                            List<MTestContent> list=new List<MTestContent>();
-                            foreach (string word in rhymeWords)
+
+                            int existedId = existedWord.id;
+                            var isRhymingWords = schoolManagementDb.TestContent.Any(t => t.relationId == existedId);
+                            if (isRhymingWords) {
+                                return "Existed";
+                            } else
                             {
-                                bool isWordPresent = schoolManagementDb.tests.Any(t => t.name.ToLower() == word.ToLower() && !t.isDeleted);
-                                if (!isWordPresent)
+
+
+
+                                //if(text)
+
+                                var aiHelper = new AiPronunciationHelper(apiKeyService);
+                                var textHelp = await aiHelper.GetKidFriendlyRhymesAsync(text);
+                                //Console.WriteLine(textHelp);
+                                //   string[] rhymeWords = textHelp.Split(",");
+                                //    var testResponse=schoolManagementDb.tests.Where(t=>!t.isDeleted && t.name.ToLower()==text.ToLower()).FirstOrDefault();
+                                //    if (testResponse != null)
+                                //    {
+                                //        List<MTestContent> list=new List<MTestContent>();
+                                //        foreach (string word in rhymeWords)
+                                //        {
+                                //            bool isWordPresent = schoolManagementDb.tests.Any(t => t.name.ToLower() == word.ToLower() && !t.isDeleted);
+                                //            if (!isWordPresent)
+                                //            {
+
+
+                                //                MTestContent model = new MTestContent()
+                                //                {
+                                //                    name = word,
+                                //                    testId = 1,
+                                //                    relationId = testResponse.id,
+                                //                    tenantId = testResponse.tenantId,
+                                //                };
+                                //                list.Add(model);
+                                //            }
+
+                                //        }
+                                //        schoolManagementDb.tests.AddRange(list);
+                                //        schoolManagementDb.SaveChangesAsync();
+
+
+                                //    }
+
+                                //    return textHelp;
+
+                                //}
+                                string afterColon;
+                                var colonIdx = textHelp?.IndexOf(':') ?? -1;
+                                if (!string.IsNullOrWhiteSpace(textHelp) && colonIdx >= 0 && colonIdx < textHelp.Length - 1)
+                                    afterColon = textHelp[(colonIdx + 1)..];
+                                else
+                                    afterColon = textHelp ?? string.Empty;
+
+                                // 2) Normalize separators and split
+                                afterColon = afterColon.Replace("\r", " ").Replace("\n", " ");
+                                afterColon = afterColon.Replace(" and ", ",", StringComparison.OrdinalIgnoreCase);
+
+                                var rhymeWords = afterColon
+                                    .Split(new[] { ',', ';', '|', ' ' }, StringSplitOptions.RemoveEmptyEntries)
+                                    .Select(NormalizeWord)
+                                    .Where(w => !string.IsNullOrWhiteSpace(w))
+                                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                                    .ToList();
+
+                                // 3) Get the parent test row
+                                var testResponse = schoolManagementDb.TestContent
+                                    .FirstOrDefault(t => !t.isDeleted && t.name.ToLower() == text.ToLower());
+
+                                if (testResponse != null && rhymeWords.Count > 0)
                                 {
+                                    // 4) Load existing words for this test in one go (avoid per-word Any())
+                                    var existingNames = await schoolManagementDb.TestContent
+                                        .Where(c => !c.isDeleted && c.testId == testResponse.id)
+                                        .Select(c => c.name.ToLower())
+                                        .ToListAsync();
 
+                                    var existingSet = new HashSet<string>(existingNames, StringComparer.OrdinalIgnoreCase);
 
-                                    MTestContent model = new MTestContent()
+                                    // 5) Prepare new rows only for words not already present
+                                    var toInsert = new List<MTestContent>();
+                                    foreach (var word in rhymeWords)
                                     {
-                                        name = word,
-                                        testId = 1,
-                                        relationId = testResponse.id,
-                                        tenantId = testResponse.tenantId,
-                                    };
-                                    list.Add(model);
+                                        if (!existingSet.Contains(word.ToLower()))
+                                        {
+                                            toInsert.Add(new MTestContent
+                                            {
+                                                name = word,                      // e.g., "narrow"
+                                                testId = 1,
+                                                relationId = testResponse.id,     // keep as you had it (if that's your link)
+                                                tenantId = testResponse.tenantId,
+                                                // set other defaults if your model requires them (created_on, created_by, etc.)
+                                            });
+                                        }
+                                    }
+
+                                    if (toInsert.Count > 0)
+                                    {
+                                        schoolManagementDb.TestContent.AddRange(toInsert); // <-- insert into the correct table
+                                        await schoolManagementDb.SaveChangesAsync();
+                                    }
+                                    return string.Join(",", toInsert.Select(x => x.name));
                                 }
-                                
+
                             }
-                            schoolManagementDb.tests.AddRange(list);
-                            schoolManagementDb.SaveChangesAsync();
-                           
-
                         }
-
-                        return textHelp;
-
                     }
                 }
+                return "InCorrect word match ";
             }
-            return "InCorrect word match ";
+        }
+         private static string NormalizeWord(string s)
+        {
+            if (string.IsNullOrWhiteSpace(s)) return string.Empty;
+
+            // Replace common “and” conjunctions to avoid capturing it as a word
+            s = s.Replace(" and ", ",", StringComparison.OrdinalIgnoreCase);
+
+            // Trim spaces
+            s = s.Trim();
+
+            // Remove trailing punctuation like . , ; : ! ?
+            s = s.Trim().Trim('\'', '"', '.', ',', ';', ':', '!', '?', '–', '—');
+
+            // Keep only letters, hyphen, apostrophe inside the word
+            var cleaned = new string(s.Where(ch => char.IsLetter(ch) || ch == '\'' || ch == '-').ToArray());
+
+            return cleaned.Trim();
         }
 
         public string AddImage(IFormFile file, string text)

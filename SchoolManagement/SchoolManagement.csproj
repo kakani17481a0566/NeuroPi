@@ -11,12 +11,16 @@
   <ItemGroup>
     <Compile Remove="Model\NewFolder\**" />
     <Compile Remove="ViewModels\**" />
+    <Compile Remove="ViewModel\NewFolder1\**" />
     <Content Remove="Model\NewFolder\**" />
     <Content Remove="ViewModels\**" />
+    <Content Remove="ViewModel\NewFolder1\**" />
     <EmbeddedResource Remove="Model\NewFolder\**" />
     <EmbeddedResource Remove="ViewModels\**" />
+    <EmbeddedResource Remove="ViewModel\NewFolder1\**" />
     <None Remove="Model\NewFolder\**" />
     <None Remove="ViewModels\**" />
+    <None Remove="ViewModel\NewFolder1\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -38,7 +42,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ViewModel\NewFolder1\" />
+    <Folder Include="SqlQueries\" />
+    <Folder Include="ViewModel\StudentRegistration\" />
   </ItemGroup>
 
 </Project>

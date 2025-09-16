@@ -89,11 +89,15 @@ builder.Services.AddScoped<IItemLocationService, ItemLocationServiceImpl>();
 builder.Services.AddScoped<IItemBranchService, ItemBranchServiceImpl>();
 builder.Services.AddScoped<IOrderItemService, OrderItemServiceImpl>();
 builder.Services.AddScoped<ICourseTeacherService, CourseTeacherServiceImpl>();
+builder.Services.AddScoped<ITestResultService, TestResultServiceImpl>();
+builder.Services.AddScoped<ICountingTestInterface, CountingTestServiceImpl>();
+
 
 // ViewModel-based Services
 builder.Services.AddScoped<IVwComprehensiveTimeTablesService, VwComprehensiveTimeTablesService>();
 builder.Services.AddScoped<IVwTermPlanDetailsService, VwTermPlanDetailsViewServiceImpl>();
 builder.Services.AddScoped<IMVTermTableService, VTermTableServiceImpl>();
+builder.Services.AddScoped<ITestService, TestServiceImpl>();
 
 
 //RegistrationForm

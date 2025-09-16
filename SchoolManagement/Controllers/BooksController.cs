@@ -2,7 +2,6 @@
 using SchoolManagement.Response;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.Book;
-using System.Collections.Generic;
 using System.Net;
 
 namespace SchoolManagement.Controllers

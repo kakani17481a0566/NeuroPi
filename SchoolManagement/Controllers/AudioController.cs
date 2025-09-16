@@ -64,12 +64,12 @@ public class AudioController : ControllerBase
         //};
         List<ImageDb> images = new List<ImageDb>();
         //Chapel, grapple, dapple, and scrapple.
-        ImageDb img1 = new ImageDb("Chapel", new byte[0]);
-        ImageDb img2 = new ImageDb("grapple", new byte[0]);
-        ImageDb img3 = new ImageDb("dapple", new byte[0]);
-        images.Add(img1);
-        images.Add(img2);
-        images.Add(img3);
+        //ImageDb img1 = new ImageDb("Chapel", new byte[0]);
+        //ImageDb img2 = new ImageDb("grapple", new byte[0]);
+        //ImageDb img3 = new ImageDb("dapple", new byte[0]);
+        //images.Add(img1);
+        //images.Add(img2);
+        //images.Add(img3);
         return  images;
         
     }
