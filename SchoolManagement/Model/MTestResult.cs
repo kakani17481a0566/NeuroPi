@@ -28,5 +28,7 @@ namespace SchoolManagement.Model
         [Column("relation_id")]
         public int RelationId { get; set; }
 
+        
+
     }
 }

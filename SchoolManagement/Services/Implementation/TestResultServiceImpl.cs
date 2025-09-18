@@ -45,6 +45,7 @@ namespace SchoolManagement.Services.Implementation
                         testId = test.TestId,
                         relationId = relationId,
                         name=test.testContent.name,
+                        testContentId = test.TestContentId,
                         url=test.testContent.url,
                         result=test.Result
 
