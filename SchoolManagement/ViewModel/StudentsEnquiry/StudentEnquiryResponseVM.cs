@@ -2,6 +2,7 @@
 using SchoolManagement.Model;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SchoolManagement.ViewModel.StudentsEnquiry
 {
@@ -32,7 +33,7 @@ namespace SchoolManagement.ViewModel.StudentsEnquiry
         public int? HearAboutUsTypeId { get; set; }
         public bool IsAgreedToTerms { get; set; }
 
-        // UI-friendly string (data URL like "data:image/png;base64,...")
+        // ✅ UI-friendly string (e.g., "data:image/png;base64,...")
         public string? Signature { get; set; }
 
         public int StatusId { get; set; }
@@ -44,6 +45,7 @@ namespace SchoolManagement.ViewModel.StudentsEnquiry
         public int? UpdatedBy { get; set; }
         public DateTime? UpdatedOn { get; set; }
 
+        // ---------- Mapping Helpers ----------
         public static StudentEnquiryResponseVM ToViewModel(MStudentsEnquiry enquiry)
         {
             return new StudentEnquiryResponseVM
@@ -54,7 +56,7 @@ namespace SchoolManagement.ViewModel.StudentsEnquiry
                 StudentLastName = enquiry.StudentLastName,
                 Dob = enquiry.Dob,
                 GenderId = enquiry.GenderId,
-                GenderName = enquiry.Gender?.Name, // null-safe
+                GenderName = enquiry.Gender?.Name, // null-safe navigation
 
                 AdmissionCourseId = enquiry.AdmissionCourseId,
                 PreviousSchoolName = enquiry.PreviousSchoolName,
@@ -69,7 +71,7 @@ namespace SchoolManagement.ViewModel.StudentsEnquiry
                 HearAboutUsTypeId = enquiry.HearAboutUsTypeId,
                 IsAgreedToTerms = enquiry.IsAgreedToTerms,
 
-                // FIX: convert byte[] -> data URL string
+                // ✅ Convert byte[] -> base64 data URL
                 Signature = ToDataUrl(enquiry.Signature),
 
                 StatusId = enquiry.StatusId,
@@ -82,12 +84,9 @@ namespace SchoolManagement.ViewModel.StudentsEnquiry
             };
         }
 
-        public List<StudentEnquiryResponseVM> ToViewModelList(List<MStudentsEnquiry> enquiryList)
+        public static List<StudentEnquiryResponseVM> ToViewModelList(List<MStudentsEnquiry> enquiryList)
         {
-            var result = new List<StudentEnquiryResponseVM>();
-            foreach (var enquiry in enquiryList)
-                result.Add(ToViewModel(enquiry));
-            return result;
+            return enquiryList.Select(ToViewModel).ToList();
         }
 
         private static string? ToDataUrl(byte[]? bytes, string mime = "image/png")

@@ -185,9 +185,9 @@ namespace SchoolManagement.Services.Implementation
             {
                 return Convert.FromBase64String(base64);
             }
-            catch
+            catch (FormatException ex)
             {
-                return null;
+                throw new FormatException("Invalid base64 signature", ex);
             }
         }
     }
