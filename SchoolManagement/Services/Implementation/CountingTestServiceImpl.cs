@@ -17,9 +17,9 @@ namespace SchoolManagement.Services.Implementation
                 int randomNumber = random.Next(1, 21);
                 count.count = randomNumber;
                 list.Add(count);
-
             }
-            return list;
+            List<CountingResponseVM> result = list.DistinctBy(x => x.count).ToList();
+            return result;
         }
     }
 }

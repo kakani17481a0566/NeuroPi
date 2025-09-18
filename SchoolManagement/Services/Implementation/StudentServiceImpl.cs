@@ -445,9 +445,7 @@ namespace SchoolManagement.Services.Implementation
                         TenantId = request.TenantId,
 
                         // ✅ fix string → byte[]
-                        StudentImageUrl = string.IsNullOrEmpty(request.Student.StudentImageUrl)
-           ? null
-           : Convert.FromBase64String(request.Student.StudentImageUrl),
+                        StudentImageUrl = request.Student.StudentImageUrl,
 
                         FatherPhoto = request.Student.FatherPhoto,
                         MotherPhoto = request.Student.MotherPhoto,

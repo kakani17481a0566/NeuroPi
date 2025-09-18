@@ -46,7 +46,7 @@ namespace SchoolManagement.ViewModel.Student
         public string? RegistrationChannel { get; set; }  // "By Post", "In Person", "Online"
 
         // Images (bytea)
-        public string? StudentImageUrl { get; set; }
+        public byte[]? StudentImageUrl { get; set; }
         public byte[]? StudentImage { get; set; }
         public byte[]? MotherPhoto { get; set; }
         public byte[]? FatherPhoto { get; set; }

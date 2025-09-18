@@ -293,7 +293,7 @@ namespace SchoolManagement.Services.Implementation
                             int existedId = existedWord.id;
                             var isRhymingWords = schoolManagementDb.TestContent.Any(t => t.relationId == existedId);
                             if (isRhymingWords) {
-                                return "Existed";
+                                //return "Existed";
                             } else
                             {
 
