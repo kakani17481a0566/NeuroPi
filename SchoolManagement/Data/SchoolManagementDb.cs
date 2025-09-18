@@ -120,6 +120,10 @@ namespace SchoolManagement.Data
         public DbSet<MCountingTestContent> CountingTestContents { get; set; }
 
 
+        public DbSet<MItemsGroup> ItemsGroup { get; set; }
+        public DbSet<MItemsImage> ItemsImages { get; set; }
+
+
 
 
 
@@ -159,6 +163,38 @@ namespace SchoolManagement.Data
             modelBuilder.Entity<MVTermTable>()
                 .HasNoKey()
                 .ToView("v_term_table");
+
+
+            modelBuilder.Entity<MItemsGroup>()
+                .HasOne(g => g.SetItem)
+                .WithMany()
+                .HasForeignKey(g => g.SetItemId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<MItemsGroup>()
+                .HasOne(g => g.Item)
+                .WithMany()
+                .HasForeignKey(g => g.ItemId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<MItemsGroup>()
+                .HasOne(g => g.Tenant)
+                .WithMany()
+                .HasForeignKey(g => g.TenantId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // 🔹 ItemsImage FK relationships
+            modelBuilder.Entity<MItemsImage>()
+                .HasOne(i => i.Item)
+                .WithMany()
+                .HasForeignKey(i => i.ItemId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<MItemsImage>()
+                .HasOne(i => i.Tenant)
+                .WithMany()
+                .HasForeignKey(i => i.TenantId)
+                .OnDelete(DeleteBehavior.Cascade);
 
 
             // Map + indexes for student_registration

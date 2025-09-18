@@ -60,5 +60,24 @@ namespace SchoolManagement.Controllers
                 "Counting test content retrieved successfully"
             );
         }
+
+        [HttpPost]
+        public ResponseResult<CountingTestContentRespounceVM> Create(CountingTestContentRequestVM model)
+        {
+            var createdContent = _service.Create(model);
+            if (createdContent == null)
+            {
+                return new ResponseResult<CountingTestContentRespounceVM>(
+                    HttpStatusCode.BadRequest,
+                    null,
+                    "Failed to create counting test content"
+                );
+            }
+            return new ResponseResult<CountingTestContentRespounceVM>(
+                HttpStatusCode.OK,
+                createdContent,
+                "Counting test content created successfully"
+            );
+        }
     }
 }

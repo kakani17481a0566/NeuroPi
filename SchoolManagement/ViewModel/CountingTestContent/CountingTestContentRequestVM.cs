@@ -1,4 +1,6 @@
-﻿namespace SchoolManagement.ViewModel.CountingTestContent
+﻿using SchoolManagement.Model;
+
+namespace SchoolManagement.ViewModel.CountingTestContent
 {
     /// <summary>
     /// Request model for creating or updating counting test content.
@@ -24,5 +26,7 @@
         /// The ID of the parent test this content belongs to.
         /// </summary>
         public int? TestId { get; set; }
+
+       
     }
 }

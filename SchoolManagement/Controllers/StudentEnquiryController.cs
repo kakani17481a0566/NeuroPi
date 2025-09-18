@@ -18,13 +18,13 @@ namespace SchoolManagement.Controllers
             _studentsEnquiry = studentsEnquiry;
         }
 
-        // POST: api/StudentEnquiry/create
+        // ✅ Create Enquiry
         [HttpPost("create")]
-        public ResponseResult<long> CreateStudentEnquiry([FromBody] StudentEnquiryRequestDataVM vm)
+        public ResponseResult<int> CreateStudentEnquiry([FromBody] StudentEnquiryRequestDataVM vm)
         {
             if (vm == null)
             {
-                return new ResponseResult<long>(
+                return new ResponseResult<int>(
                     HttpStatusCode.BadRequest,
                     0,
                     "Invalid request payload"
@@ -35,15 +35,24 @@ namespace SchoolManagement.Controllers
             {
                 var enquiryId = _studentsEnquiry.CreateStudentEnquiry(vm);
 
-                return new ResponseResult<long>(
+                return new ResponseResult<int>(
                     HttpStatusCode.Created,
                     enquiryId,
                     "Student enquiry created successfully"
                 );
             }
+            catch (FormatException fex)
+            {
+                // Catch invalid base64 for signature
+                return new ResponseResult<int>(
+                    HttpStatusCode.BadRequest,
+                    0,
+                    $"Invalid signature format: {fex.Message}"
+                );
+            }
             catch (Exception ex)
             {
-                return new ResponseResult<long>(
+                return new ResponseResult<int>(
                     HttpStatusCode.InternalServerError,
                     0,
                     $"Failed to create enquiry: {ex.Message}"
@@ -51,74 +60,137 @@ namespace SchoolManagement.Controllers
             }
         }
 
-
+        // ✅ Get All
         [HttpGet]
         public ResponseResult<List<StudentEnquiryResponseVM>> GetAllStudentEnquiries()
         {
             var studentEnquiry = _studentsEnquiry.GetAllStudentEnquiries();
-            if (studentEnquiry == null)
+            if (studentEnquiry == null || studentEnquiry.Count == 0)
             {
-                return new ResponseResult<List<StudentEnquiryResponseVM>>(HttpStatusCode.NotFound, studentEnquiry, "Student Enquiry Not Found");
+                return new ResponseResult<List<StudentEnquiryResponseVM>>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    "Student enquiries not found"
+                );
             }
-            return new ResponseResult<List<StudentEnquiryResponseVM>>(HttpStatusCode.OK, studentEnquiry, "Student Enquiry List returned Successfully");
+            return new ResponseResult<List<StudentEnquiryResponseVM>>(
+                HttpStatusCode.OK,
+                studentEnquiry,
+                "Student enquiry list returned successfully"
+            );
         }
 
+        // ✅ Get by Id
         [HttpGet("{id}")]
-        public ResponseResult<StudentEnquiryResponseVM> GetStudentEnquiryById([FromRoute] long id)
+        public ResponseResult<StudentEnquiryResponseVM> GetStudentEnquiryById([FromRoute] int id)
         {
             var studentEnquiry = _studentsEnquiry.GetStudentEnquiryById(id);
             if (studentEnquiry == null)
             {
-                return new ResponseResult<StudentEnquiryResponseVM>(HttpStatusCode.NotFound, studentEnquiry, $"Student Enquiry With Id {id} Not Found");
+                return new ResponseResult<StudentEnquiryResponseVM>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    $"Student enquiry with Id {id} not found"
+                );
             }
-            return new ResponseResult<StudentEnquiryResponseVM>(HttpStatusCode.OK, studentEnquiry, "Student Enquiry Details Fetched Successfully");
-        }
-        [HttpGet("tenantId/{tenantId}")]
-        public ResponseResult<List<StudentEnquiryResponseVM>> GetStudentEnquiriesByTenant([FromRoute] int tenantId)
-        {
-            var studentEnquiry =_studentsEnquiry.GetStudentEnquiriesByTenant(tenantId);
-            if (studentEnquiry == null)
-            {
-                return new ResponseResult<List<StudentEnquiryResponseVM>>(HttpStatusCode.NotFound, studentEnquiry, $"Students Enquiry With Tenant Id{tenantId} Not Found");
-            }
-            return new ResponseResult<List<StudentEnquiryResponseVM>>(HttpStatusCode.OK, studentEnquiry, $"Students Enquiry List with Tenant Id{tenantId} returned Successfully");
+            return new ResponseResult<StudentEnquiryResponseVM>(
+                HttpStatusCode.OK,
+                studentEnquiry,
+                "Student enquiry details fetched successfully"
+            );
         }
 
+        // ✅ Get by Tenant
+        [HttpGet("tenant/{tenantId}")]
+        public ResponseResult<List<StudentEnquiryResponseVM>> GetStudentEnquiriesByTenant([FromRoute] int tenantId)
+        {
+            var studentEnquiry = _studentsEnquiry.GetStudentEnquiriesByTenant(tenantId);
+            if (studentEnquiry == null || studentEnquiry.Count == 0)
+            {
+                return new ResponseResult<List<StudentEnquiryResponseVM>>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    $"Student enquiries with Tenant Id {tenantId} not found"
+                );
+            }
+            return new ResponseResult<List<StudentEnquiryResponseVM>>(
+                HttpStatusCode.OK,
+                studentEnquiry,
+                $"Student enquiry list with Tenant Id {tenantId} returned successfully"
+            );
+        }
+
+        // ✅ Get by Id & Tenant
         [HttpGet("{id}/{tenantId}")]
-        public ResponseResult<StudentEnquiryResponseVM> GetStudentEnquiryByIdAndTenant([FromRoute] long id, [FromRoute] int tenantId)
+        public ResponseResult<StudentEnquiryResponseVM> GetStudentEnquiryByIdAndTenant([FromRoute] int id, [FromRoute] int tenantId)
         {
             var studentEnquiry = _studentsEnquiry.GetStudentEnquiryByIdAndTenant(id, tenantId);
             if (studentEnquiry == null)
             {
-                return new ResponseResult<StudentEnquiryResponseVM>(HttpStatusCode.NotFound, studentEnquiry, $"Student Enquiry With Id {id} and Tenant Id {tenantId} Not Found");
+                return new ResponseResult<StudentEnquiryResponseVM>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    $"Student enquiry with Id {id} and Tenant Id {tenantId} not found"
+                );
             }
-            return new ResponseResult<StudentEnquiryResponseVM>(HttpStatusCode.OK, studentEnquiry, "Student Enquiry Details Fetched Successfully");
+            return new ResponseResult<StudentEnquiryResponseVM>(
+                HttpStatusCode.OK,
+                studentEnquiry,
+                "Student enquiry details fetched successfully"
+            );
         }
 
+        // ✅ Delete
         [HttpDelete("{id}/{tenantId}")]
-        public ResponseResult<bool> DeleteStudentEnquiryByIdAndTenant([FromRoute] long id, [FromRoute] int tenantId)
+        public ResponseResult<bool> DeleteStudentEnquiryByIdAndTenant([FromRoute] int id, [FromRoute] int tenantId)
         {
             var isDeleted = _studentsEnquiry.DeleteStudentEnquiryByIdAndTenant(id, tenantId);
             if (isDeleted)
             {
-                return new ResponseResult<bool>(HttpStatusCode.OK, true, $"Student Enquiry With Id {id} and Tenant Id {tenantId} Deleted Successfully");
+                return new ResponseResult<bool>(
+                    HttpStatusCode.OK,
+                    true,
+                    $"Student enquiry with Id {id} and Tenant Id {tenantId} deleted successfully"
+                );
             }
-            return new ResponseResult<bool>(HttpStatusCode.NotFound, false, $"Student Enquiry With Id {id} and Tenant Id {tenantId} Not Found");
+            return new ResponseResult<bool>(
+                HttpStatusCode.NotFound,
+                false,
+                $"Student enquiry with Id {id} and Tenant Id {tenantId} not found"
+            );
         }
 
+        // ✅ Update
         [HttpPut("{id}/tenant/{tenantId}")]
-        public ResponseResult<StudentEnquiryResponseVM> UpdateStudentEnquiry([FromRoute] long id, [FromRoute] int tenantId, [FromBody] StudentEnquiryUpdateVM vm)
+        public ResponseResult<StudentEnquiryResponseVM> UpdateStudentEnquiry(
+            [FromRoute] int id,
+            [FromRoute] int tenantId,
+            [FromBody] StudentEnquiryUpdateVM vm)
         {
             if (vm == null)
             {
-                return new ResponseResult<StudentEnquiryResponseVM>(HttpStatusCode.BadRequest, null, "Invalid request payload");
+                return new ResponseResult<StudentEnquiryResponseVM>(
+                    HttpStatusCode.BadRequest,
+                    null,
+                    "Invalid request payload"
+                );
             }
+
             var updatedEnquiry = _studentsEnquiry.UpdateStudentEnquiry(id, tenantId, vm);
             if (updatedEnquiry == null)
             {
-                return new ResponseResult<StudentEnquiryResponseVM>(HttpStatusCode.NotFound, null, $"Student Enquiry With Id {id} and Tenant Id {tenantId} Not Found");
+                return new ResponseResult<StudentEnquiryResponseVM>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    $"Student enquiry with Id {id} and Tenant Id {tenantId} not found"
+                );
             }
-            return new ResponseResult<StudentEnquiryResponseVM>(HttpStatusCode.OK, updatedEnquiry, "Student Enquiry Updated Successfully");
+
+            return new ResponseResult<StudentEnquiryResponseVM>(
+                HttpStatusCode.OK,
+                updatedEnquiry,
+                "Student enquiry updated successfully"
+            );
         }
     }
 }

@@ -11,7 +11,7 @@ namespace SchoolManagement.Model
     {
         [Key]
         [Column("id")]
-        public long Id { get; set; }
+        public int Id { get; set; }
 
         [Required, MaxLength(100)]
         [Column("student_first_name")]

@@ -106,6 +106,77 @@ namespace SchoolManagement.Controllers
             return new ResponseResult<bool>(HttpStatusCode.OK, true, "Item deleted successfully");
         }
 
+        [HttpPost("with-group")]
+        public ResponseResult<ItemsResponseVM> CreateWithGroup([FromBody] ItemInsertVM itemInsertVM)
+        {
+            if (itemInsertVM == null)
+            {
+                return new ResponseResult<ItemsResponseVM>(
+                    HttpStatusCode.BadRequest,
+                    null,
+                    "Invalid item data"
+                );
+            }
+
+            try
+            {
+                // 🔹 Option 1: If you want CreatedBy from request body
+                var createdItem = _itemService.CreateItemWithGroup(itemInsertVM);
+
+                // 🔹 Option 2 (better): Auto-fill CreatedBy from logged-in user claims
+                // var userId = int.Parse(User.FindFirst("userId").Value);
+                // itemInsertVM.CreatedBy = userId;
+                // var createdItem = _itemService.CreateItemWithGroup(itemInsertVM);
+
+                return new ResponseResult<ItemsResponseVM>(
+                    HttpStatusCode.Created,
+                    createdItem,
+                    "Item with group created successfully"
+                );
+            }
+            catch (ArgumentException ex)
+            {
+                return new ResponseResult<ItemsResponseVM>(
+                    HttpStatusCode.BadRequest,
+                    null,
+                    ex.Message
+                );
+            }
+            catch (Exception ex)
+            {
+                return new ResponseResult<ItemsResponseVM>(
+                    HttpStatusCode.InternalServerError,
+                    null,
+                    $"Failed to create item with group: {ex.Message}"
+                );
+            }
+        }
+
+
+        [HttpGet("{id}/tenant/{tenantId}/details")]
+        public ResponseResult<ItemWithGroupResponseVM> GetItemDetailsWithGroup(int id, int tenantId)
+        {
+            var result = _itemService.GetItemWithGroup(id, tenantId);
+
+            if (result == null)
+            {
+                return new ResponseResult<ItemWithGroupResponseVM>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    $"Item with id {id} and tenant {tenantId} not found"
+                );
+            }
+
+            return new ResponseResult<ItemWithGroupResponseVM>(
+                HttpStatusCode.OK,
+                result,
+                result.IsGroup
+                    ? "Group item with children fetched successfully"
+                    : "Single item fetched successfully"
+            );
+        }
+
+
 
     }
 }

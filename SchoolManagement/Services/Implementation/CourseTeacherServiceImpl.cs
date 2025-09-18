@@ -1,4 +1,5 @@
-﻿using SchoolManagement.Data;
+﻿
+using SchoolManagement.Data;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.CourseTeacher;
 
