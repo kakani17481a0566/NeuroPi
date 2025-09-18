@@ -332,6 +332,8 @@ namespace SchoolManagement.Services.Implementation
         {
             try
             {
+                MUser createdUser; // 🔹 Keep reference to created/loaded user
+
                 // ---------------------------
                 // 1. Handle User in NeuroPiDb
                 // ---------------------------
@@ -350,11 +352,13 @@ namespace SchoolManagement.Services.Implementation
                             FirstName = request.User.FirstName,
                             LastName = request.User.LastName,
                             Email = request.User.Email,
-                            Password = request.User.Password, // ⚠️ plain-text
+                            Password = request.User.Password, // ⚠️ hash later
                             MobileNumber = request.User.MobileNumber,
                             RoleTypeId = request.User.RoleTypeId,
                             TenantId = request.TenantId,
-                            UserImageUrl = request.User.UserImageUrl,
+                            UserImageUrl = string.IsNullOrEmpty(request.User.UserImageUrl)
+                                ? null
+                                : Convert.FromBase64String(request.User.UserImageUrl),
                             DateOfBirth = DateOnly.FromDateTime(request.User.Dob),
                             CreatedOn = DateTime.UtcNow,
                             CreatedBy = 1
@@ -363,8 +367,11 @@ namespace SchoolManagement.Services.Implementation
                         _userContext.Users.Add(user);
                         _userContext.SaveChanges();
 
-                        // assign parent role
-                        var parentRole = _userContext.Roles.First(r => r.Name == "PARENT");
+                        // assign parent role safely
+                        var parentRole = _userContext.Roles.FirstOrDefault(r => r.Name == "PARENT");
+                        if (parentRole == null)
+                            throw new Exception("Role 'PARENT' not found in database. Please seed roles.");
+
                         _userContext.UserRoles.Add(new MUserRole
                         {
                             UserId = user.UserId,
@@ -379,7 +386,10 @@ namespace SchoolManagement.Services.Implementation
                     {
                         if (!_userContext.UserRoles.Any(ur => ur.UserId == user.UserId))
                         {
-                            var parentRole = _userContext.Roles.First(r => r.Name == "PARENT");
+                            var parentRole = _userContext.Roles.FirstOrDefault(r => r.Name == "PARENT");
+                            if (parentRole == null)
+                                throw new Exception("Role 'PARENT' not found in database. Please seed roles.");
+
                             _userContext.UserRoles.Add(new MUserRole
                             {
                                 UserId = user.UserId,
@@ -392,6 +402,7 @@ namespace SchoolManagement.Services.Implementation
                         }
                     }
 
+                    createdUser = user; // 🔹 Save reference
                     userTransaction.Commit();
                 }
 
@@ -400,7 +411,10 @@ namespace SchoolManagement.Services.Implementation
                 // ---------------------------
                 using (var schoolTransaction = _context.Database.BeginTransaction())
                 {
-                    var user = _userContext.Users.First(u => u.Username == request.User.Username);
+                    var user = createdUser; // 🔹 Reuse created user directly
+
+                    if (user == null)
+                        throw new Exception($"User '{request.User.Username}' not found after creation.");
 
                     // Parent
                     var parent = _context.Parents
@@ -419,7 +433,7 @@ namespace SchoolManagement.Services.Implementation
                         _context.SaveChanges();
                     }
 
-                    // Student
+                    // Student duplicate check
                     var duplicateStudent = _context.Students.FirstOrDefault(s =>
                         s.Name == request.Student.FirstName &&
                         s.LastName == request.Student.LastName &&
@@ -444,22 +458,32 @@ namespace SchoolManagement.Services.Implementation
                         BranchId = request.Student.BranchId,
                         TenantId = request.TenantId,
 
-                        // ✅ fix string → byte[]
-                        StudentImageUrl = string.IsNullOrEmpty(request.Student.StudentImageUrl)
-           ? null
-           : Convert.FromBase64String(request.Student.StudentImageUrl),
+                        // decode images
+                        StudentImageUrl = string.IsNullOrEmpty(request.Student.StudentImage) ? null : Convert.FromBase64String(request.Student.StudentImage),
+                        FatherPhoto = string.IsNullOrEmpty(request.Student.FatherPhoto) ? null : Convert.FromBase64String(request.Student.FatherPhoto),
+                        MotherPhoto = string.IsNullOrEmpty(request.Student.MotherPhoto) ? null : Convert.FromBase64String(request.Student.MotherPhoto),
+                        JointPhoto = string.IsNullOrEmpty(request.Student.JointPhoto) ? null : Convert.FromBase64String(request.Student.JointPhoto),
 
-                        FatherPhoto = request.Student.FatherPhoto,
-                        MotherPhoto = request.Student.MotherPhoto,
-                        JointPhoto = request.Student.JointPhoto,
                         RegistrationChannel = request.Student.RegistrationChannel,
                         CreatedBy = user.UserId,
-                        CreatedOn = DateTime.UtcNow
+                        CreatedOn = DateTime.UtcNow,
+
+                        // decode documents
+                        Signature = string.IsNullOrEmpty(request.Student.Documents.Signature) ? null : Convert.FromBase64String(request.Student.Documents.Signature),
+                        BirthCertificate = string.IsNullOrEmpty(request.Student.Documents.BirthCertificate) ? null : Convert.FromBase64String(request.Student.Documents.BirthCertificate),
+                        KidPassport = string.IsNullOrEmpty(request.Student.Documents.KidPassport) ? null : Convert.FromBase64String(request.Student.Documents.KidPassport),
+                        Adhar = string.IsNullOrEmpty(request.Student.Documents.Adhar) ? null : Convert.FromBase64String(request.Student.Documents.Adhar),
+                        ParentAdhar = string.IsNullOrEmpty(request.Student.Documents.ParentAdhar) ? null : Convert.FromBase64String(request.Student.Documents.ParentAdhar),
+                        MotherAdhar = string.IsNullOrEmpty(request.Student.Documents.MotherAdhar) ? null : Convert.FromBase64String(request.Student.Documents.MotherAdhar),
+                        HealthForm = string.IsNullOrEmpty(request.Student.Documents.HealthForm) ? null : Convert.FromBase64String(request.Student.Documents.HealthForm),
+                        PrivacyForm = string.IsNullOrEmpty(request.Student.Documents.PrivacyForm) ? null : Convert.FromBase64String(request.Student.Documents.PrivacyForm),
+                        LiabilityForm = string.IsNullOrEmpty(request.Student.Documents.LiabilityForm) ? null : Convert.FromBase64String(request.Student.Documents.LiabilityForm)
                     };
 
+                    _context.Students.Add(student);
+                    _context.SaveChanges();
 
-                    // RegNumber
-                    // ✅ Safely handle nullable DateOfJoining
+                    // Generate RegNumber
                     var year = student.DateOfJoining.HasValue
                         ? student.DateOfJoining.Value.Year
                         : DateTime.UtcNow.Year;
@@ -468,7 +492,7 @@ namespace SchoolManagement.Services.Implementation
                         .Where(s => s.TenantId == request.TenantId &&
                                     s.BranchId == student.BranchId &&
                                     s.CourseId == student.CourseId &&
-                                    s.DateOfJoining.HasValue &&           // ✅ check before using Value
+                                    s.DateOfJoining.HasValue &&
                                     s.DateOfJoining.Value.Year == year)
                         .OrderByDescending(s => s.RegNumber)
                         .Select(s => s.RegNumber)
@@ -478,12 +502,8 @@ namespace SchoolManagement.Services.Implementation
                     if (!string.IsNullOrEmpty(lastReg) && int.TryParse(lastReg[^3..], out var lastSeq))
                         seq = lastSeq + 1;
 
-                    // ✅ Build RegNumber (YY + BranchId + CourseId + Seq)
                     student.RegNumber = $"{year % 100:D2}{student.BranchId:D2}{student.CourseId:D2}{seq:D3}";
-
-                    // Update student record
                     _context.Students.Update(student);
-
 
                     // StudentCourse
                     _context.StudentCourses.Add(new MStudentCourse
@@ -496,9 +516,6 @@ namespace SchoolManagement.Services.Implementation
                         CreatedBy = user.UserId,
                         CreatedOn = DateTime.UtcNow
                     });
-
-                    // Contacts (same as your existing contact handling)
-                    // ...
 
                     // ParentStudent link
                     if (!_context.ParentStudents.Any(ps => ps.ParentId == parent.Id && ps.StudentId == student.Id))
@@ -534,6 +551,7 @@ namespace SchoolManagement.Services.Implementation
         }
 
 
+
         public List<StudentListVM> GetStudentsByTenantCourseBranch(int tenantId, int courseId, int branchId)
         {
             var students = _context.Students
@@ -560,6 +578,26 @@ namespace SchoolManagement.Services.Implementation
 
             return students;
         }
+
+
+        private byte[]? SafeBase64Decode(string? input)
+        {
+            if (string.IsNullOrWhiteSpace(input)) return null;
+
+            // Handle data URI like "data:image/png;base64,xxxx"
+            var base64 = input.Contains(",") ? input.Split(',')[1] : input;
+
+            try
+            {
+                return Convert.FromBase64String(base64);
+            }
+            catch
+            {
+                // log the issue here if you want
+                return null; // gracefully ignore bad data
+            }
+        }
+
 
 
 

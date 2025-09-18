@@ -20,10 +20,13 @@ namespace SchoolManagement.ViewModel.Student
         public string FirstName { get; set; } = default!;
         public string LastName { get; set; } = default!;
         public string Email { get; set; } = default!;
-        public string Password { get; set; } = default!;  // hash on save
+        public string Password { get; set; } = default!;  // ⚠️ hash before saving
         public string MobileNumber { get; set; } = default!;
         public int RoleTypeId { get; set; }
-        public byte[]? UserImageUrl { get; set; }
+
+        // ✅ Base64 string from client
+        public string? UserImageUrl { get; set; }
+
         public DateTime Dob { get; set; }
     }
 
@@ -45,12 +48,11 @@ namespace SchoolManagement.ViewModel.Student
 
         public string? RegistrationChannel { get; set; }  // "By Post", "In Person", "Online"
 
-        // Images (bytea)
-        public string? StudentImageUrl { get; set; }
-        public byte[]? StudentImage { get; set; }
-        public byte[]? MotherPhoto { get; set; }
-        public byte[]? FatherPhoto { get; set; }
-        public byte[]? JointPhoto { get; set; }
+        // ✅ Images (Base64 strings)
+        public string? StudentImage { get; set; }
+        public string? MotherPhoto { get; set; }
+        public string? FatherPhoto { get; set; }
+        public string? JointPhoto { get; set; }
 
         // Transport
         public SRTransportVM Transport { get; set; } = default!;
@@ -139,19 +141,19 @@ namespace SchoolManagement.ViewModel.Student
     }
 
     // -----------------------
-    // Documents (bytea)
+    // Documents (Base64 strings)
     // -----------------------
     public class SRDocumentsVM
     {
-        public byte[]? Signature { get; set; }
-        public byte[]? BirthCertificate { get; set; }
-        public byte[]? KidPassport { get; set; }
-        public byte[]? Adhar { get; set; }
-        public byte[]? ParentAdhar { get; set; }
-        public byte[]? MotherAdhar { get; set; }
-        public byte[]? HealthForm { get; set; }
-        public byte[]? PrivacyForm { get; set; }
-        public byte[]? LiabilityForm { get; set; }
+        public string? Signature { get; set; }
+        public string? BirthCertificate { get; set; }
+        public string? KidPassport { get; set; }
+        public string? Adhar { get; set; }
+        public string? ParentAdhar { get; set; }
+        public string? MotherAdhar { get; set; }
+        public string? HealthForm { get; set; }
+        public string? PrivacyForm { get; set; }
+        public string? LiabilityForm { get; set; }
     }
 
     // -----------------------
