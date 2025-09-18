@@ -20,11 +20,11 @@ namespace SchoolManagement.Controllers
 
         // POST: api/StudentEnquiry/create
         [HttpPost("create")]
-        public ResponseResult<long> CreateStudentEnquiry([FromBody] StudentEnquiryRequestDataVM vm)
+        public ResponseResult<int> CreateStudentEnquiry([FromBody] StudentEnquiryRequestDataVM vm)
         {
             if (vm == null)
             {
-                return new ResponseResult<long>(
+                return new ResponseResult<int>(
                     HttpStatusCode.BadRequest,
                     0,
                     "Invalid request payload"
@@ -35,7 +35,7 @@ namespace SchoolManagement.Controllers
             {
                 var enquiryId = _studentsEnquiry.CreateStudentEnquiry(vm);
 
-                return new ResponseResult<long>(
+                return new ResponseResult<int>(
                     HttpStatusCode.Created,
                     enquiryId,
                     "Student enquiry created successfully"
@@ -43,7 +43,7 @@ namespace SchoolManagement.Controllers
             }
             catch (Exception ex)
             {
-                return new ResponseResult<long>(
+                return new ResponseResult<int>(
                     HttpStatusCode.InternalServerError,
                     0,
                     $"Failed to create enquiry: {ex.Message}"
@@ -64,7 +64,7 @@ namespace SchoolManagement.Controllers
         }
 
         [HttpGet("{id}")]
-        public ResponseResult<StudentEnquiryResponseVM> GetStudentEnquiryById([FromRoute] long id)
+        public ResponseResult<StudentEnquiryResponseVM> GetStudentEnquiryById([FromRoute] int id)
         {
             var studentEnquiry = _studentsEnquiry.GetStudentEnquiryById(id);
             if (studentEnquiry == null)
@@ -85,7 +85,7 @@ namespace SchoolManagement.Controllers
         }
 
         [HttpGet("{id}/{tenantId}")]
-        public ResponseResult<StudentEnquiryResponseVM> GetStudentEnquiryByIdAndTenant([FromRoute] long id, [FromRoute] int tenantId)
+        public ResponseResult<StudentEnquiryResponseVM> GetStudentEnquiryByIdAndTenant([FromRoute] int id, [FromRoute] int tenantId)
         {
             var studentEnquiry = _studentsEnquiry.GetStudentEnquiryByIdAndTenant(id, tenantId);
             if (studentEnquiry == null)
@@ -96,7 +96,7 @@ namespace SchoolManagement.Controllers
         }
 
         [HttpDelete("{id}/{tenantId}")]
-        public ResponseResult<bool> DeleteStudentEnquiryByIdAndTenant([FromRoute] long id, [FromRoute] int tenantId)
+        public ResponseResult<bool> DeleteStudentEnquiryByIdAndTenant([FromRoute] int id, [FromRoute] int tenantId)
         {
             var isDeleted = _studentsEnquiry.DeleteStudentEnquiryByIdAndTenant(id, tenantId);
             if (isDeleted)
@@ -107,7 +107,7 @@ namespace SchoolManagement.Controllers
         }
 
         [HttpPut("{id}/tenant/{tenantId}")]
-        public ResponseResult<StudentEnquiryResponseVM> UpdateStudentEnquiry([FromRoute] long id, [FromRoute] int tenantId, [FromBody] StudentEnquiryUpdateVM vm)
+        public ResponseResult<StudentEnquiryResponseVM> UpdateStudentEnquiry([FromRoute] int id, [FromRoute] int tenantId, [FromBody] StudentEnquiryUpdateVM vm)
         {
             if (vm == null)
             {

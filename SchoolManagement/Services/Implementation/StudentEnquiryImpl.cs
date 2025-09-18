@@ -19,7 +19,7 @@ namespace SchoolManagement.Services.Implementation
             _db = db;
         }
 
-        public long CreateStudentEnquiry(StudentEnquiryRequestDataVM vm)
+        public int CreateStudentEnquiry(StudentEnquiryRequestDataVM vm)
         {
             var existingEnquiry = _db.StudentsEnquiries
                 .Include(e => e.ParentContact)
@@ -34,7 +34,7 @@ namespace SchoolManagement.Services.Implementation
 
             if (existingEnquiry != null)
             {
-                return existingEnquiry.Id;
+                return existingEnquiry.Id; // ✅ int
             }
 
             var parentContact = vm.ToParentContact();
@@ -68,10 +68,7 @@ namespace SchoolManagement.Services.Implementation
                 MotherContactId = motherContactId,
                 HearAboutUsTypeId = vm.HearAboutUsTypeId,
                 IsAgreedToTerms = vm.IsAgreedToTerms,
-
-                // string (data URL / base64) -> byte[]
                 Signature = DecodeBase64DataUrl(vm.Signature),
-
                 StatusId = vm.StatusId,
                 TenantId = vm.TenantId,
                 BranchId = vm.BranchId,
@@ -83,10 +80,10 @@ namespace SchoolManagement.Services.Implementation
             _db.StudentsEnquiries.Add(newEnquiry);
             _db.SaveChanges();
 
-            return newEnquiry.Id;
+            return newEnquiry.Id; // ✅ int
         }
 
-        public bool DeleteStudentEnquiryByIdAndTenant(long id, int tenantId)
+        public bool DeleteStudentEnquiryByIdAndTenant(int id, int tenantId)
         {
             var studentEnquiry = _db.StudentsEnquiries
                 .FirstOrDefault(e => !e.IsDeleted && e.Id == id && e.TenantId == tenantId);
@@ -104,7 +101,7 @@ namespace SchoolManagement.Services.Implementation
             return _db.StudentsEnquiries
                 .Include(m => m.Gender)
                 .Where(e => !e.IsDeleted)
-                .AsEnumerable() // switch to in-memory so we can call ToViewModel (byte[]->string)
+                .AsEnumerable()
                 .Select(StudentEnquiryResponseVM.ToViewModel)
                 .ToList();
         }
@@ -119,7 +116,7 @@ namespace SchoolManagement.Services.Implementation
                 .ToList();
         }
 
-        public StudentEnquiryResponseVM GetStudentEnquiryById(long id)
+        public StudentEnquiryResponseVM GetStudentEnquiryById(int id)
         {
             var enquiry = _db.StudentsEnquiries
                 .Include(m => m.Gender)
@@ -127,11 +124,10 @@ namespace SchoolManagement.Services.Implementation
                 .Include(e => e.MotherContact)
                 .FirstOrDefault(e => !e.IsDeleted && e.Id == id);
 
-            if (enquiry == null) return null;
-            return StudentEnquiryResponseVM.ToViewModel(enquiry);
+            return enquiry != null ? StudentEnquiryResponseVM.ToViewModel(enquiry) : null;
         }
 
-        public StudentEnquiryResponseVM GetStudentEnquiryByIdAndTenant(long id, int tenantId)
+        public StudentEnquiryResponseVM GetStudentEnquiryByIdAndTenant(int id, int tenantId)
         {
             var enquiry = _db.StudentsEnquiries
                 .Include(m => m.Gender)
@@ -139,11 +135,10 @@ namespace SchoolManagement.Services.Implementation
                 .Include(e => e.MotherContact)
                 .FirstOrDefault(e => !e.IsDeleted && e.Id == id && e.TenantId == tenantId);
 
-            if (enquiry == null) return null;
-            return StudentEnquiryResponseVM.ToViewModel(enquiry);
+            return enquiry != null ? StudentEnquiryResponseVM.ToViewModel(enquiry) : null;
         }
 
-        public StudentEnquiryResponseVM UpdateStudentEnquiry(long id, int tenantId, [FromBody] StudentEnquiryUpdateVM vm)
+        public StudentEnquiryResponseVM UpdateStudentEnquiry(int id, int tenantId, [FromBody] StudentEnquiryUpdateVM vm)
         {
             var enquiry = _db.StudentsEnquiries
                 .Include(e => e.ParentContact)
@@ -168,10 +163,7 @@ namespace SchoolManagement.Services.Implementation
             enquiry.MotherContactId = vm.MotherContactId;
             enquiry.HearAboutUsTypeId = vm.HearAboutUsTypeId;
             enquiry.IsAgreedToTerms = vm.IsAgreedToTerms;
-
-            // string (data URL / base64) -> byte[]
             enquiry.Signature = DecodeBase64DataUrl(vm.Signature);
-
             enquiry.StatusId = vm.StatusId;
             enquiry.BranchId = vm.BranchId;
             enquiry.UpdatedBy = vm.UpdatedBy;
@@ -182,12 +174,10 @@ namespace SchoolManagement.Services.Implementation
         }
 
         // -------- Helpers --------
-
         private static byte[]? DecodeBase64DataUrl(string? input)
         {
             if (string.IsNullOrWhiteSpace(input)) return null;
 
-            // Accept both data URLs and raw base64
             var commaIndex = input.IndexOf(',');
             var base64 = commaIndex >= 0 ? input.Substring(commaIndex + 1) : input;
 
@@ -197,7 +187,7 @@ namespace SchoolManagement.Services.Implementation
             }
             catch
             {
-                return null; // or throw/log
+                return null;
             }
         }
     }

@@ -7,7 +7,7 @@ namespace SchoolManagement.ViewModel.StudentsEnquiry
 {
     public class StudentEnquiryResponseVM
     {
-        public long Id { get; set; }
+        public int Id { get; set; }
 
         public string StudentFirstName { get; set; }
         public string? StudentMiddleName { get; set; }
