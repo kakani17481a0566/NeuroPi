@@ -332,7 +332,7 @@ namespace SchoolManagement.Services.Implementation
         {
             try
             {
-                MUser createdUser; // 🔹 Keep reference to created/loaded user
+                MUser createdUser;
 
                 // ---------------------------
                 // 1. Handle User in NeuroPiDb
@@ -367,7 +367,6 @@ namespace SchoolManagement.Services.Implementation
                         _userContext.Users.Add(user);
                         _userContext.SaveChanges();
 
-                        // assign parent role safely
                         var parentRole = _userContext.Roles.FirstOrDefault(r => r.Name == "PARENT");
                         if (parentRole == null)
                             throw new Exception("Role 'PARENT' not found in database. Please seed roles.");
@@ -402,16 +401,16 @@ namespace SchoolManagement.Services.Implementation
                         }
                     }
 
-                    createdUser = user; // 🔹 Save reference
+                    createdUser = user;
                     userTransaction.Commit();
                 }
 
                 // ---------------------------
-                // 2. Handle Parent/Student in SchoolManagementDb
+                // 2. Handle Parent/Student + Contacts in SchoolManagementDb
                 // ---------------------------
                 using (var schoolTransaction = _context.Database.BeginTransaction())
                 {
-                    var user = createdUser; // 🔹 Reuse created user directly
+                    var user = createdUser;
 
                     if (user == null)
                         throw new Exception($"User '{request.User.Username}' not found after creation.");
@@ -458,9 +457,7 @@ namespace SchoolManagement.Services.Implementation
                         BranchId = request.Student.BranchId,
                         TenantId = request.TenantId,
 
-                        // ✅ fix string → byte[]
                         StudentImageUrl = request.Student.StudentImageUrl,
-                        // decode images
                         FatherPhoto = request.Student.FatherPhoto,
                         MotherPhoto = request.Student.MotherPhoto,
                         JointPhoto = request.Student.JointPhoto,
@@ -469,7 +466,6 @@ namespace SchoolManagement.Services.Implementation
                         CreatedBy = user.UserId,
                         CreatedOn = DateTime.UtcNow,
 
-                        // decode documents
                         Signature = string.IsNullOrEmpty(request.Student.Documents.Signature) ? null : Convert.FromBase64String(request.Student.Documents.Signature),
                         BirthCertificate = string.IsNullOrEmpty(request.Student.Documents.BirthCertificate) ? null : Convert.FromBase64String(request.Student.Documents.BirthCertificate),
                         KidPassport = string.IsNullOrEmpty(request.Student.Documents.KidPassport) ? null : Convert.FromBase64String(request.Student.Documents.KidPassport),
@@ -531,6 +527,66 @@ namespace SchoolManagement.Services.Implementation
                         });
                     }
 
+                    // ---------------------------
+                    // 3. Handle Contacts dynamically
+                    // ---------------------------
+                    if (request.Contacts != null && request.Contacts.Any())
+                    {
+                        var relationships = _context.Masters
+    .Where(m => m.MasterTypeId == 43 && !m.IsDeleted)
+    .ToDictionary(m => m.Id, m => m.Code!.ToUpper());
+
+
+                        foreach (var c in request.Contacts)
+                        {
+                            var contact = new MContact
+                            {
+                                Name = c.Name,
+                                PriNumber = c.PriNumber,
+                                SecNumber = c.SecNumber,
+                                Email = c.Email,
+                                Address1 = c.Address1,
+                                Address2 = c.Address2,
+                                City = c.City,
+                                State = c.State,
+                                Pincode = c.Pincode,
+                                Qualification = c.Qualification,
+                                Profession = c.Profession,
+                                TenantId = request.TenantId,
+                                RelationshipId = c.RelationshipId,
+                                CreatedBy = user.UserId,
+                                CreatedOn = DateTime.UtcNow
+                            };
+
+                            _context.Contacts.Add(contact);
+                            _context.SaveChanges();
+
+                            if (relationships.TryGetValue(c.RelationshipId, out var code))
+                            {
+                                switch (code)
+                                {
+                                    case "FATHER":
+                                        student.FatherContactId = contact.Id;
+                                        break;
+                                    case "MOTHER":
+                                        student.MotherContactId = contact.Id;
+                                        break;
+                                    case "GUARDIAN":
+                                        student.GuardianContactId = contact.Id;
+                                        break;
+                                    case "AFTER_SCHOOL":
+                                        student.AdditionalSupportContactId = contact.Id;
+                                        break;
+                                    case "EMERGENCY":
+                                        student.EmergencyContactId = contact.Id;
+                                        break;
+                                }
+                            }
+                        }
+
+                        _context.Students.Update(student);
+                    }
+
                     _context.SaveChanges();
                     schoolTransaction.Commit();
 
@@ -550,7 +606,6 @@ namespace SchoolManagement.Services.Implementation
                 throw new Exception($"Registration failed: {ex.InnerException?.Message ?? ex.Message}", ex);
             }
         }
-
 
 
         public List<StudentListVM> GetStudentsByTenantCourseBranch(int tenantId, int courseId, int branchId)
