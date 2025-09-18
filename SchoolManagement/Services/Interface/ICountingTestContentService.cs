@@ -19,5 +19,7 @@ namespace SchoolManagement.Services.Interface
         /// </summary>
         /// <param name="id">The ID of the counting test content.</param>
         CountingTestContentRespounceVM GetById(int id);
+
+        CountingTestContentRespounceVM Create(CountingTestContentRequestVM model);
     }
 }
