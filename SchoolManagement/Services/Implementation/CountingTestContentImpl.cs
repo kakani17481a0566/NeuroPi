@@ -57,5 +57,26 @@ namespace SchoolManagement.Services.Implementation
                 TestTitle = entity.Test != null ? entity.Test.name : null
             };
         }
+
+        public CountingTestContentRespounceVM Create(CountingTestContentRequestVM model)
+        {
+           var newContent = new Model.MCountingTestContent
+            {
+                Label = model.Label,
+                Shape = model.Shape,
+                Count = model.Count,
+                TestId = model.TestId
+            };
+            _db.CountingTestContents.Add(newContent);
+            _db.SaveChanges();
+            return new CountingTestContentRespounceVM
+            {
+                Id = newContent.Id,
+                Label = newContent.Label,
+                Shape = newContent.Shape,
+                Count = newContent.Count,
+                TestId = newContent.TestId
+            };
+        }
     }
-}
+    }
