@@ -461,10 +461,9 @@ namespace SchoolManagement.Services.Implementation
                         // ✅ fix string → byte[]
                         StudentImageUrl = request.Student.StudentImageUrl,
                         // decode images
-                        StudentImageUrl = string.IsNullOrEmpty(request.Student.StudentImage) ? null : Convert.FromBase64String(request.Student.StudentImage),
-                        FatherPhoto = string.IsNullOrEmpty(request.Student.FatherPhoto) ? null : Convert.FromBase64String(request.Student.FatherPhoto),
-                        MotherPhoto = string.IsNullOrEmpty(request.Student.MotherPhoto) ? null : Convert.FromBase64String(request.Student.MotherPhoto),
-                        JointPhoto = string.IsNullOrEmpty(request.Student.JointPhoto) ? null : Convert.FromBase64String(request.Student.JointPhoto),
+                        FatherPhoto = request.Student.FatherPhoto,
+                        MotherPhoto = request.Student.MotherPhoto,
+                        JointPhoto = request.Student.JointPhoto,
 
                         RegistrationChannel = request.Student.RegistrationChannel,
                         CreatedBy = user.UserId,
