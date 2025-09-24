@@ -332,7 +332,7 @@ namespace SchoolManagement.Services.Implementation
         {
             try
             {
-                MUser createdUser; // 🔹 Keep reference to created/loaded user
+                MUser createdUser;
 
                 // ---------------------------
                 // 1. Handle User in NeuroPiDb
@@ -367,7 +367,6 @@ namespace SchoolManagement.Services.Implementation
                         _userContext.Users.Add(user);
                         _userContext.SaveChanges();
 
-                        // assign parent role safely
                         var parentRole = _userContext.Roles.FirstOrDefault(r => r.Name == "PARENT");
                         if (parentRole == null)
                             throw new Exception("Role 'PARENT' not found in database. Please seed roles.");
@@ -402,16 +401,16 @@ namespace SchoolManagement.Services.Implementation
                         }
                     }
 
-                    createdUser = user; // 🔹 Save reference
+                    createdUser = user;
                     userTransaction.Commit();
                 }
 
                 // ---------------------------
-                // 2. Handle Parent/Student in SchoolManagementDb
+                // 2. Handle Parent/Student + Contacts in SchoolManagementDb
                 // ---------------------------
                 using (var schoolTransaction = _context.Database.BeginTransaction())
                 {
-                    var user = createdUser; // 🔹 Reuse created user directly
+                    var user = createdUser;
 
                     if (user == null)
                         throw new Exception($"User '{request.User.Username}' not found after creation.");
@@ -458,9 +457,7 @@ namespace SchoolManagement.Services.Implementation
                         BranchId = request.Student.BranchId,
                         TenantId = request.TenantId,
 
-                        // ✅ fix string → byte[]
                         StudentImageUrl = request.Student.StudentImageUrl,
-                        // decode images
                         FatherPhoto = request.Student.FatherPhoto,
                         MotherPhoto = request.Student.MotherPhoto,
                         JointPhoto = request.Student.JointPhoto,
@@ -469,7 +466,6 @@ namespace SchoolManagement.Services.Implementation
                         CreatedBy = user.UserId,
                         CreatedOn = DateTime.UtcNow,
 
-                        // decode documents
                         Signature = string.IsNullOrEmpty(request.Student.Documents.Signature) ? null : Convert.FromBase64String(request.Student.Documents.Signature),
                         BirthCertificate = string.IsNullOrEmpty(request.Student.Documents.BirthCertificate) ? null : Convert.FromBase64String(request.Student.Documents.BirthCertificate),
                         KidPassport = string.IsNullOrEmpty(request.Student.Documents.KidPassport) ? null : Convert.FromBase64String(request.Student.Documents.KidPassport),
@@ -480,6 +476,58 @@ namespace SchoolManagement.Services.Implementation
                         PrivacyForm = string.IsNullOrEmpty(request.Student.Documents.PrivacyForm) ? null : Convert.FromBase64String(request.Student.Documents.PrivacyForm),
                         LiabilityForm = string.IsNullOrEmpty(request.Student.Documents.LiabilityForm) ? null : Convert.FromBase64String(request.Student.Documents.LiabilityForm)
                     };
+
+                    // ---------------------------
+                    // 3. Map Extra Details (Transport, Custody, Medical, Languages, English Skills)
+                    // ---------------------------
+                    if (request.Student.Transport != null)
+                    {
+                        student.HasRegularTransport = request.Student.Transport.Regular.IsEnabled;
+                        student.RegularTransportId = request.Student.Transport.Regular.TransportId;
+                        student.RegularTransportText = request.Student.Transport.Regular.FreeText;
+                        student.HasAlternateTransport = request.Student.Transport.Alternate.IsEnabled;
+                        student.AlternateTransportId = request.Student.Transport.Alternate.TransportId;
+                        student.AlternateTransportText = request.Student.Transport.Alternate.FreeText;
+                        student.OtherTransportText = request.Student.Transport.OtherTransportText;
+                    }
+
+                    if (request.Student.CustodyFamily != null)
+                    {
+                        student.SpeechTherapy = request.Student.CustodyFamily.SpeechTherapy;
+                        student.Custody = request.Student.CustodyFamily.Custody;
+                        student.CustodyOfId = request.Student.CustodyFamily.CustodyOfId;
+                        student.LivesWithId = request.Student.CustodyFamily.LivesWithId;
+                        student.SiblingsInThisSchool = request.Student.CustodyFamily.SiblingsInThisSchool;
+                        student.SiblingsThisNames = request.Student.CustodyFamily.SiblingsThisNames;
+                        student.SiblingsInOtherSchool = request.Student.CustodyFamily.SiblingsInOtherSchool;
+                        student.SiblingsOtherNames = request.Student.CustodyFamily.SiblingsOtherNames;
+                    }
+
+                    if (request.Student.MedicalInfo != null)
+                    {
+                        student.AnyAllergy = request.Student.MedicalInfo.AnyAllergy;
+                        student.WhatAllergyId = request.Student.MedicalInfo.WhatAllergyId;
+                        student.OtherAllergyText = request.Student.MedicalInfo.OtherAllergyText;
+                        student.MedicalKit = request.Student.MedicalInfo.MedicalKit;
+                        student.SeriousMedicalConditions = request.Student.MedicalInfo.SeriousMedicalConditions;
+                        student.SeriousConditionsInfo = request.Student.MedicalInfo.SeriousConditionsInfo;
+                        student.OtherMedicalInfo = request.Student.MedicalInfo.OtherMedicalInfo;
+                    }
+
+                    if (request.Student.Languages != null)
+                    {
+                        student.LanguageAdultsHome = request.Student.Languages.LanguageAdultsHome;
+                        student.LanguageMostUsedWithChild = request.Student.Languages.LanguageMostUsedWithChild;
+                        student.LanguageFirstLearned = request.Student.Languages.LanguageFirstLearned;
+                    }
+
+                    if (request.Student.EnglishSkills != null)
+                    {
+                        student.CanReadEnglish = request.Student.EnglishSkills.CanReadEnglish;
+                        student.ReadSkillId = request.Student.EnglishSkills.ReadSkillId;
+                        student.CanWriteEnglish = request.Student.EnglishSkills.CanWriteEnglish;
+                        student.WriteSkillId = request.Student.EnglishSkills.WriteSkillId;
+                    }
 
                     _context.Students.Add(student);
                     _context.SaveChanges();
@@ -531,6 +579,81 @@ namespace SchoolManagement.Services.Implementation
                         });
                     }
 
+                    // ---------------------------
+                    // 4. Handle Contacts (avoid duplicates)
+                    // ---------------------------
+                    if (request.Contacts != null && request.Contacts.Any())
+                    {
+                        var relationships = _context.Masters
+                            .Where(m => m.MasterTypeId == 43 && !m.IsDeleted)
+                            .ToDictionary(m => m.Id, m => m.Code!.ToUpper());
+
+                        foreach (var c in request.Contacts)
+                        {
+                            var existingContact = _context.Contacts.FirstOrDefault(x =>
+                                x.TenantId == request.TenantId &&
+                                x.RelationshipId == c.RelationshipId &&
+                                (
+                                    (!string.IsNullOrEmpty(c.Email) && x.Email == c.Email) ||
+                                    (!string.IsNullOrEmpty(c.PriNumber) && x.PriNumber == c.PriNumber)
+                                )
+                            );
+
+                            MContact contact;
+                            if (existingContact != null)
+                            {
+                                contact = existingContact;
+                            }
+                            else
+                            {
+                                contact = new MContact
+                                {
+                                    Name = c.Name,
+                                    PriNumber = c.PriNumber,
+                                    SecNumber = c.SecNumber,
+                                    Email = c.Email,
+                                    Address1 = c.Address1,
+                                    Address2 = c.Address2,
+                                    City = c.City,
+                                    State = c.State,
+                                    Pincode = c.Pincode,
+                                    Qualification = c.Qualification,
+                                    Profession = c.Profession,
+                                    TenantId = request.TenantId,
+                                    RelationshipId = c.RelationshipId,
+                                    CreatedBy = user.UserId,
+                                    CreatedOn = DateTime.UtcNow
+                                };
+                                _context.Contacts.Add(contact);
+                                _context.SaveChanges();
+                            }
+
+                            if (relationships.TryGetValue(c.RelationshipId, out var code))
+                            {
+                                switch (code)
+                                {
+                                    case "FATHER":
+                                        student.FatherContactId = contact.Id;
+                                        break;
+                                    case "MOTHER":
+                                        student.MotherContactId = contact.Id;
+                                        break;
+                                    case "GUARDIAN":
+                                        student.GuardianContactId = contact.Id;
+                                        break;
+                                    case "AFTER_SCHOOL":
+                                        student.AdditionalSupportContactId = contact.Id;
+                                        break;
+                                    case "EMERGENCY":
+                                        student.EmergencyContactId = contact.Id;
+                                        break;
+                                }
+                            }
+                        }
+
+                        _context.Students.Update(student);
+                    }
+
                     _context.SaveChanges();
                     schoolTransaction.Commit();
 
@@ -550,7 +673,6 @@ namespace SchoolManagement.Services.Implementation
                 throw new Exception($"Registration failed: {ex.InnerException?.Message ?? ex.Message}", ex);
             }
         }
-
 
 
         public List<StudentListVM> GetStudentsByTenantCourseBranch(int tenantId, int courseId, int branchId)

@@ -17,7 +17,15 @@ namespace SchoolManagement.Services.Implementation
 
         public string AddResult(TestResultRequestVM request)
         {
+            bool result = _context.TestResult.Any
+                (r => r.StudentId == request.studentId && r.TestContentId == request.testContentId && r.RelationId == request.relationId);
+            if (result)
+            {
+                return "Record already exists";
+            }
+
             MTestResult model=TestResultRequestVM.ToModel(request);
+            
             _context.TestResult.Add(model);
             _context.SaveChanges();
             return "saved";
@@ -37,6 +45,7 @@ namespace SchoolManagement.Services.Implementation
                         testId = test.TestId,
                         relationId = relationId,
                         name=test.testContent.name,
+                        testContentId = test.TestContentId,
                         url=test.testContent.url,
                         result=test.Result,
                         testContentId=test.TestContentId
