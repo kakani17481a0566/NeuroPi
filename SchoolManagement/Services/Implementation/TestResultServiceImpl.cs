@@ -38,7 +38,8 @@ namespace SchoolManagement.Services.Implementation
                         relationId = relationId,
                         name=test.testContent.name,
                         url=test.testContent.url,
-                        result=test.Result
+                        result=test.Result,
+                        testContentId=test.TestContentId
 
 
                     };
