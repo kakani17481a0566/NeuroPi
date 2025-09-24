@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NeuroPi.UserManagment.Model;
+using NeuroPi.UserManagment.ViewModel.User;
 
 namespace NeuroPi.UserManagment.Data
 {
@@ -71,6 +72,10 @@ namespace NeuroPi.UserManagment.Data
                 .WithOne(ur => ur.Role)
                 .HasForeignKey(ur => ur.RoleId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+
+            modelBuilder.Entity<UsersProfileSummaryVM>().HasNoKey();
+
         }
 
 

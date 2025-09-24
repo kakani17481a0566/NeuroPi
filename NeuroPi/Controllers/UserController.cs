@@ -136,6 +136,19 @@ namespace NeuroPi.UserManagment.Controllers
             return new ResponseResult<object>(HttpStatusCode.BadRequest, null, "Failed to update password");
         }
 
+        // GET api/user/{id}/profile-summary?tenantId=...
+        [HttpGet("{id}/profile-summary")]
+        public ResponseResult<UsersProfileSummaryVM> GetUserProfileSummary(int id, [FromQuery] int tenantId)
+        {
+            var summary = _userService.GetUserProfileSummary(id, tenantId);
+
+            if (summary != null)
+                return new ResponseResult<UsersProfileSummaryVM>(HttpStatusCode.OK, summary, "Profile summary fetched successfully");
+
+            return new ResponseResult<UsersProfileSummaryVM>(HttpStatusCode.NotFound, null, "User not found or no summary available");
+        }
+
+
 
     }
 }

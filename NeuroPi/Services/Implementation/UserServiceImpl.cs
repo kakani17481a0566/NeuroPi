@@ -199,5 +199,48 @@ namespace NeuroPi.UserManagment.Services.Implementation
         }
 
 
+        public UsersProfileSummaryVM GetUserProfileSummary(int id, int tenantId)
+        {
+            var sql = @"
+        SELECT 
+            u.user_id AS UserId,
+            u.username AS Username,
+            CONCAT(u.first_name, ' ', u.last_name) AS FullName,
+            u.email AS Email,
+            u.mobile_number AS MobileNumber,
+            r.name AS RoleName,
+            COUNT(DISTINCT c.id) AS TotalCourses,
+            COALESCE(STRING_AGG(DISTINCT c.name, ', '), 'N/A') AS CoursesTaught,
+            COUNT(DISTINCT b.id) AS TotalBranches,
+            COALESCE(STRING_AGG(DISTINCT b.name, ', '), 'N/A') AS Branches,
+            COALESCE(TO_CHAR(u.joining_date, 'YYYY-MM-DD'), 'N/A') AS JoiningDate,
+            COALESCE(TO_CHAR(u.working_start_time, 'HH24:MI'), 'N/A') AS WorkingStartTime,
+            COALESCE(TO_CHAR(u.working_end_time, 'HH24:MI'), 'N/A') AS WorkingEndTime,
+            CASE WHEN u.is_deleted = FALSE THEN 'Active' ELSE 'Inactive' END AS UserStatus,
+            TO_CHAR(u.created_on, 'YYYY-MM-DD HH24:MI:SS') AS UserCreatedOn,
+            TO_CHAR(u.updated_on, 'YYYY-MM-DD HH24:MI:SS') AS UserLastUpdated,
+            TO_CHAR(ur.created_on, 'YYYY-MM-DD HH24:MI:SS') AS RoleAssignedOn
+        FROM user_roles ur
+        JOIN users u ON u.user_id = ur.user_id
+        JOIN roles r ON r.role_id = ur.role_id
+        LEFT JOIN course_teacher ct ON ct.teacher_id = u.user_id
+        LEFT JOIN course c ON c.id = ct.course_id
+        LEFT JOIN branch b ON b.id = ct.branch_id
+        WHERE ur.user_id = {0} AND ur.tenant_id = {1}
+        GROUP BY u.user_id, u.username, u.first_name, u.last_name, 
+                 u.email, u.mobile_number, r.name,
+                 u.joining_date, u.working_start_time, u.working_end_time,
+                 u.is_deleted, u.created_on, u.updated_on, ur.created_on;";
+
+            return _context.Set<UsersProfileSummaryVM>()
+          .FromSqlRaw(sql, id, tenantId)
+          .AsEnumerable()
+          .FirstOrDefault();
+
+
+        }
+
+
+
     }
 }
