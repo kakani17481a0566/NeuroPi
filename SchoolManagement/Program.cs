@@ -46,7 +46,7 @@ builder.Services.AddScoped<IItemService, ItemServiceImpl>();
 builder.Services.AddScoped<IItemSupplierService, ItemSupplierServiceImpl>();
 builder.Services.AddScoped<IOrders, OrderServiceImpl>();
 
-builder.Services.AddScoped<TestContentInterface,TestContentServiceImpl>();
+builder.Services.AddScoped<TestContentInterface, TestContentServiceImpl>();
 
 // Shared / Core Services
 builder.Services.AddScoped<IContactService, ContactServiceImpl>();

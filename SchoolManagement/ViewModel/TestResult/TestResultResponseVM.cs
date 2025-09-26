@@ -8,7 +8,7 @@
         public int testContentId { get; set; }
 
 
-        public int testContentId { get; set; }
+        //public int testContentId { get; set; }
 
         public string name { get; set; }
 

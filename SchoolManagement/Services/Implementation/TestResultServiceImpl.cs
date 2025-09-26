@@ -48,7 +48,7 @@ namespace SchoolManagement.Services.Implementation
                         testContentId = test.TestContentId,
                         url=test.testContent.url,
                         result=test.Result,
-                        testContentId=test.TestContentId
+                        //testContentId=test.TestContentId
 
 
                     };

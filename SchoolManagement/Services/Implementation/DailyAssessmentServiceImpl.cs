@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Azure.Core;
+using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Data;
 using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
@@ -74,7 +75,7 @@ namespace SchoolManagement.Services.Implementation
 
         public DailyAssessmentResponseVm Create(DailyAssessmentRequestVm request)
         {
-            var model = request.ToModel();
+            var model = request.ToModel(request);
             _context.DailyAssessments.Add(model);
             _context.SaveChanges();
             return DailyAssessmentResponseVm.FromModel(model);
