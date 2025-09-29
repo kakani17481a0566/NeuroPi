@@ -6,20 +6,23 @@
     public List<StudentInfoVm> Students { get; set; } = new();
     public List<AssessmentHeaderVm> HeaderDetails { get; set; } = new();
 
-    // ✅ Grouped by Subject → Skills → Student Scores
+    // ✅ Grouped by Subject → Skills → Student Scores (overall)
     public List<SubjectGroupedAssessmentVm> SubjectWiseAssessments { get; set; } = new();
 
     public Dictionary<int, string> StudentDictionary { get; set; } = new();
     public Dictionary<int, string> SubjectDictionary { get; set; } = new();
     public Dictionary<int, string> WeekDictionary { get; set; } = new();
 
-    // ✅ NEW: Week info
+    // ✅ Single Week info (legacy)
     public string? WeekName { get; set; }
     public DateOnly? WeekStartDate { get; set; }
     public DateOnly? WeekEndDate { get; set; }
 
-    // ✅ NEW: Timetable schedule
+    // ✅ Timetable schedule
     public List<AssessmentScheduleVm> AssessmentSchedule { get; set; } = new();
+
+    // ✅ NEW: Week-wise analysis
+    public List<WeeklyPerformanceVm> WeeklyAnalysis { get; set; } = new();
 }
 
 public class AssessmentScheduleVm
@@ -52,18 +55,14 @@ public class AssessmentHeaderVm
     public string SkillName { get; set; }
     public int SubjectId { get; set; }
     public string SubjectName { get; set; }
-
     public string SubjectCode { get; set; }
-
 }
 
 public class SubjectGroupedAssessmentVm
 {
     public int SubjectId { get; set; }
     public string SubjectName { get; set; }
-
     public string SubjectCode { get; set; }
-
     public List<SkillAssessmentVm> Skills { get; set; } = new();
 }
 
@@ -82,4 +81,19 @@ public class StudentScoreEntryVm
     public string Grade { get; set; }
     public decimal? Score { get; set; }
     public DateTime? AssessmentDate { get; set; }
+}
+
+// ✅ NEW: Week-wise breakdown
+public class WeeklyPerformanceVm
+{
+    public int WeekId { get; set; }
+    public string WeekName { get; set; }
+    public DateOnly StartDate { get; set; }
+    public DateOnly EndDate { get; set; }
+
+    public decimal? AverageScore { get; set; }
+    public decimal? StandardDeviation { get; set; }
+
+    // Grouped Subject → Skill → Scores for that week
+    public List<SubjectGroupedAssessmentVm> SubjectWiseAssessments { get; set; } = new();
 }
