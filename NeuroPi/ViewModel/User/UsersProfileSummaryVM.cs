@@ -9,8 +9,8 @@
         public string Email { get; set; } = string.Empty;
         public string? MobileNumber { get; set; }
 
-        // Role Info
-        public string RoleName { get; set; } = string.Empty;
+        // Role Info (aggregated)
+        public string Roles { get; set; } = string.Empty;   // comma-separated list
 
         // Course & Branch Info
         public int TotalCourses { get; set; }
@@ -19,16 +19,16 @@
         public string Branches { get; set; } = string.Empty;        // comma-separated
 
         // Work Info
-        public string JoiningDate { get; set; } = "N/A";
-        public string WorkingStartTime { get; set; } = "N/A";
-        public string WorkingEndTime { get; set; } = "N/A";
+        public DateTime? JoiningDate { get; set; }                  // nullable date
+        public TimeSpan? WorkingStartTime { get; set; }             // nullable time
+        public TimeSpan? WorkingEndTime { get; set; }               // nullable time
 
         // Status
         public string UserStatus { get; set; } = "Active";
 
         // Audit Trail
-        public string UserCreatedOn { get; set; } = string.Empty;
-        public string UserLastUpdated { get; set; } = string.Empty;
-        public string RoleAssignedOn { get; set; } = string.Empty;
+        public DateTime UserCreatedOn { get; set; }
+        public DateTime? UserLastUpdated { get; set; }              // nullable
+        public DateTime RoleAssignedOn { get; set; }
     }
 }

@@ -2,26 +2,24 @@
 {
     public List<string> AssessmentStatusCode { get; set; } = new();
     public List<string> Headers { get; set; } = new();
-    public Dictionary<string, Dictionary<int, AssessmentScoreVm>> AssessmentGrades { get; set; } = new();
+
+    // ✅ Now keyed by AssessmentId (int) → avoids name collisions
+    public Dictionary<int, Dictionary<int, AssessmentScoreVm>> AssessmentGrades { get; set; } = new();
+
     public List<StudentInfoVm> Students { get; set; } = new();
     public List<AssessmentHeaderVm> HeaderDetails { get; set; } = new();
 
-    // ✅ Grouped by Subject → Skills → Student Scores (overall)
     public List<SubjectGroupedAssessmentVm> SubjectWiseAssessments { get; set; } = new();
 
     public Dictionary<int, string> StudentDictionary { get; set; } = new();
     public Dictionary<int, string> SubjectDictionary { get; set; } = new();
     public Dictionary<int, string> WeekDictionary { get; set; } = new();
 
-    // ✅ Single Week info (legacy)
     public string? WeekName { get; set; }
     public DateOnly? WeekStartDate { get; set; }
     public DateOnly? WeekEndDate { get; set; }
 
-    // ✅ Timetable schedule
     public List<AssessmentScheduleVm> AssessmentSchedule { get; set; } = new();
-
-    // ✅ NEW: Week-wise analysis
     public List<WeeklyPerformanceVm> WeeklyAnalysis { get; set; } = new();
 }
 
@@ -83,7 +81,6 @@ public class StudentScoreEntryVm
     public DateTime? AssessmentDate { get; set; }
 }
 
-// ✅ NEW: Week-wise breakdown
 public class WeeklyPerformanceVm
 {
     public int WeekId { get; set; }
@@ -94,6 +91,5 @@ public class WeeklyPerformanceVm
     public decimal? AverageScore { get; set; }
     public decimal? StandardDeviation { get; set; }
 
-    // Grouped Subject → Skill → Scores for that week
     public List<SubjectGroupedAssessmentVm> SubjectWiseAssessments { get; set; } = new();
 }
