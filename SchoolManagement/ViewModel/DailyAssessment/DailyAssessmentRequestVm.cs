@@ -1,5 +1,4 @@
 ﻿using SchoolManagement.Model;
-
 namespace SchoolManagement.ViewModel.DailyAssessment
 {
     public class DailyAssessmentRequestVm
@@ -13,22 +12,21 @@ namespace SchoolManagement.ViewModel.DailyAssessment
         public int ConductedById { get; set; }
         public int TenantId { get; set; }
         public int CreatedBy { get; set; }
-        public int? BranchId { get; set; }
-
-        public MDailyAssessment ToModel()
+        public int BranchId { get; set; }
+        public MDailyAssessment ToModel(DailyAssessmentRequestVm requestVm)
         {
             return new MDailyAssessment
             {
-                AssessmentDate = this.AssessmentDate,
-                TimeTableId = this.TimeTableId,
+                AssessmentDate = requestVm.AssessmentDate,
+                TimeTableId = requestVm.TimeTableId,
                 //WorksheetId = this.WorksheetId,
-                GradeId = this.GradeId,
-                StudentId = this.StudentId,
-                BranchId = this.BranchId,
+                GradeId = requestVm.GradeId,
+                StudentId = requestVm.StudentId,
+                BranchId = requestVm.BranchId,
                 //CourseId = this.CourseId,
-                ConductedById = this.ConductedById,
-                TenantId = this.TenantId,
-                CreatedBy = this.CreatedBy
+                ConductedById = requestVm.ConductedById,
+                TenantId = requestVm.TenantId,
+                CreatedBy = requestVm.CreatedBy
             };
         }
     }
