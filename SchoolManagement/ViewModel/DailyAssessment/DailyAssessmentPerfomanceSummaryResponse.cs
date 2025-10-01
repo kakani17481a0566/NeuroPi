@@ -3,7 +3,7 @@
     public List<string> AssessmentStatusCode { get; set; } = new();
     public List<string> Headers { get; set; } = new();
 
-    // ✅ Now keyed by AssessmentId (int) → avoids name collisions
+    // ✅ Keyed by AssessmentId → StudentId → Score
     public Dictionary<int, Dictionary<int, AssessmentScoreVm>> AssessmentGrades { get; set; } = new();
 
     public List<StudentInfoVm> Students { get; set; } = new();
@@ -14,6 +14,7 @@
     public Dictionary<int, string> StudentDictionary { get; set; } = new();
     public Dictionary<int, string> SubjectDictionary { get; set; } = new();
     public Dictionary<int, string> WeekDictionary { get; set; } = new();
+    public Dictionary<int, string> TermDictionary { get; set; } = new(); // ✅ NEW
 
     public string? WeekName { get; set; }
     public DateOnly? WeekStartDate { get; set; }
@@ -21,6 +22,7 @@
 
     public List<AssessmentScheduleVm> AssessmentSchedule { get; set; } = new();
     public List<WeeklyPerformanceVm> WeeklyAnalysis { get; set; } = new();
+    public List<TermPerformanceVm> TermAnalysis { get; set; } = new(); // ✅ NEW
 }
 
 public class AssessmentScheduleVm
@@ -61,6 +63,11 @@ public class SubjectGroupedAssessmentVm
     public int SubjectId { get; set; }
     public string SubjectName { get; set; }
     public string SubjectCode { get; set; }
+
+    // ✅ NEW → for term or week aggregated view
+    public string Grade { get; set; } = "Not Graded";
+    public decimal? AverageScore { get; set; }
+
     public List<SkillAssessmentVm> Skills { get; set; } = new();
 }
 
@@ -90,6 +97,23 @@ public class WeeklyPerformanceVm
 
     public decimal? AverageScore { get; set; }
     public decimal? StandardDeviation { get; set; }
+
+    public List<SubjectGroupedAssessmentVm> SubjectWiseAssessments { get; set; } = new();
+}
+
+// ✅ NEW: Term-level aggregation
+public class TermPerformanceVm
+{
+    public int TermId { get; set; }
+    public string TermName { get; set; }
+    public DateOnly StartDate { get; set; }
+    public DateOnly EndDate { get; set; }
+
+    public decimal? AverageScore { get; set; }
+    public decimal? StandardDeviation { get; set; }
+
+    // ✅ NEW → overall grade for the term
+    public string Grade { get; set; } = "Not Graded";
 
     public List<SubjectGroupedAssessmentVm> SubjectWiseAssessments { get; set; } = new();
 }
