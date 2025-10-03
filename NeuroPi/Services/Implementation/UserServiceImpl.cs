@@ -223,7 +223,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
         FROM user_roles ur
         JOIN users u ON u.user_id = ur.user_id
         JOIN roles r ON r.role_id = ur.role_id
-        LEFT JOIN course_teacher ct ON ct.teacher_id = u.user_id
+        LEFT JOIN course_teacher ct ON ct.teacher_id = u.user_idailyAssessment/performance-summary
         LEFT JOIN course c ON c.id = ct.course_id
         LEFT JOIN branch b ON b.id = ct.branch_id
         WHERE ur.user_id = @p0 AND ur.tenant_id = @p1
