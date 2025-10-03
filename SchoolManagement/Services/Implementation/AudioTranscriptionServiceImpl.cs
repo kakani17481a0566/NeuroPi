@@ -367,8 +367,6 @@ namespace SchoolManagement.Services.Implementation
                                         .ToListAsync();
 
                                     var existingSet = new HashSet<string>(existingNames, StringComparer.OrdinalIgnoreCase);
-
-                                    // 5) Prepare new rows only for words not already present
                                     var toInsert = new List<MTestContent>();
                                     foreach (var word in rhymeWords)
                                     {
@@ -376,18 +374,18 @@ namespace SchoolManagement.Services.Implementation
                                         {
                                             toInsert.Add(new MTestContent
                                             {
-                                                name = word,                      // e.g., "narrow"
+                                                name = word,                     
                                                 testId = 1,
-                                                relationId = testResponse.id,     // keep as you had it (if that's your link)
+                                                relationId = testResponse.id,     
                                                 tenantId = testResponse.tenantId,
-                                                // set other defaults if your model requires them (created_on, created_by, etc.)
+                                                
                                             });
                                         }
                                     }
 
                                     if (toInsert.Count > 0)
                                     {
-                                        schoolManagementDb.TestContent.AddRange(toInsert); // <-- insert into the correct table
+                                        schoolManagementDb.TestContent.AddRange(toInsert); 
                                         await schoolManagementDb.SaveChangesAsync();
                                     }
                                     return string.Join(",", toInsert.Select(x => x.name));

@@ -16,6 +16,8 @@ namespace SchoolManagement.ViewModel.ItemCategory
         public int? UpdatedBy { get; set; }
         public DateTime? UpdatedOn { get; set; }
 
+        public string image { get; set; }
+
         public static ItemCategoryResponseVM ToViewModel(MItemCategory itemCategory)
         {
             return new ItemCategoryResponseVM
@@ -23,6 +25,7 @@ namespace SchoolManagement.ViewModel.ItemCategory
                 Id = itemCategory.Id,
                 Name = itemCategory.Name,
                 TenantId = itemCategory.TenantId,
+                image = itemCategory.imageUrl,
                 CreatedBy = itemCategory.CreatedBy,
                 CreatedOn = itemCategory.CreatedOn,
                 UpdatedBy = itemCategory.UpdatedBy,

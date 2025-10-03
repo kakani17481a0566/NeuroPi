@@ -15,7 +15,7 @@ namespace SchoolManagement.Services.Implementation
             _context = context;
         }
 
-        public string AddResult(TestResultRequestVM request)
+        public string   AddResult(TestResultRequestVM request)
         {
             bool result = _context.TestResult.Any
                 (r => r.StudentId == request.studentId && r.TestContentId == request.testContentId && r.RelationId == request.relationId);

@@ -12,6 +12,9 @@ namespace SchoolManagement.Model
         [Column("name")]
         public string Name { get; set; }
 
+        [Column("image_url")]
+        public string imageUrl {  get; set; }
+
         [ForeignKey("Tenant")]
         [Column("tenant_id")]
         public int TenantId { get; set; }

@@ -73,6 +73,7 @@ namespace SchoolManagement.Services.Implementation
                 {
                     Id = ic.Id,
                     Name = ic.Name,
+                    image=ic.imageUrl,
                     TenantId = ic.TenantId,
                     CreatedBy = ic.CreatedBy,
                     CreatedOn = ic.CreatedOn,
