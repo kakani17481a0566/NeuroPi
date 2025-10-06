@@ -19,7 +19,7 @@ namespace SchoolManagement.Model
         public virtual MItems Item { get; set; }
 
         [Column("image")]
-        public byte[]? Image { get; set; }
+        public string? Image { get; set; }
 
         [Column("img_description")]
         public string? ImgDescription { get; set; }

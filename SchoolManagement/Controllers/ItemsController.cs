@@ -42,14 +42,14 @@ namespace SchoolManagement.Controllers
         }
 
         [HttpGet("GetByTenant/{tenantId}")]
-        public ResponseResult<List<ItemsResponseVM>> GetByTenantId([FromRoute] int tenantId)
+        public ResponseResult<List<ItemsResponse>> GetByTenantId([FromRoute] int tenantId)
         {
             var response = _itemService.GetItemsByTenant(tenantId);
             if (response == null || response.Count == 0)
             {
-                return new ResponseResult<List<ItemsResponseVM>>(HttpStatusCode.NotFound, response, "No data Found for the specified tenant");
+                return new ResponseResult<List<ItemsResponse>>(HttpStatusCode.NotFound, response, "No data Found for the specified tenant");
             }
-            return new ResponseResult<List<ItemsResponseVM>>(HttpStatusCode.OK, response, "Items fetched successfully");
+            return new ResponseResult<List<ItemsResponse>>(HttpStatusCode.OK, response, "Items fetched successfully");
         }
 
         [HttpGet("{id}/{tenantId}")]

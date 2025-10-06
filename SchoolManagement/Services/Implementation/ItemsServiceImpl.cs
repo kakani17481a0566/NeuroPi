@@ -1,7 +1,9 @@
-﻿using SchoolManagement.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using SchoolManagement.Data;
 using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.Items;
+using System.Data;
 
 namespace SchoolManagement.Services.Implementation
 {
@@ -62,12 +64,31 @@ namespace SchoolManagement.Services.Implementation
         }
 
         // 🔹 Get by Tenant
-        public List<ItemsResponseVM> GetItemsByTenant(int tenantId)
+        public List<ItemsResponse> GetItemsByTenant(int tenantId)
         {
-            return _context.Items
-                .Where(i => !i.IsDeleted && i.TenantId == tenantId)
-                .Select(i => ItemsResponseVM.ToViewModel(i))
-                .ToList();
+            List<MItemBranch> items = _context.ItemBranch.Where(e => !e.IsDeleted & e.TenantId == tenantId).Include(e => e.Item).Include(e => e.Item.ItemCategory).ToList();
+            List<ItemsResponse> result= new List<ItemsResponse>();
+            foreach(var item in items)
+            {
+                var itemImage = _context.ItemsImages.Where(e => !e.IsDeleted && e.ItemId== item.Item.Id).FirstOrDefault();
+                ItemsResponse itemsResponse = new ItemsResponse()
+                {
+                    Id = item.ItemId,
+                    Name = item.Item.Name,
+                    categoryId = item.Item.CategoryId,
+                    categoryName = item.Item.ItemCategory.Name,
+                    size=item.Item.Height,
+                    price=item.ItemPrice,
+                    status=item.ItemQuantity!=null?"available":"not Available",
+                    Image=itemImage.Image
+
+
+                };
+                result.Add(itemsResponse);
+                return result;
+            }
+            return result;
+
         }
 
         // 🔹 Update

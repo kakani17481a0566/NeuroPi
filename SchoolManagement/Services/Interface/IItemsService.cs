@@ -6,7 +6,7 @@ namespace SchoolManagement.Services.Interface
     {
         List<ItemsResponseVM> GetAllItems();
 
-        List<ItemsResponseVM> GetItemsByTenant(int tenantId);
+        List<ItemsResponse> GetItemsByTenant(int tenantId);
 
         ItemsResponseVM GetItemsById(int id);
 
