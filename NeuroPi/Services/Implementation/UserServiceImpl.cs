@@ -202,35 +202,38 @@ namespace NeuroPi.UserManagment.Services.Implementation
         public UsersProfileSummaryVM GetUserProfileSummary(int id, int tenantId)
         {
             var sql = @"
-        SELECT 
-            u.user_id AS UserId,
-            u.username AS Username,
-            CONCAT(u.first_name, ' ', u.last_name) AS FullName,
-            u.email AS Email,
-            u.mobile_number AS MobileNumber,
-            COALESCE(STRING_AGG(DISTINCT r.name, ', '), 'N/A') AS Roles,
-            COUNT(DISTINCT c.id) AS TotalCourses,
-            COALESCE(STRING_AGG(DISTINCT c.name, ', '), 'N/A') AS CoursesTaught,
-            COUNT(DISTINCT b.id) AS TotalBranches,
-            COALESCE(STRING_AGG(DISTINCT b.name, ', '), 'N/A') AS Branches,
-            u.joining_date AS JoiningDate,
-            u.working_start_time AS WorkingStartTime,
-            u.working_end_time AS WorkingEndTime,
-            CASE WHEN u.is_deleted = FALSE THEN 'Active' ELSE 'Inactive' END AS UserStatus,
-            u.created_on AS UserCreatedOn,
-            u.updated_on AS UserLastUpdated,
-            ur.created_on AS RoleAssignedOn
-        FROM user_roles ur
-        JOIN users u ON u.user_id = ur.user_id
-        JOIN roles r ON r.role_id = ur.role_id
-        LEFT JOIN course_teacher ct ON ct.teacher_id = u.user_idailyAssessment/performance-summary
-        LEFT JOIN course c ON c.id = ct.course_id
-        LEFT JOIN branch b ON b.id = ct.branch_id
-        WHERE ur.user_id = @p0 AND ur.tenant_id = @p1
-        GROUP BY u.user_id, u.username, u.first_name, u.last_name, 
-                 u.email, u.mobile_number,
-                 u.joining_date, u.working_start_time, u.working_end_time,
-                 u.is_deleted, u.created_on, u.updated_on, ur.created_on;";
+    SELECT 
+        u.user_id AS UserId,
+        u.username AS Username,
+        CONCAT(u.first_name, ' ', u.last_name) AS FullName,
+        u.email AS Email,
+        u.mobile_number AS MobileNumber,
+        COALESCE(STRING_AGG(DISTINCT r.name, ', '), 'N/A') AS Roles,
+        COUNT(DISTINCT c.id) AS TotalCourses,
+        COALESCE(STRING_AGG(DISTINCT c.name, ', '), 'N/A') AS CoursesTaught,
+        COUNT(DISTINCT b.id) AS TotalBranches,
+        COALESCE(STRING_AGG(DISTINCT b.name, ', '), 'N/A') AS Branches,
+        
+        -- ✅ return native types, not text
+        u.joining_date AS JoiningDate,
+        u.working_start_time AS WorkingStartTime,
+        u.working_end_time AS WorkingEndTime,
+        
+        CASE WHEN u.is_deleted = FALSE THEN 'Active' ELSE 'Inactive' END AS UserStatus,
+        u.created_on AS UserCreatedOn,
+        u.updated_on AS UserLastUpdated,
+        ur.created_on AS RoleAssignedOn
+    FROM user_roles ur
+    JOIN users u ON u.user_id = ur.user_id
+    JOIN roles r ON r.role_id = ur.role_id
+    LEFT JOIN course_teacher ct ON ct.teacher_id = u.user_id
+    LEFT JOIN course c ON c.id = ct.course_id
+    LEFT JOIN branch b ON b.id = ct.branch_id
+    WHERE ur.user_id = {0} AND ur.tenant_id = {1}
+    GROUP BY u.user_id, u.username, u.first_name, u.last_name, 
+             u.email, u.mobile_number,
+             u.joining_date, u.working_start_time, u.working_end_time,
+             u.is_deleted, u.created_on, u.updated_on, ur.created_on;";
 
             return _context.Set<UsersProfileSummaryVM>()
                 .FromSqlRaw(sql, id, tenantId)

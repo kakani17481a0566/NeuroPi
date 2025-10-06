@@ -1,4 +1,4 @@
-using CloudinaryDotNet;
+﻿using CloudinaryDotNet;
 using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -105,6 +105,9 @@ builder.Services.AddScoped<IStudentRegistration, StudentRegistrationImpl>();
 builder.Services.AddScoped<IStudentsEnquiry, StudentEnquiryImpl>();
 
 builder.Services.AddScoped<ICountingTestContentService, CountingTestContentImpl>();
+
+builder.Services.AddScoped<IFeeStructure, FeeStructureServiceImpl>();
+builder.Services.AddScoped<IFeePackage, FeePackageServiceImpl>();
 
 
 

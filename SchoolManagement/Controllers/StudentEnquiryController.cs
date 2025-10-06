@@ -192,5 +192,30 @@ namespace SchoolManagement.Controllers
                 "Student enquiry updated successfully"
             );
         }
+
+
+        [HttpGet("student-enquiry-new/tenant/{tenantId}/branch/{branchId}/display")]
+
+        public ResponseResult<List<StudentEnquiryDisplay>> GetStudentEnquiryDisplayByTenantAndBranch(
+           [FromRoute] int tenantId,
+           [FromRoute] int branchId)
+        {
+            var enquiries = _studentsEnquiry.GetStudentEnquiryDisplayByTenantAndBranch(tenantId, branchId);
+
+            if (enquiries == null || enquiries.Count == 0)
+            {
+                return new ResponseResult<List<StudentEnquiryDisplay>>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    $"No student enquiries found for Tenant Id {tenantId} and Branch Id {branchId}"
+                );
+            }
+
+            return new ResponseResult<List<StudentEnquiryDisplay>>(
+                HttpStatusCode.OK,
+                enquiries,
+                $"Student enquiries for Tenant Id {tenantId} and Branch Id {branchId} returned successfully"
+            );
+        }
     }
 }

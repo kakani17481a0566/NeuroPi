@@ -16,12 +16,10 @@ namespace SchoolManagement.ViewModel.Contact
 
         public int TenantId { get; set; }
 
-        public int createdBy { get; set; }
-
-
-
-
-
+        // ✅ Match entity MContact
+        public string? Qualification { get; set; }
+        public string? Profession { get; set; }
+        public int CreatedBy { get; set; }   // Renamed to PascalCase for consistency
 
         public static MContact ToModel(ContactRequestVM requestVM)
         {
@@ -37,9 +35,13 @@ namespace SchoolManagement.ViewModel.Contact
                 City = requestVM.City,
                 Pincode = requestVM.Pincode,
                 TenantId = requestVM.TenantId,
-                CreatedBy = requestVM.createdBy,
+
+                // ✅ Newly mapped props
+                Qualification = requestVM.Qualification,
+                Profession = requestVM.Profession,
+                CreatedBy = requestVM.CreatedBy,
+
                 CreatedOn = DateTime.UtcNow
-               
             };
         }
     }

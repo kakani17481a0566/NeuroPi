@@ -1,5 +1,7 @@
 ﻿using SchoolManagement.Model;
+using SchoolManagement.ViewModel.Contact;
 using System;
+using System.Linq;
 
 namespace SchoolManagement.ViewModel.StudentsEnquiry
 {
@@ -55,9 +57,7 @@ namespace SchoolManagement.ViewModel.StudentsEnquiry
         // ----------------------------
         public int? HearAboutUsTypeId { get; set; }
         public bool IsAgreedToTerms { get; set; }
-
-        // UI sends a data URL or base64 string; service decodes to byte[] (DB bytea)
-        public string? Signature { get; set; }  // <-- CHANGED from byte[]? to string?
+        public string? Signature { get; set; } // Base64 string
 
         public int StatusId { get; set; }
 
@@ -69,13 +69,14 @@ namespace SchoolManagement.ViewModel.StudentsEnquiry
         public int? BranchId { get; set; }
 
         // ----------------------------
-        // Mapping Helpers
+        // Mapping Helpers (use ContactRequestVM)
         // ----------------------------
         public MContact ToParentContact()
         {
-            return new MContact
+            var vm = new ContactRequestVM
             {
-                Name = $"{ParentFirstName} {ParentMiddleName} {ParentLastName}".Trim(),
+                Name = string.Join(" ", new[] { ParentFirstName, ParentMiddleName, ParentLastName }
+                                     .Where(x => !string.IsNullOrWhiteSpace(x))),
                 PriNumber = ParentPhone,
                 SecNumber = ParentAlternatePhone,
                 Email = ParentEmail,
@@ -87,10 +88,10 @@ namespace SchoolManagement.ViewModel.StudentsEnquiry
                 Qualification = ParentQualification,
                 Profession = ParentProfession,
                 TenantId = TenantId,
-                CreatedBy = CreatedBy,
-                CreatedOn = DateTime.UtcNow,
-                IsDeleted = false
+                CreatedBy = CreatedBy
             };
+
+            return ContactRequestVM.ToModel(vm);
         }
 
         public MContact? ToMotherContact()
@@ -98,12 +99,13 @@ namespace SchoolManagement.ViewModel.StudentsEnquiry
             if (string.IsNullOrWhiteSpace(MotherFirstName) || string.IsNullOrWhiteSpace(MotherPhone))
                 return null;
 
-            return new MContact
+            var vm = new ContactRequestVM
             {
-                Name = $"{MotherFirstName} {MotherMiddleName} {MotherLastName}".Trim(),
+                Name = string.Join(" ", new[] { MotherFirstName, MotherMiddleName, MotherLastName }
+                                     .Where(x => !string.IsNullOrWhiteSpace(x))),
                 PriNumber = MotherPhone,
                 Email = MotherEmail,
-                Address1 = ParentAddress1, // Assuming same address
+                Address1 = ParentAddress1, 
                 Address2 = ParentAddress2,
                 City = ParentCity,
                 State = ParentState,
@@ -111,10 +113,10 @@ namespace SchoolManagement.ViewModel.StudentsEnquiry
                 Qualification = MotherQualification,
                 Profession = MotherProfession,
                 TenantId = TenantId,
-                CreatedBy = CreatedBy,
-                CreatedOn = DateTime.UtcNow,
-                IsDeleted = false
+                CreatedBy = CreatedBy
             };
+
+            return ContactRequestVM.ToModel(vm);
         }
     }
 }
