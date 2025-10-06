@@ -18,10 +18,10 @@
         public int TotalBranches { get; set; }
         public string Branches { get; set; } = string.Empty;        // comma-separated
 
-        // Work Info
-        public DateTime? JoiningDate { get; set; }                  // nullable date
-        public TimeSpan? WorkingStartTime { get; set; }             // nullable time
-        public TimeSpan? WorkingEndTime { get; set; }               // nullable time
+        // Work Info (nullable from DB)
+        public DateTime? JoiningDate { get; set; }                  // keep as native
+        public TimeSpan? WorkingStartTime { get; set; }             // keep as native
+        public TimeSpan? WorkingEndTime { get; set; }               // keep as native
 
         // Status
         public string UserStatus { get; set; } = "Active";

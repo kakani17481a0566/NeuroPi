@@ -14,5 +14,9 @@ namespace SchoolManagement.Services.Interface
         StudentEnquiryResponseVM GetStudentEnquiryByIdAndTenant(int id, int tenantId);
         bool DeleteStudentEnquiryByIdAndTenant(int id, int tenantId);
         StudentEnquiryResponseVM UpdateStudentEnquiry(int id, int tenantId, StudentEnquiryUpdateVM vm);
+
+        List<StudentEnquiryDisplay> GetStudentEnquiryDisplayByTenantAndBranch(int tenantId, int branchId);
+
+
     }
 }

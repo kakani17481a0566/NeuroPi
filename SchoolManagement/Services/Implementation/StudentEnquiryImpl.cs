@@ -190,5 +190,96 @@ namespace SchoolManagement.Services.Implementation
                 throw new FormatException("Invalid base64 signature", ex);
             }
         }
+
+
+        public List<StudentEnquiryDisplay> GetStudentEnquiryDisplayByTenantAndBranch(int tenantId, int branchId)
+        {
+            var query = _db.StudentsEnquiries
+                .Include(e => e.AdmissionCourse)
+                .Include(e => e.FromCourse)
+                .Include(e => e.ToCourse)
+                .Include(e => e.ParentContact)
+                .Include(e => e.MotherContact)
+                .Include(e => e.Status)
+                .Include(e => e.Gender)
+                .Include(e => e.HearAboutUs)
+                .Include(e => e.Branch)
+                .Include(e => e.Tenant)
+                .Include(e => e.CreatedUser)
+                .Include(e => e.UpdatedUser)
+                .Where(e => !e.IsDeleted && e.TenantId == tenantId && e.BranchId == branchId);
+
+            return query.AsEnumerable().Select(e => new StudentEnquiryDisplay
+            {
+                StudentEnquiryId = e.Id,
+
+                // Student Info
+                FullName = string.Join(" ",
+                    new[] { e.StudentFirstName, e.StudentMiddleName, e.StudentLastName }
+                    .Where(x => !string.IsNullOrEmpty(x))),
+                Dob = e.Dob,
+                Gender = e.Gender?.Name,
+
+                // Courses
+                AdmissionCourseId = e.AdmissionCourseId,
+                AdmissionCourseName = e.AdmissionCourse?.Name,
+                FromCourseId = e.FromCourseId,
+                FromCourseName = e.FromCourse?.Name,
+                FromYear = e.FromYear,
+                ToCourseId = e.ToCourseId,
+                ToCourseName = e.ToCourse?.Name,
+                ToYear = e.ToYear,
+                PreviousSchoolName = e.PreviousSchoolName,
+
+                // Parent contact
+                ParentContactId = e.ParentContactId,
+                ParentName = e.ParentContact?.Name,
+                ParentPhone = e.ParentContact?.PriNumber,
+                ParentEmail = e.ParentContact?.Email,
+
+                // Mother contact
+                MotherContactId = e.MotherContactId,
+                MotherName = e.MotherContact?.Name,
+                MotherPhone = e.MotherContact?.PriNumber,
+                MotherEmail = e.MotherContact?.Email,
+
+                // Heard About Us
+                HearAboutUsTypeId = e.HearAboutUsTypeId,
+                HearAboutUsName = e.HearAboutUs?.Name,
+
+                // Status
+                StatusId = e.StatusId,
+                StatusName = e.Status?.Name,
+
+                // Branch
+                BranchId = e.BranchId,
+                BranchName = e.Branch?.Name,
+                BranchContact = e.Branch?.Contact,
+                BranchAddress = e.Branch?.Address,
+                BranchDistrict = e.Branch?.District,
+                BranchState = e.Branch?.State,
+                BranchPincode = e.Branch?.Pincode,
+
+                // Tenant
+                TenantId = e.TenantId,
+                TenantName = e.Tenant?.Name,
+
+                // Audit
+                CreatedOn = e.CreatedOn,
+                CreatedBy = e.CreatedBy,
+                CreatedByName = e.CreatedUser != null
+                    ? $"{e.CreatedUser.FirstName} {e.CreatedUser.LastName}"
+                    : null,
+                UpdatedOn = e.UpdatedOn,
+                UpdatedBy = e.UpdatedBy,
+                UpdatedByName = e.UpdatedUser != null
+                    ? $"{e.UpdatedUser.FirstName} {e.UpdatedUser.LastName}"
+                    : null,
+
+                // Misc
+                IsGuardian = e.IsGuardian,
+                IsAgreedToTerms = e.IsAgreedToTerms
+            }).ToList();
+        }
     }
 }

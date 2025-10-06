@@ -125,6 +125,12 @@ namespace SchoolManagement.Data
 
 
 
+        //fee
+        public DbSet<MFeeStructure> FeeStructures { get; set; }
+        public DbSet<MFeePackage> FeePackages { get; set; }
+
+
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
