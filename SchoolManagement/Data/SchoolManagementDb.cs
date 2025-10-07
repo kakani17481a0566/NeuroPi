@@ -130,6 +130,10 @@ namespace SchoolManagement.Data
         //fee
         public DbSet<MFeeStructure> FeeStructures { get; set; }
         public DbSet<MFeePackage> FeePackages { get; set; }
+        public DbSet<MFeePackageMaster> FeePackageMasters { get; set; }
+
+        public DbSet<MCorporate> Corporates { get; set; } = null!;
+
 
 
 

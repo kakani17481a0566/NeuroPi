@@ -40,6 +40,7 @@
   <ItemGroup>
     <Folder Include="SqlQueries\" />
     <Folder Include="ViewModel\NewFolder1\" />
+    <Folder Include="ViewModel\NewFolder2\" />
     <Folder Include="ViewModel\NewFolder\" />
     <Folder Include="ViewModel\StudentRegistration\" />
   </ItemGroup>

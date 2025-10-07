@@ -19,11 +19,8 @@ namespace SchoolManagement.ViewModel.FeePackage
         public int? TaxId { get; set; }
 
         [Required]
-        [MaxLength(50)]
-        public string PaymentPeriod { get; set; }
+        public int PaymentPeriod { get; set; }   // 🔹 changed to int (matches DB + Entity)
 
-        // 🔹 Add these if you want to pass them explicitly from client
-        public int? CreatedBy { get; set; }
-        public int? UpdatedBy { get; set; }
+        public int? PackageMasterId { get; set; }  // 🔹 newly added
     }
 }

@@ -109,6 +109,9 @@ builder.Services.AddScoped<ICountingTestContentService, CountingTestContentImpl>
 
 builder.Services.AddScoped<IFeeStructure, FeeStructureServiceImpl>();
 builder.Services.AddScoped<IFeePackage, FeePackageServiceImpl>();
+builder.Services.AddScoped<IFeePackageMaster, FeePackageMasterServiceImpl>();
+
+builder.Services.AddScoped<ICorporateService, CorporateServiceImpl>();
 
 
 

@@ -33,7 +33,10 @@ namespace SchoolManagement.Services.Implementation
                     TenantId = f.TenantId,
                     TenantName = f.Tenant.Name,
                     TaxId = f.TaxId,
-                    PaymentPeriod = f.PaymentPeriod
+                    PaymentPeriodId = f.PaymentPeriod,
+                    PaymentPeriodName = f.PaymentPeriodMaster.Name,
+                    PackageMasterId = f.PackageMasterId,
+                    PackageMasterName = f.PackageMaster != null ? f.PackageMaster.Name : null
                 })
                 .ToList();
         }
@@ -54,12 +57,15 @@ namespace SchoolManagement.Services.Implementation
                     TenantId = f.TenantId,
                     TenantName = f.Tenant.Name,
                     TaxId = f.TaxId,
-                    PaymentPeriod = f.PaymentPeriod
+                    PaymentPeriodId = f.PaymentPeriod,
+                    PaymentPeriodName = f.PaymentPeriodMaster.Name,
+                    PackageMasterId = f.PackageMasterId,
+                    PackageMasterName = f.PackageMaster != null ? f.PackageMaster.Name : null
                 })
                 .FirstOrDefault();
         }
 
-        public int Create(FeePackageRequestVM vm)
+        public int Create(FeePackageRequestVM vm, int currentUserId)
         {
             var existing = _db.FeePackages.FirstOrDefault(f =>
                 f.FeeStructureId == vm.FeeStructureId &&
@@ -74,9 +80,6 @@ namespace SchoolManagement.Services.Implementation
                 return existing.Id;
             }
 
-            if (!vm.CreatedBy.HasValue)
-                throw new InvalidOperationException("CreatedBy is required");
-
             var entity = new MFeePackage
             {
                 FeeStructureId = vm.FeeStructureId,
@@ -84,10 +87,11 @@ namespace SchoolManagement.Services.Implementation
                 CourseId = vm.CourseId,
                 TenantId = vm.TenantId,
                 TaxId = vm.TaxId,
+                PackageMasterId = vm.PackageMasterId,
                 PaymentPeriod = vm.PaymentPeriod,
-                CreatedBy = vm.CreatedBy.Value,
+                CreatedBy = currentUserId,
                 CreatedOn = DateTime.UtcNow,
-                UpdatedBy = vm.UpdatedBy ?? vm.CreatedBy.Value,
+                UpdatedBy = currentUserId,
                 UpdatedOn = DateTime.UtcNow
             };
 
@@ -96,7 +100,7 @@ namespace SchoolManagement.Services.Implementation
             return entity.Id;
         }
 
-        public bool Update(int id, FeePackageRequestVM vm)
+        public bool Update(int id, FeePackageRequestVM vm, int currentUserId)
         {
             var entity = _db.FeePackages.FirstOrDefault(f =>
                 f.Id == id && f.TenantId == vm.TenantId && f.BranchId == vm.BranchId && !f.IsDeleted);
@@ -119,18 +123,15 @@ namespace SchoolManagement.Services.Implementation
             entity.CourseId = vm.CourseId;
             entity.TaxId = vm.TaxId;
             entity.PaymentPeriod = vm.PaymentPeriod;
-
-            if (!vm.UpdatedBy.HasValue)
-                throw new InvalidOperationException("UpdatedBy is required");
-
-            entity.UpdatedBy = vm.UpdatedBy.Value;
+            entity.PackageMasterId = vm.PackageMasterId;
+            entity.UpdatedBy = currentUserId;
             entity.UpdatedOn = DateTime.UtcNow;
 
             _db.FeePackages.Update(entity);
             return _db.SaveChanges() > 0;
         }
 
-        public bool Delete(int id, int tenantId, int branchId)
+        public bool Delete(int id, int tenantId, int branchId, int currentUserId)
         {
             var entity = _db.FeePackages.FirstOrDefault(f =>
                 f.Id == id && f.TenantId == tenantId && f.BranchId == branchId && !f.IsDeleted);
@@ -138,13 +139,65 @@ namespace SchoolManagement.Services.Implementation
             if (entity == null) return false;
 
             entity.IsDeleted = true;
-
-            if (!entity.UpdatedBy.HasValue)
-                throw new InvalidOperationException("UpdatedBy must be set before deletion.");
-
+            entity.UpdatedBy = currentUserId;
             entity.UpdatedOn = DateTime.UtcNow;
 
             return _db.SaveChanges() > 0;
         }
+
+        public List<FeePackageListVM> GetPackageList(int tenantId, int branchId)
+        {
+            return _db.FeePackages
+                .Where(f => f.TenantId == tenantId && f.BranchId == branchId && !f.IsDeleted)
+                .Select(f => new FeePackageListVM
+                {
+                    Id = f.Id,
+                    CourseId = f.CourseId,
+                    CourseName = f.Course.Name,
+                    PackageMasterId = f.PackageMasterId ?? 0,
+                    PackageName = f.PackageMaster != null ? f.PackageMaster.Name : null,
+                    FeeStructureId = f.FeeStructureId,
+                    FeeStructureName = f.FeeStructure.Name,
+                    Amount = f.FeeStructure.Amount,        // adjust if stored elsewhere
+                    PaymentPeriodName = f.PaymentPeriodMaster.Name
+                })
+                .ToList();
+        }
+
+        public List<FeePackageGroupVM> GetGroupedPackages(int tenantId, int branchId)
+        {
+            return _db.FeePackages
+                .Where(f => f.TenantId == tenantId && f.BranchId == branchId && !f.IsDeleted)
+                .GroupBy(f => new
+                {
+                    f.PackageMasterId,
+                    PackageName = f.PackageMaster != null ? f.PackageMaster.Name : null,
+                    f.CourseId,
+                    CourseName = f.Course.Name
+                })
+                .Select(g => new FeePackageGroupVM
+                {
+                    PackageMasterId = g.Key.PackageMasterId ?? 0,
+                    PackageName = g.Key.PackageName,
+                    CourseId = g.Key.CourseId,
+                    CourseName = g.Key.CourseName,
+                    BranchId = g.First().BranchId,
+                    BranchName = g.First().Branch.Name,
+                    TenantId = g.First().TenantId,
+                    TenantName = g.First().Tenant.Name,
+                    Items = g.Select(f => new FeePackageItemVM
+                    {
+                        Id = f.Id,
+                        FeeStructureId = f.FeeStructureId,
+                        FeeStructureName = f.FeeStructure.Name,
+                        Amount = f.FeeStructure.Amount,
+                        PaymentPeriodName = f.PaymentPeriodMaster.Name
+                    }).ToList()
+                })
+                .ToList();
+        }
+
+
+
     }
 }

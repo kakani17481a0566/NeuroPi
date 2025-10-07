@@ -12,7 +12,6 @@ namespace SchoolManagement.Model
         [Column("id")]
         public int Id { get; set; }
 
-       
         [Required]
         [Column("fee_structure_id")]
         public int FeeStructureId { get; set; }
@@ -34,10 +33,12 @@ namespace SchoolManagement.Model
 
         [Required]
         [Column("payment_period")]
-        [MaxLength(50)]
-        public string PaymentPeriod { get; set; }
+        public int PaymentPeriod { get; set; }
 
-       
+        [Column("package_master_id")]
+        public int? PackageMasterId { get; set; }
+
+        // 🔹 Navigation Properties
         [ForeignKey("FeeStructureId")]
         public virtual MFeeStructure FeeStructure { get; set; }
 
@@ -50,7 +51,13 @@ namespace SchoolManagement.Model
         [ForeignKey("TenantId")]
         public virtual MTenant Tenant { get; set; }
 
-    
+        [ForeignKey("PackageMasterId")]
+        public virtual MFeePackageMaster PackageMaster { get; set; }
+
+        // 🔹 Link to masters for PaymentPeriod
+        [ForeignKey("PaymentPeriod")]
+        public virtual MMaster PaymentPeriodMaster { get; set; }
+
         [ForeignKey("CreatedBy")]
         public virtual MUser CreatedByUser { get; set; }
 
