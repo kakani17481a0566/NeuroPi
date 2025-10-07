@@ -85,7 +85,7 @@ namespace SchoolManagement.Services.Implementation
 
                 };
                 result.Add(itemsResponse);
-                return result;
+                
             }
             return result;
 
