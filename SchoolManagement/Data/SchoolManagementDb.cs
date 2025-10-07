@@ -133,6 +133,8 @@ namespace SchoolManagement.Data
         public DbSet<MFeePackageMaster> FeePackageMasters { get; set; }
 
         public DbSet<MCorporate> Corporates { get; set; } = null!;
+        public DbSet<MFeeTransactions> FeeTransactions { get; set; }
+
 
 
 

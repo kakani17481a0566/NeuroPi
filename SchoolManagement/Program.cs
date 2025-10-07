@@ -112,6 +112,8 @@ builder.Services.AddScoped<IFeePackage, FeePackageServiceImpl>();
 builder.Services.AddScoped<IFeePackageMaster, FeePackageMasterServiceImpl>();
 
 builder.Services.AddScoped<ICorporateService, CorporateServiceImpl>();
+builder.Services.AddScoped<IFeeTransactions, FeeTransactionsServiceImpl>();
+
 
 builder.Services.AddScoped<IItemHeaderService, ItemHeaderServiceImpl>();
 
