@@ -123,6 +123,8 @@ namespace SchoolManagement.Data
         public DbSet<MItemsGroup> ItemsGroup { get; set; }
         public DbSet<MItemsImage> ItemsImages { get; set; }
 
+        public DbSet<MGenere> generes {  get; set; }
+
 
 
         //fee

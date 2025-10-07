@@ -21,6 +21,8 @@ namespace SchoolManagement.Model
         [ForeignKey("Genre")]
         public int? GenreId { get; set; }
 
+        public MGenere Genre { get; set; }
+
         [ForeignKey("Location")]
         public int? LocId { get; set; }
 
