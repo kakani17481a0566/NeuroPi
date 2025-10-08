@@ -87,6 +87,10 @@ namespace SchoolManagement.Data
 
         public DbSet<MOrderItem> OrderItem { get; set; }
 
+        public DbSet<MPostalDeliveries> PostalDeliveries { get; set; }
+
+        public DbSet<MPostalDeliveryItems> PostalDeliveryItems { get; set; }
+
 
 
         // views
@@ -133,6 +137,8 @@ namespace SchoolManagement.Data
         public DbSet<MFeePackageMaster> FeePackageMasters { get; set; }
 
         public DbSet<MCorporate> Corporates { get; set; } = null!;
+        public DbSet<MFeeTransactions> FeeTransactions { get; set; }
+
 
         public DbSet<MPostTransactionMaster> postTransactionMasters{ get; set; }
         public DbSet<MLibraryTransaction> LibraryTransaction { get; set; }

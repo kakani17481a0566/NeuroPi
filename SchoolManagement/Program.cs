@@ -92,6 +92,8 @@ builder.Services.AddScoped<IOrderItemService, OrderItemServiceImpl>();
 builder.Services.AddScoped<ICourseTeacherService, CourseTeacherServiceImpl>();
 builder.Services.AddScoped<ITestResultService, TestResultServiceImpl>();
 builder.Services.AddScoped<ICountingTestInterface, CountingTestServiceImpl>();
+builder.Services.AddScoped<IPostalDeliveriesService, PostalDeliveriesServiceImpl>();
+builder.Services.AddScoped<IPostalDeliveryItemsService, PostalDeliveryItemsServiceImpl>();
 
 
 // ViewModel-based Services
@@ -112,6 +114,8 @@ builder.Services.AddScoped<IFeePackage, FeePackageServiceImpl>();
 builder.Services.AddScoped<IFeePackageMaster, FeePackageMasterServiceImpl>();
 
 builder.Services.AddScoped<ICorporateService, CorporateServiceImpl>();
+builder.Services.AddScoped<IFeeTransactions, FeeTransactionsServiceImpl>();
+
 
 builder.Services.AddScoped<IItemHeaderService, ItemHeaderServiceImpl>();
 

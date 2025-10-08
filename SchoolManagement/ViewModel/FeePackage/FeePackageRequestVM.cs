@@ -19,8 +19,11 @@ namespace SchoolManagement.ViewModel.FeePackage
         public int? TaxId { get; set; }
 
         [Required]
-        public int PaymentPeriod { get; set; }   // 🔹 changed to int (matches DB + Entity)
+        public int PaymentPeriod { get; set; }   // 🔹 int (matches DB + Entity)
 
         public int? PackageMasterId { get; set; }  // 🔹 newly added
+
+        [Required]
+        public int FeeType { get; set; } = 0;   // 🔹 matches DB default
     }
 }

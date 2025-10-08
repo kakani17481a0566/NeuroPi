@@ -25,5 +25,9 @@
         // Optional: Package Master (if assigned)
         public int? PackageMasterId { get; set; }
         public string PackageMasterName { get; set; }
+
+        // 🔹 Fee Type (new column)
+        public int FeeTypeId { get; set; }
+        public string FeeTypeName { get; set; }
     }
 }
