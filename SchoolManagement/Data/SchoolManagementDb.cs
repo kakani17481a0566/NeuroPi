@@ -134,6 +134,11 @@ namespace SchoolManagement.Data
 
         public DbSet<MCorporate> Corporates { get; set; } = null!;
 
+        public DbSet<MPostTransactionMaster> postTransactionMasters{ get; set; }
+        public DbSet<MLibraryTransaction> LibraryTransaction { get; set; }
+
+
+
 
 
 
