@@ -93,6 +93,7 @@ builder.Services.AddScoped<ICourseTeacherService, CourseTeacherServiceImpl>();
 builder.Services.AddScoped<ITestResultService, TestResultServiceImpl>();
 builder.Services.AddScoped<ICountingTestInterface, CountingTestServiceImpl>();
 builder.Services.AddScoped<IPostalDeliveriesService, PostalDeliveriesServiceImpl>();
+builder.Services.AddScoped<IPostalDeliveryItemsService, PostalDeliveryItemsServiceImpl>();
 
 
 // ViewModel-based Services

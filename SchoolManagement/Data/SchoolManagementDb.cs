@@ -89,6 +89,8 @@ namespace SchoolManagement.Data
 
         public DbSet<MPostalDeliveries> PostalDeliveries { get; set; }
 
+        public DbSet<MPostalDeliveryItems> PostalDeliveryItems { get; set; }
+
 
 
         // views
