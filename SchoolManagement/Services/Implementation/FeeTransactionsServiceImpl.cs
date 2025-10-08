@@ -187,7 +187,7 @@ namespace SchoolManagement.Services.Implementation
                                 from fp in fpJoin.DefaultIfEmpty()
                                 join m in _db.Masters on fp.PaymentPeriod equals m.Id into mJoin
                                 from m in mJoin.DefaultIfEmpty()
-                                where ft.TenantId == tenantId && ft.StudentId == studentId && !ft.IsDeleted
+                                where ft.TenantId == tenantId && ft.StudentId == studentId && !ft.IsDeleted && ft.TrxDate <= DateTime.UtcNow
                                 orderby ft.TrxDate
                                 select new FeeReportTransactionVM
                                 {
