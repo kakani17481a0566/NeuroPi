@@ -22,5 +22,11 @@ namespace SchoolManagement.Controllers
             // Service already returns ResponseResult<int>
             return _feeTransactionsService.BuildFeeTransactions(request);
         }
+
+        [HttpGet("report-fee/{tenantId:int}/{studentId:int}")]
+        public ResponseResult<FeeReportSummaryVM> GetStudentFeeReport(int tenantId, int studentId)
+        {
+            return _feeTransactionsService.GetStudentFeeReport(tenantId, studentId);
+        }
     }
 }

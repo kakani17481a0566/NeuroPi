@@ -8,6 +8,8 @@ namespace SchoolManagement.Services.Interface
     {
 
         ResponseResult<int> BuildFeeTransactions(BuildFeeTransactionsRequest request);
+        ResponseResult<FeeReportSummaryVM> GetStudentFeeReport(int tenantId, int studentId);
+
 
     }
 }
