@@ -58,6 +58,8 @@ namespace SchoolManagement.Services.Implementation
                 // 🔹 Get only relevant fee packages for this course
                 var feePackages = _db.FeePackages
                     .Where(fp => fp.TenantId == request.TenantId && fp.CourseId == student.CourseId)
+                    // ✅ Always include mandatory fees; include optional only if requested
+                    .Where(fp => fp.FeeType == 0 || request.IncludeOptionalFeeStructures.Contains(fp.FeeStructureId))
                     .Include(fp => fp.PaymentPeriodMaster)
                     .ToList();
 

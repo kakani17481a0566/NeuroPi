@@ -13,5 +13,9 @@
 
        
         public int CreatedBy { get; set; }
+
+
+        public List<int> IncludeOptionalFeeStructures { get; set; } = new();
+
     }
 }
