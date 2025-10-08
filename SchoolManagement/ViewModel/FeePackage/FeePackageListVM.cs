@@ -15,6 +15,12 @@
 
         public decimal Amount { get; set; }
 
+        // Payment period (e.g. Monthly, Annual, Onetime)
+        public int PaymentPeriodId { get; set; }
         public string PaymentPeriodName { get; set; }
+
+        // 🔹 Include fee type for quick list filtering/grouping
+        public int FeeTypeId { get; set; }
+        public string FeeTypeName { get; set; }
     }
 }

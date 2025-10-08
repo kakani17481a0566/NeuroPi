@@ -29,6 +29,12 @@ namespace SchoolManagement.ViewModel.FeePackage
 
         public decimal Amount { get; set; }
 
+        // Payment Period (e.g. Monthly, Annual, Term, Onetime)
+        public int PaymentPeriodId { get; set; }
         public string PaymentPeriodName { get; set; }
+
+        // 🔹 Include FeeType as well
+        public int FeeTypeId { get; set; }
+        public string FeeTypeName { get; set; }
     }
 }

@@ -17,6 +17,17 @@ namespace SchoolManagement.Services.Implementation
             _db = db;
         }
 
+        // 🔹 Small helper to convert FeeType int → friendly string
+        private string GetFeeTypeName(int feeType) =>
+            feeType switch
+            {
+                0 => "Tuition",
+                1 => "Transport",
+                2 => "Hostel",
+                3 => "Miscellaneous",
+                _ => "Other"
+            };
+
         public List<FeePackageResponseVM> GetAll(int tenantId, int branchId)
         {
             return _db.FeePackages
@@ -36,7 +47,9 @@ namespace SchoolManagement.Services.Implementation
                     PaymentPeriodId = f.PaymentPeriod,
                     PaymentPeriodName = f.PaymentPeriodMaster.Name,
                     PackageMasterId = f.PackageMasterId,
-                    PackageMasterName = f.PackageMaster != null ? f.PackageMaster.Name : null
+                    PackageMasterName = f.PackageMaster != null ? f.PackageMaster.Name : null,
+                    FeeTypeId = f.FeeType,
+                    FeeTypeName = GetFeeTypeName(f.FeeType)
                 })
                 .ToList();
         }
@@ -60,7 +73,9 @@ namespace SchoolManagement.Services.Implementation
                     PaymentPeriodId = f.PaymentPeriod,
                     PaymentPeriodName = f.PaymentPeriodMaster.Name,
                     PackageMasterId = f.PackageMasterId,
-                    PackageMasterName = f.PackageMaster != null ? f.PackageMaster.Name : null
+                    PackageMasterName = f.PackageMaster != null ? f.PackageMaster.Name : null,
+                    FeeTypeId = f.FeeType,
+                    FeeTypeName = GetFeeTypeName(f.FeeType)
                 })
                 .FirstOrDefault();
         }
@@ -70,9 +85,10 @@ namespace SchoolManagement.Services.Implementation
             var existing = _db.FeePackages.FirstOrDefault(f =>
                 f.FeeStructureId == vm.FeeStructureId &&
                 f.BranchId == vm.BranchId &&
-                f.CourseId == vm.CourseId &&
+                f.CourseId == vm.CourseId &&   // ✅ fixed
                 f.TenantId == vm.TenantId &&
                 f.PaymentPeriod == vm.PaymentPeriod &&
+                f.FeeType == vm.FeeType &&
                 !f.IsDeleted);
 
             if (existing != null)
@@ -89,6 +105,7 @@ namespace SchoolManagement.Services.Implementation
                 TaxId = vm.TaxId,
                 PackageMasterId = vm.PackageMasterId,
                 PaymentPeriod = vm.PaymentPeriod,
+                FeeType = vm.FeeType,
                 CreatedBy = currentUserId,
                 CreatedOn = DateTime.UtcNow,
                 UpdatedBy = currentUserId,
@@ -114,6 +131,7 @@ namespace SchoolManagement.Services.Implementation
                 f.CourseId == vm.CourseId &&
                 f.TenantId == vm.TenantId &&
                 f.PaymentPeriod == vm.PaymentPeriod &&
+                f.FeeType == vm.FeeType &&
                 !f.IsDeleted);
 
             if (duplicate != null)
@@ -124,6 +142,7 @@ namespace SchoolManagement.Services.Implementation
             entity.TaxId = vm.TaxId;
             entity.PaymentPeriod = vm.PaymentPeriod;
             entity.PackageMasterId = vm.PackageMasterId;
+            entity.FeeType = vm.FeeType;
             entity.UpdatedBy = currentUserId;
             entity.UpdatedOn = DateTime.UtcNow;
 
@@ -158,8 +177,11 @@ namespace SchoolManagement.Services.Implementation
                     PackageName = f.PackageMaster != null ? f.PackageMaster.Name : null,
                     FeeStructureId = f.FeeStructureId,
                     FeeStructureName = f.FeeStructure.Name,
-                    Amount = f.FeeStructure.Amount,        // adjust if stored elsewhere
-                    PaymentPeriodName = f.PaymentPeriodMaster.Name
+                    Amount = f.FeeStructure.Amount,
+                    PaymentPeriodId = f.PaymentPeriod,
+                    PaymentPeriodName = f.PaymentPeriodMaster.Name,
+                    FeeTypeId = f.FeeType,
+                    FeeTypeName = GetFeeTypeName(f.FeeType)
                 })
                 .ToList();
         }
@@ -191,13 +213,13 @@ namespace SchoolManagement.Services.Implementation
                         FeeStructureId = f.FeeStructureId,
                         FeeStructureName = f.FeeStructure.Name,
                         Amount = f.FeeStructure.Amount,
-                        PaymentPeriodName = f.PaymentPeriodMaster.Name
+                        PaymentPeriodId = f.PaymentPeriod,
+                        PaymentPeriodName = f.PaymentPeriodMaster.Name,
+                        FeeTypeId = f.FeeType,
+                        FeeTypeName = GetFeeTypeName(f.FeeType)
                     }).ToList()
                 })
                 .ToList();
         }
-
-
-
     }
 }

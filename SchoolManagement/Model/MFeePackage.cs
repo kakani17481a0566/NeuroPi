@@ -38,6 +38,10 @@ namespace SchoolManagement.Model
         [Column("package_master_id")]
         public int? PackageMasterId { get; set; }
 
+        [Required]
+        [Column("fee_type")]
+        public int FeeType { get; set; } = 0; // default 0
+
         // 🔹 Navigation Properties
         [ForeignKey("FeeStructureId")]
         public virtual MFeeStructure FeeStructure { get; set; }
