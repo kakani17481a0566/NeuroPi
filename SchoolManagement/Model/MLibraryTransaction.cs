@@ -20,7 +20,7 @@ namespace SchoolManagement.Model
         public MStudent Student { get; set; }
         // Foreign key to ItemHeader (Books
         [Column("book_id")]
-        public int? BookId { get; set; }
+        public int BookId { get; set; }
         [ForeignKey("BookId")]
         public MItemHeader Book { get; set; }
         [Column("check_in")]
