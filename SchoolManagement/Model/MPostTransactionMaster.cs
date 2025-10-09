@@ -3,6 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SchoolManagement.Model
 {
+
+    [Table("pos_transaction_master")]
     public class MPostTransactionMaster
     {
         [Key]

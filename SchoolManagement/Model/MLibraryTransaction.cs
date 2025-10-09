@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SchoolManagement.Model
 {
+    [Table("lib_transaction")]
     public class MLibraryTransaction
     {
         [Key]
