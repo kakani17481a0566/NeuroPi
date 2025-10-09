@@ -20,14 +20,26 @@ namespace SchoolManagement.Controllers
 
         [HttpGet]
 
-        public ResponseResult<List<LibraryTransactionResponseVM>> GetAllLibraryTransactions([FromQuery] int studentId)
+        public ResponseResult<LibraryTransactionResponseVM> GetAllLibraryTransactions([FromQuery] int studentId)
         {
             var response = _libraryTransactionsService.GetAllLibraryTransactions(studentId);
-            if (response == null || response.Count == 0)
+            if (response == null)
             {
-                return new ResponseResult<List<LibraryTransactionResponseVM>>(HttpStatusCode.NotFound, response, "No data Found for the specified student");
+                return new ResponseResult<LibraryTransactionResponseVM>(HttpStatusCode.NotFound, response, "No data Found for the specified student");
             }
-            return new ResponseResult<List<LibraryTransactionResponseVM>>(HttpStatusCode.OK, response, "Library Transactions fetched successfully");
+            return new ResponseResult<LibraryTransactionResponseVM>(HttpStatusCode.OK, response, "Library Transactions fetched successfully");
+        }
+
+        [HttpPost]
+        public ResponseResult<string> CreateLibraryTransaction([FromBody] LibraryTransactionRequestVM ltRequestVm)
+        {
+            var response = _libraryTransactionsService.CreateLibraryTransaction(ltRequestVm);
+            if (response == "inserted")
+            {
+                return new ResponseResult<string>(HttpStatusCode.OK, response, "Library Transaction created successfully");
+            }
+            return new ResponseResult<string>(HttpStatusCode.BadRequest, response, "Failed to create Library Transaction");
+
         }
     }
 }

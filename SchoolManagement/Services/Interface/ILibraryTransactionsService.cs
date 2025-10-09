@@ -4,6 +4,8 @@ namespace SchoolManagement.Services.Interface
 {
     public interface ILibraryTransactionsService
     {
-        List<LibraryTransactionResponseVM> GetAllLibraryTransactions( int studentId);
+        LibraryTransactionResponseVM GetAllLibraryTransactions( int studentId);
+
+        string  CreateLibraryTransaction(LibraryTransactionRequestVM ltRequestVm);
     }
 }

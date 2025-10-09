@@ -24,7 +24,7 @@ namespace SchoolManagement.Model
         public DateTime? PublishedOn { get; set; }
 
         [Column("published_by")]
-        public string PublishedBy { get; set; }
+        public string? PublishedBy { get; set; }
 
         [ForeignKey("Category")]
         [Column("category_id")]
