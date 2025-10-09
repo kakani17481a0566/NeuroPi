@@ -192,9 +192,13 @@ namespace SchoolManagement.Controllers
                 "Students fetched successfully."
             );
         }
+        [HttpGet("/search/{name}")]
+        public List<StudentFilterResponseVM> GetAllStudentByNames(string name)
+        {
+            return _studentService.GetAllStudentsByName(name);
 
-
-
-
+        }
     }
+ 
+
 }

@@ -29,6 +29,7 @@ namespace SchoolManagement.Services.Interface
         SRStudentRegistrationResponseVM Register(SRStudentRegistrationRequestVM request);
 
         List<StudentListVM> GetStudentsByTenantCourseBranch(int tenantId, int courseId, int branchId);
+        List<StudentFilterResponseVM> GetAllStudentsByName(string name);
 
 
     }
