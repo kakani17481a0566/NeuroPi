@@ -5,10 +5,11 @@ namespace SchoolManagement.Model
 {
 
     [Table("pos_transaction_master")]
-    public class MPostTransactionMaster
+    public class MPosTransactionMaster
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Column("id")]
         public int Id { get; set; }
         [Column ("student_id")]
         [ForeignKey("student")]

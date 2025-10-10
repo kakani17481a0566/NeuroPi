@@ -5,16 +5,19 @@ namespace SchoolManagement.Model
 { 
 
     [Table("pos_transaction_details")]
-    public class MPostTransactionDetails
+    public class MPosTransactionDetails
     {
 
     [Key]
-    public int Id { get; set; }
+    [Column("id")]
+     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+
+        public int Id { get; set; }
         // Foreign key to
     [Column("master_transaction_id")]
     public int MasterTransactionId { get; set; }
     [ForeignKey("MasterTransactionId")]
-    public MPostTransactionMaster MasterTransaction { get; set; }
+    public MPosTransactionMaster MasterTransaction { get; set; }
         // Foreign key to Items
     [Column("item_id")]
     public int ItemId { get; set; }
@@ -27,6 +30,6 @@ namespace SchoolManagement.Model
     [Column("gst_percentage")]
     public int GstPercentage { get; set; }
         [Column("gst_value")]
-    public int GstValue { get; set; }
+    public double GstValue { get; set; }
 }
 }
