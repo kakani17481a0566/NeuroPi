@@ -91,6 +91,9 @@ namespace SchoolManagement.Data
 
         public DbSet<MPostalDeliveryItems> PostalDeliveryItems { get; set; }
 
+        public DbSet<MPosTransactionMaster> PosTransactionMaster { get; set; }
+        public DbSet<MPosTransactionDetails> PosTransactionDetails { get; set; }
+
 
 
         // views
@@ -140,7 +143,7 @@ namespace SchoolManagement.Data
         public DbSet<MFeeTransactions> FeeTransactions { get; set; }
 
 
-        public DbSet<MPostTransactionMaster> postTransactionMasters{ get; set; }
+        public DbSet<MPosTransactionMaster> postTransactionMasters{ get; set; }
         public DbSet<MLibraryTransaction> LibraryTransaction { get; set; }
 
 

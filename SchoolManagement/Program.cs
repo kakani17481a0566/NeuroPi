@@ -95,6 +95,7 @@ builder.Services.AddScoped<ICountingTestInterface, CountingTestServiceImpl>();
 builder.Services.AddScoped<IPostalDeliveriesService, PostalDeliveriesServiceImpl>();
 builder.Services.AddScoped<IPostalDeliveryItemsService, PostalDeliveryItemsServiceImpl>();
 builder.Services.AddScoped<ILibraryTransactionsService, LibraryTransactionServiceImpl>();
+builder.Services.AddScoped<IPosTransactionMasterService, PosTransactionMasterServiceImpl>();
 
 
 // ViewModel-based Services

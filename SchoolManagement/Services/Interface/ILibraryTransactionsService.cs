@@ -7,5 +7,8 @@ namespace SchoolManagement.Services.Interface
         LibraryTransactionResponseVM GetAllLibraryTransactions( int studentId);
 
         string  CreateLibraryTransaction(LibraryTransactionRequestVM ltRequestVm);
+
+        string UpdateLibraryTransaction(LibraryTransactionRequestVM ltRequestVm);
+
     }
 }

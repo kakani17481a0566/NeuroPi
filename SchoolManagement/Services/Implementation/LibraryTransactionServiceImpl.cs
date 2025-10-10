@@ -32,6 +32,7 @@ namespace SchoolManagement.Services.Implementation
             }
             _db.LibraryTransaction.AddRange(mLibraryTransactions);
             _db.SaveChanges();
+
             return "inserted";
 
         }
@@ -65,6 +66,38 @@ namespace SchoolManagement.Services.Implementation
                 return result;
             }
             return new LibraryTransactionResponseVM();
+
+
+
+
+        }
+
+        public string UpdateLibraryTransaction(LibraryTransactionRequestVM ltRequestVm)
+        {
+
+            //var transactions = _db.LibraryTransaction
+            //    .Where(l => l.StudentId == ltRequestVm.StudentId && l.Status == "checkedIn").ToList();
+
+            
+            //if (transactions == null) return null;
+            //List<>
+
+
+            //for (int i = ltRequestVm.BookIds.Count - 1; i >= 0; i--)
+            //{
+            //    foreach (var bookId in transactions)
+            //    {
+            //        if (transactions.BookId == bookId)
+            //        {
+            //            transactions.CheckOutBy = ltRequestVm.CheckOutBy;
+            //            transactions.Status = "checkedOut";
+            //            transactions.CheckOut = DateOnly.FromDateTime(DateTime.Now);
+            //        }
+            //    }
+
+            //}
+            
+            return "updated";
 
 
 
