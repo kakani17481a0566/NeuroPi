@@ -4,7 +4,7 @@
     {
         public int? StudentId { get; set; }
 
-        public List<int> BookId { get; set; }
+        public List<int> BookIds { get; set; }
 
 
     }

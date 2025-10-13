@@ -1,9 +1,11 @@
 ﻿using SchoolManagement.Model;
+using System.ComponentModel.DataAnnotations;
 
 namespace SchoolManagement.ViewModel.PostTransactionMaster
 {
     public class PosTransactionMasterRequestVM
     {
+        [Required(ErrorMessage = "The Student Id is required")]
         public int StudentId { get; set; }
 
         public int TenantId { get; set; }

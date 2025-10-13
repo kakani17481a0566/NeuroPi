@@ -3,12 +3,16 @@ using SchoolManagement.Data;
 using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.LibraryTransctions;
+using System.Runtime.ConstrainedExecution;
+
 
 namespace SchoolManagement.Services.Implementation
 {
     public class LibraryTransactionServiceImpl : ILibraryTransactionsService
     {
         private readonly SchoolManagementDb _db;
+        private readonly string CHECKEDOUT = "checkedOut";
+        private readonly string CHECKEDIN = "checkedIn";
 
         public LibraryTransactionServiceImpl(SchoolManagementDb dbcontext)
         {
@@ -26,7 +30,7 @@ namespace SchoolManagement.Services.Implementation
                     BookId = bookId,
                     CheckIn = DateOnly.FromDateTime(DateTime.Now),
                     CheckInBy = ltRequestVm.CheckInBy,
-                    Status = "checkedIn"
+                    Status = CHECKEDIN
                 };
                 mLibraryTransactions.Add(libraryTransaction);
             }
@@ -72,36 +76,24 @@ namespace SchoolManagement.Services.Implementation
 
         }
 
-        public string UpdateLibraryTransaction(LibraryTransactionRequestVM ltRequestVm)
+        public string UpdateLibraryTransaction(LibraryTransactionUpdateVM ltRequestVm)
         {
 
-            //var transactions = _db.LibraryTransaction
-            //    .Where(l => l.StudentId == ltRequestVm.StudentId && l.Status == "checkedIn").ToList();
-
-            
-            //if (transactions == null) return null;
-            //List<>
-
-
-            //for (int i = ltRequestVm.BookIds.Count - 1; i >= 0; i--)
-            //{
-            //    foreach (var bookId in transactions)
-            //    {
-            //        if (transactions.BookId == bookId)
-            //        {
-            //            transactions.CheckOutBy = ltRequestVm.CheckOutBy;
-            //            transactions.Status = "checkedOut";
-            //            transactions.CheckOut = DateOnly.FromDateTime(DateTime.Now);
-            //        }
-            //    }
-
-            //}
-            
-            return "updated";
-
-
-
-
+            var transactions = _db.LibraryTransaction
+                .Where(l => l.StudentId == ltRequestVm.StudentId && ltRequestVm.BookIds.Contains(l.BookId)).ToList();
+            if (transactions == null) return "no books were found";
+            List<MLibraryTransaction> updatedBooks=new List<MLibraryTransaction>();
+            foreach (var book in transactions)
+            {
+                book.Status = CHECKEDOUT;
+                book.CheckOut = DateOnly.FromDateTime(DateTime.Now);
+                book.CheckOutBy = 1;
+                updatedBooks.Add(book);
+            }
+            _db.UpdateRange(updatedBooks);
+           int result= _db.SaveChanges();
+            if (result > 0) return "updated";
+         return "Something went wrong";
         }
     }
 }

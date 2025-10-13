@@ -41,5 +41,15 @@ namespace SchoolManagement.Controllers
             return new ResponseResult<string>(HttpStatusCode.BadRequest, response, "Failed to create Library Transaction");
 
         }
+        [HttpPut]
+        public ResponseResult<string> UpdateLibraryTransaction([FromBody] LibraryTransactionUpdateVM updateVM)
+        {
+            var response = _libraryTransactionsService.UpdateLibraryTransaction(updateVM);
+            if (response != null)
+            {
+                return new ResponseResult<string>(HttpStatusCode.OK,response,"cheked out successfully");
+            }
+            return new ResponseResult<string>(HttpStatusCode.GatewayTimeout, response, "please try again after some time");
+        }
     }
 }

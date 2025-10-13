@@ -8,7 +8,7 @@ namespace SchoolManagement.Services.Interface
 
         string  CreateLibraryTransaction(LibraryTransactionRequestVM ltRequestVm);
 
-        string UpdateLibraryTransaction(LibraryTransactionRequestVM ltRequestVm);
+        string UpdateLibraryTransaction(LibraryTransactionUpdateVM ltRequestVm);
 
     }
 }
