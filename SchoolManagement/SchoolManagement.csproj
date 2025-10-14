@@ -16,7 +16,6 @@
     <Compile Remove="ViewModel\NewFolder3\**" />
     <Compile Remove="ViewModel\NewFolder4\**" />
     <Compile Remove="ViewModel\NewFolder5\**" />
-    <Compile Remove="ViewModel\NewFolder\**" />
     <Content Remove="Model\NewFolder\**" />
     <Content Remove="ViewModels\**" />
     <Content Remove="ViewModel\NewFolder1\**" />
@@ -24,7 +23,6 @@
     <Content Remove="ViewModel\NewFolder3\**" />
     <Content Remove="ViewModel\NewFolder4\**" />
     <Content Remove="ViewModel\NewFolder5\**" />
-    <Content Remove="ViewModel\NewFolder\**" />
     <EmbeddedResource Remove="Model\NewFolder\**" />
     <EmbeddedResource Remove="ViewModels\**" />
     <EmbeddedResource Remove="ViewModel\NewFolder1\**" />
@@ -32,7 +30,6 @@
     <EmbeddedResource Remove="ViewModel\NewFolder3\**" />
     <EmbeddedResource Remove="ViewModel\NewFolder4\**" />
     <EmbeddedResource Remove="ViewModel\NewFolder5\**" />
-    <EmbeddedResource Remove="ViewModel\NewFolder\**" />
     <None Remove="Model\NewFolder\**" />
     <None Remove="ViewModels\**" />
     <None Remove="ViewModel\NewFolder1\**" />
@@ -40,7 +37,6 @@
     <None Remove="ViewModel\NewFolder3\**" />
     <None Remove="ViewModel\NewFolder4\**" />
     <None Remove="ViewModel\NewFolder5\**" />
-    <None Remove="ViewModel\NewFolder\**" />
   </ItemGroup>
 
   <ItemGroup>

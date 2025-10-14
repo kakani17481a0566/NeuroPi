@@ -22,7 +22,7 @@ namespace SchoolManagement.Model
     [Column("item_id")]
     public int ItemId { get; set; }
     [ForeignKey("ItemId")]
-    public MItem Item { get; set; }
+    public MItems Item { get; set; }
     [Column("unit_price")]
     public double UnitPrice { get; set; }
     [Column("quantity")]

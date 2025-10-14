@@ -1,4 +1,6 @@
-﻿using SchoolManagement.Data;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
+using SchoolManagement.Data;
 using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.PostTransactionMaster;
@@ -45,6 +47,30 @@ namespace SchoolManagement.Services.Implementation
         public List<PosTransactionMasterResponseVM> GetAllPostTransactions()
         {
             throw new NotImplementedException();
+        }
+
+        public List<PosTransactionMasterResponseVM> GetPostTransactionById(int studentId)
+        {
+            var transaction = _context.postTransactionMasters.Include(t => t.student)
+                .Include(t=>t.student.Branch)
+                .Where(t => t.StudentId == studentId)
+                 .Select(t => new PosTransactionMasterResponseVM
+                 {
+                     Id = t.Id,
+                     StudentId = t.StudentId,
+                     StudentName = t.student.Name,
+                     BranchName = t.student.Branch.Name,
+                     Date = t.Date,
+                     TenantId =t.TenantId
+
+                 })
+                 .ToList();
+            if (transaction == null)
+            {
+                return null;
+            }
+            return transaction;
+
         }
     }
 }

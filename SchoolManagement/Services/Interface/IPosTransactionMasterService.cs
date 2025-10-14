@@ -7,5 +7,7 @@ namespace SchoolManagement.Services.Interface
         string CreatePostTransaction(PosTransactionMasterRequestVM request);
 
         List<PosTransactionMasterResponseVM> GetAllPostTransactions();
+
+        List<PosTransactionMasterResponseVM> GetPostTransactionById(int studentId);
     }
 }
