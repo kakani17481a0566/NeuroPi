@@ -46,8 +46,12 @@ namespace SchoolManagement.Services.Implementation
             var list = _db.LibraryTransaction
                 .Where(e => e.Status == "checkedIn" && e.StudentId == studentId).Include(e => e.Book).Include(e => e.Student)
                 .ToList();
-            if (list!= null)
+
+            if (list == null || !list.Any())
             {
+                return new LibraryTransactionResponseVM();
+            }
+
                 LibraryTransactionResponseVM result = new LibraryTransactionResponseVM();
                 result.StudentId = list[0].StudentId;
                 result.StudentName = list[0].Student.Name;
@@ -68,8 +72,7 @@ namespace SchoolManagement.Services.Implementation
                 }
                 result.Book = books;
                 return result;
-            }
-            return new LibraryTransactionResponseVM();
+            
 
 
 
