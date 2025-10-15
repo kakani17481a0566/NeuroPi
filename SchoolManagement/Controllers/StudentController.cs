@@ -193,9 +193,14 @@ namespace SchoolManagement.Controllers
             );
         }
         [HttpGet("/search/{name}")]
-        public List<StudentFilterResponseVM> GetAllStudentByNames(string name)
+        public ResponseResult<List<StudentFilterResponseVM>> GetAllStudentByNames(string name)
         {
-            return _studentService.GetAllStudentsByName(name);
+            var result = _studentService.GetAllStudentsByName(name);
+            if(result!=null && result.Count > 0)
+            {
+                return new ResponseResult<List<StudentFilterResponseVM>>(HttpStatusCode.OK, result, "Students Fetched Successfully");
+            }
+            return new ResponseResult<List<StudentFilterResponseVM>>(HttpStatusCode.NotFound,result);
 
         }
     }
