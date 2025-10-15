@@ -41,16 +41,40 @@ namespace SchoolManagement.Controllers
             return new ResponseResult<ItemsResponseVM>(HttpStatusCode.BadGateway, response, $" Item not found with id {id}");
         }
 
+        //[HttpGet("GetByTenant/{tenantId}")]
+        //public ResponseResult<List<ItemsResponse>> GetByTenantId([FromRoute] int tenantId)
+        //{
+        //    var response = _itemService.GetItemsByTenant(tenantId);
+        //    if (response == null || response.Count == 0)
+        //    {
+        //        return new ResponseResult<List<ItemsResponse>>(HttpStatusCode.NotFound, response, "No data Found for the specified tenant");
+        //    }
+        //    return new ResponseResult<List<ItemsResponse>>(HttpStatusCode.OK, response, "Items fetched successfully");
+        //}
+
+
         [HttpGet("GetByTenant/{tenantId}")]
-        public ResponseResult<List<ItemsResponse>> GetByTenantId([FromRoute] int tenantId)
+        public ResponseResult<ItemsFilterResponse> GetByTenantId([FromRoute] int tenantId)
         {
             var response = _itemService.GetItemsByTenant(tenantId);
-            if (response == null || response.Count == 0)
+
+            if (response == null || response.Items.Count == 0)
             {
-                return new ResponseResult<List<ItemsResponse>>(HttpStatusCode.NotFound, response, "No data Found for the specified tenant");
+                return new ResponseResult<ItemsFilterResponse>(
+                    HttpStatusCode.NotFound,
+                    response,
+                    "No data found for the specified tenant"
+                );
             }
-            return new ResponseResult<List<ItemsResponse>>(HttpStatusCode.OK, response, "Items fetched successfully");
+
+            return new ResponseResult<ItemsFilterResponse>(
+                HttpStatusCode.OK,
+                response,
+                "Items and filters fetched successfully"
+            );
         }
+
+
 
         [HttpGet("{id}/{tenantId}")]
         public ResponseResult<ItemsResponseVM> GetByIdAndTenantId( int id, int tenantId)

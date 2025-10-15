@@ -64,32 +64,101 @@ namespace SchoolManagement.Services.Implementation
         }
 
         // 🔹 Get by Tenant
-        public List<ItemsResponse> GetItemsByTenant(int tenantId)
+        //public List<ItemsResponse> GetItemsByTenant(int tenantId)
+        //{
+        //    List<MItemBranch> items = _context.ItemBranch.Where(e => !e.IsDeleted & e.TenantId == tenantId).Include(e => e.Item).Include(e => e.Item.ItemCategory).ToList();
+        //    List<ItemsResponse> result= new List<ItemsResponse>();
+        //    foreach(var item in items)
+        //    {
+        //        var itemImage = _context.ItemsImages.Where(e => !e.IsDeleted && e.ItemId== item.Item.Id).FirstOrDefault();
+        //        ItemsResponse itemsResponse = new ItemsResponse()
+        //        {
+        //            Id = item.ItemId,
+        //            Name = item.Item.Name,
+        //            categoryId = item.Item.CategoryId,
+        //            categoryName = item.Item.ItemCategory.Name,
+        //            size=item.Item.Height,
+        //            price=item.ItemPrice,
+        //            ItemQuantity = item.ItemQuantity,
+        //            status =item.ItemQuantity!=null?"available":"not Available",
+        //            Image=itemImage.Image
+        //        };
+        //        result.Add(itemsResponse);
+
+        //    }
+        //    return result;
+
+        //}
+
+        public ItemsFilterResponse GetItemsByTenant(int tenantId)
         {
-            List<MItemBranch> items = _context.ItemBranch.Where(e => !e.IsDeleted & e.TenantId == tenantId).Include(e => e.Item).Include(e => e.Item.ItemCategory).ToList();
-            List<ItemsResponse> result= new List<ItemsResponse>();
-            foreach(var item in items)
-            {
-                var itemImage = _context.ItemsImages.Where(e => !e.IsDeleted && e.ItemId== item.Item.Id).FirstOrDefault();
-                ItemsResponse itemsResponse = new ItemsResponse()
+            // ⚡ 1️⃣ Use projection directly in EF (avoid materializing full entities first)
+            var itemsQuery = _context.ItemBranch
+                .Where(e => !e.IsDeleted && e.TenantId == tenantId)
+                .Select(e => new
                 {
-                    Id = item.ItemId,
-                    Name = item.Item.Name,
-                    categoryId = item.Item.CategoryId,
-                    categoryName = item.Item.ItemCategory.Name,
-                    size=item.Item.Height,
-                    price=item.ItemPrice,
-                    status=item.ItemQuantity!=null?"available":"not Available",
-                    Image=itemImage.Image
+                    e.ItemId,
+                    e.Item.Name,
+                    e.Item.CategoryId,
+                    CategoryName = e.Item.ItemCategory.Name,
+                    e.Item.Height,
+                    e.ItemPrice,
+                    e.ItemQuantity,
+                    Image = _context.ItemsImages
+                        .Where(img => !img.IsDeleted && img.ItemId == e.Item.Id)
+                        .Select(img => img.Image)
+                        .FirstOrDefault()
+                })
+                .AsNoTracking(); // ✅ skip change tracking for read-only queries
 
+            var items = itemsQuery.ToList();
 
-                };
-                result.Add(itemsResponse);
-                
-            }
-            return result;
+            // ⚡ 2️⃣ Directly map to DTOs (no second DB roundtrip)
+            var result = items.Select(i => new ItemsResponse
+            {
+                Id = i.ItemId,
+                Name = i.Name,
+                CategoryId = i.CategoryId,
+                CategoryName = i.CategoryName,
+                Size = i.Height,
+                Price = i.ItemPrice,
+                ItemQuantity = i.ItemQuantity,
+                Status = i.ItemQuantity > 0 ? "Available" : "Not Available",
+                Image = i.Image
+            }).ToList();
 
+            // ⚡ 3️⃣ Compute filters in-memory efficiently
+            var filters = new ItemsFilters
+            {
+                Categories = result
+                    .GroupBy(x => x.CategoryId)
+                    .ToDictionary(g => g.Key, g => g.First().CategoryName),
+
+                StatusList = new List<string> { "Available", "Not Available" },
+
+                PriceList = result
+                    .Select(x => x.Price)
+                    .Distinct()
+                    .OrderBy(p => p)
+                    .ToList(),
+
+                Sizes = result
+                    .Where(x => x.Size > 0)
+                    .Select(x => x.Size)
+                    .Distinct()
+                    .OrderBy(s => s)
+                    .ToList()
+            };
+
+            return new ItemsFilterResponse
+            {
+                Items = result,
+                Filters = filters
+            };
         }
+
+
+
 
         // 🔹 Update
         public ItemsResponseVM UpdateItems(int id, int tenantId, ItemsUpdateVM vm)

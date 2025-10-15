@@ -724,14 +724,14 @@ namespace SchoolManagement.Services.Implementation
         public List<StudentFilterResponseVM> GetAllStudentsByName(string name)
         {
             List<StudentFilterResponseVM> result = new List<StudentFilterResponseVM>();
-            var StudentsList=_context.Students.Where(s =>EF.Functions.Like(s.Name, $"%{name}%") || EF.Functions.Like(s.LastName , $"%{name}%")).Include(e => e.Course).Include(b => b.Branch).ToList();
+            var StudentsList=_context.Students.Where(s =>EF.Functions.Like(s.Name.ToLower(), $"%{name.ToLower()}%") || EF.Functions.Like(s.LastName.ToLower(), $"%{name.ToLower()}%")).Include(e => e.Course).Include(b => b.Branch).ToList();
             if (StudentsList != null)
             {
                 foreach (var student in StudentsList)
                 {
                     StudentFilterResponseVM responseVM= new StudentFilterResponseVM();
                     responseVM.StudentId=student.Id;
-                    responseVM.StudentName=student.LastName+student.FullName;
+                    responseVM.StudentName=student.FullName;
                     responseVM.courseId = student.CourseId;
                     responseVM.CourseName = student.Course.Name;
                     responseVM.BranchId = student.BranchId;
