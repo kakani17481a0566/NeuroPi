@@ -1,10 +1,11 @@
-﻿using SchoolManagement.ViewModel.PostTransactionMaster;
+﻿using SchoolManagement.ViewModel.PosTransactionDetail;
+using SchoolManagement.ViewModel.PostTransactionMaster;
 
 namespace SchoolManagement.Services.Interface
 {
     public interface IPosTransactionMasterService
     {
-        string CreatePostTransaction(PosTransactionMasterRequestVM request);
+        PosInvoiceVM CreatePostTransaction(PosTransactionMasterRequestVM request);
 
         List<PosTransactionMasterResponseVM> GetAllPostTransactions();
 

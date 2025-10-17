@@ -1,4 +1,5 @@
 ﻿using SchoolManagement.Model;
+using SchoolManagement.ViewModel.PosTransactionMaster;
 using System.ComponentModel.DataAnnotations;
 
 namespace SchoolManagement.ViewModel.PostTransactionMaster
@@ -10,7 +11,7 @@ namespace SchoolManagement.ViewModel.PostTransactionMaster
 
         public int TenantId { get; set; }
 
-        public List<Items> Items { get; set; }
+        public List<PosItem> Items { get; set; }
 
 
         public MPosTransactionMaster ToModel(PosTransactionMasterRequestVM requestVM)
@@ -24,19 +25,19 @@ namespace SchoolManagement.ViewModel.PostTransactionMaster
         }
     }
 
-    public class Items 
-    { 
-        public int Itemid { get; set; }
+    //public class Items
+    //{
+    //    public int Itemid { get; set; }
 
-        public double UnitPrice { get; set; }
+    //    public double UnitPrice { get; set; }
 
-        public int Quantity { get; set; }
+    //    public int Quantity { get; set; }
 
-        public int GstPercentage { get; set; }
+    //    public int GstPercentage { get; set; }
 
-        public double GstValue { get; set; }
+    //    public double GstValue { get; set; }
 
-    }
+    //}
 
 
 }

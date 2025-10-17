@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using NeuroPi.UserManagment.Response;
 using SchoolManagement.Services.Interface;
+using SchoolManagement.ViewModel.PosTransactionDetail;
 using SchoolManagement.ViewModel.PostTransactionMaster;
 using System.Net;
 
@@ -19,9 +20,14 @@ namespace SchoolManagement.Controllers
         }
 
         [HttpPost("CreatePostTransaction")]
-        public string CreatePostTransaction([FromBody] PosTransactionMasterRequestVM request)
+        public ResponseResult<PosInvoiceVM> CreatePostTransaction([FromBody] PosTransactionMasterRequestVM request)
         {
-            return posTransactionMasterService.CreatePostTransaction(request);
+            PosInvoiceVM result=posTransactionMasterService.CreatePostTransaction(request);
+            if (result != null)
+            {
+                return new ResponseResult<PosInvoiceVM>(HttpStatusCode.Created, result, "Created invoice successfully");
+            }
+            return new ResponseResult<PosInvoiceVM>(HttpStatusCode.BadGateway, result, "not created facing some issue");
         }
 
         [HttpGet("GetPostTransactionById/{studentId}")]
