@@ -14,6 +14,9 @@ namespace SchoolManagement.ViewModel.PostTransactionMaster
         public List<PosItem> Items { get; set; }
 
 
+        
+
+
         public MPosTransactionMaster ToModel(PosTransactionMasterRequestVM requestVM)
         {
             return new MPosTransactionMaster
