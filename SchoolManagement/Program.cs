@@ -97,6 +97,7 @@ builder.Services.AddScoped<IPostalDeliveryItemsService, PostalDeliveryItemsServi
 builder.Services.AddScoped<ILibraryTransactionsService, LibraryTransactionServiceImpl>();
 builder.Services.AddScoped<IPosTransactionMasterService, PosTransactionMasterServiceImpl>();
 builder.Services.AddScoped<IPosTransactionDetailService, PosTransactionDetailServiceImpl>();
+builder.Services.AddScoped<IGeneticRegistrationService, GeneticRegistrationServiceImpl>();
 
 
 // ViewModel-based Services

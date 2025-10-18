@@ -146,6 +146,9 @@ namespace SchoolManagement.Data
         public DbSet<MPosTransactionMaster> postTransactionMasters{ get; set; }
         public DbSet<MLibraryTransaction> LibraryTransaction { get; set; }
 
+        public DbSet<MGeneticRegistration> GeneticRegistrations { get; set; }
+
+
 
 
 
