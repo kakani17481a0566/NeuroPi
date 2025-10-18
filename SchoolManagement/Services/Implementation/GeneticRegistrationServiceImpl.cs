@@ -1,6 +1,7 @@
 ﻿using SchoolManagement.Data;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.GeneticRegistration;
+using System.Text.RegularExpressions;
 
 namespace SchoolManagement.Services.Implementation
 {
@@ -15,7 +16,25 @@ namespace SchoolManagement.Services.Implementation
         public string AddGeneticRegistration (GeneticRegistrationRequestVM request)
         {
             var geneticRegistartion=GeneticRegistrationRequestVM.ToModel(request);
-            geneticRegistartion.CreatedAt = DateTime.UtcNow;
+            string geneticId = "";
+            geneticId += request.Country.ToUpper().Trim().Substring(0, 3)+"/";
+            string stateCode = "";
+            if (request.State.Contains(" ")){
+                string[] stateArray=request.State.Split(' ');
+
+                foreach (string state in stateArray)
+                {
+                    stateCode += state.ToUpper().Trim().Substring(0, 1);
+                }
+            }
+            else
+            {
+                stateCode= request.State.ToUpper().Trim().Substring (0, 3);
+            }
+            geneticId += stateCode + "/";
+            geneticId += ExtractNumbers(DateTime.Now.ToString());
+            geneticRegistartion.GeneticId=geneticId;
+             geneticRegistartion.CreatedAt = DateTime.UtcNow;
             _context.GeneticRegistrations.Add(geneticRegistartion);
              int  result=_context.SaveChanges();
             if (result == 0)
@@ -24,6 +43,10 @@ namespace SchoolManagement.Services.Implementation
             }
             return "inserted";
 
+        }
+        public static string ExtractNumbers(string input)
+        { 
+            return Regex.Replace(input, @"\D", "");
         }
     }
 }

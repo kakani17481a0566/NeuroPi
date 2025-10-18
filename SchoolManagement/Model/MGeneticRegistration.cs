@@ -10,6 +10,15 @@ namespace SchoolManagement.Model
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("reg_number")]
         public string RegistrationNumber { get; set; }
+
+        [Column("country")]
+        public string Country {  get; set; }
+        [Column("state")]
+        public string State { get; set; }
+        [Column("city")]
+        public string City { get; set; }
+        [Column("genetic_id")]
+        public string GeneticId { get; set; }
         [Column("student_id")]
         public int StudentId { get; set; }
         [Column("student_name")]

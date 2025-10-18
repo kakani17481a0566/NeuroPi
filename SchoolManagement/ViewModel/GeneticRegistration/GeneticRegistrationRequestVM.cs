@@ -44,6 +44,10 @@ namespace SchoolManagement.ViewModel.GeneticRegistration
         public string PollutionWater { get; set; }
 
         public string TravelTime { get; set; }
+        public string Country { get; set; }
+        public string State { get; set; }
+
+        public string City { get; set; }
 
         public static MGeneticRegistration ToModel(GeneticRegistrationRequestVM request)
         {
@@ -82,6 +86,10 @@ namespace SchoolManagement.ViewModel.GeneticRegistration
                 PollutionNoise=request.PollutionNoise,
                 PollutionWater=request.PollutionWater,
                 TravelTime=request.TravelTime,
+                Country=request.Country,
+                State=request.State,
+                City=request.City
+
             };
         }
 
