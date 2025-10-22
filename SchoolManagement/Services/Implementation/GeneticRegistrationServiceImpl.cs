@@ -11,16 +11,17 @@ namespace SchoolManagement.Services.Implementation
         public GeneticRegistrationServiceImpl(SchoolManagementDb context)
         {
             _context = context;
-            
+
         }
-        public string AddGeneticRegistration (GeneticRegistrationRequestVM request)
+        public string AddGeneticRegistration(GeneticRegistrationRequestVM request)
         {
-            var geneticRegistartion=GeneticRegistrationRequestVM.ToModel(request);
+            var geneticRegistartion = GeneticRegistrationRequestVM.ToModel(request);
             string geneticId = "";
-            geneticId += request.Country.ToUpper().Trim().Substring(0, 3)+"/";
+            geneticId += request.Country.ToUpper().Trim().Substring(0, 3) + "/";
             string stateCode = "";
-            if (request.State.Contains(" ")){
-                string[] stateArray=request.State.Split(' ');
+            if (request.State.Contains(" "))
+            {
+                string[] stateArray = request.State.Split(' ');
 
                 foreach (string state in stateArray)
                 {
@@ -29,14 +30,14 @@ namespace SchoolManagement.Services.Implementation
             }
             else
             {
-                stateCode= request.State.ToUpper().Trim().Substring (0, 3);
+                stateCode = request.State.ToUpper().Trim().Substring(0, 3);
             }
             geneticId += stateCode + "/";
             geneticId += ExtractNumbers(DateTime.Now.ToString());
-            geneticRegistartion.GeneticId=geneticId;
-             geneticRegistartion.CreatedAt = DateTime.UtcNow;
+            geneticRegistartion.GeneticId = geneticId;
+            geneticRegistartion.CreatedAt = DateTime.UtcNow;
             _context.GeneticRegistrations.Add(geneticRegistartion);
-             int  result=_context.SaveChanges();
+            int result = _context.SaveChanges();
             if (result == 0)
             {
                 return "not inserted";
@@ -45,8 +46,37 @@ namespace SchoolManagement.Services.Implementation
 
         }
         public static string ExtractNumbers(string input)
-        { 
+        {
             return Regex.Replace(input, @"\D", "");
+        }
+
+        public GeneticRegistrationResponseVM GetGeneticRegistrationByGeneticIdOrRegistrationNumber(string GeneticId, string RegistrationNumber)
+        {
+            var geneticRegistration = _context.GeneticRegistrations
+                .FirstOrDefault(gr => gr.GeneticId == GeneticId || gr.RegistrationNumber == RegistrationNumber);
+            if (geneticRegistration == null)
+            {
+                return null;
+            }
+            return new GeneticRegistrationResponseVM
+            {
+                RegistrationNumber = geneticRegistration.RegistrationNumber,
+                StudentId = geneticRegistration.StudentId,
+                StudentName = geneticRegistration.StudentName,
+                Country = geneticRegistration.Country,
+                State = geneticRegistration.State,
+                City = geneticRegistration.City,
+                GeneticId = geneticRegistration.GeneticId,
+                ClassName = geneticRegistration.ClassName,
+                Branch = geneticRegistration.Branch,
+                FatherName = geneticRegistration.FatherName,
+                FatherOccupation = geneticRegistration.FatherOccupation,
+                MotherName = geneticRegistration.MotherName,
+                MotherOccupation = geneticRegistration.MotherOccupation,
+                CountryCode = geneticRegistration.CountryCode,
+                ContactNumber = geneticRegistration.ContactNumber,
+                Age = geneticRegistration.Age,
+            };
         }
     }
 }

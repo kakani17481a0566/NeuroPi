@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using NeuroPi.UserManagment.Response;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.GeneticRegistration;
+using System.Net;
 
 namespace SchoolManagement.Controllers
 {
@@ -18,12 +19,23 @@ namespace SchoolManagement.Controllers
         [HttpPost]
         public ResponseResult<string> AddGeneticRegistration([FromBody] GeneticRegistrationRequestVM requestVM)
         {
-            var result=_geneticRegistrationService.AddGeneticRegistration(requestVM);
+            var result = _geneticRegistrationService.AddGeneticRegistration(requestVM);
             if (result.Equals("inserted")) {
-                return new ResponseResult<string>(System.Net.HttpStatusCode.OK, result, "Registered Successfully");
+                return new ResponseResult<string>(HttpStatusCode.OK, result, "Registered Successfully");
             }
-            return new ResponseResult<string>(System.Net.HttpStatusCode.Forbidden, result, "Not Registered Please try after some time");
+            return new ResponseResult<string>(HttpStatusCode.Forbidden, result, "Not Registered Please try after some time");
 
+        }
+
+        [HttpGet("{geneticId}/{registrationNumber}")]
+        public ResponseResult<GeneticRegistrationResponseVM> GetGeneticRegistrationByGeneticIdOrRegistrationNumber(string geneticId, string registrationNumber)
+        {
+            var geneticRegistration = _geneticRegistrationService.GetGeneticRegistrationByGeneticIdOrRegistrationNumber(geneticId, registrationNumber);
+            if (geneticRegistration != null)
+            {
+                return new ResponseResult<GeneticRegistrationResponseVM>(HttpStatusCode.OK, geneticRegistration, "Genetic Registration retrieved successfully");
+            }
+            return new ResponseResult<GeneticRegistrationResponseVM>(HttpStatusCode.NoContent, geneticRegistration, $"No data found for the provided Genetic ID{geneticId} or Registration Number{registrationNumber}");
         }
     }
 }
