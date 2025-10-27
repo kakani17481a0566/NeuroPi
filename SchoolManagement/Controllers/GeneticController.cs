@@ -20,7 +20,7 @@ namespace SchoolManagement.Controllers
         public ResponseResult<string> AddGeneticRegistration([FromBody] GeneticRegistrationRequestVM requestVM)
         {
             var result = _geneticRegistrationService.AddGeneticRegistration(requestVM);
-            if (result.Equals("inserted")) {
+            if (result != null) {
                 return new ResponseResult<string>(HttpStatusCode.OK, result, "Registered Successfully");
             }
             return new ResponseResult<string>(HttpStatusCode.Forbidden, result, "Not Registered Please try after some time");
