@@ -4,10 +4,12 @@ using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.CourseTeacher;
 using SchoolManagement.ViewModel.ParentStudents;
+using SchoolManagement.ViewModel.Student;
+using StudentVM = SchoolManagement.ViewModel.ParentStudents.StudentVM;
 
 namespace SchoolManagement.Services.Implementation
 {
-    public class ParentStudentsServiceImpl : SchoolManagement.Services.Interface.IParentStudentsService
+    public class ParentStudentsServiceImpl : IParentStudentsService
     {
         private readonly SchoolManagement.Data.SchoolManagementDb _db;
 
@@ -16,7 +18,7 @@ namespace SchoolManagement.Services.Implementation
             _db = db;
         }
 
-        public SchoolManagement.ViewModel.ParentStudents.ParentStudentResponseVM Create(SchoolManagement.ViewModel.ParentStudents.ParentStudentRequestVM request)
+        public ParentStudentResponseVM Create(ParentStudentRequestVM request)
         {
             var entity = new SchoolManagement.Model.MParentStudent
             {
@@ -33,7 +35,7 @@ namespace SchoolManagement.Services.Implementation
             return MapToResponse(entity);
         }
 
-        public System.Collections.Generic.List<SchoolManagement.ViewModel.ParentStudents.ParentStudentResponseVM> GetAll()
+        public List<ParentStudentResponseVM> GetAll()
         {
             return _db.ParentStudents
                 .Where(x => !x.IsDeleted)
@@ -41,7 +43,7 @@ namespace SchoolManagement.Services.Implementation
                 .ToList();
         }
 
-        public System.Collections.Generic.List<SchoolManagement.ViewModel.ParentStudents.ParentStudentResponseVM> GetAllByTenantId(int tenantId)
+        public List<ParentStudentResponseVM> GetAllByTenantId(int tenantId)
         {
             return _db.ParentStudents
                 .Where(x => x.TenantId == tenantId && !x.IsDeleted)
@@ -49,19 +51,19 @@ namespace SchoolManagement.Services.Implementation
                 .ToList();
         }
 
-        public SchoolManagement.ViewModel.ParentStudents.ParentStudentResponseVM GetById(int id)
+        public ParentStudentResponseVM GetById(int id)
         {
             var entity = _db.ParentStudents.FirstOrDefault(x => x.Id == id && !x.IsDeleted);
             return entity == null ? null : MapToResponse(entity);
         }
 
-        public SchoolManagement.ViewModel.ParentStudents.ParentStudentResponseVM GetByIdAndTenantId(int id, int tenantId)
+        public ParentStudentResponseVM GetByIdAndTenantId(int id, int tenantId)
         {
             var entity = _db.ParentStudents.FirstOrDefault(x => x.Id == id && x.TenantId == tenantId && !x.IsDeleted);
             return entity == null ? null : MapToResponse(entity);
         }
 
-        public SchoolManagement.ViewModel.ParentStudents.ParentStudentResponseVM UpdateByIdAndTenantId(int id, int tenantId, SchoolManagement.ViewModel.ParentStudents.ParentStudentUpdateVM request)
+        public ParentStudentResponseVM UpdateByIdAndTenantId(int id, int tenantId, SchoolManagement.ViewModel.ParentStudents.ParentStudentUpdateVM request)
         {
             var entity = _db.ParentStudents.FirstOrDefault(x => x.Id == id && x.TenantId == tenantId && !x.IsDeleted);
             if (entity == null) return null;
@@ -75,7 +77,7 @@ namespace SchoolManagement.Services.Implementation
             return MapToResponse(entity);
         }
 
-        public SchoolManagement.ViewModel.ParentStudents.ParentStudentResponseVM DeleteByIdAndTenantId(int id, int tenantId)
+        public ParentStudentResponseVM DeleteByIdAndTenantId(int id, int tenantId)
         {
             var entity = _db.ParentStudents.FirstOrDefault(x => x.Id == id && x.TenantId == tenantId && !x.IsDeleted);
             if (entity == null) return null;
@@ -87,9 +89,9 @@ namespace SchoolManagement.Services.Implementation
             return MapToResponse(entity);
         }
 
-        private SchoolManagement.ViewModel.ParentStudents.ParentStudentResponseVM MapToResponse(SchoolManagement.Model.MParentStudent model)
+        private ParentStudentResponseVM MapToResponse(SchoolManagement.Model.MParentStudent model)
         {
-            return new SchoolManagement.ViewModel.ParentStudents.ParentStudentResponseVM
+            return new ParentStudentResponseVM
             {
                 Id = model.Id,
                 ParentId = model.ParentId,
@@ -99,20 +101,20 @@ namespace SchoolManagement.Services.Implementation
         }
         public CourseTeacherVM GetParentDetails(int userId, int tenantId)
         {
-            CourseTeacherVM courseTeacherVM=new CourseTeacherVM();
-            var parentId=_db.Parents.Where(p=>p.UserId==userId && p.TenantId==tenantId).FirstOrDefault();
-            var result=_db.ParentStudents.Where(t=>t.TenantId==tenantId && t.ParentId== parentId.Id).Include(s=>s.Student).Include(c=>c.Student.Course).FirstOrDefault();
+            CourseTeacherVM courseTeacherVM = new CourseTeacherVM();
+            var parentId = _db.Parents.Where(p => p.UserId == userId && p.TenantId == tenantId).FirstOrDefault();
+            var result = _db.ParentStudents.Where(t => t.TenantId == tenantId && t.ParentId == parentId.Id).Include(s => s.Student).Include(c => c.Student.Course).FirstOrDefault();
             List<Course> courses = new List<Course>();
             if (result != null)
             {
                 courseTeacherVM.branchId = result.Student.BranchId;
-                
-                    var courseObj = new Course()
-                    {
-                        id = result.Student.Course.Id,
-                        name = result.Student.Course.Name,
-                    };
-                    courses.Add(courseObj);
+
+                var courseObj = new Course()
+                {
+                    id = result.Student.Course.Id,
+                    name = result.Student.Course.Name,
+                };
+                courses.Add(courseObj);
 
             }
             courseTeacherVM.courses = courses;
@@ -194,6 +196,7 @@ namespace SchoolManagement.Services.Implementation
                         MiddleName = x.Student.MiddleName,
                         LastName = x.Student.LastName,
                         CourseName = x.Student.Course?.Name,
+                        CourseId=x.Student.Course?.Id,
                         BranchName = x.Student.Branch?.Name,
                         StudentImageUrl = x.Student.StudentImageUrl,
 
@@ -214,6 +217,41 @@ namespace SchoolManagement.Services.Implementation
             return response;
         }
 
+        public List<ParentWithStudentsResponseVM> GetAllParentsWithStudentsByTenantIdAndBranchIdAndCourseId(int tenantId, int courseId, int branchId)
+        {
+            var response = _db.ParentStudents
+                .Include(s => s.Student)
+                .Where(ps => ps.TenantId == tenantId && !ps.IsDeleted &&
+                             (ps.Student.CourseId == courseId) &&
+                             (ps.Student.BranchId == branchId))
+                .Select(ps => new ParentWithStudentsResponseVM
+                {
+                    Parent = new ParentVM
+                    {
+                        ParentId = ps.Parent.Id,
+                        UserId = ps.Parent.UserId,
+                        ParentName = ps.Parent.User.Username,
+                        Email = ps.Parent.User.Email,
+                        MobileNumber = ps.Parent.User.MobileNumber,
+                        TenantId = ps.Parent.TenantId
+                    },
+                    Students = new List<StudentVM>
+                    {
+                        new StudentVM
+                        {
+                            StudentId = ps.Student.Id,
+                            Name = ps.Student.Name,
+                            MiddleName = ps.Student.MiddleName,
+                            LastName = ps.Student.LastName,
+                            CourseName = ps.Student.Course.Name,
+                            BranchName = ps.Student.Branch.Name,
+                            
+
+                        }
+                    }
+                });
+            return response.ToList();
+        }
 
     }
-}
+}          

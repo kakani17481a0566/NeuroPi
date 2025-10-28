@@ -18,6 +18,8 @@ namespace SchoolManagement.Services.Interface
 
         ParentWithStudentsResponseVM GetFullParentDetailsByUserId(int userId, int tenantId);
 
+        List<ParentWithStudentsResponseVM> GetAllParentsWithStudentsByTenantIdAndBranchIdAndCourseId(int tenantId, int courseId, int branchId);
+
 
 
         CourseTeacherVM GetParentDetails(int userId, int tenantId);

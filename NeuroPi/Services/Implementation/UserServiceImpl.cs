@@ -43,6 +43,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
             var role = _context.UserRoles
                 .Include(r => r.Role)
+                .Include(u => u.User)
                 .FirstOrDefault(r => !r.IsDeleted && r.UserId == user.UserId && r.TenantId == user.TenantId);
 
             var department = _context.UserDepartments
@@ -53,6 +54,8 @@ namespace NeuroPi.UserManagment.Services.Implementation
             return new UserLogInSucessVM
             {
                 UserName = username,
+                FirstName = role.User.FirstName,
+                LastName = role.User.LastName,
                 TenantId = user.TenantId,
                 UserId = user.UserId,
                 token = GenerateJwtToken(user),

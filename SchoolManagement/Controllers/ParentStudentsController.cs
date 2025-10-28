@@ -107,5 +107,15 @@ namespace SchoolManagement.Controllers
                 ? new ResponseResult<ParentWithStudentsResponseVM>(HttpStatusCode.NotFound, null, "Parent not found for given user and tenant")
                 : new ResponseResult<ParentWithStudentsResponseVM>(HttpStatusCode.OK, result, "Fetched parent and linked students successfully");
         }
+
+        [HttpGet("{branchId}/{courseId}/{tenantId}")]
+
+        public ResponseResult<List<ParentWithStudentsResponseVM>> GetAllParentsWithStudentsByTenantIdAndBranchIdAndCourseId(int branchId,int courseId, int tenantId)
+        {
+            var result = _service.GetAllParentsWithStudentsByTenantIdAndBranchIdAndCourseId(branchId, courseId, tenantId);
+            return result == null
+                ? new ResponseResult<List<ParentWithStudentsResponseVM>>(HttpStatusCode.NotFound, null, "parent not found")
+                : new ResponseResult<List<ParentWithStudentsResponseVM>>(HttpStatusCode.OK, result, "Details fetched Successfully");
+        }
     }
 }

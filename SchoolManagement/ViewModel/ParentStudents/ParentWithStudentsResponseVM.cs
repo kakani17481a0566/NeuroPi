@@ -59,6 +59,7 @@
         public string? LastName { get; set; }
 
         public string CourseName { get; set; }
+        public int? CourseId { get; set; }
         public string BranchName { get; set; }
         public byte[]? StudentImageUrl { get; set; }
 
