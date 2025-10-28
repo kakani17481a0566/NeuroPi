@@ -1,4 +1,5 @@
-﻿using SchoolManagement.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using SchoolManagement.Data;
 using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.GeneticRegistration;
@@ -27,18 +28,26 @@ namespace SchoolManagement.Services.Implementation
 
             var geneticRegistration = GeneticRegistrationRequestVM.ToModel(request);
 
+            // Generate registration number if not provided
+            if (string.IsNullOrWhiteSpace(geneticRegistration.RegistrationNumber))
+                geneticRegistration.RegistrationNumber = Guid.NewGuid().ToString();
+
             // Defensive handling for null/short country/state
             string countryCode = SafeSubstring(request.Country?.ToUpper().Trim(), 3);
             string stateCode = GenerateStateCode(request.State);
             string timeStampDigits = ExtractNumbers(DateTime.UtcNow.ToString("yyyyMMddHHmmss"));
 
-            // Construct Genetic ID
+            // Construct unique Genetic ID
             string geneticId = $"{countryCode}/{stateCode}/{timeStampDigits}";
             geneticRegistration.GeneticId = geneticId;
 
-            // Set timestamps
+            // System fields
             geneticRegistration.CreatedOn = DateTime.UtcNow;
             geneticRegistration.UpdatedOn = DateTime.UtcNow;
+            geneticRegistration.IsDeleted = false;
+            geneticRegistration.TenantId ??= request.TenantId;
+            geneticRegistration.CreatedBy ??= request.CreatedBy;
+            geneticRegistration.UpdatedBy ??= request.UpdatedBy;
 
             // Save to DB
             _context.GeneticRegistrations.Add(geneticRegistration);
@@ -48,50 +57,24 @@ namespace SchoolManagement.Services.Implementation
         }
 
         // ------------------------------------------------------------
-        // Helper: Extract numbers from a string
-        // ------------------------------------------------------------
-        public static string ExtractNumbers(string input)
-        {
-            return Regex.Replace(input ?? string.Empty, @"\D", "");
-        }
-
-        // ------------------------------------------------------------
-        // Helper: Generate state code (handles multi-word)
-        // ------------------------------------------------------------
-        private static string GenerateStateCode(string stateName)
-        {
-            if (string.IsNullOrWhiteSpace(stateName))
-                return "XXX"; // fallback code
-
-            var parts = stateName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            if (parts.Length > 1)
-                return string.Join("", parts.Select(s => s[0].ToString().ToUpper()));
-
-            return SafeSubstring(stateName.ToUpper().Trim(), 3);
-        }
-
-        // ------------------------------------------------------------
-        // Helper: Safe substring to avoid exceptions
-        // ------------------------------------------------------------
-        private static string SafeSubstring(string input, int length)
-        {
-            if (string.IsNullOrWhiteSpace(input))
-                return "UNK"; // unknown
-            return input.Length >= length ? input.Substring(0, length) : input.PadRight(length, 'X');
-        }
-
-        // ------------------------------------------------------------
         // Get Genetic Registration by GeneticId or RegistrationNumber
         // ------------------------------------------------------------
-        public GeneticRegistrationResponseVM GetGeneticRegistrationByGeneticIdOrRegistrationNumber(
+        public GeneticRegistrationResponseVM? GetGeneticRegistrationByGeneticIdOrRegistrationNumber(
             string geneticId, string registrationNumber)
         {
+            if (string.IsNullOrWhiteSpace(geneticId) && string.IsNullOrWhiteSpace(registrationNumber))
+                throw new ArgumentException("Either GeneticId or RegistrationNumber must be provided.");
+
             var record = _context.GeneticRegistrations
-                .FirstOrDefault(gr => gr.GeneticId == geneticId || gr.RegistrationNumber == registrationNumber);
+                .AsNoTracking()
+                .FirstOrDefault(gr =>
+                    !gr.IsDeleted &&
+                    (gr.GeneticId == geneticId || gr.RegistrationNumber == registrationNumber));
 
             if (record == null)
                 return null;
 
+            // Map entity → Response VM
             return new GeneticRegistrationResponseVM
             {
                 RegistrationNumber = record.RegistrationNumber,
@@ -139,9 +122,45 @@ namespace SchoolManagement.Services.Implementation
                 DateOfBirth = record.DateOfBirth,
                 FatherDateOfBirth = record.FatherDateOfBirth,
                 MotherDateOfBirth = record.MotherDateOfBirth,
+                TenantId = record.TenantId,
+                CreatedBy = record.CreatedBy,
+                UpdatedBy = record.UpdatedBy,
+                IsDeleted = record.IsDeleted,
                 CreatedOn = record.CreatedOn,
                 UpdatedOn = record.UpdatedOn
             };
+        }
+
+        // ------------------------------------------------------------
+        // Helper: Extract numbers from a string
+        // ------------------------------------------------------------
+        public static string ExtractNumbers(string input) =>
+            Regex.Replace(input ?? string.Empty, @"\D", "");
+
+        // ------------------------------------------------------------
+        // Helper: Generate state code (handles multi-word)
+        // ------------------------------------------------------------
+        private static string GenerateStateCode(string stateName)
+        {
+            if (string.IsNullOrWhiteSpace(stateName))
+                return "XXX"; // fallback
+
+            var parts = stateName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            return parts.Length > 1
+                ? string.Join("", parts.Select(s => s[0].ToString().ToUpper()))
+                : SafeSubstring(stateName.ToUpper().Trim(), 3);
+        }
+
+        // ------------------------------------------------------------
+        // Helper: Safe substring to avoid exceptions
+        // ------------------------------------------------------------
+        private static string SafeSubstring(string input, int length)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+                return "UNK"; // unknown
+            return input.Length >= length
+                ? input.Substring(0, length)
+                : input.PadRight(length, 'X');
         }
     }
 }

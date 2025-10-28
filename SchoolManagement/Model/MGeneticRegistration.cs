@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NeuroPi.UserManagment.Model;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -7,19 +8,21 @@ namespace SchoolManagement.Model
     [Table("genetic_reg_table")]
     public class MGeneticRegistration
     {
+        // 🔹 Primary Key
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("reg_number")]
-        public string RegistrationNumber { get; set; }
+        [Required]
+        public string RegistrationNumber { get; set; } = Guid.NewGuid().ToString(); // or generate custom code elsewhere
 
-        [Column("genetic_id")]
-        public string GeneticId { get; set; }
-
+        // 🔹 User Reference (no longer auto-generated)
         [Column("user_id")]
         public int? UserId { get; set; }
 
+        [Column("genetic_id")]
+        public string? GeneticId { get; set; }
+
         [Column("user_name")]
-        public string UserName { get; set; }
+        public string? UserName { get; set; }
 
         [Column("class_name")]
         public string? ClassName { get; set; }
@@ -28,34 +31,34 @@ namespace SchoolManagement.Model
         public string? Branch { get; set; }
 
         [Column("father_name")]
-        public string FatherName { get; set; }
+        public string? FatherName { get; set; }
 
         [Column("father_occupation")]
-        public string FatherOccupation { get; set; }
+        public string? FatherOccupation { get; set; }
 
         [Column("mother_name")]
-        public string MotherName { get; set; }
+        public string? MotherName { get; set; }
 
         [Column("mother_occupation")]
-        public string MotherOccupation { get; set; }
+        public string? MotherOccupation { get; set; }
 
         [Column("country_code")]
         public string CountryCode { get; set; } = "+91";
 
         [Column("contact_number")]
-        public string ContactNumber { get; set; }
+        public string? ContactNumber { get; set; }
 
         [Column("email")]
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
         [Column("country")]
-        public string Country { get; set; }
+        public string? Country { get; set; }
 
         [Column("state")]
-        public string State { get; set; }
+        public string? State { get; set; }
 
         [Column("city")]
-        public string City { get; set; }
+        public string? City { get; set; }
 
         [Column("date_of_birth")]
         public DateTime? DateOfBirth { get; set; }
@@ -70,7 +73,7 @@ namespace SchoolManagement.Model
         public int? Age { get; set; }
 
         [Column("gender")]
-        public string Gender { get; set; }
+        public string? Gender { get; set; }
 
         [Column("height")]
         public decimal? Height { get; set; }
@@ -79,75 +82,100 @@ namespace SchoolManagement.Model
         public decimal? Weight { get; set; }
 
         [Column("food_frequency")]
-        public string FoodFrequency { get; set; }
+        public string? FoodFrequency { get; set; }
 
         [Column("consanguinity")]
-        public string Consanguinity { get; set; }
+        public string? Consanguinity { get; set; }
 
         [Column("parents_occupation")]
-        public string ParentsOccupation { get; set; }
+        public string? ParentsOccupation { get; set; }
 
         [Column("diet_type")]
-        public string DietType { get; set; }
+        public string? DietType { get; set; }
 
         [Column("activity")]
-        public string Activity { get; set; }
+        public string? Activity { get; set; }
 
         [Column("sleep_duration")]
-        public string SleepDuration { get; set; }
+        public string? SleepDuration { get; set; }
 
         [Column("sleep_quality")]
-        public string SleepQuality { get; set; }
+        public string? SleepQuality { get; set; }
 
         [Column("screen_time")]
-        public string ScreenTime { get; set; }
+        public string? ScreenTime { get; set; }
 
         [Column("food_timing")]
-        public string FoodTiming { get; set; }
+        public string? FoodTiming { get; set; }
 
         [Column("fruits")]
-        public string Fruits { get; set; }
+        public string? Fruits { get; set; }
 
         [Column("vegetables")]
-        public string Vegetables { get; set; }
+        public string? Vegetables { get; set; }
 
         [Column("plant_based_protein")]
-        public string PlantBasedProtein { get; set; }
+        public string? PlantBasedProtein { get; set; }
 
         [Column("animal_based_protein")]
-        public string AnimalBasedProtein { get; set; }
+        public string? AnimalBasedProtein { get; set; }
 
         [Column("family_type")]
-        public string FamilyType { get; set; }
+        public string? FamilyType { get; set; }
 
         [Column("siblings")]
         public int? Siblings { get; set; }
 
         [Column("vaccination")]
-        public string Vaccination { get; set; }
+        public string? Vaccination { get; set; }
 
         [Column("nature_access")]
-        public string NatureAccess { get; set; }
+        public string? NatureAccess { get; set; }
 
         [Column("pollution_air")]
-        public string PollutionAir { get; set; }
+        public string? PollutionAir { get; set; }
 
         [Column("pollution_noise")]
-        public string PollutionNoise { get; set; }
+        public string? PollutionNoise { get; set; }
 
         [Column("pollution_water")]
-        public string PollutionWater { get; set; }
+        public string? PollutionWater { get; set; }
 
         [Column("passive_smoking")]
-        public string PassiveSmoking { get; set; }
+        public string? PassiveSmoking { get; set; }
 
         [Column("travel_time")]
-        public string TravelTime { get; set; }
+        public string? TravelTime { get; set; }
 
+        // 🔹 Audit & Tenant Fields
+        [Column("created_by")]
+        public int? CreatedBy { get; set; }
+
+        [Column("updated_by")]
+        public int? UpdatedBy { get; set; }
+
+        [Column("tenant_id")]
+        public int? TenantId { get; set; }
+
+        // 🔹 Soft Delete
+        [Column("is_deleted")]
+        public bool IsDeleted { get; set; } = false;
+
+        // 🔹 Timestamps
         [Column("created_on")]
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
 
         [Column("updated_on")]
         public DateTime UpdatedOn { get; set; } = DateTime.UtcNow;
+
+        // 🔹 Navigation Properties
+        [ForeignKey("CreatedBy")]
+        public virtual MUser? CreatedByUser { get; set; }
+
+        [ForeignKey("UpdatedBy")]
+        public virtual MUser? UpdatedByUser { get; set; }
+
+        [ForeignKey("TenantId")]
+        public virtual MTenant? Tenant { get; set; }
     }
 }

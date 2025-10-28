@@ -27,8 +27,8 @@ namespace SchoolManagement.Controllers
 
         }
 
-        [HttpGet("{geneticId}/{registrationNumber}")]
-        public ResponseResult<GeneticRegistrationResponseVM> GetGeneticRegistrationByGeneticIdOrRegistrationNumber(string geneticId, string registrationNumber)
+        [HttpGet("geneticId-registrationNumber")]
+        public ResponseResult<GeneticRegistrationResponseVM> GetGeneticRegistrationByGeneticIdOrRegistrationNumber([FromQuery]string geneticId, [FromQuery] string registrationNumber)
         {
             var geneticRegistration = _geneticRegistrationService.GetGeneticRegistrationByGeneticIdOrRegistrationNumber(geneticId, registrationNumber);
             if (geneticRegistration != null)
