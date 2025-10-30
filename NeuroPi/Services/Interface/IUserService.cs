@@ -22,7 +22,8 @@ namespace NeuroPi.UserManagment.Services.Interface
 
         Task<string> UpdateUserImageAsync(int id, int tenantId, UserImageUploadVM request, Cloudinary cloudinary);
 
-        bool UpdateUserPassword(int id, int tenantId, UserUpdatePasswordVM request);
+        bool UpdateUserPassword(int id, int tenantId, UserUpdatePasswordVM request, out string message);
+
 
         UsersProfileSummaryVM GetUserProfileSummary(int id, int tenantId);
 

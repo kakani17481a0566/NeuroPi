@@ -124,17 +124,47 @@ namespace NeuroPi.UserManagment.Controllers
         [Authorize]
         [HttpPut("{id}/password")]
         public ResponseResult<object> UpdatePassword(
-    int id,
-    [FromQuery] int tenantId,
-    [FromBody] UserUpdatePasswordVM request)
+            int id,
+            [FromQuery] int tenantId,
+            [FromBody] UserUpdatePasswordVM request)
         {
-            var result = _userService.UpdateUserPassword(id, tenantId, request);
+            var result = _userService.UpdateUserPassword(id, tenantId, request, out string message);
 
             if (result)
-                return new ResponseResult<object>(HttpStatusCode.OK, null, "Password updated successfully");
+            {
+                return new ResponseResult<object>(
+                    HttpStatusCode.OK,
+                    null,
+                    message // "Password updated successfully"
+                );
+            }
 
-            return new ResponseResult<object>(HttpStatusCode.BadRequest, null, "Failed to update password");
+            // Choose proper HTTP code based on message
+            if (message == "Current password is incorrect")
+            {
+                return new ResponseResult<object>(
+                    HttpStatusCode.Unauthorized,
+                    null,
+                    message
+                );
+            }
+
+            if (message == "User not found")
+            {
+                return new ResponseResult<object>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    message
+                );
+            }
+
+            return new ResponseResult<object>(
+                HttpStatusCode.BadRequest,
+                null,
+                message // "Failed to update password"
+            );
         }
+
 
         // GET api/user/{id}/profile-summary?tenantId=...
         [HttpGet("{id}/profile-summary")]

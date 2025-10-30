@@ -183,22 +183,40 @@ namespace NeuroPi.UserManagment.Services.Implementation
             return imageUrl;
         }
 
+        //UserUpdatePasswordVM
 
-
-        public bool UpdateUserPassword(int id, int tenantId, UserUpdatePasswordVM request)
+        public bool UpdateUserPassword(int id, int tenantId, UserUpdatePasswordVM request, out string message)
         {
+            message = string.Empty;
+
             var user = _context.Users.FirstOrDefault(u => u.UserId == id && u.TenantId == tenantId && !u.IsDeleted);
-            if (user == null) return false;
-
-            // Simple check — ideally use hashed password comparison
-            if (user.Password != request.CurrentPassword)
+            if (user == null)
+            {
+                message = "User not found";
                 return false;
+            }
 
-            user.Password = request.NewPassword; // Consider hashing here
+            // Simple check (no hash)
+            if (user.Password != request.CurrentPassword)
+            {
+                message = "Current password is incorrect";
+                return false;
+            }
+
+            user.Password = request.NewPassword;
             user.UpdatedOn = DateTime.UtcNow;
 
-            _context.SaveChanges();
-            return true;
+            try
+            {
+                _context.SaveChanges();
+                message = "Password updated successfully";
+                return true;
+            }
+            catch
+            {
+                message = "Failed to update password";
+                return false;
+            }
         }
 
 
