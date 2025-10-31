@@ -90,7 +90,9 @@ builder.Services.AddScoped<IItemLocationService, ItemLocationServiceImpl>();
 builder.Services.AddScoped<IItemBranchService, ItemBranchServiceImpl>();
 builder.Services.AddScoped<IOrderItemService, OrderItemServiceImpl>();
 builder.Services.AddScoped<ICourseTeacherService, CourseTeacherServiceImpl>();
+//builder.Services.AddScoped<ITestResultService, TestResultServiceImpl>();
 builder.Services.AddScoped<ITestResultService, TestResultServiceImpl>();
+
 builder.Services.AddScoped<ICountingTestInterface, CountingTestServiceImpl>();
 builder.Services.AddScoped<IPostalDeliveriesService, PostalDeliveriesServiceImpl>();
 builder.Services.AddScoped<IPostalDeliveryItemsService, PostalDeliveryItemsServiceImpl>();
