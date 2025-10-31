@@ -1,0 +1,6 @@
+@NeuroPi.Nutrition_HostAddress = http://localhost:5062
+
+GET {{NeuroPi.Nutrition_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
