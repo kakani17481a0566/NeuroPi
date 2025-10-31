@@ -12,14 +12,14 @@ namespace SchoolManagement.Model
         [Key]
         [Column("reg_number")]
         [Required]
-        public string RegistrationNumber { get; set; } = Guid.NewGuid().ToString(); // or generate custom code elsewhere
+        public string RegistrationNumber { get; set; } = Guid.NewGuid().ToString();
 
-        // 🔹 User Reference (no longer auto-generated)
-        [Column("user_id")]
-        public int? UserId { get; set; }
-
+        // 🔹 Core Identifiers
         [Column("genetic_id")]
         public string? GeneticId { get; set; }
+
+        [Column("user_id")]
+        public int? UserId { get; set; }
 
         [Column("user_name")]
         public string? UserName { get; set; }
@@ -30,6 +30,7 @@ namespace SchoolManagement.Model
         [Column("branch")]
         public string? Branch { get; set; }
 
+        // 🔹 Parent Details
         [Column("father_name")]
         public string? FatherName { get; set; }
 
@@ -42,6 +43,13 @@ namespace SchoolManagement.Model
         [Column("mother_occupation")]
         public string? MotherOccupation { get; set; }
 
+        [Column("father_date_of_birth")]
+        public DateTime? FatherDateOfBirth { get; set; }
+
+        [Column("mother_date_of_birth")]
+        public DateTime? MotherDateOfBirth { get; set; }
+
+        // 🔹 Contact & Location
         [Column("country_code")]
         public string CountryCode { get; set; } = "+91";
 
@@ -60,14 +68,47 @@ namespace SchoolManagement.Model
         [Column("city")]
         public string? City { get; set; }
 
+        // 🔹 Biological Address
+        [Column("biological_country")]
+        public string? BiologicalCountry { get; set; }
+
+        [Column("biological_state")]
+        public string? BiologicalState { get; set; }
+
+        [Column("biological_city")]
+        public string? BiologicalCity { get; set; }
+
+        [Column("is_biological_same")]
+        public bool IsBiologicalSame { get; set; } = false;
+
+        // 🔹 Guardian Details
+        [Column("has_guardian")]
+        public bool HasGuardian { get; set; } = false;
+
+        [Column("guardian_first_name")]
+        public string? GuardianFirstName { get; set; }
+
+        [Column("guardian_middle_name")]
+        public string? GuardianMiddleName { get; set; }
+
+        [Column("guardian_last_name")]
+        public string? GuardianLastName { get; set; }
+
+        [Column("guardian_occupation")]
+        public string? GuardianOccupation { get; set; }
+
+        [Column("guardian_relationship")]
+        public string? GuardianRelationship { get; set; }
+
+        [Column("guardian_contact_number")]
+        public string? GuardianContactNumber { get; set; }
+
+        [Column("guardian_email")]
+        public string? GuardianEmail { get; set; }
+
+        // 🔹 Personal Info
         [Column("date_of_birth")]
         public DateTime? DateOfBirth { get; set; }
-
-        [Column("father_date_of_birth")]
-        public DateTime? FatherDateOfBirth { get; set; }
-
-        [Column("mother_date_of_birth")]
-        public DateTime? MotherDateOfBirth { get; set; }
 
         [Column("age")]
         public int? Age { get; set; }
@@ -81,6 +122,7 @@ namespace SchoolManagement.Model
         [Column("weight")]
         public decimal? Weight { get; set; }
 
+        // 🔹 Health & Lifestyle
         [Column("food_frequency")]
         public string? FoodFrequency { get; set; }
 
@@ -92,6 +134,12 @@ namespace SchoolManagement.Model
 
         [Column("diet_type")]
         public string? DietType { get; set; }
+
+        [Column("plant_based_protein")]
+        public string? PlantBasedProtein { get; set; }
+
+        [Column("animal_based_protein")]
+        public string? AnimalBasedProtein { get; set; }
 
         [Column("activity")]
         public string? Activity { get; set; }
@@ -113,12 +161,6 @@ namespace SchoolManagement.Model
 
         [Column("vegetables")]
         public string? Vegetables { get; set; }
-
-        [Column("plant_based_protein")]
-        public string? PlantBasedProtein { get; set; }
-
-        [Column("animal_based_protein")]
-        public string? AnimalBasedProtein { get; set; }
 
         [Column("family_type")]
         public string? FamilyType { get; set; }
@@ -157,11 +199,9 @@ namespace SchoolManagement.Model
         [Column("tenant_id")]
         public int? TenantId { get; set; }
 
-        // 🔹 Soft Delete
         [Column("is_deleted")]
         public bool IsDeleted { get; set; } = false;
 
-        // 🔹 Timestamps
         [Column("created_on")]
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
 
@@ -169,13 +209,13 @@ namespace SchoolManagement.Model
         public DateTime UpdatedOn { get; set; } = DateTime.UtcNow;
 
         // 🔹 Navigation Properties
-        [ForeignKey("CreatedBy")]
+        [ForeignKey(nameof(CreatedBy))]
         public virtual MUser? CreatedByUser { get; set; }
 
-        [ForeignKey("UpdatedBy")]
+        [ForeignKey(nameof(UpdatedBy))]
         public virtual MUser? UpdatedByUser { get; set; }
 
-        [ForeignKey("TenantId")]
+        [ForeignKey(nameof(TenantId))]
         public virtual MTenant? Tenant { get; set; }
     }
 }

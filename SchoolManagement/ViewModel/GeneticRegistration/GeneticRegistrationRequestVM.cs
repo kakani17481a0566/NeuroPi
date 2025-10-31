@@ -5,8 +5,9 @@ namespace SchoolManagement.ViewModel.GeneticRegistration
 {
     public class GeneticRegistrationRequestVM
     {
-        // -------------------- Primary Key --------------------
-        public string? RegistrationNumber { get; set; }   // maps to reg_number (PK)
+        // -------------------- Primary Keys --------------------
+        public string? RegistrationNumber { get; set; } // reg_number (PK)
+        public string? GeneticId { get; set; }          // unique genetic id
 
         // -------------------- Personal Info --------------------
         public int? UserId { get; set; }
@@ -19,6 +20,8 @@ namespace SchoolManagement.ViewModel.GeneticRegistration
         public string? FatherOccupation { get; set; }
         public string? MotherName { get; set; }
         public string? MotherOccupation { get; set; }
+        public DateTime? FatherDateOfBirth { get; set; }
+        public DateTime? MotherDateOfBirth { get; set; }
 
         // -------------------- Contact Info --------------------
         public string CountryCode { get; set; } = "+91";
@@ -30,10 +33,24 @@ namespace SchoolManagement.ViewModel.GeneticRegistration
         public string? State { get; set; }
         public string? City { get; set; }
 
-        // -------------------- Date of Births --------------------
+        // -------------------- Biological Address --------------------
+        public string? BiologicalCountry { get; set; }
+        public string? BiologicalState { get; set; }
+        public string? BiologicalCity { get; set; }
+        public bool IsBiologicalSame { get; set; } = false;
+
+        // -------------------- Guardian Info --------------------
+        public bool HasGuardian { get; set; } = false;
+        public string? GuardianFirstName { get; set; }
+        public string? GuardianMiddleName { get; set; }
+        public string? GuardianLastName { get; set; }
+        public string? GuardianOccupation { get; set; }
+        public string? GuardianRelationship { get; set; }
+        public string? GuardianContactNumber { get; set; }
+        public string? GuardianEmail { get; set; }
+
+        // -------------------- Date of Birth --------------------
         public DateTime? DateOfBirth { get; set; }
-        public DateTime? FatherDateOfBirth { get; set; }
-        public DateTime? MotherDateOfBirth { get; set; }
 
         // -------------------- Health & Lifestyle --------------------
         public int? Age { get; set; }
@@ -87,37 +104,54 @@ namespace SchoolManagement.ViewModel.GeneticRegistration
 
             return new MGeneticRegistration
             {
+                // Core Identifiers
                 RegistrationNumber = string.IsNullOrWhiteSpace(request.RegistrationNumber)
-                    ? Guid.NewGuid().ToString()   // auto-generate if missing
+                    ? Guid.NewGuid().ToString()
                     : request.RegistrationNumber,
-
+                GeneticId = request.GeneticId,
                 UserId = request.UserId,
                 UserName = request.UserName,
                 ClassName = request.ClassName,
                 Branch = request.Branch,
 
+                // Parent Info
                 FatherName = request.FatherName,
                 FatherOccupation = request.FatherOccupation,
                 MotherName = request.MotherName,
                 MotherOccupation = request.MotherOccupation,
+                FatherDateOfBirth = request.FatherDateOfBirth,
+                MotherDateOfBirth = request.MotherDateOfBirth,
 
+                // Contact & Address
                 CountryCode = request.CountryCode,
                 ContactNumber = request.ContactNumber,
                 Email = request.Email,
-
                 Country = request.Country,
                 State = request.State,
                 City = request.City,
 
-                DateOfBirth = request.DateOfBirth,
-                FatherDateOfBirth = request.FatherDateOfBirth,
-                MotherDateOfBirth = request.MotherDateOfBirth,
+                // Biological Address
+                BiologicalCountry = request.BiologicalCountry,
+                BiologicalState = request.BiologicalState,
+                BiologicalCity = request.BiologicalCity,
+                IsBiologicalSame = request.IsBiologicalSame,
 
+                // Guardian Info
+                HasGuardian = request.HasGuardian,
+                GuardianFirstName = request.GuardianFirstName,
+                GuardianMiddleName = request.GuardianMiddleName,
+                GuardianLastName = request.GuardianLastName,
+                GuardianOccupation = request.GuardianOccupation,
+                GuardianRelationship = request.GuardianRelationship,
+                GuardianContactNumber = request.GuardianContactNumber,
+                GuardianEmail = request.GuardianEmail,
+
+                // Health & Lifestyle
+                DateOfBirth = request.DateOfBirth,
                 Age = request.Age,
                 Gender = request.Gender,
                 Height = request.Height,
                 Weight = request.Weight,
-
                 Consanguinity = request.Consanguinity,
                 ParentsOccupation = request.ParentsOccupation,
                 DietType = request.DietType,
@@ -127,16 +161,19 @@ namespace SchoolManagement.ViewModel.GeneticRegistration
                 ScreenTime = request.ScreenTime,
                 FoodTiming = request.FoodTiming,
 
+                // Nutrition
                 Fruits = request.Fruits,
                 Vegetables = request.Vegetables,
                 PlantBasedProtein = request.PlantBasedProtein,
                 AnimalBasedProtein = request.AnimalBasedProtein,
                 FoodFrequency = request.FoodFrequency,
 
+                // Family & Medical
                 FamilyType = request.FamilyType,
                 Siblings = request.Siblings,
                 Vaccination = request.Vaccination,
 
+                // Environment
                 NatureAccess = request.NatureAccess,
                 PollutionAir = request.PollutionAir,
                 PollutionNoise = request.PollutionNoise,
@@ -144,11 +181,11 @@ namespace SchoolManagement.ViewModel.GeneticRegistration
                 PassiveSmoking = request.PassiveSmoking,
                 TravelTime = request.TravelTime,
 
+                // Audit / System Fields
                 TenantId = request.TenantId,
                 CreatedBy = request.CreatedBy,
                 UpdatedBy = request.UpdatedBy,
                 IsDeleted = request.IsDeleted,
-
                 CreatedOn = DateTime.UtcNow,
                 UpdatedOn = DateTime.UtcNow
             };

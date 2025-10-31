@@ -19,21 +19,37 @@ namespace SchoolManagement.ViewModel.GeneticRegistration
         public string? FatherOccupation { get; set; }
         public string? MotherName { get; set; }
         public string? MotherOccupation { get; set; }
+        public DateTime? FatherDateOfBirth { get; set; }
+        public DateTime? MotherDateOfBirth { get; set; }
 
         // -------------------- Contact --------------------
         public string? CountryCode { get; set; } = "+91";
         public string? ContactNumber { get; set; }
         public string? Email { get; set; }
 
-        // -------------------- Location --------------------
+        // -------------------- Address --------------------
         public string? Country { get; set; }
         public string? State { get; set; }
         public string? City { get; set; }
 
+        // -------------------- Biological Address --------------------
+        public string? BiologicalCountry { get; set; }
+        public string? BiologicalState { get; set; }
+        public string? BiologicalCity { get; set; }
+        public bool IsBiologicalSame { get; set; }
+
+        // -------------------- Guardian Info --------------------
+        public bool HasGuardian { get; set; }
+        public string? GuardianFirstName { get; set; }
+        public string? GuardianMiddleName { get; set; }
+        public string? GuardianLastName { get; set; }
+        public string? GuardianOccupation { get; set; }
+        public string? GuardianRelationship { get; set; }
+        public string? GuardianContactNumber { get; set; }
+        public string? GuardianEmail { get; set; }
+
         // -------------------- Dates --------------------
         public DateTime? DateOfBirth { get; set; }
-        public DateTime? FatherDateOfBirth { get; set; }
-        public DateTime? MotherDateOfBirth { get; set; }
 
         // -------------------- Health --------------------
         public int? Age { get; set; }
@@ -82,5 +98,9 @@ namespace SchoolManagement.ViewModel.GeneticRegistration
         // -------------------- Audit Fields --------------------
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }
+
+        // -------------------- Convenience (optional) --------------------
+        public string? CreatedOnFormatted => CreatedOn.ToString("dd-MMM-yyyy HH:mm");
+        public string? UpdatedOnFormatted => UpdatedOn.ToString("dd-MMM-yyyy HH:mm");
     }
 }

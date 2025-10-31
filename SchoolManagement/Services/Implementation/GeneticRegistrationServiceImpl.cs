@@ -26,22 +26,23 @@ namespace SchoolManagement.Services.Implementation
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
 
-            var geneticRegistration = GeneticRegistrationRequestVM.ToModel(request);
+            var geneticRegistration = GeneticRegistrationRequestVM.ToModel(request)
+                ?? throw new InvalidOperationException("Mapping to model failed.");
 
-            // Generate registration number if not provided
+            // 🔹 Generate Registration Number if not provided
             if (string.IsNullOrWhiteSpace(geneticRegistration.RegistrationNumber))
                 geneticRegistration.RegistrationNumber = Guid.NewGuid().ToString();
 
-            // Defensive handling for null/short country/state
+            // 🔹 Defensive handling for null / short country / state
             string countryCode = SafeSubstring(request.Country?.ToUpper().Trim(), 3);
             string stateCode = GenerateStateCode(request.State);
             string timeStampDigits = ExtractNumbers(DateTime.UtcNow.ToString("yyyyMMddHHmmss"));
 
-            // Construct unique Genetic ID
+            // 🔹 Construct unique Genetic ID (e.g., IND/TN/20251031104703)
             string geneticId = $"{countryCode}/{stateCode}/{timeStampDigits}";
             geneticRegistration.GeneticId = geneticId;
 
-            // System fields
+            // 🔹 System fields
             geneticRegistration.CreatedOn = DateTime.UtcNow;
             geneticRegistration.UpdatedOn = DateTime.UtcNow;
             geneticRegistration.IsDeleted = false;
@@ -49,7 +50,7 @@ namespace SchoolManagement.Services.Implementation
             geneticRegistration.CreatedBy ??= request.CreatedBy;
             geneticRegistration.UpdatedBy ??= request.UpdatedBy;
 
-            // Save to DB
+            // 🔹 Save to DB
             _context.GeneticRegistrations.Add(geneticRegistration);
             int result = _context.SaveChanges();
 
@@ -74,25 +75,50 @@ namespace SchoolManagement.Services.Implementation
             if (record == null)
                 return null;
 
-            // Map entity → Response VM
+            // 🔹 Map entity → Response VM
             return new GeneticRegistrationResponseVM
             {
                 RegistrationNumber = record.RegistrationNumber,
                 UserId = record.UserId,
                 UserName = record.UserName,
                 GeneticId = record.GeneticId,
-                Country = record.Country,
-                State = record.State,
-                City = record.City,
+
                 ClassName = record.ClassName,
                 Branch = record.Branch,
+
                 FatherName = record.FatherName,
                 FatherOccupation = record.FatherOccupation,
                 MotherName = record.MotherName,
                 MotherOccupation = record.MotherOccupation,
+                FatherDateOfBirth = record.FatherDateOfBirth,
+                MotherDateOfBirth = record.MotherDateOfBirth,
+
                 CountryCode = record.CountryCode,
                 ContactNumber = record.ContactNumber,
                 Email = record.Email,
+
+                Country = record.Country,
+                State = record.State,
+                City = record.City,
+
+                // 🔹 Biological Address
+                BiologicalCountry = record.BiologicalCountry,
+                BiologicalState = record.BiologicalState,
+                BiologicalCity = record.BiologicalCity,
+                IsBiologicalSame = record.IsBiologicalSame,
+
+                // 🔹 Guardian Info
+                HasGuardian = record.HasGuardian,
+                GuardianFirstName = record.GuardianFirstName,
+                GuardianMiddleName = record.GuardianMiddleName,
+                GuardianLastName = record.GuardianLastName,
+                GuardianOccupation = record.GuardianOccupation,
+                GuardianRelationship = record.GuardianRelationship,
+                GuardianContactNumber = record.GuardianContactNumber,
+                GuardianEmail = record.GuardianEmail,
+
+                // 🔹 Health & Lifestyle
+                DateOfBirth = record.DateOfBirth,
                 Age = record.Age,
                 Gender = record.Gender,
                 Height = record.Height,
@@ -105,23 +131,28 @@ namespace SchoolManagement.Services.Implementation
                 SleepQuality = record.SleepQuality,
                 ScreenTime = record.ScreenTime,
                 FoodTiming = record.FoodTiming,
+
+                // 🔹 Nutrition
                 Fruits = record.Fruits,
                 Vegetables = record.Vegetables,
                 PlantBasedProtein = record.PlantBasedProtein,
                 AnimalBasedProtein = record.AnimalBasedProtein,
                 FoodFrequency = record.FoodFrequency,
+
+                // 🔹 Family & Medical
                 FamilyType = record.FamilyType,
                 Siblings = record.Siblings,
                 Vaccination = record.Vaccination,
+
+                // 🔹 Environment
                 NatureAccess = record.NatureAccess,
                 PollutionAir = record.PollutionAir,
                 PollutionNoise = record.PollutionNoise,
                 PollutionWater = record.PollutionWater,
                 PassiveSmoking = record.PassiveSmoking,
                 TravelTime = record.TravelTime,
-                DateOfBirth = record.DateOfBirth,
-                FatherDateOfBirth = record.FatherDateOfBirth,
-                MotherDateOfBirth = record.MotherDateOfBirth,
+
+                // 🔹 Audit & Tenant Info
                 TenantId = record.TenantId,
                 CreatedBy = record.CreatedBy,
                 UpdatedBy = record.UpdatedBy,
