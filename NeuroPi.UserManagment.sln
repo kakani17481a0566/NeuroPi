@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchoolManagement", "SchoolM
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeuroPi.Nutrition", "NeuroPi.Nutrition\NeuroPi.Nutrition.csproj", "{D960BD14-746C-4D80-A06F-D6A81F5AC330}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeuropiCommonLib", "NeuropiCommonLib\NeuropiCommonLib.csproj", "{777D2AC3-F899-43B3-8AE7-7D17666FDCF5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{D960BD14-746C-4D80-A06F-D6A81F5AC330}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D960BD14-746C-4D80-A06F-D6A81F5AC330}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D960BD14-746C-4D80-A06F-D6A81F5AC330}.Release|Any CPU.Build.0 = Release|Any CPU
+		{777D2AC3-F899-43B3-8AE7-7D17666FDCF5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{777D2AC3-F899-43B3-8AE7-7D17666FDCF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{777D2AC3-F899-43B3-8AE7-7D17666FDCF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{777D2AC3-F899-43B3-8AE7-7D17666FDCF5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -2,9 +2,7 @@
 using NeuroPi.Nutrition.Data;
 using NeuroPi.Nutrition.Services.Implementation;
 using NeuroPi.Nutrition.Services.Interface;
-using SchoolManagement.Data;
-using SchoolManagement.Services.Implementation;
-using SchoolManagement.Services.Interface;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,12 +15,11 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<NeutritionDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddDbContext<SchoolManagementDb>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 
 // ✅ Register all scoped services
 builder.Services.AddScoped<IGenGenesService, GenGenesServiceImpl>();
-builder.Services.AddScoped<ITestResultService, TestResultServiceImpl>();
+
 
 var app = builder.Build();
 

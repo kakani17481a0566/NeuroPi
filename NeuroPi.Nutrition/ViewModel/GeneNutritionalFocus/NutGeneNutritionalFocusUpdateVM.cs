@@ -1,4 +1,4 @@
-﻿namespace NeuroPi.Nutrition.ViewModel.GeneNutritionalFocus
+﻿namespace NeuroPi.Nutrition.ViewModel
 {
     public class NutGeneNutritionalFocusUpdateVM
     {
@@ -9,7 +9,6 @@
         public int UpdatedOn { get; set; }
 
         public DateTime UpdatedBy { get; set; }
-
 
 
     }

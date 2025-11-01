@@ -1,4 +1,4 @@
-﻿using NeuroPi.Nutrition.ViewModel.GeneNutritionalFocus;
+﻿using NeuroPi.Nutrition.ViewModel;
 using NeuroPi.Nutrition.ViewModel.Genes;
 
 namespace NeuroPi.Nutrition.Services.Interface

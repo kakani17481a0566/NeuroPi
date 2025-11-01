@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace NeuroPi.UserManagment.Model
+namespace NeuroPi.CommonLib.Model
 {
     public abstract class MBaseModel
     {

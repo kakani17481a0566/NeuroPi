@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using NeuroPi.Nutrition.Services.Interface;
 using NeuroPi.Nutrition.ViewModel.Genes;
-using NeuroPi.UserManagment.Response;
+using NeuroPi.CommonLib.Model;
 using System.Net;
 
 namespace NeuroPi.Nutrition.Controllers

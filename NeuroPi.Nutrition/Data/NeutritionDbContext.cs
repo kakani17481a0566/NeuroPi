@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NeuroPi.Nutrition.Model;
-using SchoolManagement.Model;
+
 
 namespace NeuroPi.Nutrition.Data
 {
@@ -9,13 +9,6 @@ namespace NeuroPi.Nutrition.Data
         public NeutritionDbContext(DbContextOptions<NeutritionDbContext> options) : base(options) { }
 
         public DbSet<MGenGenes> GenGenes { get; set;}
-
-
-
-
-
-
-
 
 }
 }

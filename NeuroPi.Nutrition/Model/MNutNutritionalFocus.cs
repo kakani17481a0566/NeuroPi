@@ -1,4 +1,4 @@
-﻿using NeuroPi.UserManagment.Model;
+﻿using NeuroPi.CommonLib.Model;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NeuroPi.Nutrition.Model
@@ -19,10 +19,8 @@ namespace NeuroPi.Nutrition.Model
         public string Description { get; set;}
 
         [Column("tenant_id")]
-        [ForeignKey("Tenant")]
         public int TenantId { get; set;}
         
-        public MTenant Tenant { get; set;}
-
+        
     }
 }

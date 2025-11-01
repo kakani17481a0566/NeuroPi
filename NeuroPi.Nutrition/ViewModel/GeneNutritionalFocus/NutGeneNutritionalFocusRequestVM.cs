@@ -1,4 +1,4 @@
-﻿namespace NeuroPi.Nutrition.ViewModel.GeneNutritionalFocus
+﻿namespace NeuroPi.Nutrition.ViewModel
 {
     public class NutGeneNutritionalFocusRequestVM
     {
