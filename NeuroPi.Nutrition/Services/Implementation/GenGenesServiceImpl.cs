@@ -66,12 +66,12 @@ namespace NeuroPi.Nutrition.Services.Implementation
             return null;
         }
 
-        public GenGenesResponseVM GetGenesByTenantId(int tenantId)
+        public List<GenGenesResponseVM> GetGenesByTenantId(int tenantId)
         {
-            var gene = _context.GenGenes.FirstOrDefault(g => g.TenantId == tenantId && !g.IsDeleted);
-            if (gene != null)
+            var genesList = _context.GenGenes.Where(g => g.TenantId == tenantId && !g.IsDeleted).ToList();
+            if (genesList != null && genesList.Count > 0)
             {
-                return GenGenesResponseVM.ToViewModel(gene);
+                return GenGenesResponseVM.ToViewModelList(genesList);
             }
             return null;
         }
@@ -95,6 +95,6 @@ namespace NeuroPi.Nutrition.Services.Implementation
 
         }
 
-      
+       
     }
 }

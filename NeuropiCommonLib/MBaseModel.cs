@@ -13,6 +13,8 @@ namespace NeuroPi.CommonLib.Model
 
         public int CreatedBy { get; set; }
 
+        //public string CreatedByName { get; set; }
+
         [Column("updated_on")]
         public DateTime? UpdatedOn { get; set; }
 
@@ -23,9 +25,6 @@ namespace NeuroPi.CommonLib.Model
 
         [Column("is_deleted")]
         public bool IsDeleted { get; set; } = false;
-
-
-
 
 
     }

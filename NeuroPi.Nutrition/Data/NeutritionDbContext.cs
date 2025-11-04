@@ -12,10 +12,16 @@ namespace NeuroPi.Nutrition.Data
         public DbSet<MNutritionalFocus>NutritionalFocuses { get; set; }
         public DbSet<MGeneNutritionalFocus> GeneNutritionalFocus { get; set; }
 
+<<<<<<< Updated upstream
         public DbSet<MNutritionalIteamType> NutritionalIteamType { get; set; }
 
         
 
+=======
+        public DbSet<MVitamins> Vitamins { get; set; }
+
+        public DbSet<MMealType> MealTypes { get; set; }
+>>>>>>> Stashed changes
 
 
     }

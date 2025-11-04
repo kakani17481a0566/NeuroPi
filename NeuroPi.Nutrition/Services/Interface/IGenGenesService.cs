@@ -9,7 +9,7 @@ namespace NeuroPi.Nutrition.Services.Interface
 
         GenGenesResponseVM GetGenesById(int id);
 
-        GenGenesResponseVM GetGenesByTenantId(int tenantId);
+        List<GenGenesResponseVM> GetGenesByTenantId(int tenantId);
 
         GenGenesResponseVM GetGenesByIdAndTenantId(int id, int tenantId);
 

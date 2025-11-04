@@ -19,6 +19,9 @@ builder.Services.AddDbContext<NeutritionDbContext>(options =>
 
 // ✅ Register all scoped services
 builder.Services.AddScoped<IGenGenesService, GenGenesServiceImpl>();
+builder.Services.AddScoped<IVitamins, VitaminServiceImpl>();
+builder.Services.AddScoped<IMealType, MealTypeServiceImpl>();
+
 
 
 var app = builder.Build();
