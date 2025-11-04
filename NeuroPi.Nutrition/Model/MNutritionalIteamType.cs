@@ -4,25 +4,21 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NeuroPi.Nutrition.Model
 {
-    [Table("gen_genes", Schema = "nutrition")]
-    public class MGenGenes : MBaseModel
+    [Table("nut_nutritional_item_type")]
+    public class MNutritionalIteamType : MBaseModel
     {
         [Column("id")]
         public int Id { get; set; }
 
         [Column("code")]
         [Required(ErrorMessage = "code is mandatory.")]
-        public string Code { get; set; }
+        public string? Code { get; set; }
 
         [Column("name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }        
 
-        [Column("description")]
-        public string Description { get; set; }
-
-  
         [Column("tenant_id")]
-        public int TenantId { get; set; }       
+        public int TenantId { get; set; }
 
 
     }

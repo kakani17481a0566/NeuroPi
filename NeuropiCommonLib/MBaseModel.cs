@@ -4,6 +4,8 @@ namespace NeuroPi.CommonLib.Model
 {
     public abstract class MBaseModel
     {
+
+
         [Column("created_on")]
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
 

@@ -9,6 +9,14 @@ namespace NeuroPi.Nutrition.Data
         public NeutritionDbContext(DbContextOptions<NeutritionDbContext> options) : base(options) { }
 
         public DbSet<MGenGenes> GenGenes { get; set;}
+        public DbSet<MNutritionalFocus>NutritionalFocuses { get; set; }
+        public DbSet<MGeneNutritionalFocus> GeneNutritionalFocus { get; set; }
 
-}
+        public DbSet<MNutritionalIteamType> NutritionalIteamType { get; set; }
+
+        
+
+
+
+    }
 }

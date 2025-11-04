@@ -1,14 +1,14 @@
 ﻿namespace NeuroPi.Nutrition.ViewModel
 {
-    public class NutGeneNutritionalFocusUpdateVM
+    public class GeneNutritionalFocusUpdateVM
     {
         public int NutritionalFocusId { get; set; }
 
         public int GenesId { get; set; }
 
-        public int UpdatedOn { get; set; }
+        public DateTime  UpdatedOn { get; set; }
 
-        public DateTime UpdatedBy { get; set; }
+        public int UpdatedBy { get; set; }
 
 
     }

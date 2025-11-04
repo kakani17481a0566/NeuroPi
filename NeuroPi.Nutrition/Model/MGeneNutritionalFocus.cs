@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace NeuroPi.Nutrition.Model
 {
     [Table("nut_gene_nutritional_focus")]
-    public class MNutGeneNutritionalFocus
+    public class MGeneNutritionalFocus : MBaseModel
     {
         [Column("id")]
         public  int Id  { get; set; }
@@ -20,9 +20,9 @@ namespace NeuroPi.Nutrition.Model
         [Column("tenant_id")]
        public int TenantId { get; set; }
 
-        public MNutNutritionalFocus NutritionalFocus { get; set; }
-
-        public MGenGenes Genes { get; set; }
+        public virtual ICollection<MNutritionalFocus> NutritionalFocus { get; set; } = new List<MNutritionalFocus>();
+        public virtual ICollection<MGenGenes> Genes { get; set; } = new List<MGenGenes>();
+         
 
       
     }
