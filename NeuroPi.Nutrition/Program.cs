@@ -29,6 +29,8 @@ builder.Services.AddScoped<INutritionalIteamType, NutritionalIteamTypeServicesIm
 builder.Services.AddScoped<INutritionalItem, NutritionalItemServiceImpl>();
 builder.Services.AddScoped<IGeneNutritionalFocus, GeneNutritionalFocusServiceImpl>();
 builder.Services.AddScoped<INutritionalFocus, NutritionalFocusServiceImpl>();
+builder.Services.AddScoped<IMealPlan, MealPlanServiceImpl>();
+
 
 
 

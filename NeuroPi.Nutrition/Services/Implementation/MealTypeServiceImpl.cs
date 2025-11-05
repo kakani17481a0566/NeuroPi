@@ -1,6 +1,6 @@
 ﻿using NeuroPi.Nutrition.Data;
 using NeuroPi.Nutrition.Services.Interface;
-using NeuroPi.Nutrition.ViewModel.MealType;
+using NeuroPi.Nutrition.ViewModel;
 
 namespace NeuroPi.Nutrition.Services.Implementation
 {

@@ -27,8 +27,8 @@ namespace NeuroPi.Nutrition.Data
          
         public DbSet<MNutritionalItem> NutritionalItems {  get; set; }
 
-        
 
+        public DbSet<MMealPlan> MealPlan { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

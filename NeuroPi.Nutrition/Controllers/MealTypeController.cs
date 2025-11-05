@@ -2,9 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using NeuroPi.CommonLib.Model;
 using NeuroPi.Nutrition.Services.Interface;
-using NeuroPi.Nutrition.ViewModel.MealType;
+using NeuroPi.Nutrition.ViewModel;
 using System.Net;
-using System.Security.Cryptography.Xml;
+
 
 namespace NeuroPi.Nutrition.Controllers
 {

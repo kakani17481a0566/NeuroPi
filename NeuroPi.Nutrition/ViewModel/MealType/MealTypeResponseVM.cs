@@ -1,6 +1,6 @@
 ﻿using NeuroPi.Nutrition.Model;
 
-namespace NeuroPi.Nutrition.ViewModel.MealType
+namespace NeuroPi.Nutrition.ViewModel
 {
     public class MealTypeResponseVM
     {

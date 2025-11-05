@@ -1,4 +1,4 @@
-﻿using NeuroPi.Nutrition.ViewModel.MealType;
+﻿using NeuroPi.Nutrition.ViewModel;
 
 namespace NeuroPi.Nutrition.Services.Interface
 {

@@ -1,4 +1,4 @@
-﻿namespace NeuroPi.Nutrition.ViewModel.MealType
+﻿namespace NeuroPi.Nutrition.ViewModel
 {
     public class MealTypeUpdateVM
     {
