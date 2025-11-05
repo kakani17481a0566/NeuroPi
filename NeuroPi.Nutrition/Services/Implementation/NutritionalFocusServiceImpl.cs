@@ -67,12 +67,12 @@ namespace NeuroPi.Nutrition.Services.Implementation
             return null;
         }
 
-        public NutritionalFocusResponseVM GetNutritionalFocusByTenantId(int tenantId)
+        public List<NutritionalFocusResponseVM> GetNutritionalFocusByTenantId(int tenantId)
         {
-            var gene = _context.NutritionalFocuses.FirstOrDefault(g => g.TenantId == tenantId && !g.IsDeleted);
+            var gene = _context.NutritionalFocuses.Where(g => g.TenantId == tenantId && !g.IsDeleted).ToList();
             if (gene != null)
             {
-                return NutritionalFocusResponseVM.ToViewModel(gene);
+                return NutritionalFocusResponseVM.ToViewModelList(gene);
             }
             return null;
         }

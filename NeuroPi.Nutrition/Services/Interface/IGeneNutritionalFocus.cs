@@ -9,10 +9,11 @@ namespace NeuroPi.Nutrition.Services.Interface
         List<GeneNutritionalFocusResponseVM> GetAllGeneNutritionalFocus();
 
         GeneNutritionalFocusResponseVM GetGeneNutritionalFocusById(int id);
-        List<GeneNutritionalFocusResponseVM> GetGeneIdById(int id);
-        List<GeneNutritionalFocusResponseVM> GetNutritionalFocusById(int id);
 
-        GeneNutritionalFocusResponseVM GetGeneNutritionalFocusByTenantId(int tenantId);
+        //GeneNutritionalFocusResponseVM GetGeneIdById(int id);
+        //GeneNutritionalFocusResponseVM GetNutritionalFocusById(int id);
+
+        List<GeneNutritionalFocusResponseVM> GetGeneNutritionalFocusByTenantId(int tenantId);
 
         GeneNutritionalFocusResponseVM GetGeneNutritionalFocusByIdAndTenantId(int id, int tenantId);
 

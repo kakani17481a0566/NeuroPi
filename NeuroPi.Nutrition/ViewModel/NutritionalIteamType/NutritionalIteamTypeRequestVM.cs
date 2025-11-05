@@ -12,7 +12,7 @@ namespace NeuroPi.Nutrition.ViewModel.NutritionalIteamType
         public int CreatedBy { get; set; }
 
         public DateTime CreatedOn { get; set; }
-        public static MNutritionalIteamType ToViewModel(NutritionalIteamTypeRequestVM viewModel)=> new MNutritionalIteamType
+        public static MNutritionalItemType ToViewModel(NutritionalIteamTypeRequestVM viewModel)=> new MNutritionalItemType
         {
             
                 Code = viewModel.Code,

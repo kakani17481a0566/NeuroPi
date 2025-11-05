@@ -50,24 +50,24 @@ namespace NeuroPi.Nutrition.Services.Implementation
             return null;
         }
 
-        public List<GeneNutritionalFocusResponseVM> GetGeneIdById(int id)
-        {
-            var GeneNutritionalFocusList = _context.GeneNutritionalFocus.Where(g => !g.IsDeleted).ToList();
-            if (GeneNutritionalFocusList != null && GeneNutritionalFocusList.Count > 0)
-            {
-                return GeneNutritionalFocusResponseVM.ToViewModelList(GeneNutritionalFocusList);
-            }
-            return null;
-        }
-        public List<GeneNutritionalFocusResponseVM> GetNutritionalFocusById(int id)
-        {
-            var GeneNutritionalFocusList = _context.GeneNutritionalFocus.Where(g => !g.IsDeleted).ToList();
-            if (GeneNutritionalFocusList != null && GeneNutritionalFocusList.Count > 0)
-            {
-                return GeneNutritionalFocusResponseVM.ToViewModelList(GeneNutritionalFocusList);
-            }
-            return null;
-        }
+        //public GeneNutritionalFocusResponseVM GetGeneIdById(int id)
+        //{
+        //    var GeneNutritionalFocusList = _context.GeneNutritionalFocus.Where(g =>g.Id==id  && !g.IsDeleted);
+        //    if (GeneNutritionalFocusList != null )
+        //    {
+        //        return GeneNutritionalFocusResponseVM.ToViewModel(GeneNutritionalFocusList);
+        //    }
+        //    return null;
+        //}
+        //public GeneNutritionalFocusResponseVM GetNutritionalFocusById(int id)
+        //{
+        //    var GeneNutritionalFocusList = _context.GeneNutritionalFocus.FirstOrDefault(g =>g.Id==id && !g.IsDeleted);
+        //    if (GeneNutritionalFocusList != null )
+        //    {
+        //        return GeneNutritionalFocusResponseVM.ToViewModel(GeneNutritionalFocusList);
+        //    }
+        //    return null;
+        //}
 
 
         public GeneNutritionalFocusResponseVM GetGeneNutritionalFocusById(int id)
@@ -90,12 +90,12 @@ namespace NeuroPi.Nutrition.Services.Implementation
             return null;
         }
 
-        public GeneNutritionalFocusResponseVM GetGeneNutritionalFocusByTenantId(int tenantId)
+        public List<GeneNutritionalFocusResponseVM> GetGeneNutritionalFocusByTenantId(int tenantId)
         {
-            var gene = _context.GeneNutritionalFocus.FirstOrDefault(g => g.TenantId == tenantId && !g.IsDeleted);
+            var gene = _context.GeneNutritionalFocus.Where(g => g.TenantId == tenantId && !g.IsDeleted).ToList();
             if (gene != null)
             {
-                return GeneNutritionalFocusResponseVM.ToViewModel(gene);
+                return GeneNutritionalFocusResponseVM.ToViewModelList(gene);
             }
             return null;
         }

@@ -9,7 +9,7 @@ namespace NeuroPi.Nutrition.Interface
 
         NutritionalFocusResponseVM GetNutritionalFocusById(int id);
 
-        NutritionalFocusResponseVM GetNutritionalFocusByTenantId(int tenantId);
+        List<NutritionalFocusResponseVM> GetNutritionalFocusByTenantId(int tenantId);
 
         NutritionalFocusResponseVM GetNutritionalFocusByIdAndTenantId(int id, int tenantId);
 

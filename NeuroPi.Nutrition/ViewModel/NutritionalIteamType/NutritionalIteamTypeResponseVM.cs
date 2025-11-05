@@ -17,7 +17,7 @@ namespace NeuroPi.Nutrition.ViewModel.NutritionalIteamType
         public int? UpdatedBy { get; set; }
 
         public DateTime? UpdatedOn { get; set; }
-        public static NutritionalIteamTypeResponseVM ToViewModel(MNutritionalIteamType model)=> new NutritionalIteamTypeResponseVM
+        public static NutritionalIteamTypeResponseVM ToViewModel(MNutritionalItemType model)=> new NutritionalIteamTypeResponseVM
         {
             
                 Id = model.Id,
@@ -32,7 +32,7 @@ namespace NeuroPi.Nutrition.ViewModel.NutritionalIteamType
             };
         
 
-        public static List<NutritionalIteamTypeResponseVM> ToViewModelList(List<MNutritionalIteamType> modelList)
+        public static List<NutritionalIteamTypeResponseVM> ToViewModelList(List<MNutritionalItemType> modelList)
         {
             List<NutritionalIteamTypeResponseVM> result = new List<NutritionalIteamTypeResponseVM>();
             foreach (var model in modelList)

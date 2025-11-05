@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace NeuroPi.Nutrition.Model
 {
     [Table("nut_nutritional_item_type")]
-    public class MNutritionalIteamType : MBaseModel
+    public class MNutritionalItemType : MBaseModel
     {
         [Column("id")]
         public int Id { get; set; }

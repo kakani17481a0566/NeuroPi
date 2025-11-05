@@ -12,7 +12,7 @@ namespace NeuroPi.Nutrition.Data
         public DbSet<MNutritionalFocus>NutritionalFocuses { get; set; }
         public DbSet<MGeneNutritionalFocus> GeneNutritionalFocus { get; set; }
 
-        public DbSet<MNutritionalIteamType> NutritionalIteamType { get; set; }
+        public DbSet<MNutritionalItemType> NutritionalIteamType { get; set; }
 
 
         public DbSet<MVitamins> Vitamins { get; set; }
@@ -22,6 +22,12 @@ namespace NeuroPi.Nutrition.Data
         public DbSet<MNutritionMasterType> NutritionMasterTypes { get; set; }
 
         public DbSet<MNutritionMaster> NutritionMasters { get; set; }
+
+        public DbSet<MUserFavourites> UserFavourites { get; set; }
+         
+        public DbSet<MNutritionalItem> NutritionalItems {  get; set; }
+
+        
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NeuroPi.Nutrition.Data;
+using NeuroPi.Nutrition.Interface;
 using NeuroPi.Nutrition.Services.Implementation;
 using NeuroPi.Nutrition.Services.Interface;
 
@@ -23,6 +24,12 @@ builder.Services.AddScoped<IVitamins, VitaminServiceImpl>();
 builder.Services.AddScoped<IMealType, MealTypeServiceImpl>();
 builder.Services.AddScoped<INutritionMasterType, NutritionMasterTypeServiceImpl>();
 builder.Services.AddScoped<INutritionMaster, NutritionMasterServiceImpl>();
+builder.Services.AddScoped<IUserFavourites, UserFavouritesServiceImpl>();
+builder.Services.AddScoped<INutritionalIteamType, NutritionalIteamTypeServicesImpl>();
+builder.Services.AddScoped<INutritionalItem, NutritionalItemServiceImpl>();
+builder.Services.AddScoped<IGeneNutritionalFocus, GeneNutritionalFocusServiceImpl>();
+builder.Services.AddScoped<INutritionalFocus, NutritionalFocusServiceImpl>();
+
 
 
 var app = builder.Build();
