@@ -21,7 +21,8 @@ builder.Services.AddDbContext<NeutritionDbContext>(options =>
 builder.Services.AddScoped<IGenGenesService, GenGenesServiceImpl>();
 builder.Services.AddScoped<IVitamins, VitaminServiceImpl>();
 builder.Services.AddScoped<IMealType, MealTypeServiceImpl>();
-
+builder.Services.AddScoped<INutritionMasterType, NutritionMasterTypeServiceImpl>();
+builder.Services.AddScoped<INutritionMaster, NutritionMasterServiceImpl>();
 
 
 var app = builder.Build();

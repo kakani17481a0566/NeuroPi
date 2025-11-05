@@ -16,6 +16,7 @@ namespace NeuroPi.Nutrition.Services.Implementation
         public MealTypeResponseVM CreateMealType(MealTypeRequestVM mealTypeRequestVM)
         {
             var newMealType = MealTypeRequestVM.ToModel(mealTypeRequestVM);
+            newMealType.CreatedOn = DateTime.UtcNow;
             _context.MealTypes.Add(newMealType);
             _context.SaveChanges();
             return MealTypeResponseVM.ToViewModel(newMealType);

@@ -12,16 +12,33 @@ namespace NeuroPi.Nutrition.Data
         public DbSet<MNutritionalFocus>NutritionalFocuses { get; set; }
         public DbSet<MGeneNutritionalFocus> GeneNutritionalFocus { get; set; }
 
-<<<<<<< Updated upstream
         public DbSet<MNutritionalIteamType> NutritionalIteamType { get; set; }
 
-        
 
-=======
         public DbSet<MVitamins> Vitamins { get; set; }
 
         public DbSet<MMealType> MealTypes { get; set; }
->>>>>>> Stashed changes
+
+        public DbSet<MNutritionMasterType> NutritionMasterTypes { get; set; }
+
+        public DbSet<MNutritionMaster> NutritionMasters { get; set; }
+
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<MGeneNutritionalFocus>()
+                .HasKey(gf => gf.Id); 
+            modelBuilder.Entity<MGeneNutritionalFocus>()
+                .HasOne(gf => gf.Genes)
+                .WithMany(g => g.NutritionalFocus)
+                .HasForeignKey(gf => gf.GenesId);
+            modelBuilder.Entity<MGeneNutritionalFocus>()
+                .HasOne(gf => gf.NutritionalFocus)
+                .WithMany(nf => nf.NutritionalFocus)
+                .HasForeignKey(gf => gf.NutritionalFocusId);
+        }
+
 
 
     }

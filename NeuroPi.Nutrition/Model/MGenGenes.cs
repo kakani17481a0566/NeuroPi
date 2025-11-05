@@ -22,7 +22,10 @@ namespace NeuroPi.Nutrition.Model
 
   
         [Column("tenant_id")]
-        public int TenantId { get; set; }       
+        public int TenantId { get; set; }
+
+        public virtual ICollection<MGeneNutritionalFocus> NutritionalFocus { get; set; } = new List<MGeneNutritionalFocus>();
+
 
 
     }
