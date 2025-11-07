@@ -34,5 +34,6 @@ namespace NeuroPi.Nutrition.Controllers
                 result,
                 "Genes fetched successfully.");
         }
+
     }
 }

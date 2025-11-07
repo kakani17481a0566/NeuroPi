@@ -14,7 +14,8 @@ namespace NeuroPi.Nutrition.Services.Implementation
         public NutritionalItemResponseVM CreateNutritionalItem(NutritionalItemRequestVM item)
         {
             var newNutrionalItem = NutritionalItemRequestVM.ToModel(item);
-            newNutrionalItem.CreatedOn = DateTime.Now;
+            newNutrionalItem.CreatedOn = DateTime.UtcNow;
+            _context.NutritionalItems.Add(newNutrionalItem);
             _context.SaveChanges();
             return NutritionalItemResponseVM.ToViewModel(newNutrionalItem);
 
@@ -66,7 +67,7 @@ namespace NeuroPi.Nutrition.Services.Implementation
 
         public List<NutritionalItemResponseVM> GetNutritionalItemResponses()
         {
-            var nutritionalItemList = _context.NutritionalItems.Where(ni => ni.IsDeleted).ToList();
+            var nutritionalItemList = _context.NutritionalItems.Where(ni => !ni.IsDeleted).ToList();
             if(nutritionalItemList == null)
             {
                 return null;

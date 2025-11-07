@@ -22,6 +22,9 @@ namespace NeuroPi.Nutrition.ViewModel.NutritionalItem
 
         public bool Edible { get; set; }
 
+        public int TenantId { get; set; }
+
+
         public int CreatedBy { get; set; }
 
         public DateTime CreatedOn { get; set; }
@@ -39,6 +42,7 @@ namespace NeuroPi.Nutrition.ViewModel.NutritionalItem
                 Receipe = vm.Receipe,
                 NutritionalItemTypeId = vm.NutritionalItemTypeId,
                 Edible = vm.Edible,
+                TenantId = vm.TenantId,
                 CreatedBy = vm.CreatedBy,
                 CreatedOn = vm.CreatedOn
 

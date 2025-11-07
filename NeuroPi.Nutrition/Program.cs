@@ -30,8 +30,11 @@ builder.Services.AddScoped<INutritionalItem, NutritionalItemServiceImpl>();
 builder.Services.AddScoped<IGeneNutritionalFocus, GeneNutritionalFocusServiceImpl>();
 builder.Services.AddScoped<INutritionalFocus, NutritionalFocusServiceImpl>();
 builder.Services.AddScoped<IMealPlan, MealPlanServiceImpl>();
-
-
+builder.Services.AddScoped<INutritionalItemVitamins, NutritionalItemVitamins>();
+builder.Services.AddScoped<IUnplannedMeal, UnplannedMealServiceImpl>();
+builder.Services.AddScoped<INutritionalItemMealType, NutritionalItemMealTypeServiceImpl>();
+builder.Services.AddScoped<IUserMealType, UserMealTypeServiceImpl>();
+builder.Services.AddScoped<IRecipesInstructions,RecipesInstructionServiceImpl>();
 
 
 var app = builder.Build();

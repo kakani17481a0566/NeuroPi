@@ -23,7 +23,7 @@ namespace NeuroPi.Nutrition.ViewModel.NutritionalIteamType
                 Id = model.Id,
                 Code = model.Code,
                 Name = model.Name,
-              
+           
                 TenantId = model.TenantId,
                 CreatedBy = model.CreatedBy,
                 CreatedOn = model.CreatedOn,

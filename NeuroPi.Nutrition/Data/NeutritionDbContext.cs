@@ -14,7 +14,6 @@ namespace NeuroPi.Nutrition.Data
 
         public DbSet<MNutritionalItemType> NutritionalIteamType { get; set; }
 
-
         public DbSet<MVitamins> Vitamins { get; set; }
 
         public DbSet<MMealType> MealTypes { get; set; }
@@ -26,9 +25,19 @@ namespace NeuroPi.Nutrition.Data
         public DbSet<MUserFavourites> UserFavourites { get; set; }
          
         public DbSet<MNutritionalItem> NutritionalItems {  get; set; }
+         
+        public DbSet<MNutritionalItemVitamins>  NutritionalItemVitamins { get; set; }
 
 
         public DbSet<MMealPlan> MealPlan { get; set; }
+
+        public DbSet<MUnplannedMeal> UnplannedMeals { get; set; }  
+        public DbSet<MNutritionalItemMealType> NutritionalItemMealType {  get; set; }
+
+        public DbSet<MUserMealType> UserMealTypes { get; set; }
+
+        public DbSet<MRecipesInstructions> RecipesInstructions { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
