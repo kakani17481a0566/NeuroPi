@@ -41,12 +41,8 @@ namespace NeuroPi.Nutrition.ViewModel.Genes
 
         public static List<GenGenesResponseVM> ToViewModelList(List<MGenGenes> modelList)
         {
-            List<GenGenesResponseVM> result = new List<GenGenesResponseVM>();
-            foreach (var model in modelList)
-            {
-                result.Add(ToViewModel(model));
-            };
-            return result;
+            
+            return modelList.Select(m => ToViewModel(m)).ToList();
         }
 
 

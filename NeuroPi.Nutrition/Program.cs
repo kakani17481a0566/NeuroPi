@@ -35,7 +35,8 @@ builder.Services.AddScoped<IUnplannedMeal, UnplannedMealServiceImpl>();
 builder.Services.AddScoped<INutritionalItemMealType, NutritionalItemMealTypeServiceImpl>();
 builder.Services.AddScoped<IUserMealType, UserMealTypeServiceImpl>();
 builder.Services.AddScoped<IRecipesInstructions,RecipesInstructionServiceImpl>();
-
+builder.Services.AddScoped<IMealPlanMonitoring, MealPlanMonitoringServiceImpl>();
+builder.Services.AddScoped<IUserGene, UserGeneServiceImpl>();
 
 var app = builder.Build();
 

@@ -94,5 +94,6 @@ namespace NeuroPi.Nutrition.Controllers
             }
             return new ResponseResult<bool>(HttpStatusCode.OK, true, "Nutritional Focus deleted successfully");
         }
+   
     }
 }

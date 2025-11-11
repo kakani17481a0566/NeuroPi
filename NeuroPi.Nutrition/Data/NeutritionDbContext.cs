@@ -38,6 +38,10 @@ namespace NeuroPi.Nutrition.Data
 
         public DbSet<MRecipesInstructions> RecipesInstructions { get; set; }
 
+        public DbSet<MMealPlanMonitoring> MealPlanMonitoring { get; set; }
+        public DbSet<MNutritionalItemRecipe> NutritionalItemRecipe { get; set; }
+
+        public DbSet<MUserGene> UserGene { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
