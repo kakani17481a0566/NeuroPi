@@ -88,5 +88,16 @@ namespace NeuroPi.Nutrition.Controllers
             return new ResponseResult<bool>(HttpStatusCode.OK, true, "Nutritional Item deleted successfully");
         }
 
+        [HttpGet("/nutrition")]
+        public ResponseResult<NutritionalItemListResponseVM> GetNutrional()
+        {
+            var result = _nutritionalItemService.GetAllItems();
+            if (result == null)
+            {
+                return new ResponseResult<NutritionalItemListResponseVM>(HttpStatusCode.NotFound, null, "Nutritional Item not found");
+            }
+            return new ResponseResult<NutritionalItemListResponseVM>(HttpStatusCode.OK, result, "Nutrional Item details fetched sucessfully");
+        }
+
     }
 }

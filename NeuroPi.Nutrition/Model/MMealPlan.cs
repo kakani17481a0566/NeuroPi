@@ -20,6 +20,7 @@ namespace NeuroPi.Nutrition.Model
         public DateOnly Date { get; set; }
 
         [Column("nutritional_item_id")]
+        [ForeignKey("NutritionalItem")]
         public int NutritionalItemId { get; set; }
 
         [Column("qty")]
@@ -29,5 +30,7 @@ namespace NeuroPi.Nutrition.Model
         public int TenantId { get; set; }
 
         public MMealType MealType { get; set; }
+
+        public MNutritionalItem NutritionalItem { set; get; }
     }
 }

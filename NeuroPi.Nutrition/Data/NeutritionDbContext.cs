@@ -43,6 +43,8 @@ namespace NeuroPi.Nutrition.Data
 
         public DbSet<MUserGene> UserGene { get; set; }
 
+        public DbSet<MNutritionalFocusItem> NutritionalFocusItem { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

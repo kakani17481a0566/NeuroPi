@@ -38,6 +38,9 @@ namespace NeuroPi.Nutrition.Model
         [Column("edible")]
         public bool Edible { get; set; }
 
+        [Column("item_url")]
+        public string? ItemImage { get; set; } = null;
+
         [Column("tenant_id")]
         public int TenantId { get; set; }
 

@@ -25,6 +25,8 @@ namespace NeuroPi.Nutrition.ViewModel.NutritionalItem
 
         public bool Edible { get; set; }
 
+        public string? ItemImage { get; set; }
+
         public int TenantId { get; set; }
 
         public int CreatedBy { get; set; }
@@ -49,6 +51,7 @@ namespace NeuroPi.Nutrition.ViewModel.NutritionalItem
                 Receipe = model.Receipe,
                 NutritionalItemTypeId = model.NutritionalItemTypeId,
                 Edible = model.Edible,
+                ItemImage = model.ItemImage,
                 TenantId = model.TenantId,
                 CreatedBy = model.CreatedBy,
                 CreatedOn = model.CreatedOn,

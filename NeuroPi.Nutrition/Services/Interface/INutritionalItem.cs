@@ -17,6 +17,8 @@ namespace NeuroPi.Nutrition.Services.Interface
 
         bool DeleteNutritionalItem(int id, int tenantId);
 
+        NutritionalItemListResponseVM GetAllItems();
+
 
     }
 }
