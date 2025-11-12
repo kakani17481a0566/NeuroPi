@@ -67,23 +67,24 @@ namespace SchoolManagement.Services.Implementation
             posResult.gst = gstValue;
             posResult.total = price + gstValue;
 
-            var ItemsList = _context.ItemBranch.ToList();
+           
 
-            foreach (var Item in ItemsList)
+            foreach (var Item in request.Items)
             {
-                var branchItem = _context.ItemBranch.FirstOrDefault(ib => ib.ItemId == Item.Id);
+                var ItemsList = _context.ItemBranch.Where(i=>i.ItemId == Item.Itemid).First();
+                var branchItem = _context.ItemBranch.FirstOrDefault(ib => ib.ItemId == ItemsList.ItemId);
 
                 if (branchItem == null)
                 {
-                    throw new Exception($"Item with ID {Item.Id} not found");
+                    throw new Exception($"Item with ID {ItemsList.Id} not found");
                 }
 
-                if (branchItem.ItemQuantity < Item.ItemQuantity)
+                if (branchItem.ItemQuantity < ItemsList.ItemQuantity)
                 {
-                    throw new Exception($"Insufficient stock for Item ID {Item.Id}");
+                    throw new Exception($"Insufficient stock for Item ID {ItemsList.Id}");
                 }
 
-                branchItem.ItemQuantity -= Item.ItemQuantity;
+                branchItem.ItemQuantity -= Item.Quantity;
 
                 _context.ItemBranch.Update(branchItem);
 
