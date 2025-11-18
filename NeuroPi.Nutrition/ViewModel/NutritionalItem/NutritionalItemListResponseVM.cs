@@ -5,6 +5,7 @@
         public List<NutritionalItemDetailsVM> AllItems { get; set; }
 
         public List<MealPlan> MealPlans { get; set; }
+        public DateOnly MealPlansDate { get; set; }  
 
         public List<Filters> MealTypes { get; set; }
 

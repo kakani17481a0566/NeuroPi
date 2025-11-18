@@ -2,6 +2,7 @@
 using NeuroPi.Nutrition.Data;
 using NeuroPi.Nutrition.Model;
 using NeuroPi.Nutrition.Services.Interface;
+using NeuroPi.Nutrition.ViewModel;
 using NeuroPi.Nutrition.ViewModel.MealPlanMonitoring;
 using NeuroPi.Nutrition.ViewModel.NutritionalItem;
 
@@ -36,92 +37,222 @@ namespace NeuroPi.Nutrition.Services.Implementation
             return true;
         }
 
+        //public NutritionalItemListResponseVM GetAllItems()
+        //{
+        //    NutritionalItemListResponseVM result = new NutritionalItemListResponseVM();
+        //    List<NutritionalItemDetailsVM> allItems= new List<NutritionalItemDetailsVM>();
+        //    var nutritionalItems=_context.NutritionalItems.Where(n=>!n.IsDeleted).ToList();
+        //    foreach (var item in nutritionalItems)
+        //    {
+        //        NutritionalItemDetailsVM nutritonalItem = new NutritionalItemDetailsVM();
+        //        nutritonalItem.Id = item.Id;
+        //        nutritonalItem.Name = item.Name;
+        //        nutritonalItem.CaloriesQuantity = item.CaloriesQuantity;
+        //        nutritonalItem.ProteinQuantity = item.ProteinQuantity;
+        //        var mealTypes=_context.NutritionalItemMealType.Where(n=>n.NutritionalItemId == item.Id).ToList();
+        //        List<int> mealTypesIds=mealTypes.Select(n => n.MealTypeId).ToList();
+        //        var vitaminsList=_context.NutritionalItemVitamins.Where(n=>!n.IsDeleted && n.NutritionalItemId==item.Id).ToList();
+        //        List<int> vitaminIds = vitaminsList.Select(n => n.VitaminsId).ToList();
+        //        nutritonalItem.VitaminIds = vitaminIds;
+        //        nutritonalItem.MealTypeIds= mealTypesIds;
+        //        var FocusIdsList = _context.NutritionalFocusItem.Where(n => !n.IsDeleted && n.NutritionalItemId ==item.Id).ToList();
+        //        List<int> FocusIdList = FocusIdsList.Select(n => n.NutritionalFocusId).ToList();
+        //        nutritonalItem.FocusIds = FocusIdList;
+        //        var isFavourite = _context.UserFavourites.Any(u=>u.UserId==1);//need to dynamic  code 
+        //        nutritonalItem.UserFavourite=isFavourite;
+        //        allItems.Add(nutritonalItem);
+
+
+        //    }
+        //    result.AllItems=allItems;
+        //    List<MealPlan> mealplansList = new List<MealPlan>();
+        //    var date= DateOnly.FromDateTime(DateTime.Now);
+        //    var mealPlans = _context.MealPlan.Where(m => m.Date==date && m.UserId==1 && !m.IsDeleted).ToList();// HARD CODED VALUES HERE //NEED TO STOP THE  REPEATED OCCURENCE
+
+        //    foreach (var mealplan in mealPlans)
+        //    {
+        //        MealPlan mealPlanVM = new MealPlan();
+        //        mealPlanVM.MealTypeId=mealplan.MealTypeId;
+        //        mealPlanVM.Date=date;
+        //        var nutritions = _context.MealPlan.Where(n => n.MealTypeId==mealplan.MealTypeId).Include(m=>m.NutritionalItem).ToList();
+        //        List<Items> nutritionsItems = new List<Items>();
+        //        foreach (var NutritionItem in nutritions)
+        //        {
+        //            Items item = new Items();
+        //            item.Id=NutritionItem.NutritionalItem.Id;
+        //            item.Quantity=NutritionItem.Quantity;
+        //            item.CaloriesQuantity=NutritionItem.NutritionalItem.CaloriesQuantity;
+        //            item.ProteinQuantity=NutritionItem.NutritionalItem.ProteinQuantity;
+        //            item.Type=NutritionItem.NutritionalItem.NutritionalItemTypeId;
+        //            var vitaminsList = _context.NutritionalItemVitamins.Where(n => !n.IsDeleted && n.NutritionalItemId==NutritionItem.NutritionalItem.Id).ToList();
+        //            List<int> vitaminIds = vitaminsList.Select(n => n.VitaminsId).ToList();
+        //            item.VitaminIds=vitaminIds;
+        //            var FocusIdsList = _context.NutritionalFocusItem.Where(n => !n.IsDeleted && n.NutritionalItemId == NutritionItem.NutritionalItem.Id).ToList();
+        //            List<int> FocusIdList = FocusIdsList.Select(n => n.NutritionalFocusId).ToList();
+        //            item.FocusIds = FocusIdList;
+        //            var isFavourite = _context.UserFavourites.Any(u => u.UserId==1);//need to dynamic  code 
+        //            item.UserFavourite=isFavourite;
+        //            nutritionsItems.Add(item);
+        //        }
+        //        mealPlanVM.Items=nutritionsItems;
+        //        mealplansList.Add(mealPlanVM);
+
+        //    }
+
+        //    result.MealPlans=mealplansList.DistinctBy(m=>m.MealTypeId).ToList();
+
+        //    var mealTypesList = _context.MealTypes.Where(mt => !mt.IsDeleted).ToList();
+        //    List<Filters> mealTypesFilters = mealTypesList.Select(mt => new Filters { Id=mt.Id, Name=mt.Name }).ToList();
+        //    result.MealTypes=mealTypesFilters;
+
+        //    var ItemTypes = _context.NutritionalIteamType.Where(mt => !mt.IsDeleted).ToList();
+        //    List<Filters> ItemTypesFilters = ItemTypes.Select(mt => new Filters { Id=mt.Id, Name=mt.Name }).ToList();
+        //    result.ItemTypes=ItemTypesFilters;
+
+
+        //    var Vitamins = _context.Vitamins.Where(mt => !mt.IsDeleted).ToList();
+        //    List<Filters> VitaminsFilters = Vitamins.Select(mt => new Filters { Id=mt.Id, Name=mt.Name }).ToList();
+        //    result.Vitamins=VitaminsFilters;
+
+        //    var FocusTags = _context.NutritionalFocuses.Where(mt => !mt.IsDeleted).ToList();
+        //    List<Filters> FocusTagsFilters = FocusTags.Select(mt => new Filters { Id=mt.Id, Name=mt.Name }).ToList();
+        //    result.FocusTags=FocusTagsFilters;
+
+
+
+        //    //var meal
+
+
+        //    return result;
+        //}
+
         public NutritionalItemListResponseVM GetAllItems()
         {
+            int userId = 1;  // TODO: replace with dynamic user
+
             NutritionalItemListResponseVM result = new NutritionalItemListResponseVM();
-            List<NutritionalItemDetailsVM> allItems= new List<NutritionalItemDetailsVM>();
-            var nutritionalItems=_context.NutritionalItems.Where(n=>!n.IsDeleted).ToList();
-            foreach (var item in nutritionalItems)
+
+            // ============================================================
+            // 1. Get all nutritional items
+            // ============================================================
+            var nutritionalItems = _context.NutritionalItems
+                .Where(n => !n.IsDeleted)
+                .ToList();
+
+            // Preload mappings (Avoid N+1 queries)
+            var mealTypeMap = _context.NutritionalItemMealType
+                .Where(n => !n.IsDeleted)
+                .GroupBy(n => n.NutritionalItemId)
+                .ToDictionary(g => g.Key, g => g.Select(x => x.MealTypeId).ToList());
+
+            var vitaminMap = _context.NutritionalItemVitamins
+                .Where(n => !n.IsDeleted)
+                .GroupBy(n => n.NutritionalItemId)
+                .ToDictionary(g => g.Key, g => g.Select(x => x.VitaminsId).ToList());
+
+            var focusMap = _context.NutritionalFocusItem
+                .Where(n => !n.IsDeleted)
+                .GroupBy(n => n.NutritionalItemId)
+                .ToDictionary(g => g.Key, g => g.Select(x => x.NutritionalFocusId).ToList());
+
+            var favourites = _context.UserFavourites
+                .Where(f => f.UserId == userId && !f.IsDeleted)
+                .Select(f => f.NutritionalItemId)
+                .ToHashSet();
+
+            // ============================================================
+            // 2. Build Item List Response
+            // ============================================================
+            result.AllItems = nutritionalItems.Select(item => new NutritionalItemDetailsVM
             {
-                NutritionalItemDetailsVM nutritonalItem = new NutritionalItemDetailsVM();
-                nutritonalItem.Id = item.Id;
-                nutritonalItem.Name = item.Name;
-                nutritonalItem.CaloriesQuantity = item.CaloriesQuantity;
-                nutritonalItem.ProteinQuantity = item.ProteinQuantity;
-                var mealTypes=_context.NutritionalItemMealType.Where(n=>n.NutritionalItemId == item.Id).ToList();
-                List<int> mealTypesIds=mealTypes.Select(n => n.MealTypeId).ToList();
-                var vitaminsList=_context.NutritionalItemVitamins.Where(n=>!n.IsDeleted && n.NutritionalItemId==item.Id).ToList();
-                List<int> vitaminIds = vitaminsList.Select(n => n.VitaminsId).ToList();
-                nutritonalItem.VitaminIds = vitaminIds;
-                nutritonalItem.MealTypeIds= mealTypesIds;
-                var FocusIdsList = _context.NutritionalFocusItem.Where(n => !n.IsDeleted && n.NutritionalItemId ==item.Id).ToList();
-                List<int> FocusIdList = FocusIdsList.Select(n => n.NutritionalFocusId).ToList();
-                nutritonalItem.FocusIds = FocusIdList;
-                var isFavourite = _context.UserFavourites.Any(u=>u.UserId==1);//need to dynamic  code 
-                nutritonalItem.UserFavourite=isFavourite;
-                allItems.Add(nutritonalItem);
-            }
-            result.AllItems=allItems;
-            List<MealPlan> mealplansList = new List<MealPlan>();
-            var date= DateOnly.FromDateTime(DateTime.Now);
-            var mealPlans = _context.MealPlan.Where(m => m.Date==date && m.UserId==1 && !m.IsDeleted).ToList();// HARD CODED VALUES HERE //NEED TO STOP THE  REPEATED OCCURENCE
-            
-            foreach (var mealplan in mealPlans)
-            {
-                MealPlan mealPlanVM = new MealPlan();
-                mealPlanVM.MealTypeId=mealplan.MealTypeId;
-                mealPlanVM.Date=date;
-                var nutritions = _context.MealPlan.Where(n => n.MealTypeId==mealplan.MealTypeId).Include(m=>m.NutritionalItem).ToList();
-                List<Items> nutritionsItems = new List<Items>();
-                foreach (var NutritionItem in nutritions)
+                Id = item.Id,
+                Name = item.Name,
+                CaloriesQuantity = item.CaloriesQuantity,
+                ProteinQuantity = item.ProteinQuantity,
+                MealTypeIds = mealTypeMap.GetValueOrDefault(item.Id, new List<int>()),
+                VitaminIds = vitaminMap.GetValueOrDefault(item.Id, new List<int>()),
+                FocusIds = focusMap.GetValueOrDefault(item.Id, new List<int>()),
+                DietTypeId = item.DietTypeId,
+                ItemImage = item.ItemImage,
+                UserFavourite = favourites.Contains(item.Id)
+
+            }).ToList();
+
+            // ============================================================
+            // 3. Meal Plans — return date once, not inside each item
+            // ============================================================
+            var date = DateOnly.FromDateTime(DateTime.Now);
+            result.MealPlansDate = date;  // ⭐ Date only once
+
+            // Load meal types
+            var allMealTypes = _context.MealTypes
+                .Where(mt => !mt.IsDeleted)
+                .Select(mt => new { mt.Id, mt.Name })
+                .ToList();
+
+            // Load meal plans for this date
+            var mealPlans = _context.MealPlan
+                .Where(m => m.Date == date && m.UserId == userId && !m.IsDeleted)
+                .Include(m => m.NutritionalItem)
+                .ToList();
+
+            // Merge existing items + empty items
+            var mealPlanVMList = allMealTypes
+                .Select(mt =>
                 {
-                    Items item = new Items();
-                    item.Id=NutritionItem.NutritionalItem.Id;
-                    item.Quantity=NutritionItem.Quantity;
-                    item.CaloriesQuantity=NutritionItem.NutritionalItem.CaloriesQuantity;
-                    item.ProteinQuantity=NutritionItem.NutritionalItem.ProteinQuantity;
-                    item.Type=NutritionItem.NutritionalItem.NutritionalItemTypeId;
-                    var vitaminsList = _context.NutritionalItemVitamins.Where(n => !n.IsDeleted && n.NutritionalItemId==NutritionItem.NutritionalItem.Id).ToList();
-                    List<int> vitaminIds = vitaminsList.Select(n => n.VitaminsId).ToList();
-                    item.VitaminIds=vitaminIds;
-                    var FocusIdsList = _context.NutritionalFocusItem.Where(n => !n.IsDeleted && n.NutritionalItemId == NutritionItem.NutritionalItem.Id).ToList();
-                    List<int> FocusIdList = FocusIdsList.Select(n => n.NutritionalFocusId).ToList();
-                    item.FocusIds = FocusIdList;
-                    var isFavourite = _context.UserFavourites.Any(u => u.UserId==1);//need to dynamic  code 
-                    item.UserFavourite=isFavourite;
-                    nutritionsItems.Add(item);
-                }
-                mealPlanVM.Items=nutritionsItems;
-                mealplansList.Add(mealPlanVM);
+                    var plansForType = mealPlans.Where(m => m.MealTypeId == mt.Id).ToList();
 
-            }
-            
-            result.MealPlans=mealplansList.DistinctBy(m=>m.MealTypeId).ToList();
+                    return new MealPlan
+                    {
+                        MealTypeId = mt.Id,
+                        Items = plansForType.Select(n => new Items
+                        {
+                            Id = n.NutritionalItem.Id,
+                            Quantity = n.Quantity,
+                            CaloriesQuantity = n.NutritionalItem.CaloriesQuantity,
+                            ProteinQuantity = n.NutritionalItem.ProteinQuantity,
+                            Type = n.NutritionalItem.NutritionalItemTypeId,
+                            FocusIds = focusMap.GetValueOrDefault(n.NutritionalItem.Id, new List<int>()),
+                            VitaminIds = vitaminMap.GetValueOrDefault(n.NutritionalItem.Id, new List<int>()),
+                            DietTypeId = n.NutritionalItem.DietTypeId ?? 0,
+                            ItemImage = n.NutritionalItem.ItemImage,
+                            UserFavourite = favourites.Contains(n.NutritionalItem.Id)
+                        }).ToList()
+                    };
+                })
+                .ToList();
 
-            var mealTypesList = _context.MealTypes.Where(mt => !mt.IsDeleted).ToList();
-            List<Filters> mealTypesFilters = mealTypesList.Select(mt => new Filters { Id=mt.Id, Name=mt.Name }).ToList();
-            result.MealTypes=mealTypesFilters;
+            result.MealPlans = mealPlanVMList;
 
-            var ItemTypes = _context.NutritionalIteamType.Where(mt => !mt.IsDeleted).ToList();
-            List<Filters> ItemTypesFilters = ItemTypes.Select(mt => new Filters { Id=mt.Id, Name=mt.Name }).ToList();
-            result.ItemTypes=ItemTypesFilters;
+            // ============================================================
+            // 4. Filters
+            // ============================================================
+            result.MealTypes = allMealTypes
+                .Select(mt => new Filters { Id = mt.Id, Name = mt.Name })
+                .ToList();
 
+            result.ItemTypes = _context.NutritionalIteamType
+                .Where(mt => !mt.IsDeleted)
+                .Select(mt => new Filters { Id = mt.Id, Name = mt.Name })
+                .ToList();
 
-            var Vitamins = _context.Vitamins.Where(mt => !mt.IsDeleted).ToList();
-            List<Filters> VitaminsFilters = Vitamins.Select(mt => new Filters { Id=mt.Id, Name=mt.Name }).ToList();
-            result.Vitamins=VitaminsFilters;
+            result.Vitamins = _context.Vitamins
+                .Where(v => !v.IsDeleted)
+                .Select(v => new Filters { Id = v.Id, Name = v.Name })
+                .ToList();
 
-            var FocusTags = _context.NutritionalFocuses.Where(mt => !mt.IsDeleted).ToList();
-            List<Filters> FocusTagsFilters = FocusTags.Select(mt => new Filters { Id=mt.Id, Name=mt.Name }).ToList();
-            result.FocusTags=FocusTagsFilters;
-
-
-
-            //var meal
-
+            result.FocusTags = _context.NutritionalFocuses
+                .Where(f => !f.IsDeleted)
+                .Select(f => new Filters { Id = f.Id, Name = f.Name })
+                .ToList();
 
             return result;
         }
+
+
+
+
+
 
         public NutritionalItemResponseVM GetNutrionalItemById(int id)
         {
@@ -180,12 +311,95 @@ namespace NeuroPi.Nutrition.Services.Implementation
             existingNutritionalItem.Quantity = item.Quantity;
             existingNutritionalItem.Receipe = item.Receipe;
             existingNutritionalItem.NutritionalItemTypeId = item.NutritionalItemTypeId;
-            existingNutritionalItem.Edible = item.Edible;
+            existingNutritionalItem.Eatble = item.Edible;
             existingNutritionalItem.UpdatedBy = item.UpdatedBy;
             existingNutritionalItem.UpdatedOn = DateTime.Now;
             _context.SaveChanges();
             return NutritionalItemResponseVM.ToViewModel(existingNutritionalItem);
 
+        }
+
+        public SaveMealPlanResponseVM SaveMealPlan(SaveMealPlanVM request)
+        {
+            int userId = request.UserId;
+            int tenantId = request.TenantId;
+            var date = request.Date;
+
+            SaveMealPlanResponseVM response = new SaveMealPlanResponseVM
+            {
+                StatusCode = 200,
+                Message = "Meal plan saved successfully",
+                Date = date
+            };
+
+            // ============================================================
+            // 1. Load existing meal-plan for that user/date
+            // ============================================================
+            var existingPlans = _context.MealPlan
+                .Where(m => m.UserId == userId
+                            && m.TenantId == tenantId
+                            && m.Date == date
+                            && !m.IsDeleted)
+                .ToList();
+
+            // ============================================================
+            // 2. Convert request → Model list
+            // ============================================================
+            var incomingItems = request.ToModelList();
+
+            // ============================================================
+            // 3. Loop through each incoming item
+            // ============================================================
+            foreach (var item in incomingItems)
+            {
+                // Find existing record with same mealType + nutritionalItem
+                var existing = existingPlans.FirstOrDefault(x =>
+                    x.MealTypeId == item.MealTypeId &&
+                    x.NutritionalItemId == item.NutritionalItemId
+                );
+
+                if (existing != null)
+                {
+                    // ------------------------------
+                    // UPDATE EXISTING
+                    // ------------------------------
+                    existing.Quantity = item.Quantity;
+                    existing.UpdatedBy = request.UserId;
+                    existing.UpdatedOn = DateTime.UtcNow;
+
+                    response.SavedItems.Add(new SavedMealItemVM
+                    {
+                        MealTypeId = item.MealTypeId,
+                        NutritionalItemId = item.NutritionalItemId,
+                        Qty = item.Quantity,
+                        IsUpdated = true,
+                        IsInserted = false
+                    });
+                }
+                else
+                {
+                    // ------------------------------
+                    // INSERT NEW
+                    // ------------------------------
+                    _context.MealPlan.Add(item);
+
+                    response.SavedItems.Add(new SavedMealItemVM
+                    {
+                        MealTypeId = item.MealTypeId,
+                        NutritionalItemId = item.NutritionalItemId,
+                        Qty = item.Quantity,
+                        IsInserted = true,
+                        IsUpdated = false
+                    });
+                }
+            }
+
+            // ============================================================
+            // 4. SAVE ALL CHANGES
+            // ============================================================
+            _context.SaveChanges();
+
+            return response;
         }
     }
 }

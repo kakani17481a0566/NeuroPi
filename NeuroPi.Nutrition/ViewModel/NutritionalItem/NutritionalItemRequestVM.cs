@@ -20,7 +20,7 @@ namespace NeuroPi.Nutrition.ViewModel.NutritionalItem
 
         public int NutritionalItemTypeId { get; set; }
 
-        public bool Edible { get; set; }
+        public bool Eatble { get; set; }
 
         public int TenantId { get; set; }
 
@@ -41,7 +41,7 @@ namespace NeuroPi.Nutrition.ViewModel.NutritionalItem
                 Quantity = vm.Quantity,
                 Receipe = vm.Receipe,
                 NutritionalItemTypeId = vm.NutritionalItemTypeId,
-                Edible = vm.Edible,
+                Eatble = vm.Eatble,
                 TenantId = vm.TenantId,
                 CreatedBy = vm.CreatedBy,
                 CreatedOn = vm.CreatedOn

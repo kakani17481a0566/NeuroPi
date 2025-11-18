@@ -1,4 +1,5 @@
-﻿using NeuroPi.Nutrition.ViewModel.NutritionalItem;
+﻿using NeuroPi.Nutrition.ViewModel;
+using NeuroPi.Nutrition.ViewModel.NutritionalItem;
 
 namespace NeuroPi.Nutrition.Services.Interface
 {
@@ -18,6 +19,9 @@ namespace NeuroPi.Nutrition.Services.Interface
         bool DeleteNutritionalItem(int id, int tenantId);
 
         NutritionalItemListResponseVM GetAllItems();
+
+        SaveMealPlanResponseVM SaveMealPlan(SaveMealPlanVM model);
+
 
 
     }

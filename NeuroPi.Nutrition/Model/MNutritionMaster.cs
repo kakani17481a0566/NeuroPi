@@ -21,5 +21,8 @@ namespace NeuroPi.Nutrition.Model
         public int TenantId { get; set; }
 
         public MNutritionMasterType NutritionMasterType { get; set; }
+
+       
+
     }
 }

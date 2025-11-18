@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using NeuroPi.CommonLib.Model;
 using NeuroPi.Nutrition.Services.Interface;
+using NeuroPi.Nutrition.ViewModel;
 using NeuroPi.Nutrition.ViewModel.NutritionalItem;
 using System.Net;
 
@@ -88,7 +89,7 @@ namespace NeuroPi.Nutrition.Controllers
             return new ResponseResult<bool>(HttpStatusCode.OK, true, "Nutritional Item deleted successfully");
         }
 
-        [HttpGet("/nutrition")]
+        [HttpGet("/nutrition/vm/test")]
         public ResponseResult<NutritionalItemListResponseVM> GetNutrional()
         {
             var result = _nutritionalItemService.GetAllItems();
@@ -97,6 +98,15 @@ namespace NeuroPi.Nutrition.Controllers
                 return new ResponseResult<NutritionalItemListResponseVM>(HttpStatusCode.NotFound, null, "Nutritional Item not found");
             }
             return new ResponseResult<NutritionalItemListResponseVM>(HttpStatusCode.OK, result, "Nutrional Item details fetched sucessfully");
+        }
+
+        [HttpPost("save-meal-plan")]
+        public ResponseResult<SaveMealPlanResponseVM> SaveMealPlan([FromBody] SaveMealPlanVM request)
+        {
+            var result = _nutritionalItemService.SaveMealPlan(request);
+
+            return new ResponseResult<SaveMealPlanResponseVM>(
+                HttpStatusCode.OK, result, "Meal Plan saved successfully");
         }
 
     }

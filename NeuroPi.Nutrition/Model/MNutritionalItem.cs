@@ -30,20 +30,29 @@ namespace NeuroPi.Nutrition.Model
         [Column("recipe")]
         public bool Receipe { get; set; }
 
-
+        // ⭐ CORRECT: maps to column "type"
         [Column("type")]
-        [ForeignKey("NutritionalItemType")]
         public int NutritionalItemTypeId { get; set; }
 
-        [Column("edible")]
-        public bool Edible { get; set; }
+        // ⭐ OPTIONAL: navigation
+        [ForeignKey("NutritionalItemTypeId")]
+        public MNutritionalItemType? NutritionalItemType { get; set; }
+
+        [Column("eatble")]
+        public bool Eatble { get; set; }
 
         [Column("item_url")]
         public string? ItemImage { get; set; } = null;
 
+        // ⭐ CORRECT: maps to diet_type_id
+        [Column("diet_type_id")]
+        public int? DietTypeId { get; set; }
+
+        [ForeignKey("DietTypeId")]
+        public MNutritionMaster? DietType { get; set; }
+
+        // ⭐ CORRECT: maps to tenant_id
         [Column("tenant_id")]
         public int TenantId { get; set; }
-
-        public MNutritionalItemType NutritionalItemType { get; set; }
     }
 }
