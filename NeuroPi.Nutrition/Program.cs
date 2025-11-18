@@ -36,7 +36,7 @@ builder.Services.AddScoped<IMealPlanMonitoring, MealPlanMonitoringServiceImpl>()
 builder.Services.AddScoped<IUserGene, UserGeneServiceImpl>();
 
 // --------------------------------------
-// ✅ CORS POLICY
+// 🌐 CORS
 // --------------------------------------
 builder.Services.AddCors(options =>
 {
@@ -50,16 +50,20 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+// --------------------------------------
+// 🚀 Swagger ALWAYS ON (Dev + Prod)
+// --------------------------------------
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "NeuroPi API V1");
+    c.RoutePrefix = "swagger";
+});
 
 app.UseHttpsRedirection();
 
 // --------------------------------------
-// 🚀 IMPORTANT: Enable CORS here
+// 🌐 Enable CORS
 // --------------------------------------
 app.UseCors("AllowAll");
 
