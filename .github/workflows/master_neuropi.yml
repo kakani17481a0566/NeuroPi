@@ -30,13 +30,13 @@ jobs:
     ###########################################################
 
     - name: Publish UserManagement API
-      run: dotnet publish NeuroPi.UserManagment/NeuroPi.UserManagment.csproj -c Release -o publish/usermanagement
+      run: dotnet publish "NeuroPi/NeuroPi.UserManagment.csproj" -c Release -o publish/usermanagement
 
     - name: Publish SchoolManagement API
-      run: dotnet publish SchoolManagement/SchoolManagement.csproj -c Release -o publish/school
+      run: dotnet publish "SchoolManagement/SchoolManagement.csproj" -c Release -o publish/school
 
     - name: Publish Nutrition API
-      run: dotnet publish NeuroPi.Nutrition/NeuroPi.Nutrition.csproj -c Release -o publish/nutrition
+      run: dotnet publish "NeuroPi.Nutrition/NeuroPi.Nutrition.csproj" -c Release -o publish/nutrition
 
     ###########################################################
     # LOGIN TO AZURE
@@ -49,7 +49,7 @@ jobs:
         subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_99DCF1DCB22E4F1282EB0E82C6D97D36 }}
 
     ###########################################################
-    # DEPLOY EACH API INTO ITS VIRTUAL FOLDER
+    # DEPLOY EACH API TO ITS VIRTUAL PATH IN AZURE
     ###########################################################
 
     - name: Deploy UserManagement API
