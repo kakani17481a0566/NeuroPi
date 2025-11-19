@@ -94,6 +94,28 @@ namespace NeuroPi.Nutrition.Controllers
             return new ResponseResult<bool>(HttpStatusCode.OK, true, "Meal Plan Monitoring deleted.");
 
         }
+
+
+        [HttpGet("7days/user/{userId}/tenant/{tenantId}")]
+        public ResponseResult<MealPlan7daysCardVM> Get7DaysMealPlanCard(int userId, int tenantId)
+        {
+            var result = _service.Get7DaysMealPlanCard(userId, tenantId);
+
+            if (result == null)
+            {
+                return new ResponseResult<MealPlan7daysCardVM>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    "No meal plan data found for this week."
+                );
+            }
+
+            return new ResponseResult<MealPlan7daysCardVM>(
+                HttpStatusCode.OK,
+                result,
+                "7 days meal plan card loaded successfully."
+            );
+        }
     }
 
     }

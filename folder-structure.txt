@@ -1,0 +1,1692 @@
+Folder PATH listing
+Volume serial number is BA40-D262
+C:.
+¦   .dockerignore
+¦   .gitattributes
+¦   .gitignore
+¦   DockerFile
+¦   folder-structure.txt
+¦   git-tool - Copy.bat
+¦   git-tool.bat
+¦   master
+¦   NeuroPi.UserManagment.sln
+¦   README.md
+¦   
++---.github
+¦   +---workflows
+¦           master_neuropi.yml
+¦           
++---CommonLib
+¦   ¦   Class1.cs
+¦   ¦   CommonLib.csproj
+¦   ¦   ResponseResult.cs
+¦   ¦   
+¦   +---bin
+¦   ¦   +---Debug
+¦   ¦       +---net8.0
+¦   ¦               CommonLib.deps.json
+¦   ¦               CommonLib.dll
+¦   ¦               CommonLib.pdb
+¦   ¦               
+¦   +---obj
+¦       ¦   CommonLib.csproj.nuget.dgspec.json
+¦       ¦   CommonLib.csproj.nuget.g.props
+¦       ¦   CommonLib.csproj.nuget.g.targets
+¦       ¦   project.assets.json
+¦       ¦   project.nuget.cache
+¦       ¦   
+¦       +---Debug
+¦           +---net8.0
+¦               ¦   .NETCoreApp,Version=v8.0.AssemblyAttributes.cs
+¦               ¦   CommonLib.AssemblyInfo.cs
+¦               ¦   CommonLib.AssemblyInfoInputs.cache
+¦               ¦   CommonLib.assets.cache
+¦               ¦   CommonLib.csproj.CoreCompileInputs.cache
+¦               ¦   CommonLib.csproj.FileListAbsolute.txt
+¦               ¦   CommonLib.dll
+¦               ¦   CommonLib.GeneratedMSBuildEditorConfig.editorconfig
+¦               ¦   CommonLib.GlobalUsings.g.cs
+¦               ¦   CommonLib.pdb
+¦               ¦   CommonLib.sourcelink.json
+¦               ¦   
+¦               +---ref
+¦               ¦       CommonLib.dll
+¦               ¦       
+¦               +---refint
+¦                       CommonLib.dll
+¦                       
++---NeuroPi
+¦   ¦   NeuroPi.http
+¦   ¦   NeuroPi.UserManagment.csproj
+¦   ¦   NeuroPi.UserManagment.csproj.user
+¦   ¦   neuro_appsettings.Development.json
+¦   ¦   neuro_appsettings.json
+¦   ¦   Program.cs
+¦   ¦   
+¦   +---bin
+¦   ¦   +---Debug
+¦   ¦       +---net8.0
+¦   ¦               CloudinaryDotNet.dll
+¦   ¦               Microsoft.AspNetCore.Authentication.JwtBearer.dll
+¦   ¦               Microsoft.EntityFrameworkCore.Abstractions.dll
+¦   ¦               Microsoft.EntityFrameworkCore.dll
+¦   ¦               Microsoft.EntityFrameworkCore.Relational.dll
+¦   ¦               Microsoft.Extensions.Caching.Abstractions.dll
+¦   ¦               Microsoft.Extensions.Caching.Memory.dll
+¦   ¦               Microsoft.Extensions.Configuration.Abstractions.dll
+¦   ¦               Microsoft.Extensions.DependencyInjection.Abstractions.dll
+¦   ¦               Microsoft.Extensions.DependencyInjection.dll
+¦   ¦               Microsoft.Extensions.Logging.Abstractions.dll
+¦   ¦               Microsoft.Extensions.Logging.dll
+¦   ¦               Microsoft.Extensions.Options.dll
+¦   ¦               Microsoft.Extensions.Primitives.dll
+¦   ¦               Microsoft.IdentityModel.Abstractions.dll
+¦   ¦               Microsoft.IdentityModel.JsonWebTokens.dll
+¦   ¦               Microsoft.IdentityModel.Logging.dll
+¦   ¦               Microsoft.IdentityModel.Protocols.dll
+¦   ¦               Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+¦   ¦               Microsoft.IdentityModel.Tokens.dll
+¦   ¦               Microsoft.OpenApi.dll
+¦   ¦               NeuroPi.UserManagment.deps.json
+¦   ¦               NeuroPi.UserManagment.dll
+¦   ¦               NeuroPi.UserManagment.exe
+¦   ¦               NeuroPi.UserManagment.pdb
+¦   ¦               NeuroPi.UserManagment.runtimeconfig.json
+¦   ¦               NeuroPi.UserManagment.staticwebassets.endpoints.json
+¦   ¦               neuro_appsettings.Development.json
+¦   ¦               neuro_appsettings.json
+¦   ¦               Newtonsoft.Json.dll
+¦   ¦               Npgsql.dll
+¦   ¦               Npgsql.EntityFrameworkCore.PostgreSQL.dll
+¦   ¦               Swashbuckle.AspNetCore.Swagger.dll
+¦   ¦               Swashbuckle.AspNetCore.SwaggerGen.dll
+¦   ¦               Swashbuckle.AspNetCore.SwaggerUI.dll
+¦   ¦               System.Diagnostics.DiagnosticSource.dll
+¦   ¦               System.IdentityModel.Tokens.Jwt.dll
+¦   ¦               
+¦   +---Controllers
+¦   ¦       AuditLogController.cs
+¦   ¦       ConfigController.cs
+¦   ¦       DepartmentController.cs
+¦   ¦       GroupsController.cs
+¦   ¦       GroupUserController.cs
+¦   ¦       OrganizationControllers.cs
+¦   ¦       PermissionController.cs
+¦   ¦       RoleController.cs
+¦   ¦       RolePermissionController.cs
+¦   ¦       TeamController.cs
+¦   ¦       TeamUserController.cs
+¦   ¦       TenantsController.cs
+¦   ¦       UserController.cs
+¦   ¦       UserDepartmentController.cs
+¦   ¦       UserRolesController.cs
+¦   ¦       
+¦   +---Data
+¦   ¦       NeuroPiDbContext.cs
+¦   ¦       
+¦   +---Model
+¦   ¦       MAuditLog.cs
+¦   ¦       MBaseModel.cs
+¦   ¦       MConfig.cs
+¦   ¦       MDepartment.cs
+¦   ¦       MGroup.cs
+¦   ¦       MGroupUser.cs
+¦   ¦       MOrganization.cs
+¦   ¦       MPermission.cs
+¦   ¦       MPrefixSuffix.cs
+¦   ¦       MRole.cs
+¦   ¦       MRolePermission.cs
+¦   ¦       MTeam.cs
+¦   ¦       MTeamUser.cs
+¦   ¦       MTenant.cs
+¦   ¦       MUser.cs
+¦   ¦       MUserDepartment.cs
+¦   ¦       MUserRole.cs
+¦   ¦       
+¦   +---obj
+¦   ¦   ¦   NeuroPi.UserManagment.csproj.nuget.dgspec.json
+¦   ¦   ¦   NeuroPi.UserManagment.csproj.nuget.g.props
+¦   ¦   ¦   NeuroPi.UserManagment.csproj.nuget.g.targets
+¦   ¦   ¦   project.assets.json
+¦   ¦   ¦   project.nuget.cache
+¦   ¦   ¦   
+¦   ¦   +---Debug
+¦   ¦       +---net8.0
+¦   ¦           ¦   .NETCoreApp,Version=v8.0.AssemblyAttributes.cs
+¦   ¦           ¦   ApiEndpoints.json
+¦   ¦           ¦   apphost.exe
+¦   ¦           ¦   NeuroPi..F0E4C8A7.Up2Date
+¦   ¦           ¦   NeuroPi.UserManagment.AssemblyInfo.cs
+¦   ¦           ¦   NeuroPi.UserManagment.AssemblyInfoInputs.cache
+¦   ¦           ¦   NeuroPi.UserManagment.assets.cache
+¦   ¦           ¦   NeuroPi.UserManagment.csproj.AssemblyReference.cache
+¦   ¦           ¦   NeuroPi.UserManagment.csproj.BuildWithSkipAnalyzers
+¦   ¦           ¦   NeuroPi.UserManagment.csproj.CoreCompileInputs.cache
+¦   ¦           ¦   NeuroPi.UserManagment.csproj.FileListAbsolute.txt
+¦   ¦           ¦   NeuroPi.UserManagment.dll
+¦   ¦           ¦   NeuroPi.UserManagment.GeneratedMSBuildEditorConfig.editorconfig
+¦   ¦           ¦   NeuroPi.UserManagment.genruntimeconfig.cache
+¦   ¦           ¦   NeuroPi.UserManagment.GlobalUsings.g.cs
+¦   ¦           ¦   NeuroPi.UserManagment.MvcApplicationPartsAssemblyInfo.cache
+¦   ¦           ¦   NeuroPi.UserManagment.MvcApplicationPartsAssemblyInfo.cs
+¦   ¦           ¦   NeuroPi.UserManagment.pdb
+¦   ¦           ¦   NeuroPi.UserManagment.sourcelink.json
+¦   ¦           ¦   rjsmcshtml.dswa.cache.json
+¦   ¦           ¦   rjsmrazor.dswa.cache.json
+¦   ¦           ¦   rpswa.dswa.cache.json
+¦   ¦           ¦   staticwebassets.build.endpoints.json
+¦   ¦           ¦   staticwebassets.build.json
+¦   ¦           ¦   staticwebassets.build.json.cache
+¦   ¦           ¦   staticwebassets.references.upToDateCheck.txt
+¦   ¦           ¦   staticwebassets.removed.txt
+¦   ¦           ¦   
+¦   ¦           +---EndpointInfo
+¦   ¦           ¦       NeuroPi.UserManagment.json
+¦   ¦           ¦       NeuroPi.UserManagment.OpenApiFiles.cache
+¦   ¦           ¦       
+¦   ¦           +---ref
+¦   ¦           ¦       NeuroPi.UserManagment.dll
+¦   ¦           ¦       
+¦   ¦           +---refint
+¦   ¦           ¦       NeuroPi.UserManagment.dll
+¦   ¦           ¦       
+¦   ¦           +---staticwebassets
+¦   +---Properties
+¦   ¦       launchSettings.json
+¦   ¦       
+¦   +---Response
+¦   ¦       ResponseResult.cs
+¦   ¦       
+¦   +---Services
+¦   ¦   +---Implementation
+¦   ¦   ¦       AuditLogServiceImpl.cs
+¦   ¦   ¦       ConfigServiceImpl.cs
+¦   ¦   ¦       DepartmentServiceImpl.cs
+¦   ¦   ¦       GroupServiceImpl.cs
+¦   ¦   ¦       GroupUserServiceImpl.cs
+¦   ¦   ¦       OrganizationImpl.cs
+¦   ¦   ¦       PermissionServiceImpl.cs
+¦   ¦   ¦       RolePermissionServiceImpl.cs
+¦   ¦   ¦       RoleServiceImpl.cs
+¦   ¦   ¦       TeamServiceImpl.cs
+¦   ¦   ¦       TeamUserServiceImpl.cs
+¦   ¦   ¦       TenantServiceImpl.cs
+¦   ¦   ¦       UserDepartmentServiceImpl.cs
+¦   ¦   ¦       UserRolesServiceImpl.cs
+¦   ¦   ¦       UserServiceImpl.cs
+¦   ¦   ¦       
+¦   ¦   +---Interface
+¦   ¦           IAuditLogService.cs
+¦   ¦           IConfigService.cs
+¦   ¦           IDepartmentService.cs
+¦   ¦           IGroupService.cs
+¦   ¦           IGroupUserService.cs
+¦   ¦           IOrganizationService.cs
+¦   ¦           IPermissionService.cs
+¦   ¦           IRolePermissionService.cs
+¦   ¦           IRoleService.cs
+¦   ¦           ITeamService.cs
+¦   ¦           ITeamUserService.cs
+¦   ¦           ITenantService.cs
+¦   ¦           IUserDepartmentService.cs
+¦   ¦           IUserRolesService.cs
+¦   ¦           IUserService.cs
+¦   ¦           
+¦   +---ViewModel
+¦       +---AuditLog
+¦       ¦       AuditLogResponseVM.cs
+¦       ¦       AuditRequestVM.cs
+¦       ¦       
+¦       +---Config
+¦       ¦       ConfigCreateVM.cs
+¦       ¦       ConfigUpdateVM.cs
+¦       ¦       ConfigVM.cs
+¦       ¦       
+¦       +---Department
+¦       ¦       DepartmentCreateVM.cs
+¦       ¦       DepartmentRequestVM.cs
+¦       ¦       DepartmentResponseVM.cs
+¦       ¦       DepartmentUpdateVM.cs
+¦       ¦       
+¦       +---Group
+¦       ¦       GroupInputVM.cs
+¦       ¦       GroupUpdateInputVM.cs
+¦       ¦       GroupUpdateWithTenantVM.cs
+¦       ¦       GroupVM.cs
+¦       ¦       
+¦       +---GroupUser
+¦       ¦       GroupUserInputVM.cs
+¦       ¦       GroupUserUpdateVM.cs
+¦       ¦       GroupUserVM.cs
+¦       ¦       
+¦       +---Organization
+¦       ¦       OrganizationInputVM.cs
+¦       ¦       OrganizationUpdateInputVM.cs
+¦       ¦       OrganizationVM.cs
+¦       ¦       
+¦       +---Permissions
+¦       ¦       PermissionRequestVM.cs
+¦       ¦       PermissionResponseVM.cs
+¦       ¦       PermissionUpdateRequestVM.cs
+¦       ¦       
+¦       +---Role
+¦       ¦       RoleRequestVM.cs
+¦       ¦       RoleResponseVM.cs
+¦       ¦       RoleUpdateRequestVM.cs
+¦       ¦       
+¦       +---RolePermission
+¦       ¦       RolePermissionDescVM.cs
+¦       ¦       RolePermissionRequestVM.cs
+¦       ¦       RolePermissionResponseVM.cs
+¦       ¦       RolePermissionVM.cs
+¦       ¦       
+¦       +---Team
+¦       ¦       MTeamInsertVM.cs
+¦       ¦       MTeamUpdateVM.cs
+¦       ¦       MTeamVM.cs
+¦       ¦       
+¦       +---TeamUser
+¦       ¦       TeamUserInputVM.cs
+¦       ¦       TeamUserRequestVM.cs
+¦       ¦       TeamUserResponseVM.cs
+¦       ¦       
+¦       +---Tenent
+¦       ¦       TenantInputVM.cs
+¦       ¦       TenantUpdateInputVM.cs
+¦       ¦       TenantVM.cs
+¦       ¦       
+¦       +---User
+¦       ¦       UserCreateRequestVM.cs
+¦       ¦       UserImageUploadVM.cs
+¦       ¦       UserLogInSucessVM.cs
+¦       ¦       UserRequestVM.cs
+¦       ¦       UserResponseVM.cs
+¦       ¦       UsersProfileSummaryVM.cs
+¦       ¦       UserUpdatePasswordVM.cs
+¦       ¦       UserUpdateRequestVM.cs
+¦       ¦       
+¦       +---UserDepartment
+¦       ¦       UserDepartmentCreateVM.cs
+¦       ¦       UserDepartmentRequestVM.cs
+¦       ¦       UserDepartmentResponseVM.cs
+¦       ¦       UserDepartmentUpdateVM.cs
+¦       ¦       
+¦       +---UserRoles
+¦               UserRoleCreateVM.cs
+¦               UserRoleUpdateVM.cs
+¦               UserRoleVM.cs
+¦               
++---NeuroPi.Nutrition
+¦   ¦   appsettings.Development.json
+¦   ¦   appsettings.json
+¦   ¦   NeuroPi.Nutrition.csproj
+¦   ¦   NeuroPi.Nutrition.csproj.user
+¦   ¦   NeuroPi.Nutrition.http
+¦   ¦   Program.cs
+¦   ¦   WeatherForecast.cs
+¦   ¦   
+¦   +---bin
+¦   ¦   +---Debug
+¦   ¦       +---net8.0
+¦   ¦           ¦   appsettings.Development.json
+¦   ¦           ¦   appsettings.json
+¦   ¦           ¦   Microsoft.DotNet.PlatformAbstractions.dll
+¦   ¦           ¦   Microsoft.EntityFrameworkCore.Abstractions.dll
+¦   ¦           ¦   Microsoft.EntityFrameworkCore.dll
+¦   ¦           ¦   Microsoft.EntityFrameworkCore.Relational.dll
+¦   ¦           ¦   Microsoft.Extensions.Caching.Abstractions.dll
+¦   ¦           ¦   Microsoft.Extensions.Caching.Memory.dll
+¦   ¦           ¦   Microsoft.Extensions.Configuration.Abstractions.dll
+¦   ¦           ¦   Microsoft.Extensions.DependencyInjection.Abstractions.dll
+¦   ¦           ¦   Microsoft.Extensions.DependencyInjection.dll
+¦   ¦           ¦   Microsoft.Extensions.DependencyModel.dll
+¦   ¦           ¦   Microsoft.Extensions.Diagnostics.Abstractions.dll
+¦   ¦           ¦   Microsoft.Extensions.Hosting.Abstractions.dll
+¦   ¦           ¦   Microsoft.Extensions.Logging.Abstractions.dll
+¦   ¦           ¦   Microsoft.Extensions.Logging.dll
+¦   ¦           ¦   Microsoft.Extensions.ObjectPool.dll
+¦   ¦           ¦   Microsoft.Extensions.Options.dll
+¦   ¦           ¦   Microsoft.Extensions.Primitives.dll
+¦   ¦           ¦   Microsoft.OpenApi.dll
+¦   ¦           ¦   NeuroPi.Nutrition.deps.json
+¦   ¦           ¦   NeuroPi.Nutrition.dll
+¦   ¦           ¦   NeuroPi.Nutrition.exe
+¦   ¦           ¦   NeuroPi.Nutrition.pdb
+¦   ¦           ¦   NeuroPi.Nutrition.runtimeconfig.json
+¦   ¦           ¦   NeuroPi.Nutrition.staticwebassets.endpoints.json
+¦   ¦           ¦   NeuroPi.Nutrition.staticwebassets.runtime.json
+¦   ¦           ¦   NeuropiCommonLib.dll
+¦   ¦           ¦   NeuropiCommonLib.pdb
+¦   ¦           ¦   Newtonsoft.Json.dll
+¦   ¦           ¦   Npgsql.dll
+¦   ¦           ¦   Npgsql.EntityFrameworkCore.PostgreSQL.dll
+¦   ¦           ¦   Swashbuckle.AspNetCore.Swagger.dll
+¦   ¦           ¦   Swashbuckle.AspNetCore.SwaggerGen.dll
+¦   ¦           ¦   Swashbuckle.AspNetCore.SwaggerUI.dll
+¦   ¦           ¦   System.Diagnostics.DiagnosticSource.dll
+¦   ¦           ¦   
+¦   ¦           +---runtimes
+¦   ¦               +---android-arm
+¦   ¦               ¦   +---native
+¦   ¦               +---android-arm64
+¦   ¦               ¦   +---native
+¦   ¦               +---android-x64
+¦   ¦               ¦   +---native
+¦   ¦               +---android-x86
+¦   ¦               ¦   +---native
+¦   ¦               +---ios-arm64
+¦   ¦               ¦   +---native
+¦   ¦               +---iossimulator-arm64
+¦   ¦               ¦   +---native
+¦   ¦               +---iossimulator-x64
+¦   ¦               ¦   +---native
+¦   ¦               +---linux-arm
+¦   ¦               ¦   +---lib
+¦   ¦               ¦   ¦   +---netstandard2.0
+¦   ¦               ¦   +---native
+¦   ¦               +---linux-arm64
+¦   ¦               ¦   +---lib
+¦   ¦               ¦   ¦   +---netstandard2.0
+¦   ¦               ¦   +---native
+¦   ¦               +---linux-x64
+¦   ¦               ¦   +---lib
+¦   ¦               ¦   ¦   +---netstandard2.0
+¦   ¦               ¦   +---native
+¦   ¦               +---maccatalyst-arm64
+¦   ¦               ¦   +---native
+¦   ¦               +---maccatalyst-x64
+¦   ¦               ¦   +---native
+¦   ¦               +---osx-arm64
+¦   ¦               ¦   +---lib
+¦   ¦               ¦   ¦   +---netstandard2.0
+¦   ¦               ¦   +---native
+¦   ¦               +---osx-x64
+¦   ¦               ¦   +---lib
+¦   ¦               ¦   ¦   +---netstandard2.0
+¦   ¦               ¦   +---native
+¦   ¦               +---win-arm
+¦   ¦               ¦   +---native
+¦   ¦               +---win-arm64
+¦   ¦               ¦   +---native
+¦   ¦               +---win-x64
+¦   ¦               ¦   +---native
+¦   ¦               +---win-x86
+¦   ¦                   +---native
+¦   +---Controllers
+¦   ¦       GeneNutritionalFocusController.cs
+¦   ¦       GenGenesController.cs
+¦   ¦       MealPlanController.cs
+¦   ¦       MealPlanMonitoringController.cs
+¦   ¦       MealTypeController.cs
+¦   ¦       NutritionalFocusController.cs
+¦   ¦       NutritionalIteamTypeController.cs
+¦   ¦       NutritionalItemController.cs
+¦   ¦       NutritionalItemMealTypeController.cs
+¦   ¦       NutritionalItemRecipeController.cs
+¦   ¦       NutritionalItemVitaminsController.cs
+¦   ¦       NutritionMasterController.cs
+¦   ¦       NutritionMasterTypeController.cs
+¦   ¦       RecipesInstructionsController.cs
+¦   ¦       UnplannedMealController.cs
+¦   ¦       UserFavouritesController.cs
+¦   ¦       UserGeneController.cs
+¦   ¦       UserMealTypeController.cs
+¦   ¦       VitaminsController.cs
+¦   ¦       
+¦   +---Data
+¦   ¦       NeutritionDbContext.cs
+¦   ¦       
+¦   +---Model
+¦   ¦       MGeneNutritionalFocus.cs
+¦   ¦       MGenGenes.cs
+¦   ¦       MMealPlan.cs
+¦   ¦       MMealPlanMonitoring.cs
+¦   ¦       MMealType.cs
+¦   ¦       MNutritionalFocus.cs
+¦   ¦       MNutritionalFocusItem.cs
+¦   ¦       MNutritionalItem.cs
+¦   ¦       MNutritionalItemMealType.cs
+¦   ¦       MNutritionalItemRecipe.cs
+¦   ¦       MNutritionalItemType.cs
+¦   ¦       MNutritionalItemVitamins.cs
+¦   ¦       MNutritionMaster.cs
+¦   ¦       MNutritionMasterType.cs
+¦   ¦       MRecipesInstructions.cs
+¦   ¦       MUnplannedMeal.cs
+¦   ¦       MUserFavourites.cs
+¦   ¦       MUserGene.cs
+¦   ¦       MUserMealType.cs
+¦   ¦       MVitamins.cs
+¦   ¦       
+¦   +---obj
+¦   ¦   ¦   NeuroPi.Nutrition.csproj.nuget.dgspec.json
+¦   ¦   ¦   NeuroPi.Nutrition.csproj.nuget.g.props
+¦   ¦   ¦   NeuroPi.Nutrition.csproj.nuget.g.targets
+¦   ¦   ¦   project.assets.json
+¦   ¦   ¦   project.nuget.cache
+¦   ¦   ¦   
+¦   ¦   +---Debug
+¦   ¦       +---net8.0
+¦   ¦           ¦   .NETCoreApp,Version=v8.0.AssemblyAttributes.cs
+¦   ¦           ¦   ApiEndpoints.json
+¦   ¦           ¦   apphost.exe
+¦   ¦           ¦   NeuroPi..7236086A.Up2Date
+¦   ¦           ¦   NeuroPi.Nutrition.AssemblyInfo.cs
+¦   ¦           ¦   NeuroPi.Nutrition.AssemblyInfoInputs.cache
+¦   ¦           ¦   NeuroPi.Nutrition.assets.cache
+¦   ¦           ¦   NeuroPi.Nutrition.csproj.AssemblyReference.cache
+¦   ¦           ¦   NeuroPi.Nutrition.csproj.BuildWithSkipAnalyzers
+¦   ¦           ¦   NeuroPi.Nutrition.csproj.CoreCompileInputs.cache
+¦   ¦           ¦   NeuroPi.Nutrition.csproj.FileListAbsolute.txt
+¦   ¦           ¦   NeuroPi.Nutrition.dll
+¦   ¦           ¦   NeuroPi.Nutrition.GeneratedMSBuildEditorConfig.editorconfig
+¦   ¦           ¦   NeuroPi.Nutrition.genruntimeconfig.cache
+¦   ¦           ¦   NeuroPi.Nutrition.GlobalUsings.g.cs
+¦   ¦           ¦   NeuroPi.Nutrition.MvcApplicationPartsAssemblyInfo.cache
+¦   ¦           ¦   NeuroPi.Nutrition.MvcApplicationPartsAssemblyInfo.cs
+¦   ¦           ¦   NeuroPi.Nutrition.pdb
+¦   ¦           ¦   NeuroPi.Nutrition.sourcelink.json
+¦   ¦           ¦   rjsmcshtml.dswa.cache.json
+¦   ¦           ¦   rjsmrazor.dswa.cache.json
+¦   ¦           ¦   rpswa.dswa.cache.json
+¦   ¦           ¦   staticwebassets.build.endpoints.json
+¦   ¦           ¦   staticwebassets.build.json
+¦   ¦           ¦   staticwebassets.build.json.cache
+¦   ¦           ¦   staticwebassets.development.json
+¦   ¦           ¦   staticwebassets.references.upToDateCheck.txt
+¦   ¦           ¦   staticwebassets.removed.txt
+¦   ¦           ¦   
+¦   ¦           +---EndpointInfo
+¦   ¦           ¦       NeuroPi.Nutrition.json
+¦   ¦           ¦       NeuroPi.Nutrition.OpenApiFiles.cache
+¦   ¦           ¦       
+¦   ¦           +---ref
+¦   ¦           ¦       NeuroPi.Nutrition.dll
+¦   ¦           ¦       
+¦   ¦           +---refint
+¦   ¦           ¦       NeuroPi.Nutrition.dll
+¦   ¦           ¦       
+¦   ¦           +---staticwebassets
+¦   +---Properties
+¦   ¦       launchSettings.json
+¦   ¦       
+¦   +---Response
+¦   +---Services
+¦   ¦   +---Implementation
+¦   ¦   ¦       GeneNutritionalFocusServiceImpl.cs
+¦   ¦   ¦       GenGenesServiceImpl.cs
+¦   ¦   ¦       MealPlanMonitoringServiceImpl.cs
+¦   ¦   ¦       MealPlanServiceImpl.cs
+¦   ¦   ¦       MealTypeServiceImpl.cs
+¦   ¦   ¦       NutritionalFocusServiceImpl.cs
+¦   ¦   ¦       NutritionalIteamTypeServicesImpl.cs
+¦   ¦   ¦       NutritionalItemMealTypeServiceImpl.cs
+¦   ¦   ¦       NutritionalItemRecipeServiceImpl.cs
+¦   ¦   ¦       NutritionalItemServiceImpl.cs
+¦   ¦   ¦       NutritionalItemVitamins.cs
+¦   ¦   ¦       NutritionMasterServiceImpl.cs
+¦   ¦   ¦       NutritionMasterTypeServiceImpl.cs
+¦   ¦   ¦       RecipesInstructionServiceImpl.cs
+¦   ¦   ¦       UnplannedMealServiceImpl.cs
+¦   ¦   ¦       UserFavouritesServiceImpl.cs
+¦   ¦   ¦       UserGeneServiceImpl.cs
+¦   ¦   ¦       UserMealTypeServiceImpl.cs
+¦   ¦   ¦       VitaminServiceImpl.cs
+¦   ¦   ¦       
+¦   ¦   +---Interface
+¦   ¦           IGeneNutritionalFocus.cs
+¦   ¦           IGenGenesService.cs
+¦   ¦           IMealPlan.cs
+¦   ¦           IMealPlanMonitoring.cs
+¦   ¦           IMealType.cs
+¦   ¦           INutritionalFocus.cs
+¦   ¦           INutritionalIteamType.cs
+¦   ¦           INutritionalItem.cs
+¦   ¦           INutritionalItemMealType.cs
+¦   ¦           INutritionalItemRecipe.cs
+¦   ¦           INutritionalItemVitamins.cs
+¦   ¦           INutritionMaster.cs
+¦   ¦           INutritionMasterType.cs
+¦   ¦           IRecipesInstructions.cs
+¦   ¦           IUnplannedMeal.cs
+¦   ¦           IUserFavourites.cs
+¦   ¦           IUserGene.cs
+¦   ¦           IUserMealType.cs
+¦   ¦           IVitamins.cs
+¦   ¦           
+¦   +---ViewModel
+¦       +---GeneNutritionalFocus
+¦       ¦       GeneNutritionalFocusRequestVM.cs
+¦       ¦       GeneNutritionalFocusResponseVM.cs
+¦       ¦       GeneNutritionalFocusUpdateVM.cs
+¦       ¦       
+¦       +---Genes
+¦       ¦       GenGenesRequestVM.cs
+¦       ¦       GenGenesResponseVM.cs
+¦       ¦       GenGenesUpdateVM.cs
+¦       ¦       
+¦       +---MealPlan
+¦       ¦       MealPlanRequestVM.cs
+¦       ¦       MealPlanResponseVM.cs
+¦       ¦       MealPlanUpdateVM.cs
+¦       ¦       SaveMealPlanVM.cs
+¦       ¦       
+¦       +---MealPlanMonitoring
+¦       ¦       MealPlanMonitoringRequestVM.cs
+¦       ¦       MealPlanMonitoringResponseVM.cs
+¦       ¦       MealPlanMonitoringUpdateVM.cs
+¦       ¦       
+¦       +---MealType
+¦       ¦       MealTypeRequestVM.cs
+¦       ¦       MealTypeResponseVM.cs
+¦       ¦       MealTypeUpdateVM.cs
+¦       ¦       
+¦       +---NutritionalFocus
+¦       ¦       NutritionalFocusRequestVM.cs
+¦       ¦       NutritionalFocusResponseVM.cs
+¦       ¦       NutritionalFocusUpdateVM.cs
+¦       ¦       
+¦       +---NutritionalIteamType
+¦       ¦       NutritionalIteamTypeRequestVM.cs
+¦       ¦       NutritionalIteamTypeResponseVM.cs
+¦       ¦       NutritionalIteamTypeUpdateVM.cs
+¦       ¦       
+¦       +---NutritionalItem
+¦       ¦       NutritionalItemDetailsVM.cs
+¦       ¦       NutritionalItemListResponseVM.cs
+¦       ¦       NutritionalItemRequestVM.cs
+¦       ¦       NutritionalItemResponseVM.cs
+¦       ¦       NutritionalItemUpdateVM.cs
+¦       ¦       
+¦       +---NutritionalItemMealType
+¦       ¦       NutritionalItemMealTypeRequestVM.cs
+¦       ¦       NutritionalItemMealTypeResponseVM.cs
+¦       ¦       NutritionalItemMealTypeUpdateVM.cs
+¦       ¦       
+¦       +---NutritionalItemRecipe
+¦       ¦       NutritionalItemRecipeRequestVM.cs
+¦       ¦       NutritionalItemRecipeResponseVM.cs
+¦       ¦       NutritionalItemRecipeUpdateVM.cs
+¦       ¦       
+¦       +---NutritionalItemVitamins
+¦       ¦       NutritionalItemVitaminsRequestVM.cs
+¦       ¦       NutritionalItemVitaminsResponseVM.cs
+¦       ¦       NutritionalItemVitaminsUpdateVM.cs
+¦       ¦       
+¦       +---NutritionMaster
+¦       ¦       NutritionMasterRequestVM.cs
+¦       ¦       NutritionMasterResponseVM.cs
+¦       ¦       NutritionMasterUpdateVM.cs
+¦       ¦       
+¦       +---NutritionMasterType
+¦       ¦       NutritionMasterTypeRequestVM.cs
+¦       ¦       NutritionMasterTypeResponseVM.cs
+¦       ¦       NutritionMasterTypeUpdateVM.cs
+¦       ¦       
+¦       +---RecipesInstructions
+¦       ¦       RecipesInstructionsRequestVM.cs
+¦       ¦       RecipesInstructionsResponseVM.cs
+¦       ¦       RecipesInstructionsUpdateVM.cs
+¦       ¦       
+¦       +---UnplannedMeal
+¦       ¦       UnplannedMealRequestVM.cs
+¦       ¦       UnplannedMealResponseVM.cs
+¦       ¦       UnplannedMealUpdateVM.cs
+¦       ¦       
+¦       +---UserFavourites
+¦       ¦       UserFavouritesRequestVM.cs
+¦       ¦       UserFavouritesResponseVM.cs
+¦       ¦       UserFavouritesUpdateVM.cs
+¦       ¦       
+¦       +---UserGene
+¦       ¦       UserGeneRequestVM.cs
+¦       ¦       UserGeneResponseVM.cs
+¦       ¦       UserGeneUpdateVM.cs
+¦       ¦       
+¦       +---UserMealType
+¦       ¦       UserMealTypeRequestVM.cs
+¦       ¦       UserMealTypeResponseVM.cs
+¦       ¦       UserMealTypeUpdateVM.cs
+¦       ¦       
+¦       +---Vitamins
+¦               VitaminsRequestVm.cs
+¦               VitaminsResponseVM.cs
+¦               VitaminsUpdateVM.cs
+¦               
++---NeuropiCommonLib
+¦   ¦   Class1.cs
+¦   ¦   MBaseModel.cs
+¦   ¦   MTenant.cs
+¦   ¦   MUser.cs
+¦   ¦   NeuropiCommonLib.csproj
+¦   ¦   ResponseResult.cs
+¦   ¦   
+¦   +---bin
+¦   ¦   +---Debug
+¦   ¦       +---net8.0
+¦   ¦               NeuropiCommonLib.deps.json
+¦   ¦               NeuropiCommonLib.dll
+¦   ¦               NeuropiCommonLib.pdb
+¦   ¦               
+¦   +---obj
+¦       ¦   NeuropiCommonLib.csproj.nuget.dgspec.json
+¦       ¦   NeuropiCommonLib.csproj.nuget.g.props
+¦       ¦   NeuropiCommonLib.csproj.nuget.g.targets
+¦       ¦   project.assets.json
+¦       ¦   project.nuget.cache
+¦       ¦   
+¦       +---Debug
+¦           +---net8.0
+¦               ¦   .NETCoreApp,Version=v8.0.AssemblyAttributes.cs
+¦               ¦   NeuropiCommonLib.AssemblyInfo.cs
+¦               ¦   NeuropiCommonLib.AssemblyInfoInputs.cache
+¦               ¦   NeuropiCommonLib.assets.cache
+¦               ¦   NeuropiCommonLib.csproj.AssemblyReference.cache
+¦               ¦   NeuropiCommonLib.csproj.BuildWithSkipAnalyzers
+¦               ¦   NeuropiCommonLib.csproj.CoreCompileInputs.cache
+¦               ¦   NeuropiCommonLib.csproj.FileListAbsolute.txt
+¦               ¦   NeuropiCommonLib.dll
+¦               ¦   NeuropiCommonLib.GeneratedMSBuildEditorConfig.editorconfig
+¦               ¦   NeuropiCommonLib.GlobalUsings.g.cs
+¦               ¦   NeuropiCommonLib.pdb
+¦               ¦   NeuropiCommonLib.sourcelink.json
+¦               ¦   
+¦               +---ref
+¦               ¦       NeuropiCommonLib.dll
+¦               ¦       
+¦               +---refint
+¦                       NeuropiCommonLib.dll
+¦                       
++---SchoolManagement
+¦   ¦   .env
+¦   ¦   appsettings.Development.json
+¦   ¦   appsettings.json
+¦   ¦   Dockerfile
+¦   ¦   Program.cs
+¦   ¦   SchoolManagement.csproj
+¦   ¦   SchoolManagement.csproj.user
+¦   ¦   SchoolManagement.http
+¦   ¦   
+¦   +---bin
+¦   ¦   +---Debug
+¦   ¦       +---net8.0
+¦   ¦           ¦   appsettings.Development.json
+¦   ¦           ¦   appsettings.json
+¦   ¦           ¦   Azure.Core.dll
+¦   ¦           ¦   CloudinaryDotNet.dll
+¦   ¦           ¦   Dapper.dll
+¦   ¦           ¦   DotNetEnv.dll
+¦   ¦           ¦   Microsoft.AspNetCore.Authentication.JwtBearer.dll
+¦   ¦           ¦   Microsoft.Bcl.AsyncInterfaces.dll
+¦   ¦           ¦   Microsoft.CognitiveServices.Speech.csharp.dll
+¦   ¦           ¦   Microsoft.EntityFrameworkCore.Abstractions.dll
+¦   ¦           ¦   Microsoft.EntityFrameworkCore.dll
+¦   ¦           ¦   Microsoft.EntityFrameworkCore.Relational.dll
+¦   ¦           ¦   Microsoft.Extensions.Caching.Abstractions.dll
+¦   ¦           ¦   Microsoft.Extensions.Caching.Memory.dll
+¦   ¦           ¦   Microsoft.Extensions.Configuration.Abstractions.dll
+¦   ¦           ¦   Microsoft.Extensions.DependencyInjection.Abstractions.dll
+¦   ¦           ¦   Microsoft.Extensions.DependencyInjection.dll
+¦   ¦           ¦   Microsoft.Extensions.Logging.Abstractions.dll
+¦   ¦           ¦   Microsoft.Extensions.Logging.dll
+¦   ¦           ¦   Microsoft.Extensions.Options.dll
+¦   ¦           ¦   Microsoft.Extensions.Primitives.dll
+¦   ¦           ¦   Microsoft.IdentityModel.Abstractions.dll
+¦   ¦           ¦   Microsoft.IdentityModel.JsonWebTokens.dll
+¦   ¦           ¦   Microsoft.IdentityModel.Logging.dll
+¦   ¦           ¦   Microsoft.IdentityModel.Protocols.dll
+¦   ¦           ¦   Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+¦   ¦           ¦   Microsoft.IdentityModel.Tokens.dll
+¦   ¦           ¦   Microsoft.OpenApi.dll
+¦   ¦           ¦   NeuroPi.UserManagment.deps.json
+¦   ¦           ¦   NeuroPi.UserManagment.dll
+¦   ¦           ¦   NeuroPi.UserManagment.exe
+¦   ¦           ¦   NeuroPi.UserManagment.pdb
+¦   ¦           ¦   NeuroPi.UserManagment.runtimeconfig.json
+¦   ¦           ¦   NeuroPi.UserManagment.staticwebassets.endpoints.json
+¦   ¦           ¦   neuro_appsettings.Development.json
+¦   ¦           ¦   neuro_appsettings.json
+¦   ¦           ¦   Newtonsoft.Json.dll
+¦   ¦           ¦   NodaTime.dll
+¦   ¦           ¦   Npgsql.dll
+¦   ¦           ¦   Npgsql.EntityFrameworkCore.PostgreSQL.dll
+¦   ¦           ¦   OpenAI_API.dll
+¦   ¦           ¦   SchoolManagement.deps.json
+¦   ¦           ¦   SchoolManagement.dll
+¦   ¦           ¦   SchoolManagement.exe
+¦   ¦           ¦   SchoolManagement.pdb
+¦   ¦           ¦   SchoolManagement.runtimeconfig.json
+¦   ¦           ¦   SchoolManagement.staticwebassets.endpoints.json
+¦   ¦           ¦   SchoolManagement.staticwebassets.runtime.json
+¦   ¦           ¦   Sprache.dll
+¦   ¦           ¦   Swashbuckle.AspNetCore.Swagger.dll
+¦   ¦           ¦   Swashbuckle.AspNetCore.SwaggerGen.dll
+¦   ¦           ¦   Swashbuckle.AspNetCore.SwaggerUI.dll
+¦   ¦           ¦   System.ClientModel.dll
+¦   ¦           ¦   System.Diagnostics.DiagnosticSource.dll
+¦   ¦           ¦   System.IdentityModel.Tokens.Jwt.dll
+¦   ¦           ¦   System.Memory.Data.dll
+¦   ¦           ¦   TimeZoneConverter.dll
+¦   ¦           ¦   
+¦   ¦           +---runtimes
+¦   ¦               +---android-arm
+¦   ¦               ¦   +---native
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.core.so
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.extension.audio.sys.so
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.extension.kws.ort.so
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.extension.kws.so
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.extension.lu.so
+¦   ¦               ¦           
+¦   ¦               +---android-arm64
+¦   ¦               ¦   +---native
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.core.so
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.extension.audio.sys.so
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.extension.kws.ort.so
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.extension.kws.so
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.extension.lu.so
+¦   ¦               ¦           
+¦   ¦               +---android-x64
+¦   ¦               ¦   +---native
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.core.so
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.extension.audio.sys.so
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.extension.kws.ort.so
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.extension.kws.so
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.extension.lu.so
+¦   ¦               ¦           
+¦   ¦               +---android-x86
+¦   ¦               ¦   +---native
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.core.so
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.extension.audio.sys.so
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.extension.kws.ort.so
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.extension.kws.so
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.extension.lu.so
+¦   ¦               ¦           
+¦   ¦               +---ios-arm64
+¦   ¦               ¦   +---native
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.core.a
+¦   ¦               ¦           
+¦   ¦               +---iossimulator-arm64
+¦   ¦               ¦   +---native
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.core.a
+¦   ¦               ¦           
+¦   ¦               +---iossimulator-x64
+¦   ¦               ¦   +---native
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.core.a
+¦   ¦               ¦           
+¦   ¦               +---linux-arm
+¦   ¦               ¦   +---lib
+¦   ¦               ¦   ¦   +---netstandard2.0
+¦   ¦               ¦   ¦           Microsoft.CognitiveServices.Speech.csharp.dll
+¦   ¦               ¦   ¦           
+¦   ¦               ¦   +---native
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.core.so
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.extension.audio.sys.so
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.extension.codec.so
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.extension.kws.ort.so
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.extension.kws.so
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.extension.lu.so
+¦   ¦               ¦           libpal_azure_c_shared.so
+¦   ¦               ¦           libpal_azure_c_shared_openssl3.so
+¦   ¦               ¦           
+¦   ¦               +---linux-arm64
+¦   ¦               ¦   +---lib
+¦   ¦               ¦   ¦   +---netstandard2.0
+¦   ¦               ¦   ¦           Microsoft.CognitiveServices.Speech.csharp.dll
+¦   ¦               ¦   ¦           
+¦   ¦               ¦   +---native
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.core.so
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.extension.audio.sys.so
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.extension.codec.so
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.extension.kws.ort.so
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.extension.kws.so
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.extension.lu.so
+¦   ¦               ¦           libpal_azure_c_shared.so
+¦   ¦               ¦           libpal_azure_c_shared_openssl3.so
+¦   ¦               ¦           
+¦   ¦               +---linux-x64
+¦   ¦               ¦   +---lib
+¦   ¦               ¦   ¦   +---netstandard2.0
+¦   ¦               ¦   ¦           Microsoft.CognitiveServices.Speech.csharp.dll
+¦   ¦               ¦   ¦           
+¦   ¦               ¦   +---native
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.core.so
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.extension.audio.sys.so
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.extension.codec.so
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.extension.kws.ort.so
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.extension.kws.so
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.extension.lu.so
+¦   ¦               ¦           libpal_azure_c_shared.so
+¦   ¦               ¦           libpal_azure_c_shared_openssl3.so
+¦   ¦               ¦           
+¦   ¦               +---maccatalyst-arm64
+¦   ¦               ¦   +---native
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.core.a
+¦   ¦               ¦           
+¦   ¦               +---maccatalyst-x64
+¦   ¦               ¦   +---native
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.core.a
+¦   ¦               ¦           
+¦   ¦               +---osx-arm64
+¦   ¦               ¦   +---lib
+¦   ¦               ¦   ¦   +---netstandard2.0
+¦   ¦               ¦   ¦           Microsoft.CognitiveServices.Speech.csharp.dll
+¦   ¦               ¦   ¦           
+¦   ¦               ¦   +---native
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.core.dylib
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.extension.kws.ort.dylib
+¦   ¦               ¦           
+¦   ¦               +---osx-x64
+¦   ¦               ¦   +---lib
+¦   ¦               ¦   ¦   +---netstandard2.0
+¦   ¦               ¦   ¦           Microsoft.CognitiveServices.Speech.csharp.dll
+¦   ¦               ¦   ¦           
+¦   ¦               ¦   +---native
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.core.dylib
+¦   ¦               ¦           libMicrosoft.CognitiveServices.Speech.extension.kws.ort.dylib
+¦   ¦               ¦           
+¦   ¦               +---win-arm
+¦   ¦               ¦   +---native
+¦   ¦               ¦           Microsoft.CognitiveServices.Speech.core.dll
+¦   ¦               ¦           Microsoft.CognitiveServices.Speech.extension.audio.sys.dll
+¦   ¦               ¦           Microsoft.CognitiveServices.Speech.extension.lu.dll
+¦   ¦               ¦           
+¦   ¦               +---win-arm64
+¦   ¦               ¦   +---native
+¦   ¦               ¦           Microsoft.CognitiveServices.Speech.core.dll
+¦   ¦               ¦           Microsoft.CognitiveServices.Speech.extension.audio.sys.dll
+¦   ¦               ¦           Microsoft.CognitiveServices.Speech.extension.kws.dll
+¦   ¦               ¦           Microsoft.CognitiveServices.Speech.extension.kws.ort.dll
+¦   ¦               ¦           Microsoft.CognitiveServices.Speech.extension.lu.dll
+¦   ¦               ¦           
+¦   ¦               +---win-x64
+¦   ¦               ¦   +---native
+¦   ¦               ¦           Microsoft.CognitiveServices.Speech.core.dll
+¦   ¦               ¦           Microsoft.CognitiveServices.Speech.extension.audio.sys.dll
+¦   ¦               ¦           Microsoft.CognitiveServices.Speech.extension.codec.dll
+¦   ¦               ¦           Microsoft.CognitiveServices.Speech.extension.kws.dll
+¦   ¦               ¦           Microsoft.CognitiveServices.Speech.extension.kws.ort.dll
+¦   ¦               ¦           Microsoft.CognitiveServices.Speech.extension.lu.dll
+¦   ¦               ¦           
+¦   ¦               +---win-x86
+¦   ¦                   +---native
+¦   ¦                           Microsoft.CognitiveServices.Speech.core.dll
+¦   ¦                           Microsoft.CognitiveServices.Speech.extension.audio.sys.dll
+¦   ¦                           Microsoft.CognitiveServices.Speech.extension.codec.dll
+¦   ¦                           Microsoft.CognitiveServices.Speech.extension.kws.dll
+¦   ¦                           Microsoft.CognitiveServices.Speech.extension.kws.ort.dll
+¦   ¦                           Microsoft.CognitiveServices.Speech.extension.lu.dll
+¦   ¦                           
+¦   +---Controllers
+¦   ¦       AccountController.cs
+¦   ¦       AssessmentMatrixController.cs
+¦   ¦       AudioController.cs
+¦   ¦       BooksController.cs
+¦   ¦       BranchController.cs
+¦   ¦       ContactController.cs
+¦   ¦       CorporateController.cs
+¦   ¦       CountingTestContentController.cs
+¦   ¦       CountingTestController.cs
+¦   ¦       CourseController.cs
+¦   ¦       CourseSubjectController.cs
+¦   ¦       CourseTeacherController.cs
+¦   ¦       DailyAssessmentController.cs
+¦   ¦       EmployeeController.cs
+¦   ¦       FeePackageController.cs
+¦   ¦       FeePackageMasterController.cs
+¦   ¦       FeeStructureController.cs
+¦   ¦       FeeTransactionsController.cs
+¦   ¦       GeneticController.cs
+¦   ¦       GenresController.cs
+¦   ¦       GradeController.cs
+¦   ¦       InstitutionController.cs
+¦   ¦       ItemBranchController.cs
+¦   ¦       ItemCategoryController.cs
+¦   ¦       ItemController.cs
+¦   ¦       ItemHeaderController.cs
+¦   ¦       ItemLocationController.cs
+¦   ¦       ItemsController.cs
+¦   ¦       ItemSupplierController.cs
+¦   ¦       LibraryTransactionController.cs
+¦   ¦       MasterController.cs
+¦   ¦       MasterTypeController.cs
+¦   ¦       OrderController.cs
+¦   ¦       OrderItemController.cs
+¦   ¦       ParentStudentsController.cs
+¦   ¦       PeriodController.cs
+¦   ¦       PhoneLogController.cs
+¦   ¦       PostalDeliveriesController.cs
+¦   ¦       PostalDeliveryItemsController.cs
+¦   ¦       PosTransactionDetailController.cs
+¦   ¦       PosTransactionMasterController.cs
+¦   ¦       PrefixSuffixController.cs
+¦   ¦       PublicHolidayController.cs
+¦   ¦       StudentAttendanceController.cs
+¦   ¦       StudentController.cs
+¦   ¦       StudentEnquiryController.cs
+¦   ¦       StudentRegistrationController.cs
+¦   ¦       SubjectController.cs
+¦   ¦       SupplierBranchController.cs
+¦   ¦       SupplierController.cs
+¦   ¦       TermController.cs
+¦   ¦       TestContentController.cs
+¦   ¦       TestController.cs
+¦   ¦       TestResultController.cs
+¦   ¦       TimeTableAssessmentController.cs
+¦   ¦       TimeTableController.cs
+¦   ¦       TimeTableDetailController.cs
+¦   ¦       TimeTableTopicsController.cs
+¦   ¦       TimeTableWorksheetController.cs
+¦   ¦       TopicController.cs
+¦   ¦       TransactionController.cs
+¦   ¦       VisitorController.cs
+¦   ¦       VTermTableController.cs
+¦   ¦       VwComprehensiveController.cs
+¦   ¦       VwTermPlanDetailsViewController.cs
+¦   ¦       WeekController.cs
+¦   ¦       WorkSheetController.cs
+¦   ¦       
+¦   +---Data
+¦   ¦       SchoolManagementDb.cs
+¦   ¦       
+¦   +---Model
+¦   ¦       MAccount.cs
+¦   ¦       MAssessment.cs
+¦   ¦       MAssessmentSkill.cs
+¦   ¦       MBook.cs
+¦   ¦       MBranch.cs
+¦   ¦       MContact.cs
+¦   ¦       MCorporate.cs
+¦   ¦       MCountingTestContent.cs
+¦   ¦       MCourse.cs
+¦   ¦       MCourseSubject.cs
+¦   ¦       MCourseTeacher.cs
+¦   ¦       MDailyAssessment.cs
+¦   ¦       MEmployee.cs
+¦   ¦       MFeePackage.cs
+¦   ¦       MFeePackageMaster.cs
+¦   ¦       MFeeStructure.cs
+¦   ¦       MFeeTransactions.cs
+¦   ¦       MGenere.cs
+¦   ¦       MGeneticRegistration.cs
+¦   ¦       MGrade.cs
+¦   ¦       MImage.cs
+¦   ¦       MInstitution.cs
+¦   ¦       MItem.cs
+¦   ¦       MItemBranch.cs
+¦   ¦       MItemCategory.cs
+¦   ¦       MItemHeader.cs
+¦   ¦       MItemLocation.cs
+¦   ¦       MItems.cs
+¦   ¦       MItemsGroup.cs
+¦   ¦       MItemsImage.cs
+¦   ¦       MItemSupplier.cs
+¦   ¦       MLibBookRecord.cs
+¦   ¦       MLibraryTransaction.cs
+¦   ¦       MMaster.cs
+¦   ¦       MMasterType.cs
+¦   ¦       MOrderItem.cs
+¦   ¦       MOrders.cs
+¦   ¦       MParent.cs
+¦   ¦       MParentStudent.cs
+¦   ¦       MPeriod.cs
+¦   ¦       MPhoneLog.cs
+¦   ¦       MPostalDeliveries.cs
+¦   ¦       MPostalDeliveryItems.cs
+¦   ¦       MPosTransactionDetails.cs
+¦   ¦       MPosTransactionMaster.cs
+¦   ¦       MPrefixSuffix.cs
+¦   ¦       MPublicHoliday.cs
+¦   ¦       MStudent.cs
+¦   ¦       MStudentAttendance.cs
+¦   ¦       MStudentCourse.cs
+¦   ¦       MStudentRegistration.cs
+¦   ¦       MStudentRegistrationMedical.cs
+¦   ¦       MStudentRegistrationOther.cs
+¦   ¦       MStudentsEnquiry.cs
+¦   ¦       MSubject.cs
+¦   ¦       MSupplier.cs
+¦   ¦       MSupplierBranch.cs
+¦   ¦       MTableFiles.cs
+¦   ¦       MTerm.cs
+¦   ¦       MTest.cs
+¦   ¦       MTestContent.cs
+¦   ¦       MTestResult.cs
+¦   ¦       MTimeTable.cs
+¦   ¦       MTimeTableAssessment.cs
+¦   ¦       MTimeTableDetail.cs
+¦   ¦       MTimeTableTopic.cs
+¦   ¦       MTimeTableWorksheet.cs
+¦   ¦       MTopic.cs
+¦   ¦       MTransaction.cs
+¦   ¦       MUtilitiesList.cs
+¦   ¦       MVisitor.cs
+¦   ¦       MVTermTable.cs
+¦   ¦       MVTimeTable.cs
+¦   ¦       MVwComprehensiveTimeTable.cs
+¦   ¦       MVwTermPlanDetails.cs
+¦   ¦       MWeek.cs
+¦   ¦       MWorksheet.cs
+¦   ¦       
+¦   +---obj
+¦   ¦   ¦   project.assets.json
+¦   ¦   ¦   project.nuget.cache
+¦   ¦   ¦   SchoolManagement.csproj.nuget.dgspec.json
+¦   ¦   ¦   SchoolManagement.csproj.nuget.g.props
+¦   ¦   ¦   SchoolManagement.csproj.nuget.g.targets
+¦   ¦   ¦   
+¦   ¦   +---Debug
+¦   ¦       +---net8.0
+¦   ¦           ¦   .NETCoreApp,Version=v8.0.AssemblyAttributes.cs
+¦   ¦           ¦   ApiEndpoints.json
+¦   ¦           ¦   apphost.exe
+¦   ¦           ¦   rjimswa.dswa.cache.json
+¦   ¦           ¦   rjsmcshtml.dswa.cache.json
+¦   ¦           ¦   rjsmrazor.dswa.cache.json
+¦   ¦           ¦   rpswa.dswa.cache.json
+¦   ¦           ¦   SchoolMa.86B6095E.Up2Date
+¦   ¦           ¦   SchoolManagement.AssemblyInfo.cs
+¦   ¦           ¦   SchoolManagement.AssemblyInfoInputs.cache
+¦   ¦           ¦   SchoolManagement.assets.cache
+¦   ¦           ¦   SchoolManagement.csproj.AssemblyReference.cache
+¦   ¦           ¦   SchoolManagement.csproj.BuildWithSkipAnalyzers
+¦   ¦           ¦   SchoolManagement.csproj.CoreCompileInputs.cache
+¦   ¦           ¦   SchoolManagement.csproj.FileListAbsolute.txt
+¦   ¦           ¦   SchoolManagement.dll
+¦   ¦           ¦   SchoolManagement.GeneratedMSBuildEditorConfig.editorconfig
+¦   ¦           ¦   SchoolManagement.genruntimeconfig.cache
+¦   ¦           ¦   SchoolManagement.GlobalUsings.g.cs
+¦   ¦           ¦   SchoolManagement.MvcApplicationPartsAssemblyInfo.cache
+¦   ¦           ¦   SchoolManagement.MvcApplicationPartsAssemblyInfo.cs
+¦   ¦           ¦   SchoolManagement.pdb
+¦   ¦           ¦   SchoolManagement.sourcelink.json
+¦   ¦           ¦   staticwebassets.build.endpoints.json
+¦   ¦           ¦   staticwebassets.build.json
+¦   ¦           ¦   staticwebassets.build.json.cache
+¦   ¦           ¦   staticwebassets.development.json
+¦   ¦           ¦   staticwebassets.references.upToDateCheck.txt
+¦   ¦           ¦   staticwebassets.removed.txt
+¦   ¦           ¦   staticwebassets.upToDateCheck.txt
+¦   ¦           ¦   
+¦   ¦           +---EndpointInfo
+¦   ¦           ¦       SchoolManagement.json
+¦   ¦           ¦       SchoolManagement.OpenApiFiles.cache
+¦   ¦           ¦       
+¦   ¦           +---ref
+¦   ¦           ¦       SchoolManagement.dll
+¦   ¦           ¦       
+¦   ¦           +---refint
+¦   ¦           ¦       SchoolManagement.dll
+¦   ¦           ¦       
+¦   ¦           +---staticwebassets
+¦   +---Properties
+¦   ¦       launchSettings.json
+¦   ¦       
+¦   +---Response
+¦   ¦       ResponseResult.cs
+¦   ¦       
+¦   +---Services
+¦   ¦   +---Implementation
+¦   ¦   ¦       AccountServiceImpl.cs
+¦   ¦   ¦       AiPronounciationHelper.cs
+¦   ¦   ¦       AssessmentMatrixService.cs
+¦   ¦   ¦       AudioTranscriptionServiceImpl.cs
+¦   ¦   ¦       BooksServiceImpl.cs
+¦   ¦   ¦       BranchServiceImpl.cs
+¦   ¦   ¦       ContactServiceImpl.cs
+¦   ¦   ¦       CorporateServiceImpl.cs
+¦   ¦   ¦       CountingTestContentImpl.cs
+¦   ¦   ¦       CountingTestServiceImpl.cs
+¦   ¦   ¦       CourseServiceImpl.cs
+¦   ¦   ¦       CourseSubjectServiceImpl.cs
+¦   ¦   ¦       CourseTeacherServiceImpl.cs
+¦   ¦   ¦       DailyAssessmentServiceImpl.cs
+¦   ¦   ¦       EmployeeServiceImpl.cs
+¦   ¦   ¦       FeePackageMasterServiceImpl.cs
+¦   ¦   ¦       FeePackageServiceImpl.cs
+¦   ¦   ¦       FeeStructureServiceImpl.cs
+¦   ¦   ¦       FeeTransactionsServiceImpl.cs
+¦   ¦   ¦       GeneticRegistrationServiceImpl.cs
+¦   ¦   ¦       GenresServiceImpl.cs
+¦   ¦   ¦       GradeServiceImpl.cs
+¦   ¦   ¦       InstitutionServiceImpl.cs
+¦   ¦   ¦       ItemBranchServiceImpl.cs
+¦   ¦   ¦       ItemCategoryServiceImpl.cs
+¦   ¦   ¦       ItemHeaderServiceImpl.cs
+¦   ¦   ¦       ItemLocationServiceImpl.cs
+¦   ¦   ¦       ItemServiceImpl.cs
+¦   ¦   ¦       ItemsServiceImpl.cs
+¦   ¦   ¦       ItemSupplierServiceImpl.cs
+¦   ¦   ¦       LibraryTransactionServiceImpl.cs
+¦   ¦   ¦       MasterServiceImpl.cs
+¦   ¦   ¦       MasterTypeServiceImpl.cs
+¦   ¦   ¦       OrderItemServiceImpl.cs
+¦   ¦   ¦       OrderServiceImpl.cs
+¦   ¦   ¦       ParentStudentsServiceImpl.cs
+¦   ¦   ¦       PeriodServiceImpl.cs
+¦   ¦   ¦       PhoneLogServiceImpl.cs
+¦   ¦   ¦       PostalDeliveriesServiceImpl.cs
+¦   ¦   ¦       PostalDeliveryItemsServiceImpl.cs
+¦   ¦   ¦       PosTransactionDetailServiceImpl.cs
+¦   ¦   ¦       PosTransactionMasterServiceImpl.cs
+¦   ¦   ¦       PrefixSuffixServiceImpl.cs
+¦   ¦   ¦       PublicHolidayServiceImpl.cs
+¦   ¦   ¦       StudentAttendanceServiceImpl.cs
+¦   ¦   ¦       StudentEnquiryImpl.cs
+¦   ¦   ¦       StudentRegistrationImpl.cs
+¦   ¦   ¦       StudentServiceImpl.cs
+¦   ¦   ¦       SubjectServiceImpl.cs
+¦   ¦   ¦       SupplierBranchImpl.cs
+¦   ¦   ¦       SupplierServiceImpl.cs
+¦   ¦   ¦       TermServiceImpl.cs
+¦   ¦   ¦       TestContentServiceImpl.cs
+¦   ¦   ¦       TestResultServiceImpl.cs
+¦   ¦   ¦       TestServiceImpl.cs
+¦   ¦   ¦       TimeTableAssessmentServiceImpl.cs
+¦   ¦   ¦       TimeTableDetailServiceImpl.cs
+¦   ¦   ¦       TimeTableServiceImpl.cs
+¦   ¦   ¦       TimeTableTopicsServiceImpl.cs
+¦   ¦   ¦       TimeTableWorksheetServiceImpl.cs
+¦   ¦   ¦       TopicServiceImpl.cs
+¦   ¦   ¦       TransactionServiceImpl.cs
+¦   ¦   ¦       UtilitiesServiceImpl.cs
+¦   ¦   ¦       VisitorServiceImpl.cs
+¦   ¦   ¦       VTermTableServiceImpl.cs
+¦   ¦   ¦       VwComprehensiveTimeTablesService.cs
+¦   ¦   ¦       VwTermPlanDetailsViewServiceImpl.cs
+¦   ¦   ¦       WeekServiceImpl.cs
+¦   ¦   ¦       WorkSheetServiceImpl.cs
+¦   ¦   ¦       
+¦   ¦   +---Interface
+¦   ¦           IAccountService.cs
+¦   ¦           IApiKeyService.cs
+¦   ¦           IAssessmentMatrixService'.cs
+¦   ¦           IAudioTranscriptionService.cs
+¦   ¦           IBooksService.cs
+¦   ¦           IBranchService.cs
+¦   ¦           IContactService.cs
+¦   ¦           ICorporateService.cs
+¦   ¦           ICountingTestContentService.cs
+¦   ¦           ICountingTestInterface.cs
+¦   ¦           ICourseService.cs
+¦   ¦           ICourseSubjectService.cs
+¦   ¦           ICourseTeacherService.cs
+¦   ¦           IDailyAssessmentService.cs
+¦   ¦           IEmployeeService.cs
+¦   ¦           IFeePackage.cs
+¦   ¦           IFeePackageMaster.cs
+¦   ¦           IFeeStructure.cs
+¦   ¦           IFeeTransactions.cs
+¦   ¦           IGeneticRegistrationService.cs
+¦   ¦           IGenreService.cs
+¦   ¦           IGradeService.cs
+¦   ¦           IInstitutionService.cs
+¦   ¦           IItemBranchService.cs
+¦   ¦           IItemCategoryService.cs
+¦   ¦           IItemHeaderService.cs
+¦   ¦           IItemLocationService.cs
+¦   ¦           IItemService.cs
+¦   ¦           IItemsService.cs
+¦   ¦           IItemSupplierService.cs
+¦   ¦           ILibraryTransactionsService.cs
+¦   ¦           IMasterService.cs
+¦   ¦           IMasterTypeService.cs
+¦   ¦           IMVTermTableService.cs
+¦   ¦           IOrderItemService.cs
+¦   ¦           IOrders.cs
+¦   ¦           IParentStudentsService.cs
+¦   ¦           IPeriodService.cs
+¦   ¦           IPhoneLogService.cs
+¦   ¦           IPostalDeliveriesService.cs
+¦   ¦           IPostalDeliveryItemsService.cs
+¦   ¦           IPosTransactionDetailService.cs
+¦   ¦           IPosTransactionMasterService.cs
+¦   ¦           IPrefixSuffixService.cs
+¦   ¦           IPublicHolidayService.cs
+¦   ¦           IStudentAttendanceService.cs
+¦   ¦           IStudentRegistration.cs
+¦   ¦           IStudentsEnquiry.cs
+¦   ¦           IStudentService.cs
+¦   ¦           ISubjectService.cs
+¦   ¦           ISupplierBranchService.cs
+¦   ¦           ITermService.cs
+¦   ¦           ITestResultService.cs
+¦   ¦           ITestService.cs
+¦   ¦           ITimeTableAssessmentService.cs
+¦   ¦           ITimeTableDetailService.cs
+¦   ¦           ITimeTableServices.cs
+¦   ¦           ITimeTableTopicsService.cs
+¦   ¦           ITimeTableWorksheetService.cs
+¦   ¦           ITopicService.cs
+¦   ¦           ITransactionService.cs
+¦   ¦           IUtilitesService.cs
+¦   ¦           IVwComprehensiveTimeTablesService.cs
+¦   ¦           IVwTermPlanDetailsService.cs
+¦   ¦           IWeekService.cs
+¦   ¦           IWorkSheetService.cs
+¦   ¦           SupplierInterface.cs
+¦   ¦           TestContentInterface.cs
+¦   ¦           VisitorInterface.cs
+¦   ¦           
+¦   +---SqlQueries_db
+¦   ¦   +---select
+¦   ¦           table_info_pk_fk.sql
+¦   ¦           
+¦   +---ViewModel
+¦   ¦   ¦   MasterTypes.cs
+¦   ¦   ¦   
+¦   ¦   +---Account
+¦   ¦   ¦       AccountRequestVM.cs
+¦   ¦   ¦       AccountResponseVM.cs
+¦   ¦   ¦       AccountUpdateVM.cs
+¦   ¦   ¦       
+¦   ¦   +---Audio
+¦   ¦   ¦       ApiKeys.cs
+¦   ¦   ¦       ApiKeyService.cs
+¦   ¦   ¦       ImageDb.cs
+¦   ¦   ¦       PronouncationResponseVM.cs
+¦   ¦   ¦       StudentResultVM.cs
+¦   ¦   ¦       
+¦   ¦   +---Book
+¦   ¦   ¦       BookRequestVM.cs
+¦   ¦   ¦       BookResponseVM.cs
+¦   ¦   ¦       BookUpdateVM.cs
+¦   ¦   ¦       
+¦   ¦   +---Branch
+¦   ¦   ¦       BranchDropDownOptionVm.cs
+¦   ¦   ¦       BranchRequestVM.cs
+¦   ¦   ¦       BranchResponseVM.cs
+¦   ¦   ¦       BranchUpdateVM.cs
+¦   ¦   ¦       
+¦   ¦   +---Contact
+¦   ¦   ¦       ContactRequestVM.cs
+¦   ¦   ¦       ContactResponseVM.cs
+¦   ¦   ¦       ContactUpdateVM.cs
+¦   ¦   ¦       
+¦   ¦   +---Corporate
+¦   ¦   ¦       CorporateVM.cs
+¦   ¦   ¦       
+¦   ¦   +---CountingTest
+¦   ¦   ¦       CountingResponseVM.cs
+¦   ¦   ¦       
+¦   ¦   +---CountingTestContent
+¦   ¦   ¦       CountingTestContentRequestVM.cs
+¦   ¦   ¦       CountingTestContentRespounceVM.cs
+¦   ¦   ¦       
+¦   ¦   +---Course
+¦   ¦   ¦       CourseCreateVm.cs
+¦   ¦   ¦       CourseDropDownOptionsVm.cs
+¦   ¦   ¦       CourseUpdateVm.cs
+¦   ¦   ¦       CourseVm.cs
+¦   ¦   ¦       
+¦   ¦   +---CourseSubject
+¦   ¦   ¦       CourseSubjectRequestVM.cs
+¦   ¦   ¦       CourseSubjectResponseVM.cs
+¦   ¦   ¦       CourseSubjectUpdateVM.cs
+¦   ¦   ¦       
+¦   ¦   +---CourseTeacher
+¦   ¦   ¦       CourseTeacherRequestVM.cs
+¦   ¦   ¦       CourseTeacherResponseVM.cs
+¦   ¦   ¦       CourseTeacherUpdateVM.cs
+¦   ¦   ¦       CourseTeacherVM.cs
+¦   ¦   ¦       
+¦   ¦   +---DailyAssessment
+¦   ¦   ¦       AssessmentMatrixResponseVM.cs
+¦   ¦   ¦       DailyAssessment.cs
+¦   ¦   ¦       DailyAssessmentPerfomanceSummaryResponse.cs
+¦   ¦   ¦       DailyAssessmentRequestVm.cs
+¦   ¦   ¦       DailyAssessmentResponseVm.cs
+¦   ¦   ¦       DailyAssessmentUpdateVm.cs
+¦   ¦   ¦       SaveAssessmentMatrixRequestVm.cs
+¦   ¦   ¦       StudentGradeEntry.cs
+¦   ¦   ¦       StudentPerformanceDashboard.cs
+¦   ¦   ¦       SubmitAssessmentGradesRequest.cs
+¦   ¦   ¦       UpdateGradeRequestVm.cs
+¦   ¦   ¦       UpdateGradeResponseVm.cs
+¦   ¦   ¦       
+¦   ¦   +---Employee
+¦   ¦   ¦       EmployeeRequestVM.cs
+¦   ¦   ¦       EmployeeResponseVM.cs
+¦   ¦   ¦       EmployeeUpdateVM.cs
+¦   ¦   ¦       
+¦   ¦   +---FeePackage
+¦   ¦   ¦       FeePackageGroupVM.cs
+¦   ¦   ¦       FeePackageListVM.cs
+¦   ¦   ¦       FeePackageRequestVM.cs
+¦   ¦   ¦       FeePackageResponseVM.cs
+¦   ¦   ¦       
+¦   ¦   +---FeePackageMaster
+¦   ¦   ¦       FeePackageMasterRequestVM.cs
+¦   ¦   ¦       FeePackageMasterResponseVM.cs
+¦   ¦   ¦       
+¦   ¦   +---FeeStructure
+¦   ¦   ¦       FeeStructureRequestVM.cs
+¦   ¦   ¦       FeeStructureResponseVM.cs
+¦   ¦   ¦       
+¦   ¦   +---FeeTransactions
+¦   ¦   ¦       BuildFeeTransactionsRequest.cs
+¦   ¦   ¦       FeeReportTransactionVM.cs
+¦   ¦   ¦       FeeTransactionResultVM.cs
+¦   ¦   ¦       
+¦   ¦   +---GeneticRegistration
+¦   ¦   ¦       GeneticRegistrationRequestVM.cs
+¦   ¦   ¦       GeneticRegistrationResponseVM.cs
+¦   ¦   ¦       
+¦   ¦   +---Genres
+¦   ¦   ¦       GenresResponseVM.cs
+¦   ¦   ¦       
+¦   ¦   +---Grade
+¦   ¦   ¦       GraderequestVM.cs
+¦   ¦   ¦       GradeResponseVM.cs
+¦   ¦   ¦       GradeUpdateVM.cs
+¦   ¦   ¦       
+¦   ¦   +---institutions
+¦   ¦   ¦       InstitutionCreateRequestVM.cs
+¦   ¦   ¦       InstitutionResponseVM.cs
+¦   ¦   ¦       InstitutionUpdateRequestVM.cs
+¦   ¦   ¦       InstitutionWithContactResponseVM.cs
+¦   ¦   ¦       InstitutionWithContactVM.cs
+¦   ¦   ¦       
+¦   ¦   +---Item
+¦   ¦   ¦       ItemRequestVM.cs
+¦   ¦   ¦       ItemVM.cs
+¦   ¦   ¦       UpdateItemVM.cs
+¦   ¦   ¦       
+¦   ¦   +---ItemBranch
+¦   ¦   ¦       ItemBranchRequestVM.cs
+¦   ¦   ¦       ItemBranchResponseVM.cs
+¦   ¦   ¦       ItemBranchUpdateVM.cs
+¦   ¦   ¦       
+¦   ¦   +---ItemCategory
+¦   ¦   ¦       ItemCategoryRequestVM.cs
+¦   ¦   ¦       ItemCategoryResponseVM.cs
+¦   ¦   ¦       ItemCategoryUpdateVM.cs
+¦   ¦   ¦       
+¦   ¦   +---ItemHeader
+¦   ¦   ¦       ItemHeaderRequestVM.cs
+¦   ¦   ¦       ItemHeaderResponseVM.cs
+¦   ¦   ¦       ItemHeaderVM.cs
+¦   ¦   ¦       
+¦   ¦   +---ItemLocation
+¦   ¦   ¦       ItemLocationRequestVM.cs
+¦   ¦   ¦       ItemLocationResponseVM.cs
+¦   ¦   ¦       ItemLocationUpdateVM.cs
+¦   ¦   ¦       
+¦   ¦   +---Items
+¦   ¦   ¦       ItemInsertVM.cs
+¦   ¦   ¦       ItemsRequestVM.cs
+¦   ¦   ¦       ItemsResponse.cs
+¦   ¦   ¦       ItemsResponseVM.cs
+¦   ¦   ¦       ItemsUpdateVM.cs
+¦   ¦   ¦       ItemWithGroupResponseVM.cs
+¦   ¦   ¦       
+¦   ¦   +---ItemSupplier
+¦   ¦   ¦       ItemSupplierCreateVM.cs
+¦   ¦   ¦       ItemSupplierRequestVM.cs
+¦   ¦   ¦       ItemSupplierResponseVM.cs
+¦   ¦   ¦       ItemSupplierVM.cs
+¦   ¦   ¦       
+¦   ¦   +---LibraryTransctions
+¦   ¦   ¦       LibraryTransactionRequestVM.cs
+¦   ¦   ¦       LibraryTransactionResponseVM.cs
+¦   ¦   ¦       LibraryTransactionUpdateVM.cs
+¦   ¦   ¦       
+¦   ¦   +---Master
+¦   ¦   ¦       MasterRequestVM.cs
+¦   ¦   ¦       MasterResponseVM.cs
+¦   ¦   ¦       MasterUpdateVM.cs
+¦   ¦   ¦       
+¦   ¦   +---MasterType
+¦   ¦   ¦       MasterTypeRequestVM.cs
+¦   ¦   ¦       MasterTypeResponseVM.cs
+¦   ¦   ¦       MasterTypeUpdateVM.cs
+¦   ¦   ¦       
+¦   ¦   +---OrderItem
+¦   ¦   ¦       OrderItemRequestVM.cs
+¦   ¦   ¦       OrderItemResponseVM.cs
+¦   ¦   ¦       OrderItemUpdateVM.cs
+¦   ¦   ¦       
+¦   ¦   +---Orders
+¦   ¦   ¦       OrderCreateVM.cs
+¦   ¦   ¦       OrderRequestVM.cs
+¦   ¦   ¦       OrderResponseVM.cs
+¦   ¦   ¦       OrdersVM.cs
+¦   ¦   ¦       
+¦   ¦   +---ParentStudents
+¦   ¦   ¦       ParentStudentRequestVM.cs
+¦   ¦   ¦       ParentStudentResponseVM.cs
+¦   ¦   ¦       ParentStudentUpdateVM.cs
+¦   ¦   ¦       ParentWithStudentsResponseVM.cs
+¦   ¦   ¦       
+¦   ¦   +---Period
+¦   ¦   ¦       PeriodDataVmRaw.cs
+¦   ¦   ¦       PeriodInserVm.cs
+¦   ¦   ¦       PeriodRequestVM.cs
+¦   ¦   ¦       PeriodResponseVM.cs
+¦   ¦   ¦       PeriodUpdateVM.cs
+¦   ¦   ¦       
+¦   ¦   +---PhoneLog
+¦   ¦   ¦       PhoneLogCreateVM.cs
+¦   ¦   ¦       PhoneLogRequestVM.cs
+¦   ¦   ¦       PhoneLogResponseVM.cs
+¦   ¦   ¦       PhoneLogUpdateVM.cs
+¦   ¦   ¦       PhoneLogVM.cs
+¦   ¦   ¦       
+¦   ¦   +---PostalDeliveries
+¦   ¦   ¦       PostalDeliveriesRequestVM.cs
+¦   ¦   ¦       PostalDeliveriesResponseVM.cs
+¦   ¦   ¦       
+¦   ¦   +---PostalDeliveryItems
+¦   ¦   ¦       PostalDeliveryItemsRequestVM.cs
+¦   ¦   ¦       PostalDeliveryItemsResponseVM.cs
+¦   ¦   ¦       
+¦   ¦   +---PosTransactionDetail
+¦   ¦   ¦       PosInvoiceVM.cs
+¦   ¦   ¦       PosTransactionDetailResponseVM.cs
+¦   ¦   ¦       
+¦   ¦   +---PosTransactionMaster
+¦   ¦   ¦       PosItem.cs
+¦   ¦   ¦       PosTransactionMasterRequestVM.cs
+¦   ¦   ¦       PosTransactionMasterResponseVM.cs
+¦   ¦   ¦       
+¦   ¦   +---PrefixSuffix
+¦   ¦   ¦       PrefixSuffixRequestVM.cs
+¦   ¦   ¦       PrefixSuffixResponseVM.cs
+¦   ¦   ¦       PrefixSuffixUpdateVM.cs
+¦   ¦   ¦       
+¦   ¦   +---PublicHoliday
+¦   ¦   ¦       PublicHolidayRequestVM.cs
+¦   ¦   ¦       PublicHolidayResponseVM.cs
+¦   ¦   ¦       
+¦   ¦   +---Student
+¦   ¦   ¦       SRStudentRegistrationResponseVM.cs
+¦   ¦   ¦       StudenListVM.cs
+¦   ¦   ¦       StudentCourseTenantVm.cs
+¦   ¦   ¦       StudentFilterResponseVM.cs
+¦   ¦   ¦       StudentregistratioRequestVM.cs
+¦   ¦   ¦       StudentRequestVM.cs
+¦   ¦   ¦       StudentResponseVM.cs
+¦   ¦   ¦       StudentsData.cs
+¦   ¦   ¦       StudentUpdateVM.cs
+¦   ¦   ¦       StudentVM.cs
+¦   ¦   ¦       VStudentPerformanceChartVM.cs
+¦   ¦   ¦       VStudentPerformanceVM.cs
+¦   ¦   ¦       
+¦   ¦   +---StudentAttendance
+¦   ¦   ¦       SaveAttendanceRequestVm.cs
+¦   ¦   ¦       StudentAttendanceGraphVM.cs
+¦   ¦   ¦       StudentAttendanceRequestVM.cs
+¦   ¦   ¦       StudentAttendanceResponseVm.cs
+¦   ¦   ¦       StudentAttendanceSummaryVm.cs
+¦   ¦   ¦       StudentAttendanceUpdateVM.cs
+¦   ¦   ¦       
+¦   ¦   +---StudentRegistration
+¦   ¦   ¦       StudentRegistrationCreateVM.cs
+¦   ¦   ¦       StudentRegistrationResponseVM.cs
+¦   ¦   ¦       
+¦   ¦   +---StudentRegistrationMedical
+¦   ¦   ¦       StudentRegistrationMedicalRequestVM.cs
+¦   ¦   ¦       StudentRegistrationMedicalResponseVM.cs
+¦   ¦   ¦       
+¦   ¦   +---StudentRegistrationOther
+¦   ¦   ¦       StudentRegistrationOtherRequestVM.cs
+¦   ¦   ¦       StudentRegistrationOtherResponseVM.cs
+¦   ¦   ¦       
+¦   ¦   +---StudentsEnquiry
+¦   ¦   ¦       StudentEnquiryDisplay.cs
+¦   ¦   ¦       StudentEnquiryRequestDataVM.cs
+¦   ¦   ¦       StudentEnquiryResponseVM.cs
+¦   ¦   ¦       StudentEnquiryUpdateVM.cs
+¦   ¦   ¦       
+¦   ¦   +---Subject
+¦   ¦   ¦       SubjectRequestVM.cs
+¦   ¦   ¦       SubjectResponseVM.cs
+¦   ¦   ¦       SubjectUpdateVM.cs
+¦   ¦   ¦       
+¦   ¦   +---Supplier
+¦   ¦   ¦       SupplierCreateVM.cs
+¦   ¦   ¦       SupplierRequestVM.cs
+¦   ¦   ¦       SupplierResponseVM.cs
+¦   ¦   ¦       SupplierUpdateVM.cs
+¦   ¦   ¦       SupplierVM.cs
+¦   ¦   ¦       
+¦   ¦   +---SupplierBranch
+¦   ¦   ¦       SupplierBranchCreateVM.cs
+¦   ¦   ¦       SupplierBranchRequestVM.cs
+¦   ¦   ¦       SupplierBranchResponseVM.cs
+¦   ¦   ¦       SupplierBranchUpdateVM.cs
+¦   ¦   ¦       SupplierBranchVM.cs
+¦   ¦   ¦       
+¦   ¦   +---TableFile
+¦   ¦   ¦       MTableFileResponseVM.cs
+¦   ¦   ¦       TableFileResponse.cs
+¦   ¦   ¦       
+¦   ¦   +---Term
+¦   ¦   ¦       TermRequestVM.cs
+¦   ¦   ¦       TermResponseVM.cs
+¦   ¦   ¦       TermUpdateVM.cs
+¦   ¦   ¦       
+¦   ¦   +---Test
+¦   ¦   ¦       TestResponseVM.cs
+¦   ¦   ¦       
+¦   ¦   +---TestContent
+¦   ¦   ¦       TestContentResponseVM.cs
+¦   ¦   ¦       TestContentVM.cs
+¦   ¦   ¦       
+¦   ¦   +---TestResult
+¦   ¦   ¦       TestResponse.cs
+¦   ¦   ¦       TestResultRequestVM.cs
+¦   ¦   ¦       TestResultResponseVM.cs
+¦   ¦   ¦       
+¦   ¦   +---TimeTable
+¦   ¦   ¦       TimeTableData.cs
+¦   ¦   ¦       TimeTableDropDown.cs
+¦   ¦   ¦       TimeTableInsertTableOptionsVM.cs
+¦   ¦   ¦       TimeTableRequestVM.cs
+¦   ¦   ¦       TimeTableResponseVM.cs
+¦   ¦   ¦       TimeTableUpdateVM.cs
+¦   ¦   ¦       
+¦   ¦   +---TimeTableAssessment
+¦   ¦   ¦       TimeTableAssessmentRequestVM.cs
+¦   ¦   ¦       TimeTableAssessmentResponseVM.cs
+¦   ¦   ¦       TimeTableAssessmentUpdateVM.cs
+¦   ¦   ¦       
+¦   ¦   +---TimeTableDetail
+¦   ¦   ¦       TimeTableDetailInsertOptionsVM.cs
+¦   ¦   ¦       TimeTableDetailRequestVM.cs
+¦   ¦   ¦       TimeTableDetailResponseVM.cs
+¦   ¦   ¦       TimeTableDetailTableResponseVM.cs
+¦   ¦   ¦       TimeTableDetailUpdateVM.cs
+¦   ¦   ¦       
+¦   ¦   +---TimeTableTopics
+¦   ¦   ¦       TimeTableTopicDropWown.cs
+¦   ¦   ¦       TimeTableTopicRequestVM.cs
+¦   ¦   ¦       TimeTableTopicResponseVM.cs
+¦   ¦   ¦       TimeTableTopicsVM.cs
+¦   ¦   ¦       TimeTableTopicUpdateVM.cs
+¦   ¦   ¦       
+¦   ¦   +---TimeTableWorksheet
+¦   ¦   ¦       TimeTableWorksheetRequestVM.cs
+¦   ¦   ¦       TimeTableWorksheetResponseVM.cs
+¦   ¦   ¦       TimeTableWorksheetUpdateVM.cs
+¦   ¦   ¦       
+¦   ¦   +---Topic
+¦   ¦   ¦       TopicDetailVM.cs
+¦   ¦   ¦       TopicFullResponseVM.cs
+¦   ¦   ¦       TopicRequestVM.cs
+¦   ¦   ¦       TopicResponseVM.cs
+¦   ¦   ¦       TopicUpdateVM.cs
+¦   ¦   ¦       
+¦   ¦   +---Transcation
+¦   ¦   ¦       TransactionDetailVM.cs
+¦   ¦   ¦       TransactionGridVM.cs
+¦   ¦   ¦       TransactionRequestVM.cs
+¦   ¦   ¦       TransactionResponseVM.cs
+¦   ¦   ¦       TransactionResultVM.cs
+¦   ¦   ¦       UpdateTrxAmountRequestVM.cs
+¦   ¦   ¦       VTransactionRowVM.cs
+¦   ¦   ¦       VTransactionTableVM.cs
+¦   ¦   ¦       VTransactionVM.cs
+¦   ¦   ¦       
+¦   ¦   +---Utilites
+¦   ¦   ¦       UtilitesRequestVM.cs
+¦   ¦   ¦       UtilitesResponseVM.cs
+¦   ¦   ¦       
+¦   ¦   +---Visitors
+¦   ¦   ¦       VisitorCreateVM.cs
+¦   ¦   ¦       VisitorRequestVM.cs
+¦   ¦   ¦       VisitorResponseVM.cs
+¦   ¦   ¦       visitorsVM.cs
+¦   ¦   ¦       
+¦   ¦   +---VTimeTable
+¦   ¦   ¦       MVTermTableVM.cs
+¦   ¦   ¦       MVTermTableWeeklyMatrixVM.cs
+¦   ¦   ¦       TData.cs
+¦   ¦   ¦       WeeklyRow.cs
+¦   ¦   ¦       WeeklyTopicMatrixRow.cs
+¦   ¦   ¦       WeeklyTopicMatrixVM.cs
+¦   ¦   ¦       
+¦   ¦   +---VwComprehensiveTimeTables
+¦   ¦   ¦       VwComprehensiveTimeTableVM.cs
+¦   ¦   ¦       
+¦   ¦   +---VwTermPlanDetails
+¦   ¦   ¦       VwTermPlanDetailsViewModel.cs
+¦   ¦   ¦       
+¦   ¦   +---Week
+¦   ¦   ¦       WeekCreateVm.cs
+¦   ¦   ¦       WeekUpdateVm.cs
+¦   ¦   ¦       WeekVm.cs
+¦   ¦   ¦       
+¦   ¦   +---Worksheets
+¦   ¦           WorksheetRequestVM.cs
+¦   ¦           WorksheetResponseVM.cs
+¦   ¦           WorksheetUpdateVM.cs
+¦   ¦           
+¦   +---wwwroot
+¦       +---uploads
+¦           +---worksheets
+¦                   0285f2d6-24aa-4072-8763-a40944167d5e_SCH_Wk1_2024_NUR.pdf
+¦                   3a758b85-7661-4ced-8025-646713cf4413_SCH_Wk1_2024_NUR.pdf
+¦                   879a98fd-cb88-4398-bfc2-f3bf242c503f_1 MON_NUR_Wk1.pdf
+¦                   c3ecc0a1-42ac-4ec8-a36c-a7f6697df508_EYFS-Assessment.pdf
+¦                   
++---TemplateEngineHost
+¦   +---vs
+¦           .vstemplates.global.etag
+¦           .vstemplates.local
+¦           .vstemplates.local.etag
+¦           templatecache.json
+¦           
++---test
+    ¦   appsettings.Development.json
+    ¦   appsettings.json
+    ¦   Program.cs
+    ¦   test.csproj
+    ¦   test.http
+    ¦   WeatherForecast.cs
+    ¦   
+    +---Controllers
+    ¦       WeatherForecastController.cs
+    ¦       
+    +---Properties
+            launchSettings.json
+            

@@ -17,5 +17,8 @@ namespace NeuroPi.Nutrition.Services.Interface
         MealPlanMonitoringResponseVM UpdateMealPlanMonitoring(int id, int tenantId, MealPlanMonitoringUpdateVM updateVM);
 
         bool DeleteMealPlanMonitoring(int id,int tenantId);
+
+        MealPlan7daysCardVM Get7DaysMealPlanCard(int userId, int tenantId);
+
     }
 }
