@@ -50,5 +50,7 @@ namespace NeuroPi.Nutrition.ViewModel
         public int Qty { get; set; }
         public bool IsUpdated { get; set; }
         public bool IsInserted { get; set; }
+        public bool IsDeleted { get; set; }
+
     }
 }

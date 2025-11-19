@@ -22,6 +22,9 @@ namespace NeuroPi.Nutrition.Services.Interface
 
         SaveMealPlanResponseVM SaveMealPlan(SaveMealPlanVM model);
 
+        SaveMealPlanResponseVM EditMealPlan(SaveMealPlanVM model);
+
+
 
 
     }

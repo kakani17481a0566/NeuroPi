@@ -109,5 +109,15 @@ namespace NeuroPi.Nutrition.Controllers
                 HttpStatusCode.OK, result, "Meal Plan saved successfully");
         }
 
+        [HttpPost("edit-meal-plan")]
+        public ResponseResult<SaveMealPlanResponseVM> EditMealPlan([FromBody] SaveMealPlanVM request)
+        {
+            var result = _nutritionalItemService.EditMealPlan(request);
+            return new ResponseResult<SaveMealPlanResponseVM>(
+                HttpStatusCode.OK, result, "Meal Plan updated successfully");
+        }
+
+
+
     }
 }

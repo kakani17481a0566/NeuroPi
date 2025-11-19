@@ -28,7 +28,7 @@ namespace NeuroPi.Nutrition.Services.Implementation
         public bool DeleteNutritionalItem(int id, int tenantId)
         {
             var existingNutritionalItem = _context.NutritionalItems.FirstOrDefault(ni => ni.Id == id && ni.TenantId == tenantId && !ni.IsDeleted);
-            if (existingNutritionalItem == null) 
+            if (existingNutritionalItem == null)
             {
                 return false;
             }
@@ -266,8 +266,8 @@ namespace NeuroPi.Nutrition.Services.Implementation
 
         public List<NutritionalItemResponseVM> GetNutrionalItemByTenantId(int tenantId)
         {
-            var nutritionalItemList = _context.NutritionalItems.Where(ni=> ni.TenantId == tenantId).ToList();
-            if(nutritionalItemList == null || nutritionalItemList.Count ==0)
+            var nutritionalItemList = _context.NutritionalItems.Where(ni => ni.TenantId == tenantId).ToList();
+            if (nutritionalItemList == null || nutritionalItemList.Count == 0)
             {
                 return null;
             }
@@ -276,7 +276,7 @@ namespace NeuroPi.Nutrition.Services.Implementation
 
         public NutritionalItemResponseVM GetNutritionalItemByIdAndTenantId(int id, int tenantId)
         {
-            var nutritionItem = _context.NutritionalItems.FirstOrDefault(ni => ni.Id ==id &&ni.TenantId == tenantId && !ni.IsDeleted);
+            var nutritionItem = _context.NutritionalItems.FirstOrDefault(ni => ni.Id == id && ni.TenantId == tenantId && !ni.IsDeleted);
             if (nutritionItem == null)
             {
                 return null;
@@ -289,7 +289,7 @@ namespace NeuroPi.Nutrition.Services.Implementation
         public List<NutritionalItemResponseVM> GetNutritionalItemResponses()
         {
             var nutritionalItemList = _context.NutritionalItems.Where(ni => !ni.IsDeleted).ToList();
-            if(nutritionalItemList == null)
+            if (nutritionalItemList == null)
             {
                 return null;
             }
@@ -319,6 +319,7 @@ namespace NeuroPi.Nutrition.Services.Implementation
 
         }
 
+
         public SaveMealPlanResponseVM SaveMealPlan(SaveMealPlanVM request)
         {
             int userId = request.UserId;
@@ -332,27 +333,20 @@ namespace NeuroPi.Nutrition.Services.Implementation
                 Date = date
             };
 
-            // ============================================================
-            // 1. Load existing meal-plan for that user/date
-            // ============================================================
+            // 1️⃣ Load existing
             var existingPlans = _context.MealPlan
-                .Where(m => m.UserId == userId
-                            && m.TenantId == tenantId
-                            && m.Date == date
-                            && !m.IsDeleted)
+                .Where(m => m.UserId == userId &&
+                            m.TenantId == tenantId &&
+                            m.Date == date &&
+                            !m.IsDeleted)
                 .ToList();
 
-            // ============================================================
-            // 2. Convert request → Model list
-            // ============================================================
+            // 2️⃣ Convert incoming
             var incomingItems = request.ToModelList();
 
-            // ============================================================
-            // 3. Loop through each incoming item
-            // ============================================================
+            // 3️⃣ INSERT or UPDATE
             foreach (var item in incomingItems)
             {
-                // Find existing record with same mealType + nutritionalItem
                 var existing = existingPlans.FirstOrDefault(x =>
                     x.MealTypeId == item.MealTypeId &&
                     x.NutritionalItemId == item.NutritionalItemId
@@ -360,11 +354,9 @@ namespace NeuroPi.Nutrition.Services.Implementation
 
                 if (existing != null)
                 {
-                    // ------------------------------
-                    // UPDATE EXISTING
-                    // ------------------------------
+                    // UPDATE
                     existing.Quantity = item.Quantity;
-                    existing.UpdatedBy = request.UserId;
+                    existing.UpdatedBy = userId;
                     existing.UpdatedOn = DateTime.UtcNow;
 
                     response.SavedItems.Add(new SavedMealItemVM
@@ -372,15 +364,15 @@ namespace NeuroPi.Nutrition.Services.Implementation
                         MealTypeId = item.MealTypeId,
                         NutritionalItemId = item.NutritionalItemId,
                         Qty = item.Quantity,
-                        IsUpdated = true,
-                        IsInserted = false
+                        IsUpdated = true
                     });
                 }
                 else
                 {
-                    // ------------------------------
-                    // INSERT NEW
-                    // ------------------------------
+                    // INSERT
+                    item.CreatedBy = userId;
+                    item.CreatedOn = DateTime.UtcNow;
+
                     _context.MealPlan.Add(item);
 
                     response.SavedItems.Add(new SavedMealItemVM
@@ -388,18 +380,114 @@ namespace NeuroPi.Nutrition.Services.Implementation
                         MealTypeId = item.MealTypeId,
                         NutritionalItemId = item.NutritionalItemId,
                         Qty = item.Quantity,
-                        IsInserted = true,
-                        IsUpdated = false
+                        IsInserted = true
                     });
                 }
             }
 
-            // ============================================================
-            // 4. SAVE ALL CHANGES
-            // ============================================================
+            // 4️⃣ Save changes
             _context.SaveChanges();
-
             return response;
         }
+
+
+        public SaveMealPlanResponseVM EditMealPlan(SaveMealPlanVM model)
+        {
+            int userId = model.UserId;
+            int tenantId = model.TenantId;
+            var date = model.Date;
+
+            SaveMealPlanResponseVM response = new SaveMealPlanResponseVM
+            {
+                StatusCode = 200,
+                Message = "Meal plan updated successfully",
+                Date = date
+            };
+
+            // 1️⃣ Load existing
+            var existing = _context.MealPlan
+                .Where(m => m.UserId == userId &&
+                            m.TenantId == tenantId &&
+                            m.Date == date &&
+                            !m.IsDeleted)
+                .ToList();
+
+            // 2️⃣ Convert incoming
+            var incoming = model.ToModelList();
+            var processedKeys = new HashSet<string>();
+
+            // 3️⃣ INSERT + UPDATE
+            foreach (var item in incoming)
+            {
+                string key = $"{item.MealTypeId}-{item.NutritionalItemId}";
+                processedKeys.Add(key);
+
+                var match = existing.FirstOrDefault(x =>
+                    x.MealTypeId == item.MealTypeId &&
+                    x.NutritionalItemId == item.NutritionalItemId
+                );
+
+                if (match == null)
+                {
+                    // INSERT
+                    item.CreatedBy = userId;
+                    item.CreatedOn = DateTime.UtcNow;
+
+                    _context.MealPlan.Add(item);
+
+                    response.SavedItems.Add(new SavedMealItemVM
+                    {
+                        MealTypeId = item.MealTypeId,
+                        NutritionalItemId = item.NutritionalItemId,
+                        Qty = item.Quantity,
+                        IsInserted = true
+                    });
+                }
+                else
+                {
+                    // UPDATE
+                    if (match.Quantity != item.Quantity)
+                    {
+                        match.Quantity = item.Quantity;
+                        match.UpdatedBy = userId;
+                        match.UpdatedOn = DateTime.UtcNow;
+
+                        response.SavedItems.Add(new SavedMealItemVM
+                        {
+                            MealTypeId = item.MealTypeId,
+                            NutritionalItemId = item.NutritionalItemId,
+                            Qty = item.Quantity,
+                            IsUpdated = true
+                        });
+                    }
+                }
+            }
+
+            // 4️⃣ DELETE items not in UI anymore
+            foreach (var old in existing)
+            {
+                string key = $"{old.MealTypeId}-{old.NutritionalItemId}";
+
+                if (!processedKeys.Contains(key))
+                {
+                    _context.MealPlan.Remove(old);
+
+                    response.SavedItems.Add(new SavedMealItemVM
+                    {
+                        MealTypeId = old.MealTypeId,
+                        NutritionalItemId = old.NutritionalItemId,
+                        Qty = old.Quantity,
+                        IsDeleted = true
+                    });
+                }
+            }
+
+            // 5️⃣ Save
+            _context.SaveChanges();
+            return response;
+        }
+
+
+
     }
 }
