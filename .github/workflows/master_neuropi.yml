@@ -1,7 +1,4 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
-name: Build and deploy ASP.Net Core app to Azure Web App - NeuroPi
+name: Build and deploy multiple ASP.Net Core apps to Azure Web App - NeuroPi
 
 on:
   push:
@@ -9,31 +6,78 @@ on:
       - master
   workflow_dispatch:
 
+env:
+  AZURE_WEBAPP_NAME: 'NeuroPi'
+  AZURE_WEBAPP_PACKAGE_PATH: './publish'
+
 jobs:
   build:
     runs-on: windows-latest
     permissions:
-      contents: read #This is required for actions/checkout
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up .NET Core
+      - name: Setup .NET Core
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.x'
 
-      - name: Build with dotnet
-        run: dotnet build --configuration Release
+      - name: Restore dependencies
+        run: |
+          dotnet restore NeuroPi.UserManagment.sln
+          dotnet restore NeuroPi.Nutrition/NeuroPi.Nutrition.csproj
+          dotnet restore SchoolManagement/SchoolManagement.csproj
 
-      - name: dotnet publish
-        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
+      - name: Build all projects
+        run: |
+          dotnet build NeuroPi.UserManagment.sln --configuration Release --no-restore
+          dotnet build NeuroPi.Nutrition/NeuroPi.Nutrition.csproj --configuration Release --no-restore
+          dotnet build SchoolManagement/SchoolManagement.csproj --configuration Release --no-restore
+
+      - name: Publish UserManagement API
+        run: |
+          dotnet publish NeuroPi/NeuroPi.UserManagment.csproj `
+            -c Release `
+            -o "${{ github.workspace }}/publish/usernamegement" `
+            --no-build `
+            -p:GenerateDocumentationFile=false
+
+      - name: Publish Nutrition API
+        run: |
+          dotnet publish NeuroPi.Nutrition/NeuroPi.Nutrition.csproj `
+            -c Release `
+            -o "${{ github.workspace }}/publish/nutrition" `
+            --no-build `
+            -p:GenerateDocumentationFile=false
+
+      - name: Publish School Management API
+        run: |
+          dotnet publish SchoolManagement/SchoolManagement.csproj `
+            -c Release `
+            -o "${{ github.workspace }}/publish/school" `
+            --no-build `
+            -p:GenerateDocumentationFile=false
+
+      - name: Create web.config for virtual directories
+        run: |
+          # Create web.config for root (optional redirect or health check)
+          echo '<?xml version="1.0" encoding="utf-8"?>' > "${{ github.workspace }}/publish/web.config"
+          echo '<configuration>' >> "${{ github.workspace }}/publish/web.config"
+          echo '  <system.webServer>' >> "${{ github.workspace }}/publish/web.config"
+          echo '    <handlers>' >> "${{ github.workspace }}/publish/web.config"
+          echo '      <add name="aspNetCore" path="*" verb="*" modules="AspNetCoreModuleV2" resourceType="Unspecified" />' >> "${{ github.workspace }}/publish/web.config"
+          echo '    </handlers>' >> "${{ github.workspace }}/publish/web.config"
+          echo '    <aspNetCore processPath=".\usernamegement\NeuroPi.UserManagment.exe" stdoutLogEnabled="false" stdoutLogFile=".\logs\stdout" />' >> "${{ github.workspace }}/publish/web.config"
+          echo '  </system.webServer>' >> "${{ github.workspace }}/publish/web.config"
+          echo '</configuration>' >> "${{ github.workspace }}/publish/web.config"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
-          name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+          name: multi-project-app
+          path: ${{ github.workspace }}/publish
 
   deploy:
     runs-on: windows-latest
@@ -42,15 +86,16 @@ jobs:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
+      id-token: write
+      contents: read
 
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
-          name: .net-app
-      
+          name: multi-project-app
+          path: ${{ github.workspace }}/publish
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -64,5 +109,4 @@ jobs:
         with:
           app-name: 'NeuroPi'
           slot-name: 'Production'
-          package: .
-          
+          package: ${{ github.workspace }}/publish
