@@ -1,77 +1,71 @@
-name: Deploy Multiple NeuroPi APIs
+name: Deploy Multi-API (.NET 8) to Azure
 
 on:
   push:
     branches:
+      - main
       - master
-  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
+
   build-and-deploy:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
+      # Checkout Code
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: "8.x"
+      # Setup .NET 8
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.x'
 
-    - name: Restore Solution
-      run: dotnet restore NeuroPi.UserManagment.sln
+      # --- BUILD MULTIPLE PROJECTS ---
+      - name: Restore dependencies
+        run: dotnet restore NeuroPi.UserManagment.sln
 
-    - name: Build Solution
-      run: dotnet build NeuroPi.UserManagment.sln -c Release
+      - name: Build API Projects
+        run: |
+          dotnet build NeuroPi/NeuroPi.UserManagment.csproj -c Release
+          dotnet build NeuroPi.Nutrition/NeuroPi.Nutrition.csproj -c Release
+          dotnet build SchoolManagement/SchoolManagement.csproj -c Release
 
-    ###########################################################
-    # PUBLISH EACH API TO ITS OWN FOLDER
-    ###########################################################
+      - name: Publish Projects
+        run: |
+          dotnet publish NeuroPi/NeuroPi.UserManagment.csproj -c Release -o publish/userapi
+          dotnet publish NeuroPi.Nutrition/NeuroPi.Nutrition.csproj -c Release -o publish/nutritionapi
+          dotnet publish SchoolManagement/SchoolManagement.csproj -c Release -o publish/schoolapi
 
-    - name: Publish UserManagement API
-      run: dotnet publish "NeuroPi/NeuroPi.UserManagment.csproj" -c Release -o publish/usermanagement
+      # --- AZURE LOGIN USING OIDC ---
+      - name: Azure Login with Federated Identity
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          allow-no-subscriptions: true
 
-    - name: Publish SchoolManagement API
-      run: dotnet publish "SchoolManagement/SchoolManagement.csproj" -c Release -o publish/school
+      # --- DEPLOY EACH API TO SEPARATE AZURE WEB APP ---
+      - name: Deploy User Management API
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: "neuropi-user-api"
+          package: "publish/userapi"
 
-    - name: Publish Nutrition API
-      run: dotnet publish "NeuroPi.Nutrition/NeuroPi.Nutrition.csproj" -c Release -o publish/nutrition
+      - name: Deploy Nutrition API
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: "neuropi-nutrition-api"
+          package: "publish/nutritionapi"
 
-    ###########################################################
-    # LOGIN TO AZURE
-    ###########################################################
-    - name: Login to Azure
-      uses: azure/login@v2
-      with:
-        client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_6570E66EC57D43EA89AFEC1CC41B7EEE }}
-        tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_1E8AAFD9DDBF49338F1F292EF08588A2 }}
-        subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_99DCF1DCB22E4F1282EB0E82C6D97D36 }}
-
-    ###########################################################
-    # DEPLOY EACH API TO ITS VIRTUAL PATH IN AZURE
-    ###########################################################
-
-    - name: Deploy UserManagement API
-      uses: azure/webapps-deploy@v3
-      with:
-        app-name: "NeuroPi"
-        slot-name: "Production"
-        package: publish/usermanagement
-        remote-path: "/usermanagement"
-
-    - name: Deploy SchoolManagement API
-      uses: azure/webapps-deploy@v3
-      with:
-        app-name: "NeuroPi"
-        slot-name: "Production"
-        package: publish/school
-        remote-path: "/school"
-
-    - name: Deploy Nutrition API
-      uses: azure/webapps-deploy@v3
-      with:
-        app-name: "NeuroPi"
-        slot-name: "Production"
-        package: publish/nutrition
-        remote-path: "/nutrition"
+      - name: Deploy School Management API
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: "neuropi-school-api"
+          package: "publish/schoolapi"
