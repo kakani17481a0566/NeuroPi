@@ -14,6 +14,7 @@ namespace NeuroPi.Nutrition.Services.Implementation
             _context = context;
         }
 
+
         public MealPlanMonitoringResponseVM CreateMealPlanMonitoring(MealPlanMonitoringRequestVM requestVM)
         {
             var newMPMonitoring = MealPlanMonitoringRequestVM.ToModel(requestVM);
@@ -232,7 +233,300 @@ namespace NeuroPi.Nutrition.Services.Implementation
         }
 
 
+        public MealPlanMonitoringResponseViewVM GetMealMonitoring(int userId, int tenantId, DateOnly date)
+        {
+            var response = new MealPlanMonitoringResponseViewVM
+            {
+                Date = date,
+                Sections = new(),
+                AchievedFocus = new()
+            };
 
+            /* ---------------------------------------------------------
+               1. Load MEAL TYPES
+            --------------------------------------------------------- */
+            var mealTypes = _context.MealTypes
+                .Where(m => m.TenantId == tenantId && !m.IsDeleted)
+                .OrderBy(m => m.Id)
+                .ToList();
 
+            /* ---------------------------------------------------------
+               2. Load TODAY (plans + monitoring + unplanned)
+            --------------------------------------------------------- */
+            var todayPlans = _context.MealPlan
+                .Where(mp => mp.UserId == userId &&
+                             mp.TenantId == tenantId &&
+                             mp.Date == date &&
+                             !mp.IsDeleted)
+                .ToList();
+
+            var planIds = todayPlans.Select(x => x.Id).ToList();
+
+            var todayMonitoring = _context.MealPlanMonitoring
+                .Where(m => planIds.Contains(m.MealPlanId) && !m.IsDeleted)
+                .ToList();
+
+            var todayUnplanned = _context.UnplannedMeals
+                .Where(u => planIds.Contains(u.MealPlanId) && !u.IsDeleted)
+                .ToList();
+
+            /* ---------------------------------------------------------
+               3. Load ALL ITEM DETAILS (1 DB CALL)
+            --------------------------------------------------------- */
+            var itemIds = todayPlans
+                .Select(p => p.NutritionalItemId)
+                .Concat(todayMonitoring.Select(m => m.NutritionalItemId))
+                .Concat(todayUnplanned.Where(u => u.NutritionalItemId != 0)
+                        .Select(u => u.NutritionalItemId))
+                .Distinct()
+                .ToList();
+
+            var itemMap = _context.NutritionalItems
+                .Where(n => itemIds.Contains(n.Id))
+                .ToDictionary(n => n.Id);
+
+            /* ---------------------------------------------------------
+               4. Build TODAY SECTIONS (FULL CARD)
+            --------------------------------------------------------- */
+            foreach (var mt in mealTypes)
+            {
+                var sec = new MealWindowVM
+                {
+                    MealTypeId = mt.Id,
+                    MealTypeName = mt.Name,
+                    Time = mt.Description,
+                    Items = new()
+                };
+
+                // Planned items
+                var planned = todayPlans.Where(p => p.MealTypeId == mt.Id).ToList();
+
+                foreach (var p in planned)
+                {
+                    if (!itemMap.TryGetValue(p.NutritionalItemId, out var item))
+                        continue;
+
+                    var consumed = todayMonitoring.FirstOrDefault(m =>
+                        m.MealPlanId == p.Id &&
+                        m.NutritionalItemId == p.NutritionalItemId);
+
+                    sec.Items.Add(new FoodMonitorVM
+                    {
+                        ItemId = item.Id,
+                        Title = item.Name,
+                        Unit = item.Description,
+                        ItemImage = item.ItemImage,
+                        Kcal = item.CaloriesQuantity,
+                        PlannedQty = p.Quantity,
+                        ConsumedQty = consumed?.Quantity ?? 0,
+                        IsUnplanned = false
+                    });
+                }
+
+                // Unplanned
+                var unp = todayUnplanned
+                    .Where(u => todayPlans.Any(p => p.Id == u.MealPlanId && p.MealTypeId == mt.Id))
+                    .ToList();
+
+                foreach (var u in unp)
+                {
+                    if (u.NutritionalItemId != 0 && itemMap.TryGetValue(u.NutritionalItemId, out var item))
+                    {
+                        sec.Items.Add(new FoodMonitorVM
+                        {
+                            ItemId = item.Id,
+                            Title = item.Name,
+                            Unit = item.Description,
+                            ItemImage = item.ItemImage,
+                            Kcal = item.CaloriesQuantity,
+                            PlannedQty = 0,
+                            ConsumedQty = u.Quantity,
+                            IsUnplanned = true
+                        });
+                    }
+                    else
+                    {
+                        sec.Items.Add(new FoodMonitorVM
+                        {
+                            ItemId = 0,
+                            Title = u.OtherName,
+                            Unit = "",
+                            ItemImage = "",
+                            Kcal = u.OtherCaloriesQuantity,
+                            PlannedQty = 0,
+                            ConsumedQty = u.Quantity,
+                            IsUnplanned = true
+                        });
+                    }
+                }
+
+                sec.SectionCalories = sec.Items.Sum(i => i.Kcal * i.ConsumedQty);
+                response.Sections.Add(sec);
+            }
+
+            response.TotalCalories = response.Sections.Sum(s => s.SectionCalories);
+
+            /* ---------------------------------------------------------
+               5. PENDING DAYS — BUILD SAME CARD AS TODAY
+            --------------------------------------------------------- */
+
+            var prevDates = _context.MealPlan
+                .Where(mp => mp.UserId == userId &&
+                             mp.TenantId == tenantId &&
+                             mp.Date < date &&
+                             !mp.IsDeleted)
+                .Select(mp => mp.Date)
+                .Distinct()
+                .OrderByDescending(d => d)
+                .ToList();
+
+            if (!prevDates.Any())
+            {
+                response.MissedDays = new MissedDaysInfoVM();
+            }
+            else
+            {
+                var prevPlans = _context.MealPlan
+                    .Where(mp => mp.UserId == userId &&
+                                 mp.TenantId == tenantId &&
+                                 prevDates.Contains(mp.Date) &&
+                                 !mp.IsDeleted)
+                    .ToList();
+
+                var planIdToDate = prevPlans.ToDictionary(x => x.Id, x => x.Date);
+                var prevPlanIds = planIdToDate.Keys.ToHashSet();
+
+                var monitoringDates = _context.MealPlanMonitoring
+                    .Where(m => prevPlanIds.Contains(m.MealPlanId) && !m.IsDeleted)
+                    .Select(m => planIdToDate[m.MealPlanId])
+                    .Distinct()
+                    .ToHashSet();
+
+                var unplannedDates = _context.UnplannedMeals
+                    .Where(u => prevPlanIds.Contains(u.MealPlanId) && !u.IsDeleted)
+                    .Select(u => planIdToDate[u.MealPlanId])
+                    .Distinct()
+                    .ToHashSet();
+
+                var pendingDates = prevDates
+                    .Where(d => !monitoringDates.Contains(d) &&
+                                !unplannedDates.Contains(d))
+                    .ToList();
+
+                // Build item map for pending days
+                var templateItemIds = prevPlans.Select(p => p.NutritionalItemId).Distinct().ToList();
+                var templateItems = _context.NutritionalItems
+                    .Where(n => templateItemIds.Contains(n.Id))
+                    .ToDictionary(n => n.Id);
+
+                List<MealWindowVM> BuildPendingSections(DateOnly dt)
+                {
+                    var list = new List<MealWindowVM>();
+
+                    foreach (var mt in mealTypes)
+                    {
+                        var sec = new MealWindowVM
+                        {
+                            MealTypeId = mt.Id,
+                            MealTypeName = mt.Name,
+                            Time = mt.Description,
+                            Items = new()
+                        };
+
+                        var items = prevPlans.Where(p => p.Date == dt && p.MealTypeId == mt.Id).ToList();
+
+                        foreach (var p in items)
+                        {
+                            if (!templateItems.TryGetValue(p.NutritionalItemId, out var item))
+                                continue;
+
+                            sec.Items.Add(new FoodMonitorVM
+                            {
+                                ItemId = item.Id,
+                                Title = item.Name,
+                                Unit = item.Description,
+                                ItemImage = item.ItemImage,
+                                Kcal = item.CaloriesQuantity,
+                                PlannedQty = p.Quantity,
+                                ConsumedQty = 0,
+                                IsUnplanned = false
+                            });
+                        }
+
+                        sec.SectionCalories = sec.Items.Sum(i => i.Kcal * i.PlannedQty);
+                        list.Add(sec);
+                    }
+
+                    return list;
+                }
+
+                int streak = 0;
+                foreach (var d in pendingDates)
+                {
+                    if (d == date.AddDays(-(streak + 1)))
+                        streak++;
+                    else break;
+                }
+
+                response.MissedDays = new MissedDaysInfoVM
+                {
+                    TotalMissedDays = pendingDates.Count,
+                    StreakMissed = streak,
+                    LastEatenDate = monitoringDates
+                        .Union(unplannedDates)
+                        .OrderByDescending(d => d)
+                        .FirstOrDefault(),
+                    History = pendingDates.Select(d => new PreviousDayVM
+                    {
+                        Date = d,
+                        Status = "PENDING",
+                        Sections = BuildPendingSections(d),
+                        TotalCalories = BuildPendingSections(d)
+                            .Sum(sec => sec.Items.Sum(x => x.Kcal * x.PlannedQty))
+                    }).ToList()
+                };
+            }
+
+            /* ---------------------------------------------------------
+               6. Filters for frontend
+            --------------------------------------------------------- */
+            response.AllMealTypes = mealTypes.Select(m => new FilterOptions
+            {
+                Id = m.Id,
+                Name = m.Name,
+                Image = null
+            }).ToList();
+
+            response.AllFoods = _context.NutritionalItems
+                .Where(n => n.TenantId == tenantId && !n.IsDeleted)
+                .Select(n => new FilterOptions
+                {
+                    Id = n.Id,
+                    Name = n.Name,
+                    Image = n.ItemImage
+                })
+                .ToList();
+
+            response.AllFocus = _context.NutritionalFocuses
+                .Where(f => f.TenantId == tenantId && !f.IsDeleted)
+                .Select(f => new FilterOptions
+                {
+                    Id = f.Id,
+                    Name = f.Name
+                }).ToList();
+
+            response.AllVitamins = _context.Vitamins
+                .Where(v => v.TenantId == tenantId && !v.IsDeleted)
+                .Select(v => new FilterOptions
+                {
+                    Id = v.Id,
+                    Name = v.Name
+                }).ToList();
+
+            return response;
+        }
+
+    
+    
     }
 }

@@ -116,6 +116,61 @@ namespace NeuroPi.Nutrition.Controllers
                 "7 days meal plan card loaded successfully."
             );
         }
-    }
+
+
+        // -------------------------------------------------------------------
+        // ⭐ NEW ENDPOINT — Get Meal Monitoring
+        // Date is optional. If not passed, backend uses today's date.
+        // Example:
+        // GET /api/MealPlanMonitoring/monitor/user/1/tenant/1
+        // GET /api/MealPlanMonitoring/monitor/user/1/tenant/1/date/2025-02-19
+        // -------------------------------------------------------------------
+        [HttpGet("monitor/user/{userId}/tenant/{tenantId}")]
+        public ResponseResult<MealPlanMonitoringResponseViewVM> GetMealMonitoring(
+            int userId,
+            int tenantId,
+            [FromQuery] string? date = null)
+        {
+            // If no date provided → use today
+            DateOnly selectedDate;
+
+            if (string.IsNullOrWhiteSpace(date))
+            {
+                selectedDate = DateOnly.FromDateTime(DateTime.Today);
+            }
+            else
+            {
+                if (!DateOnly.TryParse(date, out selectedDate))
+                {
+                    return new ResponseResult<MealPlanMonitoringResponseViewVM>(
+                        HttpStatusCode.BadRequest,
+                        null,
+                        "Invalid date format. Use yyyy-MM-dd."
+                    );
+                }
+            }
+
+            var result = _service.GetMealMonitoring(userId, tenantId, selectedDate);
+
+            if (result == null)
+            {
+                return new ResponseResult<MealPlanMonitoringResponseViewVM>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    "Meal monitoring data not found."
+                );
+            }
+
+            return new ResponseResult<MealPlanMonitoringResponseViewVM>(
+                HttpStatusCode.OK,
+                result,
+                "Meal monitoring loaded successfully."
+            );
+        }
+
+
+
 
     }
+
+}
