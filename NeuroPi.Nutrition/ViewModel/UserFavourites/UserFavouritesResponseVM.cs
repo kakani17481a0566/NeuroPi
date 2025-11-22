@@ -8,6 +8,7 @@ namespace NeuroPi.Nutrition.ViewModel.UserFavourites
         public int UserId { get; set; }
         public int NutritionalItemId { get; set; }
         public int TenantId { get; set; }
+        public string Message { get; set; }
 
         public int CreatedBy { get; set; }
 

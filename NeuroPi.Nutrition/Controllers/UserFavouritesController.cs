@@ -73,26 +73,48 @@ namespace NeuroPi.Nutrition.Controllers
             var result = _userFavouritesService.CreateUserFavourites(userFavouritesRequestVM);
             return new ResponseResult<UserFavouritesResponseVM>(HttpStatusCode.OK, result, "User favourite created successfully.");
         }
-        [HttpPut("id/{id}/tenant/{tenantId}")]
-        public ResponseResult<UserFavouritesResponseVM> UpdateUserFavourites(int id, int tenantId, [FromBody] UserFavouritesUpdateVM userFavouritesUpdateVM)
+        [HttpPut("userId/{userId}/tenant/{tenantId}/nutritionalItemid/{nutritionalItemId}")]
+        public ResponseResult<UserFavouritesResponseVM> UpdateUserFavourites(int userId,int tenantId,int nutritionalItemId,[FromBody] UserFavouritesUpdateVM vm)
         {
+            var result = _userFavouritesService.UpdateUserFavourites(userId,tenantId,nutritionalItemId,vm);
 
-            var result = _userFavouritesService.UpdateUserFavourites(id, tenantId, userFavouritesUpdateVM);
             if (result == null)
             {
-                return new ResponseResult<UserFavouritesResponseVM>(HttpStatusCode.NotFound, null, "User favourite not found.");
+                return new ResponseResult<UserFavouritesResponseVM>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    "User favourite not found."
+                );
             }
-            return new ResponseResult<UserFavouritesResponseVM>(HttpStatusCode.OK, result, "User favourite updated successfully.");
+
+            return new ResponseResult<UserFavouritesResponseVM>(
+                HttpStatusCode.OK,
+                result,
+                "User favourite updated successfully."
+            );
         }
-        [HttpDelete("id/{id}/tenant/{tenantId}")]
-        public ResponseResult<bool> DeleteUserFavourites(int id, int tenantId)
+
+
+        [HttpDelete("user/{userId}/item/{nutritionalItemId}/tenant/{tenantId}")]
+        public ResponseResult<bool> DeleteUserFavourites(int userId,int nutritionalItemId, int tenantId)
         {
-            var isDeleted = _userFavouritesService.DeleteUserFavourites(id, tenantId);
+            var isDeleted = _userFavouritesService.DeleteUserFavourites(userId, nutritionalItemId, tenantId);
+
             if (!isDeleted)
             {
-                return new ResponseResult<bool>(HttpStatusCode.NotFound, false, "User favourite not found.");
+                return new ResponseResult<bool>(
+                    HttpStatusCode.NotFound,
+                    false,
+                    "User favourite not found."
+                );
             }
-            return new ResponseResult<bool>(HttpStatusCode.OK, true, "User favourite deleted successfully.");
+
+            return new ResponseResult<bool>(
+                HttpStatusCode.OK,
+                true,
+                "User favourite deleted successfully."
+            );
         }
+
     }
 }

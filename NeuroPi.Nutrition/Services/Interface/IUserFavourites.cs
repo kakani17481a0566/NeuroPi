@@ -13,9 +13,10 @@ namespace NeuroPi.Nutrition.Services.Interface
         UserFavouritesResponseVM GetUserFavouritesByIdAndTenantId(int id,int tenantId);
 
         UserFavouritesResponseVM CreateUserFavourites(UserFavouritesRequestVM userFavouritesRequestVM);
-        UserFavouritesResponseVM UpdateUserFavourites(int id,int tenatId, UserFavouritesUpdateVM userFavouritesRequestVM);
+        UserFavouritesResponseVM UpdateUserFavourites(int userId,int NutritionalItemId, int tenatId, UserFavouritesUpdateVM userFavouritesRequestVM);
 
-        bool DeleteUserFavourites(int id,int tenantId);
+        bool DeleteUserFavourites(int userId, int nutritionalItemId, int tenantId);
+
 
 
     }
