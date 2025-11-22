@@ -102,13 +102,14 @@ namespace NeuroPi.Nutrition.Services.Implementation
         {
             var culture = CultureInfo.CurrentCulture;
 
-            // Load meal types (dynamic)
+            // Load meal types
             var mealTypeMap = _context.MealTypes
                 .Where(m => m.TenantId == tenantId && !m.IsDeleted)
                 .ToDictionary(m => m.Id, m => m.Name);
 
-            // Compute Monday → Sunday
+            // Compute Monday → Sunday of THIS week
             var today = DateTime.Today;
+
             int diff = today.DayOfWeek == DayOfWeek.Sunday
                 ? -6
                 : DayOfWeek.Monday - today.DayOfWeek;
@@ -116,7 +117,7 @@ namespace NeuroPi.Nutrition.Services.Implementation
             var monday = today.AddDays(diff);
             var sunday = monday.AddDays(6);
 
-            // Fetch all meal plans for this week (1 query)
+            // Fetch plans for the week
             var weekMealPlans = _context.MealPlan
                 .Where(mp => mp.UserId == userId
                           && mp.TenantId == tenantId
@@ -125,7 +126,7 @@ namespace NeuroPi.Nutrition.Services.Implementation
                           && !mp.IsDeleted)
                 .ToList();
 
-            // Fetch nutritional items (1 query)
+            // Load nutritional info
             var itemIds = weekMealPlans.Select(mp => mp.NutritionalItemId).Distinct().ToList();
 
             var itemMap = _context.NutritionalItems
@@ -137,7 +138,7 @@ namespace NeuroPi.Nutrition.Services.Implementation
 
             var response = new MealPlan7daysCardVM();
 
-            // Daily loop (Mon → Sun)
+            // Loop for each day of the week (Mon → Sun)
             for (int i = 0; i < 7; i++)
             {
                 var date = monday.AddDays(i);
@@ -161,7 +162,6 @@ namespace NeuroPi.Nutrition.Services.Implementation
                     totalKcal += kcal;
                     totalProtein += protein;
 
-                    // Dynamic meal name
                     string mealLabel = mealTypeMap.ContainsKey(mp.MealTypeId)
                         ? mealTypeMap[mp.MealTypeId]
                         : $"MealType-{mp.MealTypeId}";
@@ -170,10 +170,12 @@ namespace NeuroPi.Nutrition.Services.Implementation
                     mealWiseProtein[mealLabel] = mealWiseProtein.GetValueOrDefault(mealLabel, 0) + protein;
                 }
 
-                // ----------------------------------------------------
-                // ⭐ DYNAMIC STATUS LOGIC (NO HARDCODE, NO DB RULES)
-                // ----------------------------------------------------
-                int goal = 1200; // If needed, load per user/tenant
+
+                // ------------------------------
+                // ⭐ STATUS LOGIC
+                // ------------------------------
+                int goal = 1200; // can be dynamic later
+
                 string statusText;
                 string statusType;
 
@@ -208,6 +210,7 @@ namespace NeuroPi.Nutrition.Services.Implementation
                     }
                 }
 
+                // Add day summary to response
                 response.Days.Add(new MealPlan7DayItemVM
                 {
                     Date = date.Day,
@@ -224,15 +227,31 @@ namespace NeuroPi.Nutrition.Services.Implementation
                 });
             }
 
+            // ----------------------------------------------------
+            // ⭐ NEXT MONDAY UNLOCK LOGIC (Works for February too)
+            // ----------------------------------------------------
+            var todayLocal = today;
+
+            // Calculate next Monday
+            var nextMonday = todayLocal.AddDays(
+                ((int)DayOfWeek.Monday - (int)todayLocal.DayOfWeek + 7) % 7
+            );
+
+            // If today is Monday, unlock next week (after 7 days)
+            if (nextMonday == todayLocal)
+                nextMonday = todayLocal.AddDays(7);
+
             response.UnlockNote = new UnlockNoteVM
             {
                 Enabled = true,
                 TextTop = "Next week schedule unlocks on",
-                TextBottom = monday.AddDays(3).ToString("dd dddd, MMMM", culture)
+                TextBottom = nextMonday.ToString("dd dddd, MMMM", culture)
             };
 
             return response;
         }
+
+
 
 
 
