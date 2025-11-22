@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using NeuroPi.CommonLib.Model;
 using NeuroPi.Nutrition.Services.Interface;
 using NeuroPi.Nutrition.ViewModel.MealPlanMonitoring;
@@ -18,159 +17,137 @@ namespace NeuroPi.Nutrition.Controllers
             _service = service;
         }
 
+        // --------------------------------------------------------------------
+        // CRUD — Existing Endpoints
+        // --------------------------------------------------------------------
         [HttpGet]
-        public ResponseResult<List<MealPlanMonitoringResponseVM>> Getall()
+        public ResponseResult<List<MealPlanMonitoringResponseVM>> GetAll()
         {
             var result = _service.GetAllMealPlanMonitoring();
-            if (result == null)
-            {
-                return new ResponseResult<List<MealPlanMonitoringResponseVM>>(HttpStatusCode.NotFound, null, "Meal Plan Monitoring Not Found");
-            }
-            return new ResponseResult<List<MealPlanMonitoringResponseVM>>(HttpStatusCode.OK, result, "Meal Plan Monitoring Not Found");
+            return new ResponseResult<List<MealPlanMonitoringResponseVM>>(
+                HttpStatusCode.OK, result, "Meal Plan Monitoring Loaded");
         }
 
         [HttpGet("id/{id}")]
-        public ResponseResult<MealPlanMonitoringResponseVM> GetMealPlanMonitotingById(int id)
+        public ResponseResult<MealPlanMonitoringResponseVM> GetById(int id)
         {
             var result = _service.GetMealPlanMonitoringById(id);
             if (result == null)
-            {
-                return new ResponseResult<MealPlanMonitoringResponseVM>(HttpStatusCode.NotFound, null, "Meal Plan Monitoring Not Found");
-            }
-            return new ResponseResult<MealPlanMonitoringResponseVM>(HttpStatusCode.OK, result, "Meal Plan Monitoring Not Found");
+                return new ResponseResult<MealPlanMonitoringResponseVM>(
+                    HttpStatusCode.NotFound, null, "Meal Plan Monitoring Not Found");
 
-        }
-        [HttpGet("id/{id}/tenantId/{tenantId}")]
-        public ResponseResult<MealPlanMonitoringResponseVM> GetMealPlanMonitotingById(int id, int tenantId)
-        {
-            var result = _service.GetMealPlanMonitoringById(id);
-            if (result == null)
-            {
-                return new ResponseResult<MealPlanMonitoringResponseVM>(HttpStatusCode.NotFound, null, "Meal Plan Monitoring Not Found");
-            }
-            return new ResponseResult<MealPlanMonitoringResponseVM>(HttpStatusCode.OK, result, "Meal Plan Monitoring Not Found");
-
+            return new ResponseResult<MealPlanMonitoringResponseVM>(
+                HttpStatusCode.OK, result, "Meal Plan Monitoring Loaded");
         }
 
-        [HttpGet("tenantId/{tenantId}")]
-        public ResponseResult<List<MealPlanMonitoringResponseVM>> GetallByTenantId(int tenantId)
+        [HttpGet("tenant/{tenantId}")]
+        public ResponseResult<List<MealPlanMonitoringResponseVM>> GetByTenant(int tenantId)
         {
             var result = _service.GetAllMealPlanMonitoringByTenantId(tenantId);
-            if (result == null)
-            {
-                return new ResponseResult<List<MealPlanMonitoringResponseVM>>(HttpStatusCode.NotFound, null, "Meal Plan Monitoring Not Found");
-            }
-            return new ResponseResult<List<MealPlanMonitoringResponseVM>>(HttpStatusCode.OK, result, "Meal Plan Monitoring Not Found");
+            return new ResponseResult<List<MealPlanMonitoringResponseVM>>(
+                HttpStatusCode.OK, result, "Meal Plan Monitoring Loaded");
         }
 
         [HttpPost]
-        public ResponseResult<MealPlanMonitoringResponseVM> CreateMealPlanMonitoring(MealPlanMonitoringRequestVM request)
+        public ResponseResult<MealPlanMonitoringResponseVM> Create(MealPlanMonitoringRequestVM request)
         {
             var result = _service.CreateMealPlanMonitoring(request);
-
-            return new ResponseResult<MealPlanMonitoringResponseVM>(HttpStatusCode.OK, result, "Meal Plan Monitoring Created.");
-
+            return new ResponseResult<MealPlanMonitoringResponseVM>(
+                HttpStatusCode.OK, result, "Meal Plan Monitoring Created");
         }
 
-        [HttpPut("id/{id}/tenantId/{tenantId}")]
-        public ResponseResult<MealPlanMonitoringResponseVM> UpdateMealPlanMonitoring(int id, int tenantId, MealPlanMonitoringUpdateVM updateVM)
+        [HttpPut("id/{id}/tenant/{tenantId}")]
+        public ResponseResult<MealPlanMonitoringResponseVM> Update(
+            int id, int tenantId, MealPlanMonitoringUpdateVM updateVM)
         {
             var result = _service.UpdateMealPlanMonitoring(id, tenantId, updateVM);
+
             if (result == null)
-            {
-                return new ResponseResult<MealPlanMonitoringResponseVM>(HttpStatusCode.NotFound, null, "Meal plan monitoring not found");
-            }
-            return new ResponseResult<MealPlanMonitoringResponseVM>(HttpStatusCode.OK, result, "Meal Plan Monitoring Updated.");
+                return new ResponseResult<MealPlanMonitoringResponseVM>(
+                    HttpStatusCode.NotFound, null, "Meal Plan Monitoring Not Found");
+
+            return new ResponseResult<MealPlanMonitoringResponseVM>(
+                HttpStatusCode.OK, result, "Meal Plan Monitoring Updated");
         }
 
-        [HttpDelete("id/{id}/tenantId/{tenantId}")]
-        public ResponseResult<bool> DeleteMealPlanMonitoring(int id, int tenantId)
+        [HttpDelete("id/{id}/tenant/{tenantId}")]
+        public ResponseResult<bool> Delete(int id, int tenantId)
         {
             var result = _service.DeleteMealPlanMonitoring(id, tenantId);
-            if (result == null)
-            {
-                return new ResponseResult<bool>(HttpStatusCode.NotFound, false, "Meal plan monitoring not found");
-            }
-            return new ResponseResult<bool>(HttpStatusCode.OK, true, "Meal Plan Monitoring deleted.");
 
+            return new ResponseResult<bool>(
+                HttpStatusCode.OK, result, result ? "Deleted successfully" : "Delete failed");
         }
 
-
+        // --------------------------------------------------------------------
+        // 7 days view
+        // --------------------------------------------------------------------
         [HttpGet("7days/user/{userId}/tenant/{tenantId}")]
         public ResponseResult<MealPlan7daysCardVM> Get7DaysMealPlanCard(int userId, int tenantId)
         {
             var result = _service.Get7DaysMealPlanCard(userId, tenantId);
-
             if (result == null)
-            {
                 return new ResponseResult<MealPlan7daysCardVM>(
-                    HttpStatusCode.NotFound,
-                    null,
-                    "No meal plan data found for this week."
-                );
-            }
+                    HttpStatusCode.NotFound, null, "No data found for this week");
 
             return new ResponseResult<MealPlan7daysCardVM>(
-                HttpStatusCode.OK,
-                result,
-                "7 days meal plan card loaded successfully."
-            );
+                HttpStatusCode.OK, result, "7 Days Meal Card Loaded");
         }
 
-
-        // -------------------------------------------------------------------
-        // ⭐ NEW ENDPOINT — Get Meal Monitoring
-        // Date is optional. If not passed, backend uses today's date.
-        // Example:
-        // GET /api/MealPlanMonitoring/monitor/user/1/tenant/1
-        // GET /api/MealPlanMonitoring/monitor/user/1/tenant/1/date/2025-02-19
-        // -------------------------------------------------------------------
+        // --------------------------------------------------------------------
+        // Meal Monitoring View (today or selected date)
+        // --------------------------------------------------------------------
         [HttpGet("monitor/user/{userId}/tenant/{tenantId}")]
         public ResponseResult<MealPlanMonitoringResponseViewVM> GetMealMonitoring(
             int userId,
             int tenantId,
             [FromQuery] string? date = null)
         {
-            // If no date provided → use today
             DateOnly selectedDate;
 
             if (string.IsNullOrWhiteSpace(date))
-            {
                 selectedDate = DateOnly.FromDateTime(DateTime.Today);
-            }
-            else
-            {
-                if (!DateOnly.TryParse(date, out selectedDate))
-                {
-                    return new ResponseResult<MealPlanMonitoringResponseViewVM>(
-                        HttpStatusCode.BadRequest,
-                        null,
-                        "Invalid date format. Use yyyy-MM-dd."
-                    );
-                }
-            }
+            else if (!DateOnly.TryParse(date, out selectedDate))
+                return new ResponseResult<MealPlanMonitoringResponseViewVM>(
+                    HttpStatusCode.BadRequest, null, "Invalid date format (use yyyy-MM-dd)");
 
             var result = _service.GetMealMonitoring(userId, tenantId, selectedDate);
 
-            if (result == null)
-            {
-                return new ResponseResult<MealPlanMonitoringResponseViewVM>(
-                    HttpStatusCode.NotFound,
-                    null,
-                    "Meal monitoring data not found."
-                );
-            }
-
             return new ResponseResult<MealPlanMonitoringResponseViewVM>(
-                HttpStatusCode.OK,
-                result,
-                "Meal monitoring loaded successfully."
-            );
+                HttpStatusCode.OK, result, "Meal Monitoring Loaded");
         }
 
+        // --------------------------------------------------------------------
+        // ⭐ NEW ENDPOINT — SAVE MEAL TRACKING (Pending or Today)
+        // --------------------------------------------------------------------
+        // POST /api/MealPlanMonitoring/track/user/1/tenant/1
+        //
+        // BODY:
+        // [
+        //   { "date":"2025-02-18", "mealTypeId":1, "nutritionalItemId": 5,
+        //     "plannedQty":1, "consumedQty":2 },
+        //   { "date":"2025-02-18", "mealTypeId":1, "nutritionalItemId": 0,
+        //     "otherName":"Dosa", "otherCaloriesQuantity":120, "consumedQty":1 }
+        // ]
+        // --------------------------------------------------------------------
+        [HttpPost("track/user/{userId}/tenant/{tenantId}")]
+        public ResponseResult<SaveMealsTrackingResponseVM> SaveMealsTracking(
+            int userId,
+            int tenantId,
+            [FromBody] List<SavePendingMeals> items)
+        {
+            if (items == null || items.Count == 0)
+            {
+                return new ResponseResult<SaveMealsTrackingResponseVM>(
+                    HttpStatusCode.BadRequest,
+                    null,
+                    "No meal tracking data received");
+            }
 
+            var result = _service.SaveMealsTracking(userId, tenantId, items);
 
-
+            return new ResponseResult<SaveMealsTrackingResponseVM>(
+                HttpStatusCode.OK, result, "Meal tracking saved successfully");
+        }
     }
-
 }
