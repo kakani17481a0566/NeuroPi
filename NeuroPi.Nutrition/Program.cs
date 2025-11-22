@@ -34,6 +34,8 @@ builder.Services.AddScoped<IUserMealType, UserMealTypeServiceImpl>();
 builder.Services.AddScoped<IRecipesInstructions, RecipesInstructionServiceImpl>();
 builder.Services.AddScoped<IMealPlanMonitoring, MealPlanMonitoringServiceImpl>();
 builder.Services.AddScoped<IUserGene, UserGeneServiceImpl>();
+builder.Services.AddScoped<IUserFeedback, UserFeedbackServiceImpl>();
+
 
 // --------------------------------------
 // 🌐 CORS
