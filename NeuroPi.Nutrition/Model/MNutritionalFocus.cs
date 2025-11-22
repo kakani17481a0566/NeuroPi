@@ -24,8 +24,5 @@ namespace NeuroPi.Nutrition.Model
         public int TenantId { get; set;}
 
         public virtual ICollection<MGeneNutritionalFocus> NutritionalFocus { get; set; } = new List<MGeneNutritionalFocus>();
-
-
-
     }
 }

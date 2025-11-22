@@ -24,5 +24,13 @@ namespace NeuroPi.Nutrition.Services.Interface
         MealPlanMonitoringResponseViewVM GetMealMonitoring(int userId, int tenantId, DateOnly date);
 
 
+
+        SaveMealsTrackingResponseVM SaveMealsTracking(
+    int userId,
+    int tenantId,
+    List<SavePendingMeals> items);
+
+
+
     }
 }

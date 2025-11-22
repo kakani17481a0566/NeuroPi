@@ -9,14 +9,11 @@ namespace NeuroPi.Nutrition.Model
     {
         [Column("id")]
         public int Id { get; set; }
-
         [Column("code")]
         [Required(ErrorMessage = "code is mandatory.")]
         public string Code { get; set; }
-
         [Column("name")]
         public string Name { get; set; }
-
         [Column("description")]
         public string Description { get; set; }
 
