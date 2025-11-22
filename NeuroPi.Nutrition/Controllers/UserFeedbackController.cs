@@ -184,5 +184,27 @@ namespace NeuroPi.Nutrition.Controllers
                 "User feedback deleted successfully."
             );
         }
+
+        [HttpGet("questions/user/{userId}/tenant/{tenantId}")]
+        public ResponseResult<List<FeedbackQuestionVM>> GetFeedbackQuestions(int userId, int tenantId)
+        {
+            var result = _userFeedbackService.GetFeedbackQuestions(userId, tenantId);
+            return new ResponseResult<List<FeedbackQuestionVM>>(HttpStatusCode.OK, result);
+        }
+
+        [HttpPost("save/user/{userId}/tenant/{tenantId}")]
+        public ResponseResult<bool> SaveFeedback(int userId, int tenantId, [FromBody] SaveFeedbackVM model)
+        {
+            var success = _userFeedbackService.SaveUserFeedback(userId, tenantId, model);
+
+            if (!success)
+                return new ResponseResult<bool>(HttpStatusCode.BadRequest, false, "Already submitted");
+
+            return new ResponseResult<bool>(HttpStatusCode.OK, true, "Saved successfully");
+        }
+
+
+
+
     }
 }

@@ -18,6 +18,13 @@ namespace NeuroPi.Nutrition.Services.Interface
         UserFeedbackResponseVM UpdateUserFeedback(int id,int tenantId, UserFeedbackUpdateVM RequestVM);
 
         bool DeleteUserFeedback(int id, int tenantId);
+
+        List<FeedbackQuestionVM> GetFeedbackQuestions(int userId, int tenantId);
+
+        bool SaveUserFeedback(int userId, int tenantId, SaveFeedbackVM model);
+
+
+
     }
 
 }

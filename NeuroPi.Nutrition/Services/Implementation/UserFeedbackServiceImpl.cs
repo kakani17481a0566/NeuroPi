@@ -138,5 +138,75 @@ namespace NeuroPi.Nutrition.Services.Implementation
                 .Select(f => ToResponseVM(f))
                 .ToList();
         }
+
+        public List<FeedbackQuestionVM> GetFeedbackQuestions(int userId, int tenantId)
+        {
+            var today = DateOnly.FromDateTime(DateTime.UtcNow);
+            var yesterday = today.AddDays(-1);
+
+            bool hasSubmitted = _context.UserFeedback
+                .Any(f => f.UserId == userId
+                       && f.TenantId == tenantId
+                       && f.Date == yesterday
+                       && !f.IsDeleted);
+
+            if (hasSubmitted)
+                return new List<FeedbackQuestionVM>();
+
+            var masterType = _context.NutritionMasterTypes
+                .FirstOrDefault(t => t.Name.ToLower() == "previous_day_feedback_type"
+                                  && t.TenantId == tenantId
+                                  && !t.IsDeleted);
+
+            if (masterType == null)
+                return new List<FeedbackQuestionVM>();
+
+            var masters = _context.NutritionMasters
+                .Where(m => m.NutritionMasterTypeId == masterType.Id
+                         && m.TenantId == tenantId
+                         && !m.IsDeleted)
+                .ToList();
+
+            return FeedbackQuestionVM.FromMasterList(masters, yesterday);  // 🔥 PASS DATE
+        }
+
+
+
+        public bool SaveUserFeedback(int userId, int tenantId, SaveFeedbackVM model)
+        {
+            if (!DateOnly.TryParse(model.Date, out var parsedDate))
+                return false;
+
+            var existing = _context.UserFeedback
+                .FirstOrDefault(f =>
+                    f.UserId == userId &&
+                    f.TenantId == tenantId &&
+                    f.FeedbackTypeId == model.FeedbackTypeId &&
+                    f.Date == parsedDate &&
+                    !f.IsDeleted
+                );
+
+            if (existing != null)
+                return false;
+
+            var entity = new MUserFeedback
+            {
+                UserId = userId,
+                TenantId = tenantId,
+                FeedbackTypeId = model.FeedbackTypeId,
+                FeedbackText = model.FeedbackText,
+                Date = parsedDate,        // safely parsed
+                CreatedBy = userId,
+                CreatedOn = DateTime.UtcNow,
+                IsDeleted = false
+            };
+
+            _context.UserFeedback.Add(entity);
+            _context.SaveChanges();
+            return true;
+        }
+
+
+
     }
 }
