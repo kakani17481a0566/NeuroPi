@@ -18,7 +18,8 @@ namespace NeuroPi.Nutrition.Services.Interface
 
         bool DeleteNutritionalItem(int id, int tenantId);
 
-        NutritionalItemListResponseVM GetAllItems();
+        NutritionalItemListResponseVM GetAllItems(int userId, int tenantId, DateTime? date);
+
 
         SaveMealPlanResponseVM SaveMealPlan(SaveMealPlanVM model);
 

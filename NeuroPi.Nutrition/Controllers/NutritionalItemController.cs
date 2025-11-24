@@ -90,15 +90,32 @@ namespace NeuroPi.Nutrition.Controllers
         }
 
         [HttpGet("/nutrition/vm/test")]
-        public ResponseResult<NutritionalItemListResponseVM> GetNutrional()
+        public ResponseResult<NutritionalItemListResponseVM> GetNutrional(
+    [FromQuery] int userId,
+    [FromQuery] int tenantId,
+    [FromQuery] DateTime? date
+)
         {
-            var result = _nutritionalItemService.GetAllItems();
+            var result = _nutritionalItemService.GetAllItems(userId, tenantId, date);
+
             if (result == null)
             {
-                return new ResponseResult<NutritionalItemListResponseVM>(HttpStatusCode.NotFound, null, "Nutritional Item not found");
+                return new ResponseResult<NutritionalItemListResponseVM>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    "Nutritional Item not found"
+                );
             }
-            return new ResponseResult<NutritionalItemListResponseVM>(HttpStatusCode.OK, result, "Nutrional Item details fetched sucessfully");
+
+            return new ResponseResult<NutritionalItemListResponseVM>(
+                HttpStatusCode.OK,
+                result,
+                "Nutritional Item details fetched successfully"
+            );
         }
+
+
+
 
         [HttpPost("save-meal-plan")]
         public ResponseResult<SaveMealPlanResponseVM> SaveMealPlan([FromBody] SaveMealPlanVM request)

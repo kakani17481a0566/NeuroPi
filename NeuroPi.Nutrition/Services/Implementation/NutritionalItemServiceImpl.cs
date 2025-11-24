@@ -126,43 +126,42 @@ namespace NeuroPi.Nutrition.Services.Implementation
         //    return result;
         //}
 
-        public NutritionalItemListResponseVM GetAllItems()
+        public NutritionalItemListResponseVM GetAllItems(int userId, int tenantId, DateTime? selectedDate)
         {
-            int userId = 1;  // TODO: replace with dynamic user
+            // If no date passed → use today
+            var date = selectedDate?.Date ?? DateTime.Now.Date;
 
-            NutritionalItemListResponseVM result = new NutritionalItemListResponseVM();
+            var result = new NutritionalItemListResponseVM();
 
             // ============================================================
-            // 1. Get all nutritional items
+            // 1. Get all nutritional items for this tenant
             // ============================================================
             var nutritionalItems = _context.NutritionalItems
-                .Where(n => !n.IsDeleted)
+                .Where(n => !n.IsDeleted && n.TenantId == tenantId)
                 .ToList();
 
-            // Preload mappings (Avoid N+1 queries)
+            // Preload efficiently
             var mealTypeMap = _context.NutritionalItemMealType
-                .Where(n => !n.IsDeleted)
+                .Where(n => !n.IsDeleted && n.TenantId == tenantId)
                 .GroupBy(n => n.NutritionalItemId)
                 .ToDictionary(g => g.Key, g => g.Select(x => x.MealTypeId).ToList());
 
             var vitaminMap = _context.NutritionalItemVitamins
-                .Where(n => !n.IsDeleted)
+                .Where(n => !n.IsDeleted && n.TenantId == tenantId)
                 .GroupBy(n => n.NutritionalItemId)
                 .ToDictionary(g => g.Key, g => g.Select(x => x.VitaminsId).ToList());
 
             var focusMap = _context.NutritionalFocusItem
-                .Where(n => !n.IsDeleted)
+                .Where(n => !n.IsDeleted && n.TenantId == tenantId)
                 .GroupBy(n => n.NutritionalItemId)
                 .ToDictionary(g => g.Key, g => g.Select(x => x.NutritionalFocusId).ToList());
 
             var favourites = _context.UserFavourites
-                .Where(f => f.UserId == userId && !f.IsDeleted)
+                .Where(f => f.UserId == userId && !f.IsDeleted && f.TenantId == tenantId)
                 .Select(f => f.NutritionalItemId)
                 .ToHashSet();
 
-            // ============================================================
-            // 2. Build Item List Response
-            // ============================================================
+            // Build response
             result.AllItems = nutritionalItems.Select(item => new NutritionalItemDetailsVM
             {
                 Id = item.Id,
@@ -179,70 +178,65 @@ namespace NeuroPi.Nutrition.Services.Implementation
             }).ToList();
 
             // ============================================================
-            // 3. Meal Plans — return date once, not inside each item
+            // 2. Meal Plan for specific date + tenant
             // ============================================================
-            var date = DateOnly.FromDateTime(DateTime.Now);
-            result.MealPlansDate = date;  // ⭐ Date only once
+            result.MealPlansDate = DateOnly.FromDateTime(date);
 
-            // Load meal types
             var allMealTypes = _context.MealTypes
-                .Where(mt => !mt.IsDeleted)
+                .Where(mt => !mt.IsDeleted && mt.TenantId == tenantId)
                 .Select(mt => new { mt.Id, mt.Name })
                 .ToList();
 
-            // Load meal plans for this date
             var mealPlans = _context.MealPlan
-                .Where(m => m.Date == date && m.UserId == userId && !m.IsDeleted)
+                .Where(m => m.Date == DateOnly.FromDateTime(date) &&
+                            m.UserId == userId &&
+                            m.TenantId == tenantId &&
+                            !m.IsDeleted)
                 .Include(m => m.NutritionalItem)
                 .ToList();
 
-            // Merge existing items + empty items
-            var mealPlanVMList = allMealTypes
-                .Select(mt =>
+            result.MealPlans = allMealTypes.Select(mt =>
+            {
+                var plansForType = mealPlans.Where(m => m.MealTypeId == mt.Id).ToList();
+
+                return new MealPlan
                 {
-                    var plansForType = mealPlans.Where(m => m.MealTypeId == mt.Id).ToList();
-
-                    return new MealPlan
+                    MealTypeId = mt.Id,
+                    Items = plansForType.Select(n => new Items
                     {
-                        MealTypeId = mt.Id,
-                        Items = plansForType.Select(n => new Items
-                        {
-                            Id = n.NutritionalItem.Id,
-                            Quantity = n.Quantity,
-                            CaloriesQuantity = n.NutritionalItem.CaloriesQuantity,
-                            ProteinQuantity = n.NutritionalItem.ProteinQuantity,
-                            Type = n.NutritionalItem.NutritionalItemTypeId,
-                            FocusIds = focusMap.GetValueOrDefault(n.NutritionalItem.Id, new List<int>()),
-                            VitaminIds = vitaminMap.GetValueOrDefault(n.NutritionalItem.Id, new List<int>()),
-                            DietTypeId = n.NutritionalItem.DietTypeId ?? 0,
-                            ItemImage = n.NutritionalItem.ItemImage,
-                            UserFavourite = favourites.Contains(n.NutritionalItem.Id)
-                        }).ToList()
-                    };
-                })
-                .ToList();
-
-            result.MealPlans = mealPlanVMList;
+                        Id = n.NutritionalItem.Id,
+                        Quantity = n.Quantity,
+                        CaloriesQuantity = n.NutritionalItem.CaloriesQuantity,
+                        ProteinQuantity = n.NutritionalItem.ProteinQuantity,
+                        Type = n.NutritionalItem.NutritionalItemTypeId,
+                        FocusIds = focusMap.GetValueOrDefault(n.NutritionalItem.Id, new List<int>()),
+                        VitaminIds = vitaminMap.GetValueOrDefault(n.NutritionalItem.Id, new List<int>()),
+                        DietTypeId = n.NutritionalItem.DietTypeId ?? 0,
+                        ItemImage = n.NutritionalItem.ItemImage,
+                        UserFavourite = favourites.Contains(n.NutritionalItem.Id)
+                    }).ToList()
+                };
+            }).ToList();
 
             // ============================================================
-            // 4. Filters
+            // 3. Filters – tenant-based
             // ============================================================
             result.MealTypes = allMealTypes
                 .Select(mt => new Filters { Id = mt.Id, Name = mt.Name })
                 .ToList();
 
             result.ItemTypes = _context.NutritionalIteamType
-                .Where(mt => !mt.IsDeleted)
-                .Select(mt => new Filters { Id = mt.Id, Name = mt.Name })
+                .Where(v => !v.IsDeleted && v.TenantId == tenantId)
+                .Select(v => new Filters { Id = v.Id, Name = v.Name })
                 .ToList();
 
             result.Vitamins = _context.Vitamins
-                .Where(v => !v.IsDeleted)
+                .Where(v => !v.IsDeleted && v.TenantId == tenantId)
                 .Select(v => new Filters { Id = v.Id, Name = v.Name })
                 .ToList();
 
             result.FocusTags = _context.NutritionalFocuses
-                .Where(f => !f.IsDeleted)
+                .Where(f => !f.IsDeleted && f.TenantId == tenantId)
                 .Select(f => new Filters { Id = f.Id, Name = f.Name })
                 .ToList();
 
