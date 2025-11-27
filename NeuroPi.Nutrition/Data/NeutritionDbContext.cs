@@ -47,12 +47,11 @@ namespace NeuroPi.Nutrition.Data
 
         public DbSet<MNutritionalFocusItem> NutritionalFocusItem { get; set; }
 
-<<<<<<< Updated upstream
+
 
         public DbSet<MUserFeedback> UserFeedback { get; set; }
 
-=======
->>>>>>> Stashed changes
+
         public DbSet<MResourceType> ResourceTypes { get; set; }
         public DbSet<MResourceMaster> ResourceMasters { get; set; }
         public DbSet<MResourceInstruction> ResourceInstructions { get; set; }
@@ -81,52 +80,7 @@ namespace NeuroPi.Nutrition.Data
 
         }
 
-        // Resource Type
-//        modelBuilder.Entity<MResourceType>()
-//                .HasMany(rt => rt.Resources)
-//                .WithOne(rm => rm.Type)
-//                .HasForeignKey(rm => rm.TypeId);
-
-//        // Resource Master
-//        modelBuilder.Entity<MResourceMaster>()
-//                .HasOne(rm => rm.Module)
-//                .WithMany()
-//                .HasForeignKey(rm => rm.ModuleId);
-
-//        // Resource Instructions
-//        modelBuilder.Entity<MResourceInstruction>()
-//                .HasOne(i => i.Resource)
-//                .WithMany(r => r.Instructions)
-//                .HasForeignKey(i => i.ResourceId)
-//                .OnDelete(DeleteBehavior.Cascade);
-
-//        // Timetable
-//        modelBuilder.Entity<MTimetable>()
-//                .HasOne(t => t.Resource)
-//                .WithMany(r => r.Timetables)
-//                .HasForeignKey(t => t.ResourceId);
-
-//        modelBuilder.Entity<MTimetable>()
-//                .HasIndex(t => new { t.Date, t.ResourceId
-//    })
-//                .IsUnique();
-
-//    // User Game Status
-//    modelBuilder.Entity<MUserGamesStatus>()
-//                .HasIndex(s => new { s.UserId, s.NutTimetableId, s.ActivityDate
-//})
-//                .IsUnique();
-
-//modelBuilder.Entity<MUserGamesStatus>()
-//    .HasOne(s => s.Timetable)
-//    .WithMany(t => t.UserStatuses)
-//    .HasForeignKey(s => s.NutTimetableId);
-
-//modelBuilder.Entity<MUserGamesStatus>()
-//    .HasOne(s => s.Status)
-//    .WithMany()
-//    .HasForeignKey(s => s.StatusId);
-
+        
 
 
 

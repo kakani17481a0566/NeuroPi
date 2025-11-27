@@ -13,6 +13,10 @@ namespace NeuroPi.Nutrition.Model
         [Column("name")]
         public string Name { get; set; }
 
+        [Column("code")]
+        public string? Code { get; set; }
+
+
         [Column("masters_type_id")]
         [ForeignKey("NutritionMasterType")]
         public int NutritionMasterTypeId { get; set; }

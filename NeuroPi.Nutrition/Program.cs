@@ -35,6 +35,8 @@ builder.Services.AddScoped<IRecipesInstructions, RecipesInstructionServiceImpl>(
 builder.Services.AddScoped<IMealPlanMonitoring, MealPlanMonitoringServiceImpl>();
 builder.Services.AddScoped<IUserGene, UserGeneServiceImpl>();
 builder.Services.AddScoped<IUserFeedback, UserFeedbackServiceImpl>();
+builder.Services.AddScoped<ITimetable, TimetableServiceImpl>();
+
 
 
 // --------------------------------------
