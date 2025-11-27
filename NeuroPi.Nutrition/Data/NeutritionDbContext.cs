@@ -47,7 +47,9 @@ namespace NeuroPi.Nutrition.Data
 
         public DbSet<MNutritionalFocusItem> NutritionalFocusItem { get; set; }
 
+
         public DbSet<MUserFeedback> UserFeedback { get; set; }
+
         public DbSet<MResourceType> ResourceTypes { get; set; }
         public DbSet<MResourceMaster> ResourceMasters { get; set; }
         public DbSet<MResourceInstruction> ResourceInstructions { get; set; }
