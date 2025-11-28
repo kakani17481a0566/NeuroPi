@@ -16,122 +16,91 @@ namespace NeuroPi.Nutrition.Services.Implementation
 
         public List<TimetableVM> GetTimetable(int userId, DateTime date, int tenantId, int moduleId)
         {
-            // Handle special flags
             bool getAll = date == DateTime.MinValue;
             bool getCurrentWeek = date == DateTime.MinValue.AddDays(1);
 
-            // Base Query
-            var baseQuery =
+            var query =
                 from t in _context.Timetables
-                join r in _context.ResourceMasters
-                    on t.ResourceId equals r.Id into rj
-                from r in rj.DefaultIfEmpty()
+                join r in _context.ResourceMasters on t.ResourceId equals r.Id
+                join rt in _context.ResourceTypes on r.TypeId equals rt.Id
 
-                join rt in _context.ResourceTypes
-                    on r.TypeId equals rt.Id into rtj
-                from rt in rtj.DefaultIfEmpty()
-
-                join us in _context.UserGamesStatuses
-                    on new { Tid = (int?)t.Id, Uid = (int?)userId }
-                    equals new { Tid = us.NutTimetableId, Uid = us.UserId } into usj
+                join us in _context.UserGamesStatuses.Where(x => x.UserId == userId)
+                    on t.Id equals us.NutTimetableId into usj
                 from us in usj.DefaultIfEmpty()
 
-                join sm in _context.NutritionMasters
-                    on us.StatusId equals sm.Id into smj
-                from sm in smj.DefaultIfEmpty()
-
-                where t.TenantId == tenantId
-                      && r.ModuleId == moduleId
+                where t.TenantId == tenantId && r.ModuleId == moduleId
                 select new
                 {
-                    t.Id,
-                    t.Date,
-                    t.Cycle,
-                    t.Duration,
-                    t.DailyWeekly,
+                    Timetable = t,
                     Resource = r,
                     ResourceType = rt,
-
-                    // ⭐ USER STATUS HANDLING
-                    StatusId = us != null ? us.StatusId : (int?)null,
-
-                    StatusCode = sm != null ? sm.Code : "NOT_STARTED",
-                    StatusName = sm != null ? sm.Name : "Not Started"
+                    UserStatus = us
                 };
 
-            // Apply date filters
-            if (!getAll && !getCurrentWeek)
+            // -----------------------------
+            // DATE FILTERING
+            // -----------------------------
+            if (getCurrentWeek)
             {
-                date = DateTime.SpecifyKind(date, DateTimeKind.Utc);
-                baseQuery = baseQuery.Where(x => x.Date.HasValue && x.Date.Value.Date == date.Date);
+                var today = DateTime.UtcNow.Date;
+
+                // Monday = start of week
+                var startOfWeek = today.AddDays(-(int)today.DayOfWeek + 1);
+                var endOfWeek = startOfWeek.AddDays(6);
+
+                query = query.Where(x =>
+                    x.Timetable.Date >= startOfWeek &&
+                    x.Timetable.Date <= endOfWeek);
             }
-            else if (getCurrentWeek)
+            else if (!getAll)
             {
-                DateTime today = DateTime.UtcNow.Date;
-                int diff = (7 + (today.DayOfWeek - DayOfWeek.Monday)) % 7;
-                DateTime weekStart = today.AddDays(-diff);
-                DateTime weekEnd = weekStart.AddDays(6);
-
-                baseQuery = baseQuery.Where(x =>
-                    x.Date.HasValue &&
-                    x.Date.Value.Date >= weekStart &&
-                    x.Date.Value.Date <= weekEnd
-                );
+                query = query.Where(x => x.Timetable.Date == date.Date);
             }
 
-            var result = baseQuery.ToList();
+            var rawList = query.ToList();
 
-            // Instructions Lookup
-            var resourceIds = result.Where(x => x.Resource != null)
-                                    .Select(x => x.Resource.Id)
-                                    .Distinct()
-                                    .ToList();
+            // -----------------------------
+            // REMOVE DUPLICATES
+            // -----------------------------
+            var grouped = rawList
+                .GroupBy(x => x.Timetable.Id)
+                .Select(g =>
+                    g.FirstOrDefault(x => x.UserStatus != null) ?? g.First())
+                .ToList();
 
-            var instructionsLookup = new Dictionary<int, List<string>>();
-
-            if (resourceIds.Count > 0)
+            // -----------------------------
+            // FINAL RESPONSE
+            // -----------------------------
+            var result = grouped.Select(x => new TimetableVM
             {
-                instructionsLookup = _context.ResourceInstructions
-                    .Where(i => resourceIds.Contains(i.ResourceId.Value))
+                Id = x.Timetable.Id,
+                Date = x.Timetable.Date,
+                Cycle = x.Timetable.Cycle,
+                Duration = x.Timetable.Duration,
+                DailyWeekly = x.Timetable.DailyWeekly,
+
+                ResourceId = x.Resource.Id,
+                ResourceName = x.Resource.Name,
+                ResourceShortName = x.Resource.ShortName,
+                ResourceDescription = x.Resource.Description,
+                PreviewUrl = x.Resource.PreviewUrl,
+                Image = x.Resource.PreviewUrl,
+                Script = x.Resource.Script,
+                ResourceType = x.ResourceType.Name,
+
+                Instructions = _context.ResourceInstructions
+                    .Where(i => i.ResourceId == x.Resource.Id)
                     .OrderBy(i => i.Id)
-                    .ToList()
-                    .GroupBy(i => i.ResourceId.Value)
-                    .ToDictionary(
-                        g => g.Key,
-                        g => g.Select(i => i.Description).ToList()
-                    );
-            }
+                    .Select(i => i.Description)
+                    .ToList(),
 
-            // Final Map
-            return result.Select(x => new TimetableVM
-            {
-                Id = x.Id,
-                Date = x.Date,
-                Cycle = x.Cycle,
-                Duration = x.Duration,
-                DailyWeekly = x.DailyWeekly,
+                StatusId = x.UserStatus?.StatusId ?? 0,
+                StatusName = x.UserStatus?.Status?.Name ?? "Not Started",
+                StatusCode = x.UserStatus?.Status?.Code ?? "NOT_STARTED"
 
-                ResourceId = x.Resource?.Id,
-                ResourceName = x.Resource?.Name,
-                ResourceShortName = x.Resource?.ShortName,
-                ResourceDescription = x.Resource?.Description,
-                PreviewUrl = x.Resource?.PreviewUrl,
-                Image = x.Resource?.Image,
-                Script = x.Resource?.Script,
-                ResourceType = x.ResourceType?.Name,
+            }).OrderBy(x => x.Date).ToList();
 
-                Instructions = (x.Resource != null &&
-                                instructionsLookup.ContainsKey(x.Resource.Id))
-                                ? instructionsLookup[x.Resource.Id]
-                                : new List<string>(),
-
-                StatusId = x.StatusId,
-                StatusName = x.StatusName,
-                StatusCode = x.StatusCode
-
-            }).ToList();
+            return result;
         }
-
-
     }
 }

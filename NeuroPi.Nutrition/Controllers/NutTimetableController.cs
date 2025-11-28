@@ -6,6 +6,8 @@ using System.Net;
 
 namespace NeuroPi.Nutrition.Controllers
 {
+
+
     [Route("api/[controller]")]
     [ApiController]
     public class NutTimetableController : ControllerBase
@@ -20,35 +22,30 @@ namespace NeuroPi.Nutrition.Controllers
         [HttpGet]
         public ResponseResult<List<TimetableVM>> GetTimetable(
             [FromQuery] int userId,
-            [FromQuery] int date,        // ⭐ CHANGED from DateTime to int
+            [FromQuery] int date,
             [FromQuery] int tenantId,
             [FromQuery] int moduleId)
         {
             try
             {
-                // ---------------------------------------
-                // ⭐ RESOLVE DATE FLAG
-                // ---------------------------------------
                 DateTime resolvedDate;
 
-                if (date == 0)
+                switch (date)
                 {
-                    resolvedDate = DateTime.MinValue; // ALL
-                }
-                else if (date == -1)
-                {
-                    resolvedDate = DateTime.MinValue.AddDays(1); // CURRENT WEEK
-                }
-                else
-                {
-                    // Normal date (yyyyMMdd int converted to string)
-                    string dateStr = date.ToString();
-                    resolvedDate = DateTime.ParseExact(dateStr, "yyyyMMdd", null);
+                    case 0:
+                        resolvedDate = DateTime.MinValue; // ALL
+                        break;
+
+                    case -1:
+                        resolvedDate = DateTime.MinValue.AddDays(1); // CURRENT WEEK FLAG
+                        break;
+
+                    default:
+                        // Convert yyyyMMdd → DateTime
+                        resolvedDate = DateTime.ParseExact(date.ToString(), "yyyyMMdd", null);
+                        break;
                 }
 
-                // ---------------------------------------
-                // ⭐ CALL SERVICE
-                // ---------------------------------------
                 var data = _timetableService.GetTimetable(userId, resolvedDate, tenantId, moduleId);
 
                 return new ResponseResult<List<TimetableVM>>(
@@ -67,4 +64,7 @@ namespace NeuroPi.Nutrition.Controllers
             }
         }
     }
+
+
+
 }
