@@ -16,12 +16,13 @@ namespace NeuroPi.Nutrition.Services.Implementation
 
         public List<TimetableVM> GetTimetable(int userId, DateTime date, int tenantId, int moduleId)
         {
-            // FIX: Force incoming date to UTC
-            date = DateTime.SpecifyKind(date, DateTimeKind.Utc);
+            // Handle special flags
+            bool getAll = date == DateTime.MinValue;
+            bool getCurrentWeek = date == DateTime.MinValue.AddDays(1);
 
-            var timetableData =
+            // Base Query
+            var baseQuery =
                 from t in _context.Timetables
-
                 join r in _context.ResourceMasters
                     on t.ResourceId equals r.Id into rj
                 from r in rj.DefaultIfEmpty()
@@ -40,9 +41,7 @@ namespace NeuroPi.Nutrition.Services.Implementation
                 from sm in smj.DefaultIfEmpty()
 
                 where t.TenantId == tenantId
-                      && t.Date.HasValue
-                      && t.Date.Value.Date == date.Date
-                      && r.ModuleId == moduleId   // ← added module filter
+                      && r.ModuleId == moduleId
                 select new
                 {
                     t.Id,
@@ -52,17 +51,41 @@ namespace NeuroPi.Nutrition.Services.Implementation
                     t.DailyWeekly,
                     Resource = r,
                     ResourceType = rt,
-                    UserStatus = us,
-                    StatusMaster = sm
+
+                    // ⭐ USER STATUS HANDLING
+                    StatusId = us != null ? us.StatusId : (int?)null,
+
+                    StatusCode = sm != null ? sm.Code : "NOT_STARTED",
+                    StatusName = sm != null ? sm.Name : "Not Started"
                 };
 
-            var result = timetableData.ToList();
+            // Apply date filters
+            if (!getAll && !getCurrentWeek)
+            {
+                date = DateTime.SpecifyKind(date, DateTimeKind.Utc);
+                baseQuery = baseQuery.Where(x => x.Date.HasValue && x.Date.Value.Date == date.Date);
+            }
+            else if (getCurrentWeek)
+            {
+                DateTime today = DateTime.UtcNow.Date;
+                int diff = (7 + (today.DayOfWeek - DayOfWeek.Monday)) % 7;
+                DateTime weekStart = today.AddDays(-diff);
+                DateTime weekEnd = weekStart.AddDays(6);
 
-            var resourceIds = result
-                .Where(x => x.Resource != null)
-                .Select(x => x.Resource.Id)
-                .Distinct()
-                .ToList();
+                baseQuery = baseQuery.Where(x =>
+                    x.Date.HasValue &&
+                    x.Date.Value.Date >= weekStart &&
+                    x.Date.Value.Date <= weekEnd
+                );
+            }
+
+            var result = baseQuery.ToList();
+
+            // Instructions Lookup
+            var resourceIds = result.Where(x => x.Resource != null)
+                                    .Select(x => x.Resource.Id)
+                                    .Distinct()
+                                    .ToList();
 
             var instructionsLookup = new Dictionary<int, List<string>>();
 
@@ -79,12 +102,11 @@ namespace NeuroPi.Nutrition.Services.Implementation
                     );
             }
 
+            // Final Map
             return result.Select(x => new TimetableVM
             {
                 Id = x.Id,
                 Date = x.Date,
-
-                // added here
                 Cycle = x.Cycle,
                 Duration = x.Duration,
                 DailyWeekly = x.DailyWeekly,
@@ -98,14 +120,14 @@ namespace NeuroPi.Nutrition.Services.Implementation
                 Script = x.Resource?.Script,
                 ResourceType = x.ResourceType?.Name,
 
-                Instructions = (x.Resource != null
-                                && instructionsLookup.ContainsKey(x.Resource.Id))
+                Instructions = (x.Resource != null &&
+                                instructionsLookup.ContainsKey(x.Resource.Id))
                                 ? instructionsLookup[x.Resource.Id]
                                 : new List<string>(),
 
-                StatusId = x.UserStatus?.StatusId,
-                StatusName = x.StatusMaster?.Name,
-                StatusCode = x.StatusMaster?.Code
+                StatusId = x.StatusId,
+                StatusName = x.StatusName,
+                StatusCode = x.StatusCode
 
             }).ToList();
         }
