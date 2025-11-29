@@ -84,7 +84,7 @@ namespace NeuroPi.Nutrition.Services.Implementation
                 ResourceShortName = x.Resource.ShortName,
                 ResourceDescription = x.Resource.Description,
                 PreviewUrl = x.Resource.PreviewUrl,
-                Image = x.Resource.PreviewUrl,
+                Image = x.Resource.Image,
                 Script = x.Resource.Script,
                 ResourceType = x.ResourceType.Name,
 
