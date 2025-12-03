@@ -91,12 +91,16 @@ namespace NeuroPi.Nutrition.Services.Implementation
             existingUnplannedMeal.NutritionalItemId = UpdateVM.NutritionalItemId;
             existingUnplannedMeal.Quantity = UpdateVM.Quantity;
             existingUnplannedMeal.OtherName = UpdateVM.OtherName;
-            existingUnplannedMeal.OtherCaloriesQuantity = UpdateVM.OtherCaloriesQuantity;
+            existingUnplannedMeal.OtherCaloriesQuantity = (int)UpdateVM.OtherCaloriesQuantity;
             existingUnplannedMeal.UpdatedBy = UpdateVM.UpdatedBy;
             existingUnplannedMeal.UpdatedOn = DateTime.UtcNow;
             _context.SaveChanges();
             return UnplannedMealResponseVM.ToViewModel(existingUnplannedMeal);
 
         }
+
+
+
+
     }
 }
