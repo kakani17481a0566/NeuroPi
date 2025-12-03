@@ -20,6 +20,8 @@
 
         public bool Edible { get; set; }
 
+        public string? ItemImage { get; set; } = null;
+
         public int? UpdatedBy { get; set; }
 
         public DateTime? UpdatedOn { get; set; }

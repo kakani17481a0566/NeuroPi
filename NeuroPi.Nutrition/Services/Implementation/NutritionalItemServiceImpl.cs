@@ -390,6 +390,7 @@ namespace NeuroPi.Nutrition.Services.Implementation
             existingNutritionalItem.Receipe = item.Receipe;
             existingNutritionalItem.NutritionalItemTypeId = item.NutritionalItemTypeId;
             existingNutritionalItem.Eatble = item.Edible;
+            existingNutritionalItem.ItemImage = item.ItemImage;
             existingNutritionalItem.UpdatedBy = item.UpdatedBy;
             existingNutritionalItem.UpdatedOn = DateTime.UtcNow;
             _context.SaveChanges();
