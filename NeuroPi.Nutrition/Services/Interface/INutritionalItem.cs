@@ -25,6 +25,9 @@ namespace NeuroPi.Nutrition.Services.Interface
 
         SaveMealPlanResponseVM EditMealPlan(SaveMealPlanVM model);
 
+        NutritionalDropdownsVM GetDropdowns(int tenantId);
+
+
 
 
 

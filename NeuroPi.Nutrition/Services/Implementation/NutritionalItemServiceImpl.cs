@@ -565,7 +565,36 @@ namespace NeuroPi.Nutrition.Services.Implementation
             return response;
         }
 
+        public NutritionalDropdownsVM GetDropdowns(int tenantId)
+        {
+            var result = new NutritionalDropdownsVM();
 
+            // Meal Types
+            result.MealTypes = _context.MealTypes
+                .Where(x => !x.IsDeleted && x.TenantId == tenantId)
+                .Select(x => new Filters { Id = x.Id, Name = x.Name })
+                .ToList();
+
+            // Vitamins
+            result.Vitamins = _context.Vitamins
+                .Where(x => !x.IsDeleted && x.TenantId == tenantId)
+                .Select(x => new Filters { Id = x.Id, Name = x.Name })
+                .ToList();
+
+            // Focus Tags
+            result.FocusTags = _context.NutritionalFocuses
+                .Where(x => !x.IsDeleted && x.TenantId == tenantId)
+                .Select(x => new Filters { Id = x.Id, Name = x.Name })
+                .ToList();
+
+            // Nutritional Item Types
+            result.ItemTypes = _context.NutritionalIteamType
+                .Where(x => !x.IsDeleted && x.TenantId == tenantId)
+                .Select(x => new Filters { Id = x.Id, Name = x.Name })
+                .ToList();
+
+            return result;
+        }
 
     }
 }

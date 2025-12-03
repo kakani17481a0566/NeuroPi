@@ -134,6 +134,20 @@ namespace NeuroPi.Nutrition.Controllers
                 HttpStatusCode.OK, result, "Meal Plan updated successfully");
         }
 
+        [HttpGet("dropdowns/{tenantId}")]
+        public ResponseResult<NutritionalDropdownsVM> GetDropdowns(int tenantId)
+        {
+            var result = _nutritionalItemService.GetDropdowns(tenantId);
+
+            return new ResponseResult<NutritionalDropdownsVM>(
+                HttpStatusCode.OK,
+                result,
+                "Dropdown data fetched successfully"
+            );
+        }
+
+
+
 
 
     }
