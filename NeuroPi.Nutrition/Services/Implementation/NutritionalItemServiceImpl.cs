@@ -391,7 +391,7 @@ namespace NeuroPi.Nutrition.Services.Implementation
             existingNutritionalItem.NutritionalItemTypeId = item.NutritionalItemTypeId;
             existingNutritionalItem.Eatble = item.Edible;
             existingNutritionalItem.UpdatedBy = item.UpdatedBy;
-            existingNutritionalItem.UpdatedOn = DateTime.Now;
+            existingNutritionalItem.UpdatedOn = DateTime.UtcNow;
             _context.SaveChanges();
             return NutritionalItemResponseVM.ToViewModel(existingNutritionalItem);
 
