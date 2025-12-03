@@ -4,11 +4,11 @@ using NeuroPi.Nutrition.ViewModel.NutritionalItemVitamins;
 
 namespace NeuroPi.Nutrition.Services.Implementation
 {
-    public class NutritionalItemVitamins : INutritionalItemVitamins
+    public class NutritionalItemVitaminsServiceImpl : INutritionalItemVitamins
     {
         private readonly NeutritionDbContext _context;
 
-        public NutritionalItemVitamins (NeutritionDbContext context)
+        public NutritionalItemVitaminsServiceImpl (NeutritionDbContext context)
         {
             _context = context;
         }
