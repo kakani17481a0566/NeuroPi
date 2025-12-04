@@ -261,11 +261,45 @@ namespace SchoolManagement.Services.Implementation
             };
         }
 
-        public string GetWeekTimeTable(int courseId, int tenantId)
+        public TimeTableFullResponseVM GetWeekTimeTable(int courseId, int tenantId)
         {
-            string day = DateTime.UtcNow.DayOfWeek.ToString();
+            var model = _dbContext.TimeTables
+        .Include(x => x.Week)
+        .Include(x => x.Course)
+        .Include(x => x.AssessmentStatus)
+        .Include(x => x.PublicHoliday)   
+        .FirstOrDefault(x =>
+            x.CourseId == courseId &&
+            x.TenantId == tenantId &&
+            !x.IsDeleted);
 
-            return day;
+            if (model == null)
+                return null;
+
+            return new TimeTableFullResponseVM
+            {
+                Id = model.Id,
+                Name = model.Name,
+                Date = model.Date,
+
+                WeekId = model.WeekId,
+                WeekName = model.Week?.Name,
+
+                HolidayId = model.HolidayId,
+                HolidayName = model.PublicHoliday?.Name,
+
+                Status = model.Status,
+
+                CourseId = model.CourseId,
+                CourseName = model.Course?.Name,
+
+                AssessmentStatusCode = model.AssessmentStatusCode,
+                AssessmentStatusName = model.AssessmentStatus?.Name,
+
+                TenantId = model.TenantId
+            };
+
+
 
         }
 

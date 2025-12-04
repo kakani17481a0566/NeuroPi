@@ -19,10 +19,12 @@ namespace SchoolManagement.Services.Interface
         WeekTimeTableData GetWeeklyTimeTable(int weekId, int tenantId, int courseId);
         bool Delete(int id, int tenantId);
         //MTableFileResponseVM GetAllByCourseId(int courseId);
-        String GetWeekTimeTable(int courseId,int tenantId);
+        TimeTableFullResponseVM GetWeekTimeTable(int courseId,int tenantId);
 
         TimeTableData GetAllStructured(int tenantId);
         TimeTableInsertTableOptionsVM GetInsertOptions(int tenantId);
+
+        
 
 
     }
