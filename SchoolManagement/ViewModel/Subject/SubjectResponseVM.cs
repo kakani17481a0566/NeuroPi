@@ -8,6 +8,9 @@ namespace SchoolManagement.ViewModel.Subject
         public string Name { get; set; }
         public string Code { get; set; }
         public string Description { get; set; }
+        
+
+    
 
         public static SubjectResponseVM FromModel(MSubject model) => new SubjectResponseVM
         {

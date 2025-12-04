@@ -11,6 +11,8 @@ namespace SchoolManagement.Services.Interface
         SubjectResponseVM GetSubjectById(int id, int tenantId);
         SubjectResponseVM CreateSubject(SubjectRequestVM subject);
         SubjectResponseVM UpdateSubject(int id, int tenantId, SubjectUpdateVM subject);
+
+        List<SubjectResponseVM> GetSubjectsByCourseIdAndTenantIt(int courseId, int tenantId);
         bool DeleteSubject(int id, int tenantId);
     }
 }

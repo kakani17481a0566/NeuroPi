@@ -116,5 +116,27 @@ namespace SchoolManagement.Controllers
 
             return new ResponseResult<string>(HttpStatusCode.OK, "Deleted", "Subject deleted successfully");
         }
+
+        [HttpGet("subjectsByCourseId/{courseId}/{tenantId}")]
+        public ResponseResult<List<SubjectResponseVM>> GetSubjectsByCourseId(int courseId, int tenantId)
+        {
+            var subjects = _subjectService.GetSubjectsByCourseIdAndTenantIt(courseId, tenantId);
+
+            if (subjects == null || !subjects.Any())
+            {
+                return new ResponseResult<List<SubjectResponseVM>>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    "No subjects found for this course and tenant"
+                );
+            }
+
+            return new ResponseResult<List<SubjectResponseVM>>(
+                HttpStatusCode.OK,
+                subjects,
+                "Subjects fetched successfully"
+            );
+        }
+
     }
 }

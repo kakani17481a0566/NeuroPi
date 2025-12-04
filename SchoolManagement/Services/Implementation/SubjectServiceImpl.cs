@@ -82,5 +82,14 @@ namespace SchoolManagement.Services.Implementation
             _dbContext.SaveChanges();
             return true;
         }
+
+        public List<SubjectResponseVM> GetSubjectsByCourseIdAndTenantIt(int courseId, int tenantId)
+        {
+            return _dbContext.subjects
+               .Where(s => s.CourseId==courseId && s.TenantId == tenantId && !s.IsDeleted)
+               .Select(SubjectResponseVM.FromModel)
+               .ToList();
+
+        }
     }
 }
