@@ -13,6 +13,8 @@ namespace SchoolManagement.Services.Interface
         WeekVm GetWeekById(int id);
         WeekVm CreateWeek(WeekCreateVm request);
         WeekVm UpdateWeek(int id, int tenantId, WeekUpdateVm request);
+
+        WeekVm GetWeeksByTermAndTenant(int termId, int tenantId);    
         bool DeleteWeek(int id, int tenantId);
     }
 }

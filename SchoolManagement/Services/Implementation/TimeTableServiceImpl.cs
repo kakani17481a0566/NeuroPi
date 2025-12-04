@@ -261,22 +261,25 @@ namespace SchoolManagement.Services.Implementation
             };
         }
 
-        public TimeTableFullResponseVM GetWeekTimeTable(int courseId, int tenantId)
+        public List<TimeTableFullResponseVM> GetWeekTimeTable(int weekId, int courseId, int tenantId)
         {
-            var model = _dbContext.TimeTables
-        .Include(x => x.Week)
-        .Include(x => x.Course)
-        .Include(x => x.AssessmentStatus)
-        .Include(x => x.PublicHoliday)   
-        .FirstOrDefault(x =>
-            x.CourseId == courseId &&
-            x.TenantId == tenantId &&
-            !x.IsDeleted);
+            var query = _dbContext.TimeTables
+                .Include(x => x.Week)
+                .Include(x => x.Course)
+                .Include(x => x.AssessmentStatus)
+                .Include(x => x.PublicHoliday)
+                .Where(x =>
+                    x.WeekId == weekId &&
+                    x.CourseId == courseId &&
+                    x.TenantId == tenantId &&
+                    !x.IsDeleted)
+                .OrderBy(x => x.Date)
+                .ToList();
 
-            if (model == null)
-                return null;
+            if (!query.Any())
+                return new List<TimeTableFullResponseVM>();
 
-            return new TimeTableFullResponseVM
+            return query.Select(model => new TimeTableFullResponseVM
             {
                 Id = model.Id,
                 Name = model.Name,
@@ -297,11 +300,10 @@ namespace SchoolManagement.Services.Implementation
                 AssessmentStatusName = model.AssessmentStatus?.Name,
 
                 TenantId = model.TenantId
-            };
 
-
-
+            }).ToList();
         }
+
 
 
 

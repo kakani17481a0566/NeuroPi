@@ -18,8 +18,9 @@ namespace SchoolManagement.Services.Interface
         TimeTableResponseVM Update(int id, int tenantId, TimeTableUpdateVM vm);
         WeekTimeTableData GetWeeklyTimeTable(int weekId, int tenantId, int courseId);
         bool Delete(int id, int tenantId);
-        //MTableFileResponseVM GetAllByCourseId(int courseId);
-        TimeTableFullResponseVM GetWeekTimeTable(int courseId,int tenantId);
+        
+        List<TimeTableFullResponseVM> GetWeekTimeTable(int weekId, int courseId, int tenantId);
+
 
         TimeTableData GetAllStructured(int tenantId);
         TimeTableInsertTableOptionsVM GetInsertOptions(int tenantId);
