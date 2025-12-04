@@ -94,5 +94,15 @@ namespace SchoolManagement.Controllers
             }
             return await Task.FromResult(new ResponseResult<string>(HttpStatusCode.NoContent, null, "Week deleted successfully"));
         }
+
+        // GET: api/week/tenant/{tenantId}/term/{termId}
+        [HttpGet("week/tenant/term/{tenantId}/term/{termId}")]
+        public async Task<IActionResult> GetWeeksByTenantIdAndTermId(int tenantId, int termId)
+        {
+            var weeks = _weekService.GetWeeksByTenantIdAndTermId(tenantId, termId);
+            var response = new ResponseResult<List<WeekVm>>(HttpStatusCode.OK, weeks);
+            return await Task.FromResult(response);
+        }
+
     }
 }

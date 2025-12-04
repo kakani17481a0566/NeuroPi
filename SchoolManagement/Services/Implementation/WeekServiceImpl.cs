@@ -98,5 +98,16 @@ namespace SchoolManagement.Services.Implementation
 
             return true;
         }
+
+        public List<WeekVm> GetWeeksByTenantIdAndTermId(int tenantId, int termId)
+        {
+            return _dbContext.Weeks
+                .Where(w => w.TenantId == tenantId
+                         && w.TermId == termId
+                         && !w.IsDeleted)
+                .Select(WeekVm.FromModel)
+                .ToList();
+        }
+
     }
 }

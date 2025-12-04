@@ -16,5 +16,8 @@ namespace SchoolManagement.Services.Interface
 
         WeekVm GetWeeksByTermAndTenant(int termId, int tenantId);    
         bool DeleteWeek(int id, int tenantId);
+
+        List<WeekVm> GetWeeksByTenantIdAndTermId(int tenantId, int termId);
+
     }
 }
