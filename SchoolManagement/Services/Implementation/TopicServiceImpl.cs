@@ -78,12 +78,28 @@ namespace SchoolManagement.Services.Implementation
         // --------------------------------------------------------------------
         public TopicResponseVM Create(TopicRequestVM request)
         {
+            // 🔍 1. CHECK IF SAME TOPIC ALREADY EXISTS (Name + Subject + Tenant)
+            bool exists = _dbContext.Topics.Any(t =>
+                t.Name.ToLower() == request.Name.ToLower() &&
+                t.SubjectId == request.SubjectId &&
+                t.TenantId == request.TenantId &&
+                !t.IsDeleted
+            );
+
+            if (exists)
+            {
+                throw new InvalidOperationException("Topic with same name already exists for this subject.");
+            }
+
+            // 🔍 2. (Optional) Check duplicate Code
+                     // ✅ 3. IF SAFE → INSERT
             var topic = request.ToModel();
             _dbContext.Topics.Add(topic);
             _dbContext.SaveChanges();
 
             return TopicResponseVM.FromModel(topic);
         }
+
 
         // --------------------------------------------------------------------
         // UPDATE
