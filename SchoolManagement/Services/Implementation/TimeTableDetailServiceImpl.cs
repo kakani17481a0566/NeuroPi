@@ -271,5 +271,36 @@ namespace SchoolManagement.Services.Implementation
         }
 
 
+        public List<TimeTableDetailResponseByTTVM> GetByTimeTableId(int timeTableId, int tenantId)
+        {
+            var items = _dbContext.TimeTableDetails
+                .Include(x => x.Period)
+                .Include(x => x.Subject)
+                .Where(x =>
+                    x.TimeTableId == timeTableId &&
+                    x.TenantId == tenantId &&
+                    !x.IsDeleted
+                )
+                .ToList();
+
+            if (!items.Any())
+                return null;
+
+            return items.Select(item => new TimeTableDetailResponseByTTVM
+            {
+                Id = item.Id,
+                TimeTableId = item.TimeTableId,
+
+                PeriodId = item.PeriodId,
+                PeriodName = item.Period?.Name,
+
+                SubjectId = item.SubjectId,
+                SubjectName = item.Subject?.Name
+
+            }).ToList();
+        }
+
+
+
     }
 }

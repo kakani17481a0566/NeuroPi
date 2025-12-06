@@ -66,7 +66,7 @@ namespace SchoolManagement.Controllers
 
         // Create a new topic
         // POST: api/topic
-        [HttpPost]
+        [HttpPost("Create-topics")]
         public ResponseResult<TopicResponseVM> Create([FromBody] TopicRequestVM request)
         {
             if (request == null)
@@ -134,6 +134,29 @@ namespace SchoolManagement.Controllers
             }
             return new ResponseResult<TimeTableDropDown>(HttpStatusCode.OK, result, "Timetable dropdown data fetched successfully");
         }
+
+        // GET: api/topic/subject/{subjectId}/tenant/{tenantId}
+        // GET: api/topic/by-subject/{subjectId}/tenant/{tenantId}
+        [HttpGet("by-subject/{subjectId}/tenant/{tenantId}")]
+        public ResponseResult<List<TopicResponseVM>> GetTopicsBySubject(int subjectId, int tenantId)
+        {
+            var result = _service.GetBySubject(subjectId, tenantId);
+
+            if (result == null || result.Count == 0)
+                return new ResponseResult<List<TopicResponseVM>>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    "No topics found for this subject"
+                );
+
+            return new ResponseResult<List<TopicResponseVM>>(
+                HttpStatusCode.OK,
+                result,
+                "Topics fetched successfully"
+            );
+        }
+
+
 
     }
 }

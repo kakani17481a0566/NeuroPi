@@ -125,6 +125,8 @@ builder.Services.AddScoped<IFeeTransactions, FeeTransactionsServiceImpl>();
 
 builder.Services.AddScoped<IItemHeaderService, ItemHeaderServiceImpl>();
 
+builder.Services.AddScoped<ITableFilesService, TableFilesServiceImpl>();
+
 
 
 

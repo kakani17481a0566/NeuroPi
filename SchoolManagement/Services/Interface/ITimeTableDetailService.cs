@@ -15,6 +15,12 @@ namespace SchoolManagement.Services.Interface
         TimeTableDetailTableResponseVM GetTableDetails(int tenantId);
         TimeTableDetailInsertOptionsVM GetInsertOptions(int tenantId);
 
+      
+
+        List<TimeTableDetailResponseByTTVM> GetByTimeTableId(int timeTableId, int tenantId);
+
+
+
 
     }
 }

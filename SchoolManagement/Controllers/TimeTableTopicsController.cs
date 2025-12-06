@@ -96,5 +96,20 @@ namespace SchoolManagement.Controllers
             return new ResponseResult<TimeTableTopicDropdown>(HttpStatusCode.OK, data, "Mapped dropdowns fetched successfully");
         }
 
+        [HttpGet("TimetableDetailTopicsController/{tenantId}/detail/{timeTableDetailId}")]
+        public ResponseResult<List<TimeTableTopicByDetailResponseVM>>
+    GetTopicsByDetail(int tenantId, int timeTableDetailId)
+        {
+            var data = _service.GetTopicsByTimeTableDetailId(tenantId, timeTableDetailId);
+
+            if (data == null || data.Count == 0)
+                return new ResponseResult<List<TimeTableTopicByDetailResponseVM>>
+                    (HttpStatusCode.NotFound, null, "No topics found");
+
+            return new ResponseResult<List<TimeTableTopicByDetailResponseVM>>
+                (HttpStatusCode.OK, data, "Topics fetched successfully");
+        }
+
+
     }
 }

@@ -12,6 +12,9 @@ namespace SchoolManagement.ViewModel.Topic
         public int? TopicTypeId { get; set; }
         public int TenantId { get; set; }
 
+        // 🆕 Add this
+        public string TopicTypeName { get; set; }
+
         public static TopicResponseVM FromModel(MTopic model)
         {
             if (model == null) return null;
@@ -24,7 +27,10 @@ namespace SchoolManagement.ViewModel.Topic
                 Description = model.Description,
                 SubjectId = model.SubjectId,
                 TopicTypeId = model.TopicTypeId,
-                TenantId = model.TenantId   
+                TenantId = model.TenantId,
+
+                // 🆕 Fetch topic type name
+                TopicTypeName = model.TopicType?.Name
             };
         }
     }

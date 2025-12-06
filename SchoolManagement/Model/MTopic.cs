@@ -29,6 +29,9 @@ namespace SchoolManagement.Model
 
         [Column("topic_type_id")]
         public int? TopicTypeId { get; set; }
+        [ForeignKey("TopicTypeId")]
+        public virtual MMaster TopicType { get; set; }
+
 
         [Required]
         [Column("tenant_id")]

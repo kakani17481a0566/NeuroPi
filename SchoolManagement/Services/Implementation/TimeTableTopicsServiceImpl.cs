@@ -190,6 +190,43 @@ namespace SchoolManagement.Services.Implementation
         }
 
 
+        public List<TimeTableTopicByDetailResponseVM> GetTopicsByTimeTableDetailId(int tenantId, int timeTableDetailId)
+        {
+            var topics = _dbContext.TimeTableTopics
+                .Where(x => x.TenantId == tenantId &&
+                            x.TimeTableDetailId == timeTableDetailId &&
+                            !x.IsDeleted)
+                .Include(x => x.Topic)
+                    .ThenInclude(t => t.Subject)
+                .Include(x => x.Topic)
+                    .ThenInclude(t => t.TopicType)
+                .ToList();
+
+            var dtos = new List<TimeTableTopicByDetailResponseVM>();
+
+            foreach (var x in topics)
+            {
+                dtos.Add(new TimeTableTopicByDetailResponseVM
+                {
+                    Id = x.Id,
+                    TopicId = x.TopicId,
+
+                    TopicName = x.Topic?.Name ?? "",
+                    SubjectName = x.Topic?.Subject?.Name ?? "",
+
+                    TopicTypeId = x.Topic?.TopicTypeId,
+                    TopicTypeName = x.Topic?.TopicType?.Name ?? "",
+
+                    TimeTableDetailId = x.TimeTableDetailId ?? 0
+
+                });
+            }
+
+            return dtos;
+        }
+
+
+
 
     }
 }

@@ -19,44 +19,75 @@ namespace SchoolManagement.Services.Implementation
             _dbContext = dbContext;
         }
 
+        // --------------------------------------------------------------------
+        // GET ALL
+        // --------------------------------------------------------------------
         public List<TopicResponseVM> GetAll()
         {
             return _dbContext.Topics
                 .Where(t => !t.IsDeleted)
+                .Include(t => t.TopicType)
+                .Include(t => t.Subject)
+                .OrderBy(t => t.Name)
                 .Select(TopicResponseVM.FromModel)
                 .ToList();
         }
 
+        // --------------------------------------------------------------------
+        // GET BY ID
+        // --------------------------------------------------------------------
         public TopicResponseVM GetById(int id)
         {
             var topic = _dbContext.Topics
+                .Include(t => t.TopicType)
+                .Include(t => t.Subject)
                 .FirstOrDefault(t => t.Id == id && !t.IsDeleted);
+
             return TopicResponseVM.FromModel(topic);
         }
 
+        // --------------------------------------------------------------------
+        // GET ALL BY TENANT
+        // --------------------------------------------------------------------
         public List<TopicResponseVM> GetAll(int tenantId)
         {
             return _dbContext.Topics
                 .Where(t => !t.IsDeleted && t.TenantId == tenantId)
+                .Include(t => t.TopicType)
+                .Include(t => t.Subject)
+                .OrderBy(t => t.Name)
                 .Select(TopicResponseVM.FromModel)
                 .ToList();
         }
 
+        // --------------------------------------------------------------------
+        // GET BY ID + TENANT
+        // --------------------------------------------------------------------
         public TopicResponseVM GetById(int id, int tenantId)
         {
             var topic = _dbContext.Topics
+                .Include(t => t.TopicType)
+                .Include(t => t.Subject)
                 .FirstOrDefault(t => t.Id == id && t.TenantId == tenantId && !t.IsDeleted);
+
             return TopicResponseVM.FromModel(topic);
         }
 
+        // --------------------------------------------------------------------
+        // CREATE
+        // --------------------------------------------------------------------
         public TopicResponseVM Create(TopicRequestVM request)
         {
             var topic = request.ToModel();
             _dbContext.Topics.Add(topic);
             _dbContext.SaveChanges();
+
             return TopicResponseVM.FromModel(topic);
         }
 
+        // --------------------------------------------------------------------
+        // UPDATE
+        // --------------------------------------------------------------------
         public TopicResponseVM Update(int id, int tenantId, TopicUpdateVM request)
         {
             var topic = _dbContext.Topics
@@ -73,9 +104,13 @@ namespace SchoolManagement.Services.Implementation
             topic.UpdatedBy = request.UpdatedBy;
 
             _dbContext.SaveChanges();
+
             return TopicResponseVM.FromModel(topic);
         }
 
+        // --------------------------------------------------------------------
+        // DELETE (SOFT DELETE)
+        // --------------------------------------------------------------------
         public bool Delete(int id, int tenantId)
         {
             var topic = _dbContext.Topics
@@ -85,13 +120,14 @@ namespace SchoolManagement.Services.Implementation
 
             topic.IsDeleted = true;
             topic.UpdatedOn = DateTime.UtcNow;
-            _dbContext.SaveChanges();
 
+            _dbContext.SaveChanges();
             return true;
         }
 
-        // ✅ New method: Resolved details
-
+        // --------------------------------------------------------------------
+        // RESOLVED TOPICS (FULL DETAILS)
+        // --------------------------------------------------------------------
         public TopicFullResponseVM GetResolvedTopics(int tenantId)
         {
             var masters = _dbContext.Masters
@@ -100,7 +136,8 @@ namespace SchoolManagement.Services.Implementation
 
             var topics = _dbContext.Topics
                 .Where(t => !t.IsDeleted && t.TenantId == tenantId)
-                .Include(t => t.Subject).ThenInclude(s => s.Course)
+                .Include(t => t.Subject)!.ThenInclude(s => s.Course)
+                .Include(t => t.TopicType)
                 .Include(t => t.Tenant)
                 .ToList();
 
@@ -118,50 +155,55 @@ namespace SchoolManagement.Services.Implementation
                     ? masters[t.TopicTypeId.Value]
                     : null,
                 TenantName = t.Tenant?.Name
-            }).ToList();
+            })
+            .OrderBy(t => t.Name)
+            .ToList();
 
             var courseDict = topics
                 .Where(t => t.Subject?.Course != null)
-                .Select(t => t.Subject.Course)
+                .Select(t => t.Subject!.Course!)
                 .Distinct()
                 .ToDictionary(c => c.Id, c => c.Name);
 
             var subjectDict = topics
                 .Where(t => t.Subject != null)
-                .Select(t => t.Subject)
+                .Select(t => t.Subject!)
                 .Distinct()
                 .ToDictionary(s => s.Id, s => s.Name);
 
             var subjectCourseMap = topics
                 .Where(t => t.Subject != null && t.Subject.Course != null)
-                .Select(t => new { SubjectId = t.Subject.Id, CourseId = t.Subject.Course.Id })
+                .Select(t => new { SubjectId = t.Subject!.Id, CourseId = t.Subject.Course!.Id })
                 .Distinct()
                 .ToDictionary(x => x.SubjectId, x => x.CourseId);
 
             return new TopicFullResponseVM
             {
                 Headers = new List<string>
-        {
-            "Id", "Name", "Code", "Description", "SubjectName", "CourseName", "TopicTypeName", "TenantName"
-        },
+                {
+                    "Id","Name","Code","Description","SubjectName","CourseName","TopicTypeName","TenantName"
+                },
                 TDataTopic = topicDetails,
                 Courses = courseDict,
                 Subjects = subjectDict,
-                SubjectCourseMap = subjectCourseMap // ✅ Include subject → course mapping
+                SubjectCourseMap = subjectCourseMap
             };
         }
 
-
+        // --------------------------------------------------------------------
+        // TIMETABLE DROPDOWN
+        // --------------------------------------------------------------------
         public TimeTableDropDown GetTimeTableDropDown(int tenantId)
         {
             var courses = _dbContext.Courses
                 .Include(c => c.Subjects)
                 .Where(c => c.TenantId == tenantId && !c.IsDeleted)
+                .OrderBy(c => c.Name)
                 .ToList();
 
-            // ✅ Updated type to TopicTypeOptionVM
             var topicTypes = _dbContext.Masters
                 .Where(m => !m.IsDeleted && m.TenantId == tenantId && m.MasterTypeId == 37)
+                .OrderBy(m => m.Name)
                 .Select(m => new TopicTypeOptionVM
                 {
                     Id = m.Id,
@@ -169,7 +211,7 @@ namespace SchoolManagement.Services.Implementation
                 })
                 .ToList();
 
-            var vm = new TimeTableDropDown
+            return new TimeTableDropDown
             {
                 Courses = courses.ToDictionary(
                     c => c.Id,
@@ -178,15 +220,29 @@ namespace SchoolManagement.Services.Implementation
                         Name = c.Name,
                         Subjects = c.Subjects
                             .Where(s => !s.IsDeleted)
+                            .OrderBy(s => s.Name)
                             .ToDictionary(s => s.Id, s => s.Name)
                     }
                 ),
                 TopicTypes = topicTypes
             };
-
-            return vm;
         }
 
+        // --------------------------------------------------------------------
+        // GET TOPICS BY SUBJECT + TENANT (Alphabetical + Includes Type & Subject)
+        // --------------------------------------------------------------------
+        public List<TopicResponseVM> GetBySubject(int subjectId, int tenantId)
+        {
+            return _dbContext.Topics
+                .Where(t => t.SubjectId == subjectId &&
+                            t.TenantId == tenantId &&
+                            !t.IsDeleted)
+                .Include(t => t.TopicType)
+                .Include(t => t.Subject)
+                .OrderBy(t => t.Name)
+                .Select(TopicResponseVM.FromModel)
+                .ToList();
+        }
 
     }
 }

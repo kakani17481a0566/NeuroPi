@@ -18,6 +18,7 @@ namespace SchoolManagement.Services.Interface
         TopicFullResponseVM GetResolvedTopics(int tenantId);
         TimeTableDropDown GetTimeTableDropDown(int tenantId);
 
+        List<TopicResponseVM> GetBySubject(int subjectId, int tenantId);
 
     }
 }

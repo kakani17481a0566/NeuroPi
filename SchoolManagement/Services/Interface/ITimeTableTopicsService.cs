@@ -16,6 +16,9 @@ namespace SchoolManagement.Services.Interface
         TimeTableTopicsVM GetStructured(int tenantId);
         TimeTableTopicDropdown GetDropdownMapped(int tenantId);
 
+        List<TimeTableTopicByDetailResponseVM> GetTopicsByTimeTableDetailId(int tenantId, int timeTableDetailId);
+
+
 
     }
 }

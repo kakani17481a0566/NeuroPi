@@ -92,5 +92,20 @@ namespace SchoolManagement.Controllers
             var data = _service.GetInsertOptions(tenantId);
             return new ResponseResult<TimeTableDetailInsertOptionsVM>(HttpStatusCode.OK, data);
         }
+
+        [HttpGet("by-timetable/{timeTableId}/{tenantId}")]
+        public ResponseResult<List<TimeTableDetailResponseByTTVM>> GetByTimeTableId(int timeTableId, int tenantId)
+        {
+            var data = _service.GetByTimeTableId(timeTableId, tenantId);
+
+            if (data == null || data.Count == 0)
+                return new ResponseResult<List<TimeTableDetailResponseByTTVM>>
+                    (HttpStatusCode.NotFound, null, "No data found");
+
+            return new ResponseResult<List<TimeTableDetailResponseByTTVM>>
+                (HttpStatusCode.OK, data, "Fetched successfully");
+        }
+
+
     }
 }
