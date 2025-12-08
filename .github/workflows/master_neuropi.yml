@@ -37,14 +37,12 @@ jobs:
       - name: dotnet publish
         run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
 
-      # TEMPORARY: Artifact upload disabled due to GitHub quota recalculation (6-12 hours)
-      # Will re-enable after quota updates
-      # - name: Upload artifact for deployment job
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: .net-app
-      #     path: ${{env.DOTNET_ROOT}}/myapp
-      #     retention-days: 7
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v4
+        with:
+          name: .net-app
+          path: ${{env.DOTNET_ROOT}}/myapp
+          retention-days: 7
 
   deploy:
     runs-on: windows-latest
@@ -57,21 +55,11 @@ jobs:
       contents: read #This is required for actions/checkout
 
     steps:
-      # TEMPORARY: Using build output directly instead of artifact
-      - uses: actions/checkout@v4
-      
-      - name: Set up .NET Core
-        uses: actions/setup-dotnet@v4
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
         with:
-          dotnet-version: '8.x'
+          name: .net-app
 
-      - name: dotnet publish
-        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
-
-      # - name: Download artifact from build job
-      #   uses: actions/download-artifact@v4
-      #   with:
-      #     name: .net-app
       
       - name: Login to Azure
         uses: azure/login@v2
