@@ -37,12 +37,14 @@ jobs:
       - name: Publish
         run: dotnet publish NeuroPi.Nutrition/NeuroPi.Nutrition.csproj -c Release -o ./publish
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: nutrition-api
-          path: ./publish
-          retention-days: 7
+      # TEMPORARY: Artifact upload disabled due to GitHub quota recalculation (6-12 hours)
+      # Will re-enable after quota updates
+      # - name: Upload artifact
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: nutrition-api
+      #     path: ./publish
+      #     retention-days: 7
 
   deploy:
     runs-on: windows-latest
@@ -52,10 +54,24 @@ jobs:
       contents: read
 
     steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
+      # TEMPORARY: Using build output directly instead of artifact
+      - uses: actions/checkout@v4
+      
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v4
         with:
-          name: nutrition-api
+          dotnet-version: '8.x'
+
+      - name: Restore dependencies
+        run: dotnet restore NeuroPi.Nutrition/NeuroPi.Nutrition.csproj
+
+      - name: Publish
+        run: dotnet publish NeuroPi.Nutrition/NeuroPi.Nutrition.csproj -c Release -o ./publish
+
+      # - name: Download artifact
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: nutrition-api
 
       - name: Login to Azure
         uses: azure/login@v2
