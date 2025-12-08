@@ -26,6 +26,13 @@ jobs:
       - name: Build with dotnet
         run: dotnet build --configuration Release
 
+      - name: Delete old artifacts
+        run: |
+          gh api repos/${{ github.repository }}/actions/artifacts --paginate --jq '.artifacts[] | select(.name == ".net-app") | select(.expired == false) | .id' | ForEach-Object { gh api --method DELETE repos/${{ github.repository }}/actions/artifacts/$_ }
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
       - name: dotnet publish
         run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
 
