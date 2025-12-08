@@ -127,6 +127,10 @@ builder.Services.AddScoped<IItemHeaderService, ItemHeaderServiceImpl>();
 
 builder.Services.AddScoped<ITableFilesService, TableFilesServiceImpl>();
 
+//enquirey-from 
+builder.Services.AddScoped<IEnquiryFormService, EnquiryFormServiceImpl>();
+
+
 
 
 

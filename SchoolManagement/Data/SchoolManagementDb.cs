@@ -95,6 +95,10 @@ namespace SchoolManagement.Data
         public DbSet<MPosTransactionDetails> PosTransactionDetails { get; set; }
 
 
+        public DbSet<MEnquiryForm> EnquiryForms { get; set; }
+
+
+
 
         // views
         public DbSet<MVwComprehensiveTimeTable> VwComprehensiveTimeTables { get; set; }
@@ -243,11 +247,20 @@ namespace SchoolManagement.Data
             });
 
 
+            modelBuilder.Entity<MEnquiryForm>()
+               .HasKey(e => e.Uuid);
 
+            // Optional: Prevent EF from generating ID column
+            modelBuilder.Entity<MEnquiryForm>()
+                .Property(e => e.Uuid)
+                .HasDefaultValueSql("gen_random_uuid()");
         }
+
+
+
+    }
 
 
 
 
     }
-}
