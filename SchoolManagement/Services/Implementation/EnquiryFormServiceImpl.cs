@@ -50,6 +50,16 @@ namespace SchoolManagement.Services.Implementation
             _context.SaveChanges();
 
             // ---------------------------------------
+            // GENERATE LINK
+            // ---------------------------------------
+            string ndaLink = "#";
+            if (!string.IsNullOrEmpty(request.NdaBaseUrl))
+            {
+                // Ensure no trailing slash on base, and construct: {base}/{uuid}/nda
+                ndaLink = $"{request.NdaBaseUrl.TrimEnd('/')}/{model.Uuid}/nda";
+            }
+
+            // ---------------------------------------
             // SEND EMAIL
             // ---------------------------------------
             try
@@ -60,7 +70,7 @@ namespace SchoolManagement.Services.Implementation
                 string html = File.ReadAllText(templatePath);
 
                 html = html.Replace("{{ContactPerson}}", model.ContactPerson)
-                           .Replace("{{NdaLink}}", "https://your-nda-url.com");
+                           .Replace("{{NdaLink}}", ndaLink);
 
                 _emailService.SendEmailAsync(
                     model.Email,
@@ -73,7 +83,10 @@ namespace SchoolManagement.Services.Implementation
                 Console.WriteLine("EMAIL ERROR: " + ex.Message);
             }
 
-            return ToResponse(model);
+            var response = ToResponse(model);
+            response.Link = ndaLink != "#" ? ndaLink : null;
+            
+            return response;
         }
 
         // ------------------------------------------------------

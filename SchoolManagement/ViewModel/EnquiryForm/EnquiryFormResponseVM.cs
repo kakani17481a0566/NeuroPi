@@ -22,5 +22,7 @@ namespace SchoolManagement.ViewModel.EnquiryForm
 
         public DateTime? UpdatedOn { get; set; }
         public int? UpdatedBy { get; set; }
+
+        public string? Link { get; set; }
     }
 }

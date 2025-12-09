@@ -11,5 +11,7 @@
         public int TenantId { get; set; }
 
         public int CreatedBy { get; set; } // frontend passes logged-in user ID
+        
+        public string? NdaBaseUrl { get; set; }
     }
 }
