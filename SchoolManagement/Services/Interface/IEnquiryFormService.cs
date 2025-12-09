@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using SchoolManagement.ViewModel.EnquiryForm;
 
 namespace SchoolManagement.Services.Interface
@@ -7,7 +8,7 @@ namespace SchoolManagement.Services.Interface
     public interface IEnquiryFormService
     {
         // Create
-        EnquiryFormResponseVM Create(EnquiryFormRequestVM request, int createdBy);
+        Task<EnquiryFormResponseVM> Create(EnquiryFormRequestVM request, int createdBy);
 
         // Get Single
         EnquiryFormResponseVM GetByUuid(Guid uuid, int tenantId);

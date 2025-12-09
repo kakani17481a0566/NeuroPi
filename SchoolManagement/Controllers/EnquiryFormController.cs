@@ -5,6 +5,7 @@ using SchoolManagement.ViewModel.EnquiryForm;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace SchoolManagement.Controllers
 {
@@ -65,7 +66,7 @@ namespace SchoolManagement.Controllers
         // POST: api/enquiryform
         // ---------------------------------------------------------
         [HttpPost]
-        public ResponseResult<EnquiryFormResponseVM> Create([FromBody] EnquiryFormRequestVM request)
+        public async Task<ResponseResult<EnquiryFormResponseVM>> Create([FromBody] EnquiryFormRequestVM request)
         {
             if (request == null)
             {
@@ -76,7 +77,7 @@ namespace SchoolManagement.Controllers
                 );
             }
 
-            var created = _service.Create(request, request.CreatedBy);
+            var created = await _service.Create(request, request.CreatedBy);
 
             return new ResponseResult<EnquiryFormResponseVM>(
                 HttpStatusCode.Created,

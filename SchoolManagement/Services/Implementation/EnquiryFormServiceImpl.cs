@@ -24,7 +24,7 @@ namespace SchoolManagement.Services.Implementation
         // ------------------------------------------------------
         // CREATE
         // ------------------------------------------------------
-        public EnquiryFormResponseVM Create(EnquiryFormRequestVM request, int createdBy)
+        public async Task<EnquiryFormResponseVM> Create(EnquiryFormRequestVM request, int createdBy)
         {
             var now = DateTime.UtcNow;
 
@@ -67,20 +67,33 @@ namespace SchoolManagement.Services.Implementation
                 string templatePath = Path.Combine(Directory.GetCurrentDirectory(), 
                                                    "EmailTemplates", "NdaEmail.html");
 
-                string html = File.ReadAllText(templatePath);
+                if (!File.Exists(templatePath))
+                {
+                    Console.WriteLine($"EMAIL ERROR: Template file not found at {templatePath}");
+                }
+                else
+                {
+                    string html = File.ReadAllText(templatePath);
 
-                html = html.Replace("{{ContactPerson}}", model.ContactPerson)
-                           .Replace("{{NdaLink}}", ndaLink);
+                    html = html.Replace("{{ContactPerson}}", model.ContactPerson)
+                               .Replace("{{NdaLink}}", ndaLink);
 
-                _emailService.SendEmailAsync(
-                    model.Email,
-                    "NeuroPi – NDA for Our Continued Collaboration",
-                    html
-                );
+                    Console.WriteLine($"Sending email to: {model.Email}");
+                    Console.WriteLine($"NDA Link in email: {ndaLink}");
+
+                    await _emailService.SendEmailAsync(
+                        model.Email,
+                        "NeuroPi – NDA for Our Continued Collaboration",
+                        html
+                    );
+
+                    Console.WriteLine("EMAIL SENT SUCCESSFULLY");
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("EMAIL ERROR: " + ex.Message);
+                Console.WriteLine($"EMAIL ERROR: {ex.Message}");
+                Console.WriteLine($"EMAIL ERROR STACK TRACE: {ex.StackTrace}");
             }
 
             var response = ToResponse(model);
