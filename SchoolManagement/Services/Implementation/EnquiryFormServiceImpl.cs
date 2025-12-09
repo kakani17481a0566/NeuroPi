@@ -170,11 +170,14 @@ namespace SchoolManagement.Services.Implementation
                                 </ul>
                                 <p>Please find the signed NDA document attached to this email for your records.</p>
                                 <br/>
-                                <p>Best regards,<br/>
-                                NeuroPi Team</p>
+                                <p>Warm regards,<br/>
+                                <strong>Dr. Aparna Volluru</strong><br/>
+                                Founder & CEO, NeuroPi</p>
+                                <div style='margin-top:10px;'>
+                                    <img src='cid:neuropi-logo' alt='NeuroPi' style='height:40px; width:auto;' />
+                                </div>
                                 <hr style='border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;'/>
                                 <div style='text-align: center; padding: 20px 0;'>
-                                    <img src='https://neuropi.ai/assets/logo.png' alt='NeuroPi Logo' style='max-width: 150px; height: auto;'/>
                                     <p style='font-size: 12px; color: #666; margin-top: 10px;'>NeuroPi Tech Private Limited</p>
                                     <p style='font-size: 11px; color: #999;'>© 2025 All rights reserved</p>
                                 </div>

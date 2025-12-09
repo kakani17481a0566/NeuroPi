@@ -84,27 +84,32 @@ namespace NeuropiCommonLib.Email
             message.To.Add(MailboxAddress.Parse(toEmail));
             message.Subject = subject;
 
-            // Create multipart message
-            var multipart = new Multipart("mixed");
-
-            // Add HTML body
-            multipart.Add(new TextPart(TextFormat.Html)
+            var builder = new BodyBuilder
             {
-                Text = htmlBody
-            });
-
-            // Add PDF attachment
-            var attachment = new MimePart("application", "pdf")
-            {
-                Content = new MimeContent(new System.IO.MemoryStream(attachmentData)),
-                ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
-                ContentTransferEncoding = ContentEncoding.Base64,
-                FileName = attachmentName
+                HtmlBody = htmlBody
             };
 
-            multipart.Add(attachment);
+            // 1. Embed NeuroPi Logo
+            string logoPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Email", "Templates", "Neuuropi.svg");
+            
+            // Fallback path check
+            if (!File.Exists(logoPath))
+            {
+                 logoPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Templates", "Neuuropi.svg");
+            }
 
-            message.Body = multipart;
+            if (File.Exists(logoPath))
+            {
+                var image = builder.LinkedResources.Add(logoPath);
+                image.ContentId = "neuropi-logo";
+                image.ContentType.MediaType = "image";
+                image.ContentType.MediaSubtype = "svg+xml";
+            }
+
+            // 2. Add PDF Attachment
+            builder.Attachments.Add(attachmentName, attachmentData, ContentType.Parse("application/pdf"));
+
+            message.Body = builder.ToMessageBody();
 
             using var smtp = new SmtpClient();
 
