@@ -61,8 +61,39 @@ namespace SchoolManagement.Services.Implementation
                 ndaLink = $"{request.NdaBaseUrl.TrimEnd('/')}/{model.Uuid}/nda";
             }
 
-            // NOTE: Email sending removed - users will download PDF manually
-            // Email is still sent automatically when NDA is signed (see Update method)
+            // ---------------------------------------
+            // SEND EMAIL (Invitation to Sign)
+            // ---------------------------------------
+            if (ndaLink != "#")
+            {
+                try
+                {
+                    string templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Email", "Templates", "NdaEmail.html");
+                    if (!File.Exists(templatePath))
+                    {
+                        // Fallback location check
+                        templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Templates", "NdaEmail.html");
+                    }
+
+                    if (File.Exists(templatePath))
+                    {
+                        string emailBody = File.ReadAllText(templatePath);
+                        emailBody = emailBody.Replace("{{ContactPerson}}", model.ContactPerson ?? "Partner");
+                        emailBody = emailBody.Replace("{{NdaLink}}", ndaLink);
+
+                        await _emailService.SendEmailAsync(
+                            model.Email,
+                            "Action Required: Sign NDA - NeuroPi",
+                            emailBody
+                        );
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"EMAIL ERROR (Create): {ex.Message}");
+                    // Continue even if email fails
+                }
+            }
 
             var response = ToResponse(model);
             response.Link = ndaLink != "#" ? ndaLink : null;
