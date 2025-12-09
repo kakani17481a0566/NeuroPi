@@ -204,7 +204,7 @@ namespace NeuropiCommonLib.PDF
                             col.Item().PaddingTop(5).Height(60).Image(neuroPiSignaturePath);
                         }
 
-                        col.Item().PaddingTop(10).Text("DR. APARNA RAO VOLLURU").Bold();
+                        col.Item().PaddingTop(10).Text("DR. APERNA RAO VOLLURU").Bold();
                         col.Item().Text("Founder & CEO, NeuroPi Tech Pvt. Ltd.").FontSize(10);
                         col.Item().PaddingTop(5).Text($"Date: {displayDate}").FontSize(10);
                         col.Item().Text("Place: Hyderabad, INDIA").FontSize(10);
