@@ -64,7 +64,7 @@ jobs:
           $rg = az webapp list --query "[?name=='NeuroPi'].resourceGroup" --output tsv
           echo "Stopping App Service in Resource Group: $rg"
           az webapp stop --name NeuroPi --resource-group $rg
-          Start-Sleep -Seconds 20
+          Start-Sleep -Seconds 60
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
