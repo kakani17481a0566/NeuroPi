@@ -65,6 +65,15 @@ jobs:
           echo "Resetting WEBSITE_RUN_FROM_PACKAGE=0 to ensure standard zip deploy works"
           az webapp config appsettings set --name NeuroPi --resource-group $rg --settings WEBSITE_RUN_FROM_PACKAGE="0"
 
+      - name: Restart App Service (Clear Temp Files)
+        shell: pwsh
+        run: |
+          $rg = az webapp list --query "[?name=='NeuroPi'].resourceGroup" --output tsv
+          echo "Restarting App Service to clear temp files (Fixing Disk Space Error)..."
+          az webapp restart --name NeuroPi --resource-group $rg
+          echo "Waiting for restart to complete..."
+          Start-Sleep -Seconds 50
+
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
