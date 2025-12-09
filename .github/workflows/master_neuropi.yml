@@ -68,6 +68,13 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_1E8AAFD9DDBF49338F1F292EF08588A2 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_99DCF1DCB22E4F1282EB0E82C6D97D36 }}
 
+      - name: Stop App Service
+        shell: pwsh
+        run: |
+          $rg = az webapp list --query "[?name=='NeuroPi'].resourceGroup" --output tsv
+          echo "Stopping App Service in Resource Group: $rg"
+          az webapp stop --name NeuroPi --resource-group $rg
+
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
@@ -75,4 +82,12 @@ jobs:
           app-name: 'NeuroPi'
           slot-name: 'Production'
           package: .
+
+      - name: Start App Service
+        if: always()
+        shell: pwsh
+        run: |
+          $rg = az webapp list --query "[?name=='NeuroPi'].resourceGroup" --output tsv
+          echo "Starting App Service in Resource Group: $rg"
+          az webapp start --name NeuroPi --resource-group $rg
           
