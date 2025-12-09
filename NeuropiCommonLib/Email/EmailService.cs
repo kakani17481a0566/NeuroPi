@@ -37,12 +37,12 @@ namespace NeuropiCommonLib.Email
 
             // Embed NeuroPi Logo
             // Note: Adjust path as necessary for your deployment
-            string logoPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Email", "Templates", "Neuuropi.svg");
+            string logoPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Email", "Templates", "Neurologi.png");
             
             // Fallback path check if running locally or different structure
             if (!File.Exists(logoPath))
             {
-                 logoPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Templates", "Neuuropi.svg");
+                 logoPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Templates", "Neurologi.png");
             }
 
             if (File.Exists(logoPath))
@@ -50,7 +50,7 @@ namespace NeuropiCommonLib.Email
                 var image = builder.LinkedResources.Add(logoPath);
                 image.ContentId = "neuropi-logo";
                 image.ContentType.MediaType = "image";
-                image.ContentType.MediaSubtype = "svg+xml";
+                image.ContentType.MediaSubtype = "png";
             }
 
             message.Body = builder.ToMessageBody();
@@ -90,12 +90,12 @@ namespace NeuropiCommonLib.Email
             };
 
             // 1. Embed NeuroPi Logo
-            string logoPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Email", "Templates", "Neuuropi.svg");
+            string logoPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Email", "Templates", "Neurologi.png");
             
             // Fallback path check
             if (!File.Exists(logoPath))
             {
-                 logoPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Templates", "Neuuropi.svg");
+                 logoPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Templates", "Neurologi.png");
             }
 
             if (File.Exists(logoPath))
@@ -103,7 +103,7 @@ namespace NeuropiCommonLib.Email
                 var image = builder.LinkedResources.Add(logoPath);
                 image.ContentId = "neuropi-logo";
                 image.ContentType.MediaType = "image";
-                image.ContentType.MediaSubtype = "svg+xml";
+                image.ContentType.MediaSubtype = "png";
             }
 
             // 2. Add PDF Attachment
