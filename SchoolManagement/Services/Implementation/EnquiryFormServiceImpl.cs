@@ -52,7 +52,7 @@ namespace SchoolManagement.Services.Implementation
             _context.SaveChanges();
 
             // ---------------------------------------
-            // GENERATE LINK
+            // GENERATE LINK (for frontend display)
             // ---------------------------------------
             string ndaLink = "#";
             if (!string.IsNullOrEmpty(request.NdaBaseUrl))
@@ -61,42 +61,8 @@ namespace SchoolManagement.Services.Implementation
                 ndaLink = $"{request.NdaBaseUrl.TrimEnd('/')}/{model.Uuid}/nda";
             }
 
-            // ---------------------------------------
-            // SEND EMAIL
-            // ---------------------------------------
-            try
-            {
-                string templatePath = Path.Combine(Directory.GetCurrentDirectory(), 
-                                                   "EmailTemplates", "NdaEmail.html");
-
-                if (!File.Exists(templatePath))
-                {
-                    Console.WriteLine($"EMAIL ERROR: Template file not found at {templatePath}");
-                }
-                else
-                {
-                    string html = File.ReadAllText(templatePath);
-
-                    html = html.Replace("{{ContactPerson}}", model.ContactPerson)
-                               .Replace("{{NdaLink}}", ndaLink);
-
-                    Console.WriteLine($"Sending email to: {model.Email}");
-                    Console.WriteLine($"NDA Link in email: {ndaLink}");
-
-                    await _emailService.SendEmailAsync(
-                        model.Email,
-                        "NeuroPi – NDA for Our Continued Collaboration",
-                        html
-                    );
-
-                    Console.WriteLine("EMAIL SENT SUCCESSFULLY");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"EMAIL ERROR: {ex.Message}");
-                Console.WriteLine($"EMAIL ERROR STACK TRACE: {ex.StackTrace}");
-            }
+            // NOTE: Email sending removed - users will download PDF manually
+            // Email is still sent automatically when NDA is signed (see Update method)
 
             var response = ToResponse(model);
             response.Link = ndaLink != "#" ? ndaLink : null;

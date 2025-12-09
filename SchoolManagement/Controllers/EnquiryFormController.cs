@@ -87,6 +87,47 @@ namespace SchoolManagement.Controllers
         }
 
         // ---------------------------------------------------------
+        // DOWNLOAD NDA PDF
+        // GET: api/enquiryform/download-nda/{uuid}
+        // ---------------------------------------------------------
+        [HttpGet("download-nda/{uuid}")]
+        public IActionResult DownloadNdaPdf(Guid uuid, [FromQuery] int tenantId = 1)
+        {
+            try
+            {
+                var enquiry = _service.GetByUuid(uuid, tenantId);
+
+                if (enquiry == null)
+                {
+                    return NotFound(new { message = "Enquiry not found" });
+                }
+
+                // Generate unsigned NDA PDF (with NeuroPi signature only)
+                string neuroPiSignaturePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "NeuroPiSignature.jpg");
+
+                byte[] pdfBytes = NeuropiCommonLib.PDF.NdaPdfGenerator.GenerateNdaPdf(
+                    companyName: enquiry.CompanyName,
+                    contactPerson: enquiry.ContactPerson,
+                    email: enquiry.Email,
+                    contactNumber: enquiry.ContactNumber ?? "",
+                    place: "",
+                    agreedOn: DateTime.UtcNow,
+                    recipientSignatureBase64: "", // Empty - not signed yet
+                    neuroPiSignaturePath: neuroPiSignaturePath
+                );
+
+                string fileName = $"NDA_{enquiry.CompanyName.Replace(" ", "_")}_{DateTime.UtcNow:yyyyMMdd}.pdf";
+
+                return File(pdfBytes, "application/pdf", fileName);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"PDF DOWNLOAD ERROR: {ex.Message}");
+                return StatusCode(500, new { message = "Failed to generate PDF", error = ex.Message });
+            }
+        }
+
+        // ---------------------------------------------------------
         // UPDATE
         // PUT: api/enquiryform/{uuid}/{tenantId}
         // ---------------------------------------------------------
