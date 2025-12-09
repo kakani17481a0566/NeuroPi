@@ -91,7 +91,7 @@ namespace SchoolManagement.Controllers
         // PUT: api/enquiryform/{uuid}/{tenantId}
         // ---------------------------------------------------------
         [HttpPut("{uuid}/{tenantId}")]
-        public ResponseResult<EnquiryFormResponseVM> Update(
+        public async Task<ResponseResult<EnquiryFormResponseVM>> Update(
             Guid uuid,
             int tenantId,
             [FromBody] EnquiryFormUpdateVM request
@@ -106,7 +106,7 @@ namespace SchoolManagement.Controllers
                 );
             }
 
-            var updated = _service.Update(uuid, request, tenantId, request.UpdatedBy);
+            var updated = await _service.Update(uuid, request, tenantId, request.UpdatedBy);
 
             if (updated == null)
             {

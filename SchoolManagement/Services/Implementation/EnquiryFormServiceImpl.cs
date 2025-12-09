@@ -130,7 +130,7 @@ namespace SchoolManagement.Services.Implementation
         // ------------------------------------------------------
         // UPDATE
         // ------------------------------------------------------
-        public EnquiryFormResponseVM Update(Guid uuid, EnquiryFormUpdateVM request, int tenantId, int updatedBy)
+        public async Task<EnquiryFormResponseVM> Update(Guid uuid, EnquiryFormUpdateVM request, int tenantId, int updatedBy)
         {
             var model = _context.EnquiryForms
                 .FirstOrDefault(x => x.Uuid == uuid &&
@@ -150,7 +150,8 @@ namespace SchoolManagement.Services.Implementation
             model.DigitalSignature = request.DigitalSignature;
 
             // ✔ Only set AgreedOn when user newly agrees (false → true)
-            if (!model.IsAgreed && request.IsAgreed)
+            bool isNewlyAgreed = !model.IsAgreed && request.IsAgreed;
+            if (isNewlyAgreed)
             {
                 model.AgreedOn = now;
             }
@@ -162,6 +163,75 @@ namespace SchoolManagement.Services.Implementation
             model.UpdatedOn = now;
 
             _context.SaveChanges();
+
+            // ✔ Send confirmation email when NDA is signed
+            if (isNewlyAgreed)
+            {
+                try
+                {
+                    // TODO: Generate PDF of signed NDA document
+                    // For now, send email confirmation without PDF
+                    
+                    string confirmationSubject = "NDA Signed Successfully - NeuroPi";
+                    string confirmationBody = $@"
+                        <html>
+                        <body style='font-family: Arial, sans-serif;'>
+                            <h2>NDA Signed Successfully</h2>
+                            <p>Dear {model.ContactPerson},</p>
+                            <p>Thank you for signing the Non-Disclosure Agreement with NeuroPi Tech Private Limited.</p>
+                            <p><strong>Details:</strong></p>
+                            <ul>
+                                <li>Company: {model.CompanyName}</li>
+                                <li>Signed by: {model.ContactPerson}</li>
+                                <li>Email: {model.Email}</li>
+                                <li>Date Signed: {model.AgreedOn?.ToString("MMMM dd, yyyy")}</li>
+                            </ul>
+                            <p>A copy of this signed NDA has been recorded in our system.</p>
+                            <p><em>Note: PDF copy will be attached in the next update.</em></p>
+                            <br/>
+                            <p>Best regards,<br/>
+                            NeuroPi Team</p>
+                        </body>
+                        </html>";
+
+                    // Send to the signer
+                    await _emailService.SendEmailAsync(
+                        model.Email,
+                        confirmationSubject,
+                        confirmationBody
+                    );
+
+                    // Send notification to NeuroPi admin (info@neuropi.ai)
+                    string adminNotification = $@"
+                        <html>
+                        <body style='font-family: Arial, sans-serif;'>
+                            <h2>New NDA Signed</h2>
+                            <p><strong>Details:</strong></p>
+                            <ul>
+                                <li>Company: {model.CompanyName}</li>
+                                <li>Contact Person: {model.ContactPerson}</li>
+                                <li>Email: {model.Email}</li>
+                                <li>Phone: {model.ContactNumber}</li>
+                                <li>Date Signed: {model.AgreedOn?.ToString("MMMM dd, yyyy HH:mm:ss")} UTC</li>
+                                <li>UUID: {model.Uuid}</li>
+                            </ul>
+                        </body>
+                        </html>";
+
+                    await _emailService.SendEmailAsync(
+                        "info@neuropi.ai",
+                        $"NDA Signed: {model.CompanyName}",
+                        adminNotification
+                    );
+
+                    Console.WriteLine($"Confirmation emails sent for NDA signing: {model.CompanyName}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"EMAIL ERROR (NDA Confirmation): {ex.Message}");
+                    // Don't fail the update if email fails
+                }
+            }
 
             return ToResponse(model);
         }

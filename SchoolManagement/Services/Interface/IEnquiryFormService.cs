@@ -17,7 +17,7 @@ namespace SchoolManagement.Services.Interface
         List<EnquiryFormResponseVM> GetAll(int tenantId);
 
         // Update (Optional — if needed later)
-        public EnquiryFormResponseVM Update(Guid uuid, EnquiryFormUpdateVM request, int tenantId, int updatedBy);
+        public Task<EnquiryFormResponseVM> Update(Guid uuid, EnquiryFormUpdateVM request, int tenantId, int updatedBy);
 
 
         // Soft Delete
