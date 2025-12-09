@@ -202,7 +202,7 @@ namespace SchoolManagement.Services.Implementation
                                 <p>Please find the signed NDA document attached to this email for your records.</p>
                                 <br/>
                                 <p>Warm regards,<br/>
-                                <strong>Dr. Aparna Volluru</strong><br/>
+                                <strong>Dr. Aperna Volluru</strong><br/>
                                 Founder & CEO, NeuroPi</p>
                                 <div style='margin-top:10px;'>
                                     
