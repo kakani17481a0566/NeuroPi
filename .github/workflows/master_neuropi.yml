@@ -58,12 +58,12 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_1E8AAFD9DDBF49338F1F292EF08588A2 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_99DCF1DCB22E4F1282EB0E82C6D97D36 }}
 
-      - name: Configure Run From Package
+      - name: Reset Configuration (Standard Deployment)
         shell: pwsh
         run: |
           $rg = az webapp list --query "[?name=='NeuroPi'].resourceGroup" --output tsv
-          echo "Setting WEBSITE_RUN_FROM_PACKAGE=1 for App Service in Resource Group: $rg"
-          az webapp config appsettings set --name NeuroPi --resource-group $rg --settings WEBSITE_RUN_FROM_PACKAGE="1"
+          echo "Resetting WEBSITE_RUN_FROM_PACKAGE=0 to ensure standard zip deploy works"
+          az webapp config appsettings set --name NeuroPi --resource-group $rg --settings WEBSITE_RUN_FROM_PACKAGE="0"
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
