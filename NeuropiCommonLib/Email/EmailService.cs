@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Configuration;
 using MimeKit;
 using MimeKit.Text;
+using System;
+using System.IO;
 using System.Threading.Tasks;
 using SmtpClient = MailKit.Net.Smtp.SmtpClient;
 
@@ -28,10 +30,30 @@ namespace NeuropiCommonLib.Email
             message.To.Add(MailboxAddress.Parse(toEmail));
             message.Subject = subject;
 
-            message.Body = new TextPart(TextFormat.Html)
+            var builder = new BodyBuilder
             {
-                Text = htmlBody
+                HtmlBody = htmlBody
             };
+
+            // Embed NeuroPi Logo
+            // Note: Adjust path as necessary for your deployment
+            string logoPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Email", "Templates", "Neuuropi.svg");
+            
+            // Fallback path check if running locally or different structure
+            if (!File.Exists(logoPath))
+            {
+                 logoPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Templates", "Neuuropi.svg");
+            }
+
+            if (File.Exists(logoPath))
+            {
+                var image = builder.LinkedResources.Add(logoPath);
+                image.ContentId = "neuropi-logo";
+                image.ContentType.MediaType = "image";
+                image.ContentType.MediaSubtype = "svg+xml";
+            }
+
+            message.Body = builder.ToMessageBody();
 
             using var smtp = new SmtpClient();
 
