@@ -5,16 +5,20 @@ using SchoolManagement.Data;
 using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.EnquiryForm;
+using NeuropiCommonLib.Email;
+using System.IO;
 
 namespace SchoolManagement.Services.Implementation
 {
     public class EnquiryFormServiceImpl : IEnquiryFormService
     {
         private readonly SchoolManagementDb _context;
+        private readonly IEmailService _emailService;
 
-        public EnquiryFormServiceImpl(SchoolManagementDb context)
+        public EnquiryFormServiceImpl(SchoolManagementDb context, IEmailService emailService)
         {
             _context = context;
+            _emailService = emailService;
         }
 
         // ------------------------------------------------------
@@ -44,6 +48,30 @@ namespace SchoolManagement.Services.Implementation
 
             _context.EnquiryForms.Add(model);
             _context.SaveChanges();
+
+            // ---------------------------------------
+            // SEND EMAIL
+            // ---------------------------------------
+            try
+            {
+                string templatePath = Path.Combine(Directory.GetCurrentDirectory(), 
+                                                   "EmailTemplates", "NdaEmail.html");
+
+                string html = File.ReadAllText(templatePath);
+
+                html = html.Replace("{{ContactPerson}}", model.ContactPerson)
+                           .Replace("{{NdaLink}}", "https://your-nda-url.com");
+
+                _emailService.SendEmailAsync(
+                    model.Email,
+                    "NeuroPi – NDA for Our Continued Collaboration",
+                    html
+                );
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("EMAIL ERROR: " + ex.Message);
+            }
 
             return ToResponse(model);
         }

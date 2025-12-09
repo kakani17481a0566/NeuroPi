@@ -55,6 +55,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NeuroPi\NeuroPi.UserManagment.csproj" />
+    <ProjectReference Include="..\NeuropiCommonLib\NeuropiCommonLib.csproj" />
   </ItemGroup>
 
   <ItemGroup>

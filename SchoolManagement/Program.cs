@@ -7,6 +7,7 @@ using Microsoft.OpenApi.Models;
 using NeuroPi.UserManagment.Data;
 using NeuroPi.UserManagment.Services.Implementation;
 using NeuroPi.UserManagment.Services.Interface;
+using NeuropiCommonLib.Email;
 using SchoolManagement.Data;
 using SchoolManagement.Services.Implementation;
 using SchoolManagement.Services.Interface;
@@ -129,6 +130,8 @@ builder.Services.AddScoped<ITableFilesService, TableFilesServiceImpl>();
 
 //enquirey-from 
 builder.Services.AddScoped<IEnquiryFormService, EnquiryFormServiceImpl>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+
 
 
 
