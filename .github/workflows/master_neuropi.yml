@@ -14,7 +14,6 @@ jobs:
     runs-on: windows-latest
     permissions:
       contents: read #This is required for actions/checkout
-      actions: write #This is required for deleting artifacts
 
     steps:
       - uses: actions/checkout@v4
@@ -27,22 +26,14 @@ jobs:
       - name: Build with dotnet
         run: dotnet build --configuration Release
 
-      - name: Delete old artifacts
-        run: |
-          gh api repos/${{ github.repository }}/actions/artifacts --paginate --jq '.artifacts[] | select(.name == ".net-app") | select(.expired == false) | .id' | ForEach-Object { gh api --method DELETE repos/${{ github.repository }}/actions/artifacts/$_ }
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        continue-on-error: true
-
       - name: dotnet publish
-        run: dotnet publish NeuroPi/NeuroPi.UserManagment.csproj -c Release -o "${{env.DOTNET_ROOT}}/myapp"
+        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
           path: ${{env.DOTNET_ROOT}}/myapp
-          retention-days: 7
 
   deploy:
     runs-on: windows-latest
@@ -59,7 +50,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: .net-app
-
       
       - name: Login to Azure
         uses: azure/login@v2
@@ -68,13 +58,6 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_1E8AAFD9DDBF49338F1F292EF08588A2 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_99DCF1DCB22E4F1282EB0E82C6D97D36 }}
 
-      - name: Stop App Service
-        shell: pwsh
-        run: |
-          $rg = az webapp list --query "[?name=='NeuroPi'].resourceGroup" --output tsv
-          echo "Stopping App Service in Resource Group: $rg"
-          az webapp stop --name NeuroPi --resource-group $rg
-
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
@@ -82,12 +65,4 @@ jobs:
           app-name: 'NeuroPi'
           slot-name: 'Production'
           package: .
-
-      - name: Start App Service
-        if: always()
-        shell: pwsh
-        run: |
-          $rg = az webapp list --query "[?name=='NeuroPi'].resourceGroup" --output tsv
-          echo "Starting App Service in Resource Group: $rg"
-          az webapp start --name NeuroPi --resource-group $rg
           
