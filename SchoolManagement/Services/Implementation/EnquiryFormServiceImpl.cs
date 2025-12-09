@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using SchoolManagement.Data;
 using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.EnquiryForm;
 using NeuropiCommonLib.Email;
+using NeuropiCommonLib.PDF;
 using System.IO;
 
 namespace SchoolManagement.Services.Implementation
@@ -169,66 +171,100 @@ namespace SchoolManagement.Services.Implementation
             {
                 try
                 {
-                    // TODO: Generate PDF of signed NDA document
-                    // For now, send email confirmation without PDF
+                    // ✅ Generate PDF of signed NDA document
+                    string neuroPiSignaturePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "NeuroPiSignature.jpg");
+                    
+                    byte[] pdfBytes = NdaPdfGenerator.GenerateNdaPdf(
+                        companyName: model.CompanyName,
+                        contactPerson: model.ContactPerson,
+                        email: model.Email,
+                        contactNumber: model.ContactNumber ?? "",
+                        place: "", // Place is not stored in the model
+                        agreedOn: model.AgreedOn ?? DateTime.UtcNow,
+                        recipientSignatureBase64: model.DigitalSignature,
+                        neuroPiSignaturePath: neuroPiSignaturePath
+                    );
+
+                    string pdfFileName = $"NDA_{model.CompanyName.Replace(" ", "_")}_{model.AgreedOn?.ToString("yyyyMMdd")}.pdf";
                     
                     string confirmationSubject = "NDA Signed Successfully - NeuroPi";
                     string confirmationBody = $@"
                         <html>
-                        <body style='font-family: Arial, sans-serif;'>
-                            <h2>NDA Signed Successfully</h2>
-                            <p>Dear {model.ContactPerson},</p>
-                            <p>Thank you for signing the Non-Disclosure Agreement with NeuroPi Tech Private Limited.</p>
-                            <p><strong>Details:</strong></p>
-                            <ul>
-                                <li>Company: {model.CompanyName}</li>
-                                <li>Signed by: {model.ContactPerson}</li>
-                                <li>Email: {model.Email}</li>
-                                <li>Date Signed: {model.AgreedOn?.ToString("MMMM dd, yyyy")}</li>
-                            </ul>
-                            <p>A copy of this signed NDA has been recorded in our system.</p>
-                            <p><em>Note: PDF copy will be attached in the next update.</em></p>
-                            <br/>
-                            <p>Best regards,<br/>
-                            NeuroPi Team</p>
+                        <body style='font-family: Arial, sans-serif; padding: 20px;'>
+                            <div style='max-width: 600px; margin: 0 auto;'>
+                                <h2 style='color: #1A4255;'>NDA Signed Successfully</h2>
+                                <p>Dear {model.ContactPerson},</p>
+                                <p>Thank you for signing the Non-Disclosure Agreement with NeuroPi Tech Private Limited.</p>
+                                <p><strong>Details:</strong></p>
+                                <ul>
+                                    <li>Company: {model.CompanyName}</li>
+                                    <li>Signed by: {model.ContactPerson}</li>
+                                    <li>Email: {model.Email}</li>
+                                    <li>Date Signed: {model.AgreedOn?.ToString("MMMM dd, yyyy")}</li>
+                                </ul>
+                                <p>Please find the signed NDA document attached to this email for your records.</p>
+                                <br/>
+                                <p>Best regards,<br/>
+                                NeuroPi Team</p>
+                                <hr style='border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;'/>
+                                <div style='text-align: center; padding: 20px 0;'>
+                                    <img src='https://neuropi.ai/assets/logo.png' alt='NeuroPi Logo' style='max-width: 150px; height: auto;'/>
+                                    <p style='font-size: 12px; color: #666; margin-top: 10px;'>NeuroPi Tech Private Limited</p>
+                                    <p style='font-size: 11px; color: #999;'>© 2025 All rights reserved</p>
+                                </div>
+                            </div>
                         </body>
                         </html>";
 
-                    // Send to the signer
-                    await _emailService.SendEmailAsync(
+                    // Send to the signer with PDF attachment
+                    await _emailService.SendEmailWithAttachmentAsync(
                         model.Email,
                         confirmationSubject,
-                        confirmationBody
+                        confirmationBody,
+                        pdfBytes,
+                        pdfFileName
                     );
 
-                    // Send notification to NeuroPi admin (info@neuropi.ai)
+                    // Send notification to NeuroPi admin (info@neuropi.ai) with PDF attachment
                     string adminNotification = $@"
                         <html>
-                        <body style='font-family: Arial, sans-serif;'>
-                            <h2>New NDA Signed</h2>
-                            <p><strong>Details:</strong></p>
-                            <ul>
-                                <li>Company: {model.CompanyName}</li>
-                                <li>Contact Person: {model.ContactPerson}</li>
-                                <li>Email: {model.Email}</li>
-                                <li>Phone: {model.ContactNumber}</li>
-                                <li>Date Signed: {model.AgreedOn?.ToString("MMMM dd, yyyy HH:mm:ss")} UTC</li>
-                                <li>UUID: {model.Uuid}</li>
-                            </ul>
+                        <body style='font-family: Arial, sans-serif; padding: 20px;'>
+                            <div style='max-width: 600px; margin: 0 auto;'>
+                                <h2 style='color: #1A4255;'>New NDA Signed</h2>
+                                <p><strong>Details:</strong></p>
+                                <ul>
+                                    <li>Company: {model.CompanyName}</li>
+                                    <li>Contact Person: {model.ContactPerson}</li>
+                                    <li>Email: {model.Email}</li>
+                                    <li>Phone: {model.ContactNumber}</li>
+                                    <li>Date Signed: {model.AgreedOn?.ToString("MMMM dd, yyyy HH:mm:ss")} UTC</li>
+                                    <li>UUID: {model.Uuid}</li>
+                                </ul>
+                                <p>The signed NDA document is attached.</p>
+                                <hr style='border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;'/>
+                                <div style='text-align: center; padding: 20px 0;'>
+                                    <img src='https://neuropi.ai/assets/logo.png' alt='NeuroPi Logo' style='max-width: 150px; height: auto;'/>
+                                    <p style='font-size: 12px; color: #666; margin-top: 10px;'>NeuroPi Tech Private Limited</p>
+                                    <p style='font-size: 11px; color: #999;'>© 2025 All rights reserved</p>
+                                </div>
+                            </div>
                         </body>
                         </html>";
 
-                    await _emailService.SendEmailAsync(
+                    await _emailService.SendEmailWithAttachmentAsync(
                         "info@neuropi.ai",
                         $"NDA Signed: {model.CompanyName}",
-                        adminNotification
+                        adminNotification,
+                        pdfBytes,
+                        pdfFileName
                     );
 
-                    Console.WriteLine($"Confirmation emails sent for NDA signing: {model.CompanyName}");
+                    Console.WriteLine($"Confirmation emails with PDF sent for NDA signing: {model.CompanyName}");
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"EMAIL ERROR (NDA Confirmation): {ex.Message}");
+                    Console.WriteLine($"STACK TRACE: {ex.StackTrace}");
                     // Don't fail the update if email fails
                 }
             }

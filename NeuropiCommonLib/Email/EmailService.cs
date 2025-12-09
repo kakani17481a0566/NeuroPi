@@ -49,5 +49,56 @@ namespace NeuropiCommonLib.Email
             await smtp.SendAsync(message);
             await smtp.DisconnectAsync(true);
         }
+
+        public async Task SendEmailWithAttachmentAsync(string toEmail, string subject, string htmlBody, byte[] attachmentData, string attachmentName)
+        {
+            var message = new MimeMessage();
+
+            message.From.Add(new MailboxAddress(
+                _config["EmailSettings:FromName"],
+                _config["EmailSettings:FromEmail"]
+            ));
+
+            message.To.Add(MailboxAddress.Parse(toEmail));
+            message.Subject = subject;
+
+            // Create multipart message
+            var multipart = new Multipart("mixed");
+
+            // Add HTML body
+            multipart.Add(new TextPart(TextFormat.Html)
+            {
+                Text = htmlBody
+            });
+
+            // Add PDF attachment
+            var attachment = new MimePart("application", "pdf")
+            {
+                Content = new MimeContent(new System.IO.MemoryStream(attachmentData)),
+                ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
+                ContentTransferEncoding = ContentEncoding.Base64,
+                FileName = attachmentName
+            };
+
+            multipart.Add(attachment);
+
+            message.Body = multipart;
+
+            using var smtp = new SmtpClient();
+
+            await smtp.ConnectAsync(
+                _config["EmailSettings:SmtpHost"],
+                int.Parse(_config["EmailSettings:SmtpPort"]),
+                SecureSocketOptions.StartTls
+            );
+
+            await smtp.AuthenticateAsync(
+                _config["EmailSettings:SmtpUser"],
+                _config["EmailSettings:SmtpPassword"]
+            );
+
+            await smtp.SendAsync(message);
+            await smtp.DisconnectAsync(true);
+        }
     }
 }
