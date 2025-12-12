@@ -3,11 +3,8 @@ using SchoolManagement.Data;
 using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.Worksheets;
-using CloudinaryDotNet;
-using CloudinaryDotNet.Actions;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 namespace SchoolManagement.Services.Implementation
@@ -15,12 +12,10 @@ namespace SchoolManagement.Services.Implementation
     public class WorkSheetServiceImpl : IWorkSheetService
     {
         private readonly SchoolManagementDb _dbContext;
-        private readonly Cloudinary _cloudinary;
 
-        public WorkSheetServiceImpl(SchoolManagementDb dbContext, Cloudinary cloudinary)
+        public WorkSheetServiceImpl(SchoolManagementDb dbContext)
         {
             _dbContext = dbContext;
-            _cloudinary = cloudinary;
         }
 
         public List<WorksheetResponseVM> GetAll()
@@ -65,41 +60,11 @@ namespace SchoolManagement.Services.Implementation
 
         public WorksheetResponseVM Create(WorksheetRequestVM request)
         {
-            string uploadedUrl = null;
-
-            if (request.File != null && request.File.Length > 0)
-            {
-                var extension = Path.GetExtension(request.File.FileName).ToLower();
-
-                // ✅ Only allow .pdf files
-                if (extension != ".pdf")
-                    throw new InvalidOperationException("Only PDF files are allowed.");
-
-                using (var stream = request.File.OpenReadStream())
-                {
-                    var uploadParams = new RawUploadParams
-                    {
-                        File = new FileDescription(request.File.FileName, stream),
-                        Folder = "worksheets",
-                        UseFilename = true,
-                        UniqueFilename = false,
-                        Overwrite = false,
-                        Type = "upload" // Ensure it's public
-                    };
-
-                    var uploadResult = _cloudinary.Upload(uploadParams);
-                    if (uploadResult.StatusCode == System.Net.HttpStatusCode.OK)
-                        uploadedUrl = uploadResult.SecureUrl.AbsoluteUri;
-                    else
-                        throw new Exception("Cloudinary upload failed.");
-                }
-            }
-
             var model = new MWorksheet
             {
                 Name = request.Name,
                 Description = request.Description,
-                Location = uploadedUrl,
+                Location = request.Location,
                 TenantId = request.TenantId,
                 SubjectId = request.SubjectId,
                 CreatedBy = request.CreatedBy,
@@ -133,22 +98,10 @@ namespace SchoolManagement.Services.Implementation
             item.UpdatedOn = DateTime.UtcNow;
             item.UpdatedBy = request.UpdatedBy;
 
-            if (request.File != null && request.File.Length > 0)
+            // Update location only if a new URL is provided
+            if (!string.IsNullOrWhiteSpace(request.Location))
             {
-                using (var stream = request.File.OpenReadStream())
-                {
-                    var uploadParams = new RawUploadParams
-                    {
-                        File = new FileDescription(request.File.FileName, stream),
-                        Folder = "worksheets"
-                    };
-
-                    var uploadResult = _cloudinary.Upload(uploadParams);
-                    if (uploadResult.StatusCode == System.Net.HttpStatusCode.OK)
-                        item.Location = uploadResult.SecureUrl.AbsoluteUri;
-                    else
-                        throw new Exception("Cloudinary upload failed.");
-                }
+                item.Location = request.Location;
             }
 
             _dbContext.SaveChanges();

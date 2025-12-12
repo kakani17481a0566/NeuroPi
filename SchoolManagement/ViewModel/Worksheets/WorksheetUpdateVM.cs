@@ -4,7 +4,7 @@
     {
         public string Name { get; set; }
         public string Description { get; set; }
-        public IFormFile File { get; set; } // for file update
+        public string Location { get; set; } // URL to the uploaded file (optional for updates)
         public int? SubjectId { get; set; }
         public int UpdatedBy { get; set; }
     }

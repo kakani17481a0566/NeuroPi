@@ -76,6 +76,14 @@ namespace SchoolManagement.Services.Implementation
 
         }
 
+        public List<TimeTableAssessmentResponseVM> GetTimeTableAssessmentsByTimeTableId(int timeTableId, int tenantId)
+        {
+            var assessments = _context.TimeTableAssessments
+                .Where(a => a.TimeTableId == timeTableId && a.TenantId == tenantId && !a.IsDeleted)
+                .ToList();
+            return assessments.Select(TimeTableAssessmentResponseVM.ToViewModel).ToList();
+        }
+
         public TimeTableAssessmentResponseVM UpdateTimeTableAssessment(int id, int tenantId, TimeTableAssessmentUpdateVM timeTableAssessment)
         {
             var existingAssessment = _context.TimeTableAssessments

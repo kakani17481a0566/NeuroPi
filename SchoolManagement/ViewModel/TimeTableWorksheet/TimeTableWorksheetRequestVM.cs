@@ -7,6 +7,7 @@ namespace SchoolManagement.ViewModel.TimeTableWorksheet
         public int TimeTableId { get; set; }
         public int WorksheetId { get; set; }
         public int TenantId { get; set; }
+        public int CreatedBy { get; set; }
 
         public MTimeTableWorksheet ToModel()
         {
@@ -15,7 +16,8 @@ namespace SchoolManagement.ViewModel.TimeTableWorksheet
                 TimeTableId = this.TimeTableId,
                 WorksheetId = this.WorksheetId,
                 TenantId = this.TenantId,
-                // CreatedOn and CreatedBy set in service
+                CreatedBy = this.CreatedBy,
+                // CreatedOn set in service
             };
         }
     }

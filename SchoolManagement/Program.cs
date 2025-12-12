@@ -85,6 +85,8 @@ builder.Services.AddScoped<IStudentAttendanceService, StudentAttendanceServiceIm
 builder.Services.AddScoped<IWorkSheetService, WorkSheetServiceImpl>();
 builder.Services.AddScoped<IPublicHolidayService, PublicHolidayServiceImpl>();
 builder.Services.AddScoped<IAssessmentMatrixService, AssessmentMatrixService>();
+builder.Services.AddScoped<IAssessmentSkillService, AssessmentSkillServiceImpl>();
+builder.Services.AddScoped<IAssessmentService, AssessmentServiceImpl>();
 builder.Services.AddScoped<IItemsService, ItemsServiceImpl>();
 builder.Services.AddScoped<IItemCategoryService, ItemCategoryServiceImpl>();
 builder.Services.AddScoped<IItemLocationService, ItemLocationServiceImpl>();

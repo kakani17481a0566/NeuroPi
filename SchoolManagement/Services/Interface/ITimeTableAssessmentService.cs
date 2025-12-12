@@ -8,6 +8,8 @@ namespace SchoolManagement.Services.Interface
 
         List<TimeTableAssessmentResponseVM> GetTimeTableAssessmentsByTenantId(int tenantId);
 
+        List<TimeTableAssessmentResponseVM> GetTimeTableAssessmentsByTimeTableId(int timeTableId, int tenantId);
+
         TimeTableAssessmentResponseVM GetTimeTableAssessmentById(int id);
 
         TimeTableAssessmentResponseVM GetTimeTableAssessmentByTenantIdAndId(int tenantId, int id);

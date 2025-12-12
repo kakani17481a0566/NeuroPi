@@ -138,5 +138,30 @@ namespace SchoolManagement.Controllers
             );
         }
 
+        // Get subjects by course ID and tenant ID (alternative route pattern)
+        // HTTP GET: api/subject/{courseId}/tenant/{tenantId}
+        // Parameter: int courseId, int tenantId
+        [HttpGet("{courseId}/tenant/{tenantId}")]
+        public ResponseResult<List<SubjectResponseVM>> GetSubjectsByCourseAndTenant(int courseId, int tenantId)
+        {
+            var subjects = _subjectService.GetSubjectsByCourseIdAndTenantIt(courseId, tenantId);
+
+            if (subjects == null || !subjects.Any())
+            {
+                return new ResponseResult<List<SubjectResponseVM>>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    "No subjects found for this course and tenant"
+                );
+            }
+
+            return new ResponseResult<List<SubjectResponseVM>>(
+                HttpStatusCode.OK,
+                subjects,
+                "Subjects fetched successfully"
+            );
+        }
+
+
     }
 }

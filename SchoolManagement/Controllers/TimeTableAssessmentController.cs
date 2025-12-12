@@ -24,6 +24,20 @@ namespace SchoolManagement.Controllers
             return new ResponseResult<List<TimeTableAssessmentResponseVM>>(HttpStatusCode.OK, assessments, "Time table assessments retrieved successfully");
         }
 
+        [HttpGet("tenant/{tenantId}")]
+        public ResponseResult<List<TimeTableAssessmentResponseVM>> GetTimeTableAssessmentsByTenantId(int tenantId)
+        {
+            var assessments = _timeTableAssessmentService.GetTimeTableAssessmentsByTenantId(tenantId);
+            return new ResponseResult<List<TimeTableAssessmentResponseVM>>(HttpStatusCode.OK, assessments, "Time table assessments for tenant retrieved successfully");
+        }
+
+        [HttpGet("timetable/{timeTableId}/tenant/{tenantId}")]
+        public ResponseResult<List<TimeTableAssessmentResponseVM>> GetTimeTableAssessmentsByTimeTableId(int timeTableId, int tenantId)
+        {
+            var assessments = _timeTableAssessmentService.GetTimeTableAssessmentsByTimeTableId(timeTableId, tenantId);
+            return new ResponseResult<List<TimeTableAssessmentResponseVM>>(HttpStatusCode.OK, assessments, "Time table assessments for timetable retrieved successfully");
+        }
+
         [HttpGet("{id}")]
         public ResponseResult<TimeTableAssessmentResponseVM> GetTimeTableAssessmentById(int id)
         {
