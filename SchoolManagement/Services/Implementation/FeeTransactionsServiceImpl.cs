@@ -247,5 +247,164 @@ namespace SchoolManagement.Services.Implementation
 
 
 
+        public ResponseResult<List<FeeReportTransactionVM>> GetRecentTransactions(
+            int tenantId, 
+            int branchId, 
+            int courseId, 
+            int limit)
+        {
+            // Get recent transactions for students in the specified course
+            var transactions = (from ft in _db.FeeTransactions
+                                join s in _db.Students on ft.StudentId equals s.Id
+                                join fs in _db.FeeStructures on ft.FeeStructureId equals fs.Id
+                                join fp in _db.FeePackages
+                                      on new { ft.FeeStructureId, s.CourseId, ft.TenantId }
+                                   equals new { FeeStructureId = fp.FeeStructureId, fp.CourseId, fp.TenantId }
+                                      into fpJoin
+                                from fp in fpJoin.DefaultIfEmpty()
+                                join m in _db.Masters on fp.PaymentPeriod equals m.Id into mJoin
+                                from m in mJoin.DefaultIfEmpty()
+                                where ft.TenantId == tenantId 
+                                   && s.CourseId == courseId 
+                                   && s.BranchId == branchId
+                                   && !ft.IsDeleted 
+                                   && ft.TrxDate <= DateTime.UtcNow
+                                orderby ft.TrxDate descending
+                                select new FeeReportTransactionVM
+                                {
+                                    Id = ft.Id,
+                                    TenantId = ft.TenantId,
+                                    FeeStructureId = ft.FeeStructureId,
+                                    FeeStructureName = fs.Name,
+                                    StudentId = ft.StudentId,
+                                    TrxDate = ft.TrxDate,
+                                    TrxMonth = ft.TrxDate.ToString("MMM"),
+                                    TrxYear = ft.TrxDate.Year.ToString(),
+                                    TrxType = ft.TrxType,
+                                    TrxName = ft.TrxName,
+                                    Debit = ft.Debit,
+                                    Credit = ft.Credit,
+                                    TrxStatus = ft.TrxStatus,
+                                    PaymentType = m.Name ?? "Annual"
+                                })
+                                .Take(limit)
+                                .ToList();
+
+            if (!transactions.Any())
+            {
+                return new ResponseResult<List<FeeReportTransactionVM>>(
+                    HttpStatusCode.NotFound,
+                    new List<FeeReportTransactionVM>(),
+                    "No recent transactions found."
+                );
+            }
+
+            return new ResponseResult<List<FeeReportTransactionVM>>(
+                HttpStatusCode.OK,
+                transactions,
+                $"Retrieved {transactions.Count} recent transactions."
+            );
+        }
+
+        public ResponseResult<int> AddPayment(AddPaymentRequest request)
+        {
+            try
+            {
+                var transaction = new MFeeTransactions
+                {
+                    TenantId = request.TenantId,
+                    FeeStructureId = request.FeeStructureId, // Provided by frontend
+                    StudentId = request.StudentId,
+                    TrxDate = request.TrxDate,
+                    TrxType = "credit",
+                    TrxName = $"Payment Received - {request.PaymentMode}",
+                    Debit = 0,
+                    Credit = request.Amount,
+                    TrxStatus = "Completed",
+                    TrxId = Guid.NewGuid().ToString(),
+                    CreatedOn = DateTime.UtcNow,
+                    CreatedBy = request.CreatedBy,
+                    UpdatedOn = DateTime.UtcNow,
+                    UpdatedBy = request.CreatedBy,
+                    IsDeleted = false
+                };
+
+                _db.FeeTransactions.Add(transaction);
+                var result = _db.SaveChanges();
+
+                return new ResponseResult<int>(
+                    HttpStatusCode.OK,
+                    result,
+                    $"Payment of ₹{request.Amount} recorded successfully."
+                );
+            }
+            catch (Exception ex)
+            {
+                return new ResponseResult<int>(
+                    HttpStatusCode.InternalServerError,
+                    0,
+                    $"Error recording payment: {ex.Message}"
+                );
+            }
+        }
+
+        public ResponseResult<int> AddBill(AddBillRequest request)
+        {
+            try
+            {
+                // Try to find fee structure by name if not provided
+                int feeStructureId = request.FeeStructureId ?? 0;
+                
+                if (feeStructureId == 0 && !string.IsNullOrEmpty(request.FeeStructureName))
+                {
+                    var feeStructure = _db.FeeStructures
+                        .FirstOrDefault(fs => fs.TenantId == request.TenantId && 
+                                             fs.Name == request.FeeStructureName);
+                    
+                    if (feeStructure != null)
+                    {
+                        feeStructureId = feeStructure.Id;
+                    }
+                }
+
+                var transaction = new MFeeTransactions
+                {
+                    TenantId = request.TenantId,
+                    FeeStructureId = feeStructureId,
+                    StudentId = request.StudentId,
+                    TrxDate = request.TrxDate,
+                    TrxType = "debit",
+                    TrxName = !string.IsNullOrEmpty(request.Description) 
+                        ? request.Description 
+                        : request.FeeStructureName,
+                    Debit = request.Amount,
+                    Credit = 0,
+                    TrxStatus = "Pending",
+                    TrxId = Guid.NewGuid().ToString(),
+                    CreatedOn = DateTime.UtcNow,
+                    CreatedBy = request.CreatedBy,
+                    UpdatedOn = DateTime.UtcNow,
+                    UpdatedBy = request.CreatedBy,
+                    IsDeleted = false
+                };
+
+                _db.FeeTransactions.Add(transaction);
+                var result = _db.SaveChanges();
+
+                return new ResponseResult<int>(
+                    HttpStatusCode.OK,
+                    result,
+                    $"Bill of ₹{request.Amount} added successfully."
+                );
+            }
+            catch (Exception ex)
+            {
+                return new ResponseResult<int>(
+                    HttpStatusCode.InternalServerError,
+                    0,
+                    $"Error adding bill: {ex.Message}"
+                );
+            }
+        }
     }
 }
