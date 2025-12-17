@@ -1,4 +1,5 @@
-﻿using CloudinaryDotNet;
+﻿using Azure.Storage.Blobs;
+using CloudinaryDotNet;
 using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +21,9 @@ Env.Load();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+
+// Azure Blob Storage Configuration
+builder.Services.AddSingleton(x => new BlobServiceClient(builder.Configuration.GetConnectionString("AzureBlobStorage")));
 
 // User Management Services
 builder.Services.AddScoped<ITenantService, TenantServiceImpl>();

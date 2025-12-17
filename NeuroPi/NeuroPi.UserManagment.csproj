@@ -16,15 +16,13 @@
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
       </ItemGroup>
 		<ItemGroup>
-			<None Update="appsettings.json">
+			<None Update="neuro_appsettings.json">
 				<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 				<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-				<TargetPath>neuro_appsettings.json</TargetPath>
 			</None>
-			<None Update="appsettings.Development.json">
+			<None Update="neuro_appsettings.Development.json">
 				<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 				<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-				<TargetPath>neuro_appsettings.Development.json</TargetPath>
 			</None>
 		</ItemGroup>
 
