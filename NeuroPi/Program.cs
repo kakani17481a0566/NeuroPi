@@ -1,4 +1,5 @@
 using System.Text;
+using Azure.Storage.Blobs;
 using CloudinaryDotNet;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +28,11 @@ var cloudinary = new Cloudinary(new Account(
 ));
 cloudinary.Api.Secure = true;
 builder.Services.AddSingleton(cloudinary);
+
+// -------------------------------------------
+// Azure Blob Storage Configuration
+// -------------------------------------------
+builder.Services.AddSingleton(x => new BlobServiceClient(builder.Configuration.GetConnectionString("AzureBlobStorage")));
 
 // -------------------------------------------
 // Add Services to Container

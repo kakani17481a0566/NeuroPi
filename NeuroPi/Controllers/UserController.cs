@@ -108,12 +108,11 @@ namespace NeuroPi.UserManagment.Controllers
 
         [HttpPut("{id}/image")]
         public async Task<ResponseResult<string>> UpdateUserImageAsync(
-    int id,
-    [FromQuery] int tenantId,
-    [FromForm] UserImageUploadVM request,
-    [FromServices] Cloudinary cloudinary)
+           int id,
+           [FromQuery] int tenantId,
+           [FromForm] UserImageUploadVM request)
         {
-            var result = await _userService.UpdateUserImageAsync(id, tenantId, request, cloudinary);
+            var result = await _userService.UpdateUserImageAsync(id, tenantId, request);
 
             if (!string.IsNullOrEmpty(result))
                 return new ResponseResult<string>(HttpStatusCode.OK, result, "Image updated successfully");

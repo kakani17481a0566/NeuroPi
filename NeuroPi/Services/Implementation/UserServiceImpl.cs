@@ -17,11 +17,13 @@ namespace NeuroPi.UserManagment.Services.Implementation
     {
         private readonly NeuroPiDbContext _context;
         private readonly IConfiguration _configuration;
+        private readonly BlobServiceClient _blobServiceClient;
 
-        public UserServiceImpl(NeuroPiDbContext context, IConfiguration configuration)
+        public UserServiceImpl(NeuroPiDbContext context, IConfiguration configuration, BlobServiceClient blobServiceClient)
         {
             _context = context;
             _configuration = configuration;
+            _blobServiceClient = blobServiceClient;
         }
 
 
@@ -158,30 +160,34 @@ namespace NeuroPi.UserManagment.Services.Implementation
             return UserResponseVM.ToViewModel(user);
         }
 
-        public async Task<string> UpdateUserImageAsync(int id, int tenantId, UserImageUploadVM request, Cloudinary cloudinary)
+        public async Task<string> UpdateUserImageAsync(int id, int tenantId, UserImageUploadVM request)
         {
             var user = _context.Users.FirstOrDefault(u => u.UserId == id && u.TenantId == tenantId && !u.IsDeleted);
             if (user == null || request.Image == null || request.Image.Length == 0)
                 return null;
 
-            var uploadParams = new ImageUploadParams
+            var containerClient = _blobServiceClient.GetBlobContainerClient("user-profiles");
+            await containerClient.CreateIfNotExistsAsync(Azure.Storage.Blobs.Models.PublicAccessType.Blob);
+
+            var blobName = $"{Guid.NewGuid()}{Path.GetExtension(request.Image.FileName)}";
+            var blobClient = containerClient.GetBlobClient(blobName);
+
+            using (var stream = request.Image.OpenReadStream())
             {
-                File = new FileDescription(request.Image.FileName, request.Image.OpenReadStream()),
-                UseFilename = true,
-                UniqueFilename = true,
-                Overwrite = true,
-                Folder = "user_profiles"
-            };
+                await blobClient.UploadAsync(stream, true);
+            }
 
-            var uploadResult = await cloudinary.UploadAsync(uploadParams);
-            if (uploadResult.StatusCode != HttpStatusCode.OK)
-                return null;
-
-            var imageUrl = uploadResult.SecureUrl.AbsoluteUri;
+            var imageUrl = blobClient.Uri.ToString();
 
             //user.UserImageUrl  = imageUrl;
             user.UpdatedBy = request.UpdatedBy;
             user.UpdatedOn = DateTime.UtcNow;
+            user.UserImageUrl = imageUrl;
+            
+            _context.SaveChanges();
+
+            return imageUrl;
+        }
 
             _context.SaveChanges();
             return imageUrl;

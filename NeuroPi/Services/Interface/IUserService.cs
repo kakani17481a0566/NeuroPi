@@ -1,5 +1,4 @@
-﻿using CloudinaryDotNet;
-using NeuroPi.UserManagment.ViewModel.User;
+﻿using NeuroPi.UserManagment.ViewModel.User;
 using System.Collections.Generic;
 
 namespace NeuroPi.UserManagment.Services.Interface
@@ -20,7 +19,7 @@ namespace NeuroPi.UserManagment.Services.Interface
 
         UserResponseVM DeleteUser(int id, int tenantId);
 
-        Task<string> UpdateUserImageAsync(int id, int tenantId, UserImageUploadVM request, Cloudinary cloudinary);
+        Task<string> UpdateUserImageAsync(int id, int tenantId, UserImageUploadVM request);
 
         bool UpdateUserPassword(int id, int tenantId, UserUpdatePasswordVM request, out string message);
 
