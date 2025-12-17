@@ -189,9 +189,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
             return imageUrl;
         }
 
-            _context.SaveChanges();
-            return imageUrl;
-        }
+
 
         //UserUpdatePasswordVM
 
