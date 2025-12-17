@@ -132,6 +132,10 @@ namespace NeuroPi.UserManagment.Services.Implementation
             user.Address = userUpdate.Address;
             user.UpdatedBy = userUpdate.UpdatedBy;
             user.UpdatedOn = DateTime.UtcNow;
+            if (!string.IsNullOrEmpty(userUpdate.UserImageUrl))
+            {
+                user.UserImageUrl = userUpdate.UserImageUrl;
+            }
 
             _context.SaveChanges();
 

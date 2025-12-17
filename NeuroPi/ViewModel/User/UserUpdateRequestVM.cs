@@ -21,6 +21,7 @@ namespace NeuroPi.UserManagment.ViewModel.User
         public string? Address { get; set; }
 
         public int? UpdatedBy { get; set; }
+        public string? UserImageUrl { get; set; }
 
 
     }
