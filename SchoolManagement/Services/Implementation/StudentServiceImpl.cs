@@ -356,9 +356,7 @@ namespace SchoolManagement.Services.Implementation
                             MobileNumber = request.User.MobileNumber,
                             RoleTypeId = request.User.RoleTypeId,
                             TenantId = request.TenantId,
-                            UserImageUrl = string.IsNullOrEmpty(request.User.UserImageUrl)
-                                ? null
-                                : Convert.FromBase64String(request.User.UserImageUrl),
+                            UserImageUrl = request.User.UserImageUrl,
                             DateOfBirth = DateOnly.FromDateTime(request.User.Dob),
                             CreatedOn = DateTime.UtcNow,
                             CreatedBy = 1
@@ -466,15 +464,15 @@ namespace SchoolManagement.Services.Implementation
                         CreatedBy = user.UserId,
                         CreatedOn = DateTime.UtcNow,
 
-                        Signature = string.IsNullOrEmpty(request.Student.Documents.Signature) ? null : Convert.FromBase64String(request.Student.Documents.Signature),
-                        BirthCertificate = string.IsNullOrEmpty(request.Student.Documents.BirthCertificate) ? null : Convert.FromBase64String(request.Student.Documents.BirthCertificate),
-                        KidPassport = string.IsNullOrEmpty(request.Student.Documents.KidPassport) ? null : Convert.FromBase64String(request.Student.Documents.KidPassport),
-                        Adhar = string.IsNullOrEmpty(request.Student.Documents.Adhar) ? null : Convert.FromBase64String(request.Student.Documents.Adhar),
-                        ParentAdhar = string.IsNullOrEmpty(request.Student.Documents.ParentAdhar) ? null : Convert.FromBase64String(request.Student.Documents.ParentAdhar),
-                        MotherAdhar = string.IsNullOrEmpty(request.Student.Documents.MotherAdhar) ? null : Convert.FromBase64String(request.Student.Documents.MotherAdhar),
-                        HealthForm = string.IsNullOrEmpty(request.Student.Documents.HealthForm) ? null : Convert.FromBase64String(request.Student.Documents.HealthForm),
-                        PrivacyForm = string.IsNullOrEmpty(request.Student.Documents.PrivacyForm) ? null : Convert.FromBase64String(request.Student.Documents.PrivacyForm),
-                        LiabilityForm = string.IsNullOrEmpty(request.Student.Documents.LiabilityForm) ? null : Convert.FromBase64String(request.Student.Documents.LiabilityForm)
+                        Signature = request.Student.Documents.Signature,
+                        BirthCertificate = request.Student.Documents.BirthCertificate,
+                        KidPassport = request.Student.Documents.KidPassport,
+                        Adhar = request.Student.Documents.Adhar,
+                        ParentAdhar = request.Student.Documents.ParentAdhar,
+                        MotherAdhar = request.Student.Documents.MotherAdhar,
+                        HealthForm = request.Student.Documents.HealthForm,
+                        PrivacyForm = request.Student.Documents.PrivacyForm,
+                        LiabilityForm = request.Student.Documents.LiabilityForm
                     };
 
                     // ---------------------------

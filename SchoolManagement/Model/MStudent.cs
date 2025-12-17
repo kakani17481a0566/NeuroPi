@@ -46,8 +46,9 @@ namespace SchoolManagement.Model
         public string? RegNumber { get; set; }
 
         // ✅ Student Image stored as BYTEA but property name kept as StudentImageUrl
-        [Column("student_image", TypeName = "bytea")]
-        public byte[]? StudentImageUrl { get; set; }
+        // ✅ Student Image stored as URL
+        [Column("student_image")]
+        public string? StudentImageUrl { get; set; }
 
         [Column("bloodgroup")]
         public string? BloodGroup { get; set; }
@@ -185,40 +186,40 @@ namespace SchoolManagement.Model
         // Documents & Forms
         // ----------------------------
         [Column("signature")]
-        public byte[]? Signature { get; set; }
+        public string? Signature { get; set; }
 
         [Column("birth_certificate")]
-        public byte[]? BirthCertificate { get; set; }
+        public string? BirthCertificate { get; set; }
 
         [Column("kid_passport")]
-        public byte[]? KidPassport { get; set; }
+        public string? KidPassport { get; set; }
 
         [Column("adhar")]
-        public byte[]? Adhar { get; set; }
+        public string? Adhar { get; set; }
 
         [Column("parent_adhar")]
-        public byte[]? ParentAdhar { get; set; }
+        public string? ParentAdhar { get; set; }
 
         [Column("mother_adhar")]
-        public byte[]? MotherAdhar { get; set; }
+        public string? MotherAdhar { get; set; }
 
         [Column("mother_photo")]
-        public byte[]? MotherPhoto { get; set; }
+        public string? MotherPhoto { get; set; }
 
         [Column("father_photo")]
-        public byte[]? FatherPhoto { get; set; }
+        public string? FatherPhoto { get; set; }
 
         [Column("joint_photo")]
-        public byte[]? JointPhoto { get; set; }
+        public string? JointPhoto { get; set; }
 
         [Column("health_form")]
-        public byte[]? HealthForm { get; set; }
+        public string? HealthForm { get; set; }
 
         [Column("privacy_form")]
-        public byte[]? PrivacyForm { get; set; }
+        public string? PrivacyForm { get; set; }
 
         [Column("liability_form")]
-        public byte[]? LiabilityForm { get; set; }
+        public string? LiabilityForm { get; set; }
 
         [Column("registration_channel")]
         [MaxLength(20)]

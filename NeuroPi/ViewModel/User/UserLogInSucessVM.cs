@@ -19,7 +19,7 @@
 
         public  int departmentId { get; set; }
 
-        public byte[]? UserImageUrl { get; set; }
+        public string? UserImageUrl { get; set; }
         public UserResponseVM UserProfile { get; set; }
 
 

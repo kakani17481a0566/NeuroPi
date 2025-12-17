@@ -23,7 +23,7 @@ namespace NeuroPi.UserManagment.ViewModel.User
         public int? CreatedBy { get; set; } // Keep as int? to match MBaseModel
 
         public int? UpdatedBy { get; set; } // Keep as int? to match MBaseModel
-        public byte[]? UserImageUrl { get; set; }
+        public string? UserImageUrl { get; set; }
 
 
 

@@ -48,12 +48,12 @@ namespace SchoolManagement.ViewModel.Student
 
         public string? RegistrationChannel { get; set; }  // "By Post", "In Person", "Online"
 
-        // Images (bytea)
-        public byte[]? StudentImageUrl { get; set; }
-        public byte[]? StudentImage { get; set; }
-        public byte[]? MotherPhoto { get; set; }
-        public byte[]? FatherPhoto { get; set; }
-        public byte[]? JointPhoto { get; set; }
+        // Images (base64 strings that will be converted to bytea)
+        public string? StudentImageUrl { get; set; }
+        public string? StudentImage { get; set; }
+        public string? MotherPhoto { get; set; }
+        public string? FatherPhoto { get; set; }
+        public string? JointPhoto { get; set; }
 
         // Transport
         public SRTransportVM Transport { get; set; } = default!;
