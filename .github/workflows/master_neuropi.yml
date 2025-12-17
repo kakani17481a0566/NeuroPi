@@ -50,6 +50,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: .net-app
+          path: published_app
       
       - name: Login to Azure
         uses: azure/login@v2
@@ -65,14 +66,14 @@ jobs:
           echo "Resetting WEBSITE_RUN_FROM_PACKAGE=0 to ensure standard zip deploy works"
           az webapp config appsettings set --name NeuroPi --resource-group $rg --settings WEBSITE_RUN_FROM_PACKAGE="0"
 
-      - name: Stop App Service (Prevent File Locking)
+      - name: Restart App Service (Clear Temp Files)
         shell: pwsh
         run: |
           $rg = az webapp list --query "[?name=='NeuroPi'].resourceGroup" --output tsv
-          echo "Stopping App Service..."
-          az webapp stop --name NeuroPi --resource-group $rg
-          echo "Waiting for stop..."
-          Start-Sleep -Seconds 10
+          echo "Restarting App Service to clear temp files (Fixing Disk Space Error)..."
+          az webapp restart --name NeuroPi --resource-group $rg
+          echo "Waiting for restart to complete..."
+          Start-Sleep -Seconds 50
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
@@ -80,13 +81,6 @@ jobs:
         with:
           app-name: 'NeuroPi'
           slot-name: 'Production'
-          package: .
-
-      - name: Start App Service
-        shell: pwsh
-        run: |
-          $rg = az webapp list --query "[?name=='NeuroPi'].resourceGroup" --output tsv
-          echo "Starting App Service..."
-          az webapp start --name NeuroPi --resource-group $rg
+          package: published_app
 
 
