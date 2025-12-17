@@ -80,7 +80,7 @@ jobs:
           echo "Setting WEBSITE_RUN_FROM_PACKAGE=1"
           az webapp config appsettings set --name NeuroPi --resource-group $rg --settings WEBSITE_RUN_FROM_PACKAGE="1"
           
-          echo "Deploying app.zip..."
-          az webapp deploy --name NeuroPi --resource-group $rg --src-path app.zip --type zip
+          echo "Deploying app.zip with clean..."
+          az webapp deploy --name NeuroPi --resource-group $rg --src-path app.zip --type zip --clean true
 
 
