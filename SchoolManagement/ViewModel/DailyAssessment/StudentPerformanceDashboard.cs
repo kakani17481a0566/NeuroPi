@@ -4,7 +4,7 @@
     {
         public int StudentId { get; set; }
         public string StudentName { get; set; }
-        public byte[]? ImageUrl { get; set; }
+        public string? ImageUrl { get; set; }
 
         public PerformanceBreakdown Daily { get; set; }
         public PerformanceBreakdown Weekly { get; set; }
