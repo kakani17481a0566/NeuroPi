@@ -71,9 +71,16 @@ jobs:
         shell: pwsh
         run: |
           $rg = az webapp list --query "[?name=='NeuroPi'].resourceGroup" --output tsv
+          
+          echo "Ensuring App Service is Started..."
+          az webapp start --name NeuroPi --resource-group $rg
+          echo "Waiting for start..."
+          Start-Sleep -Seconds 10
+          
           echo "Setting WEBSITE_RUN_FROM_PACKAGE=1"
           az webapp config appsettings set --name NeuroPi --resource-group $rg --settings WEBSITE_RUN_FROM_PACKAGE="1"
+          
           echo "Deploying app.zip..."
-          az webapp deployment source config-zip --name NeuroPi --resource-group $rg --src app.zip
+          az webapp deploy --name NeuroPi --resource-group $rg --src-path app.zip --type zip
 
 
