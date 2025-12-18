@@ -54,7 +54,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
             Console.WriteLine($"[INFO] Login successful: Role = {role?.Role?.Name}, DepartmentId = {department?.DepartmentId}");
 
-            return new UserLogInSucessVM
+            var response = new UserLogInSucessVM
             {
                 UserName = username,
                 FirstName = role.User.FirstName,
@@ -63,11 +63,42 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 UserId = user.UserId,
                 token = GenerateJwtToken(user),
                 UserProfile = UserResponseVM.ToViewModel(user),
-                RoleId=role.Role.RoleId,
+                RoleId = role.Role.RoleId,
                 RoleName = role?.Role?.Name,
                 departmentId = department?.DepartmentId ?? 0,
-                UserImageUrl  = user.UserImageUrl
+                UserImageUrl = user.UserImageUrl
             };
+
+            // ✅ Generate SAS Token for Login response too (Sidebar/Header usually use this)
+            if (!string.IsNullOrEmpty(response.UserImageUrl))
+            {
+                try
+                {
+                    var uri = new Uri(response.UserImageUrl);
+                    var blobName = System.IO.Path.GetFileName(uri.LocalPath);
+                    var containerClient = _blobServiceClient.GetBlobContainerClient("user-profiles");
+                    var blobClient = containerClient.GetBlobClient(blobName);
+
+                    if (blobClient.CanGenerateSasUri)
+                    {
+                        var sasBuilder = new Azure.Storage.Sas.BlobSasBuilder
+                        {
+                            BlobContainerName = "user-profiles",
+                            BlobName = blobName,
+                            Resource = "b",
+                            ExpiresOn = DateTimeOffset.UtcNow.AddHours(1)
+                        };
+                        sasBuilder.SetPermissions(Azure.Storage.Sas.BlobSasPermissions.Read);
+                        response.UserImageUrl = blobClient.GenerateSasUri(sasBuilder).ToString();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[ERROR] Failed to generate SAS token for login image: {ex.Message}");
+                }
+            }
+
+            return response;
         }
 
         private string GenerateJwtToken(MUser user)
@@ -128,7 +159,10 @@ namespace NeuroPi.UserManagment.Services.Implementation
             user.MiddleName = userUpdate.MiddleName;
             user.LastName = userUpdate.LastName;
             user.Email = userUpdate.Email;
-            user.Password = userUpdate.Password;
+            if (!string.IsNullOrEmpty(userUpdate.Password))
+            {
+                user.Password = userUpdate.Password;
+            }
             user.MobileNumber = userUpdate.MobileNumber;
             user.AlternateNumber = userUpdate.AlternateNumber;
             user.DateOfBirth = userUpdate.DateOfBirth;
@@ -168,7 +202,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 return null;
 
             var containerClient = _blobServiceClient.GetBlobContainerClient("user-profiles");
-            await containerClient.CreateIfNotExistsAsync(Azure.Storage.Blobs.Models.PublicAccessType.Blob);
+            await containerClient.CreateIfNotExistsAsync(Azure.Storage.Blobs.Models.PublicAccessType.None);
 
             var blobName = $"{Guid.NewGuid()}{Path.GetExtension(request.Image.FileName)}";
             var blobClient = containerClient.GetBlobClient(blobName);
@@ -238,6 +272,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
         CONCAT(u.first_name, ' ', u.last_name) AS FullName,
         u.email AS Email,
         u.mobile_number AS MobileNumber,
+        u.user_image_url AS UserImageUrl,
         COALESCE(STRING_AGG(DISTINCT r.name, ', '), 'N/A') AS Roles,
         COUNT(DISTINCT c.id) AS TotalCourses,
         COALESCE(STRING_AGG(DISTINCT c.name, ', '), 'N/A') AS CoursesTaught,
@@ -261,14 +296,50 @@ namespace NeuroPi.UserManagment.Services.Implementation
     LEFT JOIN branch b ON b.id = ct.branch_id
     WHERE ur.user_id = {0} AND ur.tenant_id = {1}
     GROUP BY u.user_id, u.username, u.first_name, u.last_name, 
-             u.email, u.mobile_number,
+             u.email, u.mobile_number, u.user_image_url,
              u.joining_date, u.working_start_time, u.working_end_time,
              u.is_deleted, u.created_on, u.updated_on, ur.created_on;";
 
-            return _context.Set<UsersProfileSummaryVM>()
+            var summary = _context.Set<UsersProfileSummaryVM>()
                 .FromSqlRaw(sql, id, tenantId)
                 .AsEnumerable()
                 .FirstOrDefault();
+
+            if (summary != null && !string.IsNullOrEmpty(summary.UserImageUrl))
+            {
+                try
+                {
+                    // Extract blob name from URL
+                    // URL format: https://<account>.blob.core.windows.net/<container>/<blobname>
+                    var uri = new Uri(summary.UserImageUrl);
+                    var blobName = System.IO.Path.GetFileName(uri.LocalPath);
+
+                    var containerClient = _blobServiceClient.GetBlobContainerClient("user-profiles");
+                    var blobClient = containerClient.GetBlobClient(blobName);
+
+                    if (blobClient.CanGenerateSasUri)
+                    {
+                        var sasBuilder = new Azure.Storage.Sas.BlobSasBuilder
+                        {
+                            BlobContainerName = "user-profiles",
+                            BlobName = blobName,
+                            Resource = "b",
+                            ExpiresOn = DateTimeOffset.UtcNow.AddHours(1)
+                        };
+
+                        sasBuilder.SetPermissions(Azure.Storage.Sas.BlobSasPermissions.Read);
+
+                        summary.UserImageUrl = blobClient.GenerateSasUri(sasBuilder).ToString();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[ERROR] Failed to generate SAS token for image: {ex.Message}");
+                    // Keep original URL on error
+                }
+            }
+
+            return summary;
         }
 
 
