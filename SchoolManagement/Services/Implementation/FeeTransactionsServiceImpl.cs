@@ -131,7 +131,25 @@ namespace SchoolManagement.Services.Implementation
 
             if (finalInsert.Any())
             {
-                _db.FeeTransactions.AddRange(finalInsert);
+                // 🔹 Check for existing transactions to avoid duplicates
+                var studentIds = finalInsert.Select(f => f.StudentId).Distinct().ToList();
+                var existingTransactions = _db.FeeTransactions
+                    .Where(ft => studentIds.Contains(ft.StudentId) && !ft.IsDeleted)
+                    .Select(ft => new { ft.StudentId, ft.FeeStructureId, ft.TrxDate })
+                    .ToList();
+
+                // Filter out transactions that already exist
+                var transactionsToInsert = finalInsert
+                    .Where(ft => !existingTransactions.Any(et =>
+                        et.StudentId == ft.StudentId &&
+                        et.FeeStructureId == ft.FeeStructureId &&
+                        et.TrxDate.Date == ft.TrxDate.Date))
+                    .ToList();
+
+                if (transactionsToInsert.Any())
+                {
+                    _db.FeeTransactions.AddRange(transactionsToInsert);
+                }
             }
 
             var count = _db.SaveChanges();
@@ -205,7 +223,11 @@ namespace SchoolManagement.Services.Implementation
                                     Credit = ft.Credit,
                                     TrxStatus = ft.TrxStatus,
                                     PaymentType = m.Name ?? "Annual"
-                                }).ToList();
+                                })
+                                .GroupBy(t => t.Id) // Group by transaction ID to remove duplicates
+                                .Select(g => g.First()) // Take first from each group
+                                .OrderBy(t => t.TrxDate)
+                                .ToList();
 
             if (!transactions.Any())
             {

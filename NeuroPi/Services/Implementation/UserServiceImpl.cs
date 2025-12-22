@@ -221,6 +221,20 @@ namespace NeuroPi.UserManagment.Services.Implementation
             
             _context.SaveChanges();
 
+            // ✅ Generate SAS Token for return value
+            if (blobClient.CanGenerateSasUri)
+            {
+                var sasBuilder = new Azure.Storage.Sas.BlobSasBuilder
+                {
+                    BlobContainerName = "user-profiles",
+                    BlobName = blobName,
+                    Resource = "b",
+                    ExpiresOn = DateTimeOffset.UtcNow.AddHours(1)
+                };
+                sasBuilder.SetPermissions(Azure.Storage.Sas.BlobSasPermissions.Read);
+                return blobClient.GenerateSasUri(sasBuilder).ToString();
+            }
+
             return imageUrl;
         }
 
