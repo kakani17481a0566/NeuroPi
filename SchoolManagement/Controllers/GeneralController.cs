@@ -13,10 +13,12 @@ namespace SchoolManagement.Controllers
     public class GeneralController : ControllerBase
     {
         private readonly IConfiguration _configuration;
+        private readonly IWebHostEnvironment _environment;
 
-        public GeneralController(IConfiguration configuration)
+        public GeneralController(IConfiguration configuration, IWebHostEnvironment environment)
         {
             _configuration = configuration;
+            _environment = environment;
         }
 
         [HttpPost("Upload")]
@@ -26,6 +28,38 @@ namespace SchoolManagement.Controllers
                 return BadRequest("No file uploaded.");
 
             string connectionString = _configuration.GetSection("AzureBlobStorage:ConnectionString").Value;
+
+            // Check if using development storage (emulator)
+            bool useDevelopmentStorage = connectionString == "UseDevelopmentStorage=true";
+
+            if (useDevelopmentStorage)
+            {
+                // Use local file storage as fallback
+                try
+                {
+                    var uploadsFolder = Path.Combine(_environment.WebRootPath ?? _environment.ContentRootPath, "uploads");
+                    if (!Directory.Exists(uploadsFolder))
+                        Directory.CreateDirectory(uploadsFolder);
+
+                    string fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+                    string filePath = Path.Combine(uploadsFolder, fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+
+                    // Return URL that can be accessed via static files
+                    string fileUrl = $"{Request.Scheme}://{Request.Host}/uploads/{fileName}";
+                    return Ok(new { Url = fileUrl });
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(500, $"Local file storage error: {ex.Message}");
+                }
+            }
+
+            // Use Azure Blob Storage for production
             string containerName = "student-docs";
 
             if (string.IsNullOrEmpty(connectionString))

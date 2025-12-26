@@ -56,8 +56,10 @@ namespace SchoolManagement.Services.Implementation
                 var joinDateTime = student.DateOfJoining.Value.ToDateTime(TimeOnly.MinValue);
 
                 // 🔹 Get only relevant fee packages for this course
+                // If PackageMasterId is specified, filter by it; otherwise get all packages for the course
                 var feePackages = _db.FeePackages
                     .Where(fp => fp.TenantId == request.TenantId && fp.CourseId == student.CourseId)
+                    .Where(fp => !request.PackageMasterId.HasValue || fp.PackageMasterId == request.PackageMasterId.Value)
                     .Include(fp => fp.PaymentPeriodMaster)
                     .ToList();
 
@@ -68,7 +70,7 @@ namespace SchoolManagement.Services.Implementation
                 {
                     var fee = feeStructures.FirstOrDefault(fs => fs.Id == pkg.FeeStructureId);
                     if (fee != null)
-                        insertedTransactions.Add(BuildTransaction(student, fee, joinDateTime, request.CreatedBy));
+                        insertedTransactions.Add(BuildTransaction(student, fee, joinDateTime, request.CreatedBy, request.CorporateId));
                 }
 
                 // -----------------------
@@ -81,14 +83,14 @@ namespace SchoolManagement.Services.Implementation
                     {
                         var fee = feeStructures.FirstOrDefault(fs => fs.Id == pkg.FeeStructureId);
                         if (fee != null)
-                            insertedTransactions.Add(BuildTransaction(student, fee, joinDateTime, request.CreatedBy));
+                            insertedTransactions.Add(BuildTransaction(student, fee, joinDateTime, request.CreatedBy, request.CorporateId));
                     }
                 }
                 else
                 {
                     var fee = feeStructures.FirstOrDefault(fs => fs.Name == "Annual Fee");
                     if (fee != null)
-                        insertedTransactions.Add(BuildTransaction(student, fee, joinDateTime, request.CreatedBy));
+                        insertedTransactions.Add(BuildTransaction(student, fee, joinDateTime, request.CreatedBy, request.CorporateId));
                 }
 
                 // -----------------------
@@ -103,7 +105,7 @@ namespace SchoolManagement.Services.Implementation
                     for (var dt = startDate; dt <= academicYearEnd; dt = dt.AddMonths(1))
                     {
                         var trxDate = dt < joinDateTime ? joinDateTime : dt;
-                        insertedTransactions.Add(BuildTransaction(student, fee, trxDate, request.CreatedBy));
+                        insertedTransactions.Add(BuildTransaction(student, fee, trxDate, request.CreatedBy, request.CorporateId));
                     }
                 }
 
@@ -118,7 +120,7 @@ namespace SchoolManagement.Services.Implementation
                     foreach (var term in terms.Where(t => joinDateTime <= t.EndDate))
                     {
                         var trxDate = term.StartDate < joinDateTime ? joinDateTime : term.StartDate;
-                        insertedTransactions.Add(BuildTransaction(student, fee, trxDate, request.CreatedBy));
+                        insertedTransactions.Add(BuildTransaction(student, fee, trxDate, request.CreatedBy, request.CorporateId));
                     }
                 }
             }
@@ -168,8 +170,22 @@ namespace SchoolManagement.Services.Implementation
             );
         }
 
-        private MFeeTransactions BuildTransaction(MStudent student, MFeeStructure fee, DateTime trxDate, int createdBy)
+        private MFeeTransactions BuildTransaction(MStudent student, MFeeStructure fee, DateTime trxDate, int createdBy, int? corporateId = null)
         {
+            // Calculate final amount with corporate discount if applicable
+            decimal finalAmount = fee.Amount;
+            
+            if (corporateId.HasValue)
+            {
+                var corporate = _db.Corporates.FirstOrDefault(c => c.Id == corporateId.Value);
+                if (corporate != null && corporate.Discount > 0)
+                {
+                    finalAmount = fee.Amount - corporate.Discount;
+                    // Ensure amount doesn't go negative
+                    if (finalAmount < 0) finalAmount = 0;
+                }
+            }
+
             return new MFeeTransactions
             {
                 TenantId = student.TenantId,
@@ -178,7 +194,7 @@ namespace SchoolManagement.Services.Implementation
                 TrxDate = trxDate,
                 TrxType = "debit",
                 TrxName = $"{fee.Name} Fee",
-                Debit = fee.Amount,
+                Debit = finalAmount,  // Use discounted amount
                 Credit = 0,
                 TrxStatus = "Pending",
                 TrxId = Guid.NewGuid().ToString(),
@@ -223,11 +239,7 @@ namespace SchoolManagement.Services.Implementation
                                     Credit = ft.Credit,
                                     TrxStatus = ft.TrxStatus,
                                     PaymentType = m.Name ?? "Annual"
-                                })
-                                .GroupBy(t => t.Id) // Group by transaction ID to remove duplicates
-                                .Select(g => g.First()) // Take first from each group
-                                .OrderBy(t => t.TrxDate)
-                                .ToList();
+                                }).ToList();
 
             if (!transactions.Any())
             {

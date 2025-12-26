@@ -9,6 +9,10 @@ namespace SchoolManagement.ViewModel.Student
         public SRUserVM User { get; set; } = default!;
         public SRStudentVM Student { get; set; } = default!;
         public List<SRContactVM> Contacts { get; set; } = new();
+        
+        // Fee package and corporate discount selections
+        public int? SelectedFeePackage { get; set; }  // Package Master ID
+        public int? SelectedCorporate { get; set; }   // Corporate ID for discount
     }
 
     // -----------------------
