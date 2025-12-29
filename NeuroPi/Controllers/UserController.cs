@@ -43,6 +43,18 @@ namespace NeuroPi.UserManagment.Controllers
             return new ResponseResult<List<UserResponseVM>>(HttpStatusCode.NotFound, null, "No users found");
         }
 
+        // GET api/user/by-tenant-with-roles?tenantId=...
+        [HttpGet("by-tenant-with-roles")]
+        public ResponseResult<List<UserResponseVM>> GetUsersByTenantIdWithRoles([FromQuery] int tenantId)
+        {
+            var users = _userService.GetAllUsersByTenantIdWithRoles(tenantId);
+
+            if (users != null && users.Count > 0)
+                return new ResponseResult<List<UserResponseVM>>(HttpStatusCode.OK, users, "Users with roles fetched successfully");
+
+            return new ResponseResult<List<UserResponseVM>>(HttpStatusCode.NotFound, null, "No users found");
+        }
+
         // GET api/user
         [HttpGet]
         public ResponseResult<List<UserResponseVM>> GetAllUsers()
@@ -56,7 +68,7 @@ namespace NeuroPi.UserManagment.Controllers
         }
 
         // GET api/user/{id}?tenantId=...
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public ResponseResult<UserResponseVM> GetUserById(int id, [FromQuery] int tenantId)
         {
             Console.WriteLine($"GetUserById called with id={id}, tenantId={tenantId}");

@@ -24,6 +24,7 @@ namespace NeuroPi.UserManagment.ViewModel.User
 
         public int? UpdatedBy { get; set; } // Keep as int? to match MBaseModel
         public string? UserImageUrl { get; set; }
+        public string? RoleName { get; set; }
 
 
 

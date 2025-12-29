@@ -10,6 +10,7 @@ namespace NeuroPi.UserManagment.Services.Interface
         List<UserResponseVM> GetAllUsers();
 
         List<UserResponseVM> GetAllUsersByTenantId(int tenantId);
+        List<UserResponseVM> GetAllUsersByTenantIdWithRoles(int tenantId);
 
         UserResponseVM GetUser(int id, int tenantId);
 

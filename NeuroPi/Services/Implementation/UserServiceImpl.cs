@@ -130,6 +130,30 @@ namespace NeuroPi.UserManagment.Services.Implementation
         public List<UserResponseVM> GetAllUsersByTenantId(int tenantId) =>
             UserResponseVM.ToViewModelList(_context.Users.Where(u => u.TenantId == tenantId && !u.IsDeleted).ToList());
 
+        public List<UserResponseVM> GetAllUsersByTenantIdWithRoles(int tenantId)
+        {
+            var users = _context.Users
+                .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
+                .Where(u => u.TenantId == tenantId && !u.IsDeleted)
+                .ToList();
+
+            var userVMs = UserResponseVM.ToViewModelList(users);
+
+            // Manual mapping for RoleName since AutoMapper isn't being used here
+            foreach (var vm in userVMs)
+            {
+                var user = users.FirstOrDefault(u => u.UserId == vm.UserId);
+                if (user != null)
+                {
+                    var role = user.UserRoles.FirstOrDefault(ur => !ur.IsDeleted);
+                    vm.RoleName = role?.Role?.Name;
+                }
+            }
+
+            return userVMs;
+        }
+
         public UserResponseVM GetUser(int id, int tenantId)
         {
             var user=_context.Users.FirstOrDefault(u=>u.UserId==id && u.TenantId==tenantId && !u.IsDeleted);
