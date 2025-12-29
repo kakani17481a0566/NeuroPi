@@ -154,7 +154,11 @@ namespace NeuroPi.UserManagment.Services.Implementation
             var user = _context.Users.FirstOrDefault(u => u.UserId == id && u.TenantId == tenantId && !u.IsDeleted);
             if (user == null) return null;
 
-            user.Username = userUpdate.Username;
+            // Only update username if provided (usernames typically shouldn't change)
+            if (!string.IsNullOrEmpty(userUpdate.Username))
+            {
+                user.Username = userUpdate.Username;
+            }
             user.FirstName = userUpdate.FirstName;
             user.MiddleName = userUpdate.MiddleName;
             user.LastName = userUpdate.LastName;
@@ -356,6 +360,36 @@ namespace NeuroPi.UserManagment.Services.Implementation
             return summary;
         }
 
+        public List<UserWithRoleVM> GetAllUsersByTenantIdWithRoles(int tenantId)
+        {
+            var sql = @"
+    SELECT 
+        u.user_id AS UserId,
+        u.username AS Username,
+        u.first_name AS FirstName,
+        u.last_name AS LastName,
+        CONCAT(u.first_name, ' ', COALESCE(u.middle_name || ' ', ''), u.last_name) AS FullName,
+        u.email AS Email,
+        u.mobile_number AS MobileNumber,
+        u.user_image_url AS UserImageUrl,
+        u.dob AS DateOfBirth,
+        u.address AS Address,
+        u.tenant_id AS TenantId,
+        r.name AS RoleName,
+        r.role_id AS RoleId,
+        CASE WHEN u.is_deleted = FALSE THEN TRUE ELSE FALSE END AS IsActive,
+        u.created_on AS CreatedOn
+    FROM users u
+    LEFT JOIN user_roles ur ON ur.user_id = u.user_id AND ur.tenant_id = u.tenant_id AND ur.is_deleted = FALSE
+    LEFT JOIN roles r ON r.role_id = ur.role_id AND r.is_deleted = FALSE
+    WHERE u.tenant_id = {0} AND u.is_deleted = FALSE
+    ORDER BY u.user_id";
+
+            var users = _context.Database.SqlQueryRaw<UserWithRoleVM>(sql, tenantId)
+                .ToList();
+
+            return users;
+        }
 
     }
 }

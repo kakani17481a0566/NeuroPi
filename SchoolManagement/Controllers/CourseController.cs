@@ -1,80 +1,44 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using NeuroPi.UserManagment.Response;
+using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Services.Interface;
+using NeuroPi.UserManagment.Response;
 using SchoolManagement.ViewModel.Course;
 using System.Net;
 
-[Route("api/[controller]")]
-[ApiController]
-public class CourseController : ControllerBase
+namespace SchoolManagement.Controllers
 {
-    private readonly ICourseService _courseService;
-
-    public CourseController(ICourseService courseService)
+    [Route("api/[controller]")]
+    [ApiController]
+    public class CourseController : ControllerBase
     {
-        _courseService = courseService;
-    }
+        private readonly ICourseService _courseService;
 
-    [HttpPost]
-    public ResponseResult<CourseVm> Create([FromBody] CourseCreateVm courseCreateVm)
-    {
-        var result = _courseService.CreateCourse(courseCreateVm);
-        return new ResponseResult<CourseVm>(HttpStatusCode.Created, result, "Course created successfully");
-    }
+        public CourseController(ICourseService courseService)
+        {
+            _courseService = courseService;
+        }
 
-    [HttpGet]
-    public ResponseResult<List<CourseVm>> GetAll()
-    {
-        var result = _courseService.GetAllCourses();
-        return new ResponseResult<List<CourseVm>>(HttpStatusCode.OK, result, "All courses fetched successfully");
-    }
+        // GET api/course/by-tenant?tenantId=1
+        [HttpGet("by-tenant")]
+        public ResponseResult<List<CourseVM>> GetCoursesByTenant([FromQuery] int tenantId)
+        {
+            var courses = _courseService.GetCoursesByTenantId(tenantId);
 
-    [HttpGet("{id}")]
-    public ResponseResult<CourseVm> GetById(int id)
-    {
-        var result = _courseService.GetCourseById(id);
-        if (result == null)
-            return new ResponseResult<CourseVm>(HttpStatusCode.NotFound, null, "Course not found");
+            if (courses != null && courses.Count > 0)
+                return new ResponseResult<List<CourseVM>>(HttpStatusCode.OK, courses, "Courses fetched successfully");
 
-        return new ResponseResult<CourseVm>(HttpStatusCode.OK, result, "Course fetched successfully");
-    }
+            return new ResponseResult<List<CourseVM>>(HttpStatusCode.NotFound, null, "No courses found");
+        }
 
-    [HttpGet("tenant/{tenantId}")]
-    public ResponseResult<List<CourseVm>> GetByTenant(int tenantId)
-    {
-        var result = _courseService.GetCoursesByTenantId(tenantId);
-        return new ResponseResult<List<CourseVm>>(HttpStatusCode.OK, result, "Courses by tenant fetched successfully");
-    }
+        // GET api/course/{id}?tenantId=1
+        [HttpGet("{id}")]
+        public ResponseResult<CourseVM> GetCourseById(int id, [FromQuery] int tenantId)
+        {
+            var course = _courseService.GetCourseById(id, tenantId);
 
-    [HttpPut("{id}/tenant/{tenantId}")]
-    public ResponseResult<CourseVm> Update(int id, int tenantId, [FromBody] CourseUpdateVm courseUpdateVm)
-    {
-        var result = _courseService.UpdateCourse(id, tenantId, courseUpdateVm);
-        if (result == null)
-            return new ResponseResult<CourseVm>(HttpStatusCode.NotFound, null, "Course not found or not updated");
+            if (course != null)
+                return new ResponseResult<CourseVM>(HttpStatusCode.OK, course, "Course fetched successfully");
 
-        return new ResponseResult<CourseVm>(HttpStatusCode.OK, result, "Course updated successfully");
-    }
-
-    [HttpDelete("{id}/tenant/{tenantId}")]
-    public ResponseResult<string> Delete(int id, int tenantId)
-    {
-        var success = _courseService.DeleteCourseByIdAndTenantId(id, tenantId);
-        if (!success)
-            return new ResponseResult<string>(HttpStatusCode.NotFound, null, "Course not found or already deleted");
-
-        return new ResponseResult<string>(HttpStatusCode.OK, "Deleted", "Course deleted successfully");
-    }
-
-
-    [HttpGet("dropdown-options-course/{tenantId:int}")]
-    public ResponseResult<List<CourseDropDownOptionsVm>> GetCourseDropdownOptions(int tenantId)
-    {
-        var options = _courseService.GetCourseDropDownOptions(tenantId);
-        return new ResponseResult<List<CourseDropDownOptionsVm>>(
-            HttpStatusCode.OK,
-            options,
-            "Course dropdown options retrieved successfully"
-        );
+            return new ResponseResult<CourseVM>(HttpStatusCode.NotFound, null, "Course not found");
+        }
     }
 }

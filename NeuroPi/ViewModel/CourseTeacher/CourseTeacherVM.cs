@@ -1,4 +1,4 @@
-﻿namespace SchoolManagement.ViewModel.CourseTeacher
+namespace NeuroPi.ViewModel.CourseTeacher
 {
     public class CourseTeacherVM
     {
