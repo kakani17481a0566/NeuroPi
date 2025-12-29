@@ -26,7 +26,6 @@ namespace NeuroPi.UserManagment.Services.Interface
 
         UsersProfileSummaryVM GetUserProfileSummary(int id, int tenantId);
 
-        List<UserWithRoleVM> GetAllUsersByTenantIdWithRoles(int tenantId);
 
 
     }

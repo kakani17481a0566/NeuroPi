@@ -1,11 +1,18 @@
-using SchoolManagement.ViewModel.CourseTeacher;
+﻿using SchoolManagement.ViewModel.CourseTeacher;
 
 namespace SchoolManagement.Services.Interface
 {
     public interface ICourseTeacherService
     {
-        List<CourseTeacherVM> GetCoursesByTeacherId(int teacherId, int tenantId);
-        CourseTeacherVM AssignCourseToTeacher(AssignCourseTeacherVM model);
-        bool RemoveCourseFromTeacher(int id, int tenantId);
+        List<CourseTeacherResponseVM> GetAllCourseTeachers();
+        List<CourseTeacherResponseVM> GetCourseTeachersByTenant(int tenantId);
+        CourseTeacherResponseVM GetCourseTeacherById(int id);
+        CourseTeacherResponseVM GetCourseTeacherByIdAndTenant(int id, int tenantId);
+
+        CourseTeacherResponseVM CreateCourseTeacher(CourseTeacherRequestVM courseTeacherRequestVM);
+
+        CourseTeacherResponseVM UpdateCourseTeacher(int id, int tenantId, CourseTeacherUpdateVM courseTeacherUpdateVM);
+        bool DeleteCourseTeacherByIdAndTenant(int id, int tenantId);
+
     }
 }

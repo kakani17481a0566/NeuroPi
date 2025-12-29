@@ -1,8 +1,7 @@
-using Microsoft.EntityFrameworkCore;
+﻿
 using SchoolManagement.Data;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.CourseTeacher;
-using SchoolManagement.Model;
 
 namespace SchoolManagement.Services.Implementation
 {
@@ -14,85 +13,91 @@ namespace SchoolManagement.Services.Implementation
         {
             _context = context;
         }
-
-        public List<CourseTeacherVM> GetCoursesByTeacherId(int teacherId, int tenantId)
+        public CourseTeacherResponseVM CreateCourseTeacher(CourseTeacherRequestVM courseTeacherRequestVM)
         {
-            var sql = @"
-                SELECT 
-                    ct.id,
-                    ct.course_id as CourseId,
-                    c.name as CourseName,
-                    c.description as CourseDescription,
-                    ct.branch_id as BranchId,
-                    b.name as BranchName,
-                    b.address as BranchAddress,
-                    ct.teacher_id as TeacherId,
-                    CONCAT(u.first_name, ' ', u.last_name) as TeacherName,
-                    ct.created_on as CreatedOn,
-                    ct.is_deleted as IsDeleted
-                FROM course_teacher ct
-                INNER JOIN course c ON ct.course_id = c.id
-                INNER JOIN branch b ON ct.branch_id = b.id
-                INNER JOIN users u ON ct.teacher_id = u.user_id
-                WHERE ct.teacher_id = {0} 
-                    AND ct.tenant_id = {1} 
-                    AND ct.is_deleted = false
-                ORDER BY ct.created_on DESC";
-
-            return _context.Database
-                .SqlQueryRaw<CourseTeacherVM>(sql, teacherId, tenantId)
-                .ToList();
-        }
-
-        public CourseTeacherVM AssignCourseToTeacher(AssignCourseTeacherVM model)
-        {
-            // Check if assignment already exists
-            var existing = _context.Set<MCourseTeacher>()
-                .FirstOrDefault(ct => 
-                    ct.TeacherId == model.TeacherId &&
-                    ct.CourseId == model.CourseId &&
-                    ct.BranchId == model.BranchId &&
-                    ct.TenantId == model.TenantId &&
-                    !ct.IsDeleted);
-
-            if (existing != null)
-            {
-                throw new Exception("This course-branch assignment already exists for this teacher");
-            }
-
-            var courseTeacher = new MCourseTeacher
-            {
-                TeacherId = model.TeacherId,
-                CourseId = model.CourseId,
-                BranchId = model.BranchId,
-                TenantId = model.TenantId,
-                CreatedBy = model.CreatedBy ?? model.TeacherId,
-                CreatedOn = DateTime.UtcNow,
-                IsDeleted = false
-            };
-
-            _context.Set<MCourseTeacher>().Add(courseTeacher);
+            var newCourseTeacher = courseTeacherRequestVM.ToModel();
+            newCourseTeacher.CreatedOn = DateTime.Now;
+            _context.CourseTeachers.Add(newCourseTeacher);
             _context.SaveChanges();
-
-            // Return the created assignment with full details
-            var assignments = GetCoursesByTeacherId(model.TeacherId, model.TenantId);
-            return assignments.FirstOrDefault(a => a.Id == courseTeacher.Id);
+            return CourseTeacherResponseVM.ToViewModel(newCourseTeacher);
         }
 
-        public bool RemoveCourseFromTeacher(int id, int tenantId)
+        public bool DeleteCourseTeacherByIdAndTenant(int id, int tenantId)
         {
-            var courseTeacher = _context.Set<MCourseTeacher>()
-                .FirstOrDefault(ct => ct.Id == id && ct.TenantId == tenantId && !ct.IsDeleted);
-
-            if (courseTeacher == null)
-                return false;
-
-            // Soft delete
+            var courseTeacher = _context.CourseTeachers.FirstOrDefault(c=>!c.IsDeleted && c.TenantId == tenantId && c.Id==id);
+            if (courseTeacher == null) return false;
             courseTeacher.IsDeleted = true;
-            courseTeacher.UpdatedOn = DateTime.UtcNow;
+            courseTeacher.UpdatedOn = DateTime.Now;
             _context.SaveChanges();
-
             return true;
         }
-    }
+
+        public List<CourseTeacherResponseVM> GetAllCourseTeachers()
+        {
+            return _context.CourseTeachers
+                 .Where(c => !c.IsDeleted)
+                 .Select(c => new CourseTeacherResponseVM
+                 {
+                    Id = c.Id,
+                    CourseId = c.CourseId,
+                    TeacherId = c.TeacherId,
+                    BranchId = c.BranchId,
+                    TenantId = c.TenantId,
+                    CreatedBy = c.CreatedBy,
+                    CreatedOn = c.CreatedOn,
+                    UpdatedBy = c.UpdatedBy,
+                    UpdatedOn = c.UpdatedOn,
+                 }).ToList();
+
+        }
+
+        public CourseTeacherResponseVM GetCourseTeacherById(int id)
+        {
+            var courseTeacher = _context.CourseTeachers.FirstOrDefault(c => !c.IsDeleted && c.Id == id);
+            if (courseTeacher == null) return null;
+            return CourseTeacherResponseVM.ToViewModel(courseTeacher);
+            
+
+        }
+
+        public CourseTeacherResponseVM GetCourseTeacherByIdAndTenant(int id, int tenantId)
+        {
+            var courseTeacher = _context.CourseTeachers.FirstOrDefault(c => !c.IsDeleted && c.Id == id && c.TenantId == tenantId);
+            if (courseTeacher == null) return null;
+            return CourseTeacherResponseVM.ToViewModel(courseTeacher);
+        }
+
+        public List<CourseTeacherResponseVM> GetCourseTeachersByTenant(int tenantId)
+        {
+            return _context.CourseTeachers
+                .Where(c=> !c.IsDeleted && c.TenantId == tenantId)  
+                .Select(c => new CourseTeacherResponseVM
+                {
+                    Id = c.Id,
+                    CourseId = c.CourseId,
+                    TeacherId = c.TeacherId,
+                    BranchId = c.BranchId,
+                    TenantId = c.TenantId,
+                    CreatedBy = c.CreatedBy,
+                    CreatedOn = c.CreatedOn,
+                    UpdatedBy = c.UpdatedBy,
+                    UpdatedOn = c.UpdatedOn,
+                }).ToList();
+
+        }
+
+        public CourseTeacherResponseVM UpdateCourseTeacher(int id, int tenantId, CourseTeacherUpdateVM courseTeacherUpdateVM)
+        {
+            var existingCourseTeacher = _context.CourseTeachers.FirstOrDefault(c => !c.IsDeleted && c.Id == id && c.TenantId == tenantId);
+            if (existingCourseTeacher == null) return null;
+            existingCourseTeacher.CourseId = courseTeacherUpdateVM.CourseId;
+            existingCourseTeacher.TeacherId = courseTeacherUpdateVM.TeacherId;
+            existingCourseTeacher.BranchId = courseTeacherUpdateVM.BranchId;
+            existingCourseTeacher.UpdatedBy = courseTeacherUpdateVM.UpdatedBy;
+            existingCourseTeacher.UpdatedOn = DateTime.Now;
+            _context.SaveChanges();
+            return CourseTeacherResponseVM.ToViewModel(existingCourseTeacher);  
+
+        }
+    }   
 }

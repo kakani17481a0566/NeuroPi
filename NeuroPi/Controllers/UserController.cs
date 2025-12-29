@@ -177,17 +177,7 @@ namespace NeuroPi.UserManagment.Controllers
             return new ResponseResult<UsersProfileSummaryVM>(HttpStatusCode.NotFound, null, "User not found or no summary available");
         }
 
-        // GET api/user/by-tenant-with-roles?tenantId=...
-        [HttpGet("by-tenant-with-roles")]
-        public ResponseResult<List<UserWithRoleVM>> GetUsersByTenantIdWithRoles([FromQuery] int tenantId)
-        {
-            var users = _userService.GetAllUsersByTenantIdWithRoles(tenantId);
 
-            if (users != null && users.Count > 0)
-                return new ResponseResult<List<UserWithRoleVM>>(HttpStatusCode.OK, users, "Users with roles fetched successfully");
-
-            return new ResponseResult<List<UserWithRoleVM>>(HttpStatusCode.NotFound, null, "No users found");
-        }
 
     }
 }

@@ -1,7 +1,9 @@
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SchoolManagement.Services.Interface;
 using NeuroPi.UserManagment.Response;
+using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.Branch;
+using SchoolManagement.ViewModel.CourseTeacher;
 using System.Net;
 
 namespace SchoolManagement.Controllers
@@ -11,34 +13,102 @@ namespace SchoolManagement.Controllers
     public class BranchController : ControllerBase
     {
         private readonly IBranchService _branchService;
-
         public BranchController(IBranchService branchService)
         {
             _branchService = branchService;
         }
 
-        // GET api/branch/by-tenant?tenantId=1
-        [HttpGet("by-tenant")]
-        public ResponseResult<List<BranchVM>> GetBranchesByTenant([FromQuery] int tenantId)
+        [HttpGet]
+        public ResponseResult<List<BranchResponseVM>> GetAllBranches()
         {
-            var branches = _branchService.GetBranchesByTenantId(tenantId);
-
-            if (branches != null && branches.Count > 0)
-                return new ResponseResult<List<BranchVM>>(HttpStatusCode.OK, branches, "Branches fetched successfully");
-
-            return new ResponseResult<List<BranchVM>>(HttpStatusCode.NotFound, null, "No branches found");
+            var branches = _branchService.GetAllBranches();
+            return new ResponseResult<List<BranchResponseVM>>(HttpStatusCode.OK, branches, "All branches retrieved successfully");
         }
 
-        // GET api/branch/{id}?tenantId=1
         [HttpGet("{id}")]
-        public ResponseResult<BranchVM> GetBranchById(int id, [FromQuery] int tenantId)
+        public ResponseResult<BranchResponseVM> GetBranchById(int id)
         {
-            var branch = _branchService.GetBranchById(id, tenantId);
+            var branch = _branchService.GetBranchById(id);
+            return branch == null
+                ? new ResponseResult<BranchResponseVM>(HttpStatusCode.NotFound, null, "Branch not found")
+                : new ResponseResult<BranchResponseVM>(HttpStatusCode.OK, branch, "Branch retrieved successfully");
+        }
 
-            if (branch != null)
-                return new ResponseResult<BranchVM>(HttpStatusCode.OK, branch, "Branch fetched successfully");
+        [HttpGet("tenant/{tenantId}")]
+        public ResponseResult<List<BranchResponseVM>> GetBranchesByTenantId(int tenantId)
+        {
+            var branches = _branchService.GetBranchesByTenantId(tenantId);
+            return branches == null
+                ? new ResponseResult<List<BranchResponseVM>>(HttpStatusCode.NotFound, null, "No branches found for the specified tenant")
+                : new ResponseResult<List<BranchResponseVM>>(HttpStatusCode.OK, branches, "Branches retrieved successfully");
+        }
 
-            return new ResponseResult<BranchVM>(HttpStatusCode.NotFound, null, "Branch not found");
+        [HttpGet("{id}/{tenantId}")]
+        public ResponseResult<BranchResponseVM> GetBranchByIdAndTenantId(int id, int tenantId)
+        {
+            var branch = _branchService.GetBranchByIdAndTenantId(id, tenantId);
+            return branch == null
+                ? new ResponseResult<BranchResponseVM>(HttpStatusCode.NotFound, null, "Branch not found for the specified tenant")
+                : new ResponseResult<BranchResponseVM>(HttpStatusCode.OK, branch, "Branch retrieved successfully");
+        }
+        [HttpPost]
+        public ResponseResult<BranchResponseVM> CreateBranch([FromBody] BranchRequestVM branchRequest)
+        {
+            if (branchRequest == null)
+            {
+                return new ResponseResult<BranchResponseVM>(HttpStatusCode.BadRequest, null, "Invalid branch data");
+            }
+            var createdBranch = _branchService.AddBranch(branchRequest);
+            return new ResponseResult<BranchResponseVM>(HttpStatusCode.Created, createdBranch, "Branch created successfully");
+        }
+        [HttpPut("{id}/{tenantId}")]
+        public ResponseResult<BranchResponseVM> UpdateBranch(int id, int tenantId, [FromBody] BranchUpdateVM branchUpdate)
+        {
+            if (branchUpdate == null)
+            {
+                return new ResponseResult<BranchResponseVM>(HttpStatusCode.BadRequest, null, "Invalid branch update data");
+            }
+            var updatedBranch = _branchService.UpdateBranch(id, tenantId, branchUpdate);
+            return updatedBranch == null
+                ? new ResponseResult<BranchResponseVM>(HttpStatusCode.NotFound, null, "Branch not found for the specified ID and tenant")
+                : new ResponseResult<BranchResponseVM>(HttpStatusCode.OK, updatedBranch, "Branch updated successfully");
+        }
+        [HttpDelete("{id}/{tenantId}")]
+        public ResponseResult<bool> DeleteBranch(int id, int tenantId)
+        {
+            var isDeleted = _branchService.DeleteBranch(id, tenantId);
+            return isDeleted
+                ? new ResponseResult<bool>(HttpStatusCode.OK, true, "Branch deleted successfully")
+                : new ResponseResult<bool>(HttpStatusCode.NotFound, false, "Branch not found or already deleted");
+
+
+
+        }
+
+        //sai vardhan
+
+        [HttpGet("/department/{userId}/user/{tenanatId}")]
+        public ResponseResult<CourseTeacherVM> GetBranchByDepartmentId(int userId, int tenanatId)
+        {
+            var branch = _branchService.GetBranchByDepartmentId( userId,tenanatId);
+            return branch == null
+                ? new ResponseResult<CourseTeacherVM>(HttpStatusCode.NotFound, null, "Branch not found")
+                : new ResponseResult<CourseTeacherVM>(HttpStatusCode.OK, branch, "Ids  Fetched  successfully");
+        }
+
+
+
+
+        [HttpGet("dropdown-options/{tenantId:int}")]
+        public ResponseResult<List<BranchDropDownOptionVm>> GetBranchDropDownOptions(int tenantId)
+        {
+            var options = _branchService.GetBranchDropDownOptions(tenantId);
+            // List<T> won’t be null; return OK with empty list if no matches
+            return new ResponseResult<List<BranchDropDownOptionVm>>(
+                HttpStatusCode.OK,
+                options,
+                "Branch dropdown options retrieved successfully"
+            );
         }
     }
 }

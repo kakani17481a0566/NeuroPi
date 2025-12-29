@@ -101,29 +101,28 @@ namespace SchoolManagement.Services.Implementation
         }
         public CourseTeacherVM GetParentDetails(int userId, int tenantId)
         {
-            // TODO: This method needs to be refactored to work with the new CourseTeacherVM structure
-            // For now, returning a basic CourseTeacherVM
+            CourseTeacherVM courseTeacherVM = new CourseTeacherVM();
             var parentId = _db.Parents.Where(p => p.UserId == userId && p.TenantId == tenantId).FirstOrDefault();
-            if (parentId == null)
-                return null;
-
-            var result = _db.ParentStudents
-                .Where(t => t.TenantId == tenantId && t.ParentId == parentId.Id)
-                .Include(s => s.Student)
-                .Include(c => c.Student.Course)
-                .FirstOrDefault();
-
-            if (result == null)
-                return null;
-
-            // Return basic course teacher info
-            return new CourseTeacherVM
+            var result = _db.ParentStudents.Where(t => t.TenantId == tenantId && t.ParentId == parentId.Id).Include(s => s.Student).Include(c => c.Student.Course).FirstOrDefault();
+            List<Course> courses = new List<Course>();
+            if (result != null)
             {
-                CourseId = result.Student.CourseId,
-                CourseName = result.Student.Course?.Name,
-                BranchId = result.Student.BranchId,
-                TeacherId = userId
-            };
+                courseTeacherVM.branchId = result.Student.BranchId;
+
+                var courseObj = new Course()
+                {
+                    id = result.Student.Course.Id,
+                    name = result.Student.Course.Name,
+                };
+                courses.Add(courseObj);
+
+            }
+            courseTeacherVM.courses = courses;
+            DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
+            var week = _db.Weeks.Where(w => w.StartDate <= today && w.EndDate >= today && !w.IsDeleted).FirstOrDefault();
+            courseTeacherVM.weekId = week != null ? week.Id : 0;
+            courseTeacherVM.termId = week != null ? week.TermId : 0;
+            return courseTeacherVM;
         }
 
 

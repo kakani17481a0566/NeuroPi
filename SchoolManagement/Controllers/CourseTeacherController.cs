@@ -1,6 +1,7 @@
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SchoolManagement.Services.Interface;
 using NeuroPi.UserManagment.Response;
+using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.CourseTeacher;
 using System.Net;
 
@@ -11,53 +12,86 @@ namespace SchoolManagement.Controllers
     public class CourseTeacherController : ControllerBase
     {
         private readonly ICourseTeacherService _courseTeacherService;
-
         public CourseTeacherController(ICourseTeacherService courseTeacherService)
         {
             _courseTeacherService = courseTeacherService;
         }
 
-        // GET api/courseteacher/teacher/{teacherId}?tenantId=1
-        [HttpGet("teacher/{teacherId}")]
-        public ResponseResult<List<CourseTeacherVM>> GetCoursesByTeacher(int teacherId, [FromQuery] int tenantId)
+        [HttpGet]
+        public ResponseResult<List<CourseTeacherResponseVM>> GetAllCourseTeachers()
         {
-            var courses = _courseTeacherService.GetCoursesByTeacherId(teacherId, tenantId);
-
-            if (courses != null && courses.Count > 0)
-                return new ResponseResult<List<CourseTeacherVM>>(HttpStatusCode.OK, courses, "Courses fetched successfully");
-
-            return new ResponseResult<List<CourseTeacherVM>>(HttpStatusCode.NotFound, null, "No courses found for this teacher");
+            var response = _courseTeacherService.GetAllCourseTeachers();
+            if (response == null)
+            {
+                return new ResponseResult<List<CourseTeacherResponseVM>>(HttpStatusCode.NotFound, response, "No data Found");
+            }
+            return new ResponseResult<List<CourseTeacherResponseVM>>(HttpStatusCode.OK, response, "CourseTeachers fetched successfully");
         }
 
-        // POST api/courseteacher
-        [HttpPost]
-        public ResponseResult<CourseTeacherVM> AssignCourse([FromBody] AssignCourseTeacherVM model)
+        [HttpGet("GetCourseTeachersByTenant/{tenantId}")]
+        public ResponseResult<List<CourseTeacherResponseVM>> GetCourseTeachersByTenant([FromRoute] int tenantId)
         {
-            try
+            var response = _courseTeacherService.GetCourseTeachersByTenant(tenantId);
+            if (response == null || response.Count == 0)
             {
-                var assignment = _courseTeacherService.AssignCourseToTeacher(model);
-
-                if (assignment != null)
-                    return new ResponseResult<CourseTeacherVM>(HttpStatusCode.Created, assignment, "Course assigned successfully");
-
-                return new ResponseResult<CourseTeacherVM>(HttpStatusCode.BadRequest, null, "Failed to assign course");
+                return new ResponseResult<List<CourseTeacherResponseVM>>(HttpStatusCode.NotFound, response, "No data Found for the specified tenant");
             }
-            catch (Exception ex)
-            {
-                return new ResponseResult<CourseTeacherVM>(HttpStatusCode.BadRequest, null, ex.Message);
-            }
+            return new ResponseResult<List<CourseTeacherResponseVM>>(HttpStatusCode.OK, response, "CourseTeachers fetched successfully");
         }
 
-        // DELETE api/courseteacher/{id}?tenantId=1
-        [HttpDelete("{id}")]
-        public ResponseResult<object> RemoveCourse(int id, [FromQuery] int tenantId)
+        [HttpGet("GetCourseTeacherById/{id}")]
+        public ResponseResult<CourseTeacherResponseVM> GetCourseTeacherById([FromRoute] int id)
         {
-            var success = _courseTeacherService.RemoveCourseFromTeacher(id, tenantId);
+            var response = _courseTeacherService.GetCourseTeacherById(id);
+            if (response != null)
+            {
+                return new ResponseResult<CourseTeacherResponseVM>(HttpStatusCode.OK, response, "CourseTeacher is fetched successfully");
+            }
+            return new ResponseResult<CourseTeacherResponseVM>(HttpStatusCode.BadGateway, response, $" CourseTeacher not found with id {id}");
+        }
 
-            if (success)
-                return new ResponseResult<object>(HttpStatusCode.OK, null, "Course assignment removed successfully");
+        [HttpGet("GetCourseTeacherByIdAndTenant/{id}/{tenantId}")]
+        public ResponseResult<CourseTeacherResponseVM> GetCourseTeacherByIdAndTenantId([FromRoute] int id, [FromRoute] int tenantId)
+        {
+            var response = _courseTeacherService.GetCourseTeacherByIdAndTenant(id, tenantId);
+            if (response != null)
+            {
+                return new ResponseResult<CourseTeacherResponseVM>(HttpStatusCode.OK, response, "CourseTeacher is fetched successfully");
+            }
+            return new ResponseResult<CourseTeacherResponseVM>(HttpStatusCode.BadGateway, response, $" CourseTeacher not found with id {id} for the specified tenant");
+        }
 
-            return new ResponseResult<object>(HttpStatusCode.NotFound, null, "Course assignment not found");
+        [HttpPost("CreateCourseTeacher")]
+        public ResponseResult<CourseTeacherResponseVM> CreateCourseTeacher([FromBody] CourseTeacherRequestVM courseTeacherRequestVM)
+        {
+            var response = _courseTeacherService.CreateCourseTeacher(courseTeacherRequestVM);
+            if (response != null)
+            {
+                return new ResponseResult<CourseTeacherResponseVM>(HttpStatusCode.OK, response, "CourseTeacher created successfully");
+            }
+            return new ResponseResult<CourseTeacherResponseVM>(HttpStatusCode.BadGateway, response, "Failed to create CourseTeacher");
+        }
+
+        [HttpPut("UpdateCourseTeacher/{id}/{tenantId}")]
+        public ResponseResult<CourseTeacherResponseVM> UpdateCourseTeacher([FromRoute] int id, [FromRoute] int tenantId, [FromBody] CourseTeacherUpdateVM courseTeacherUpdateVM)
+        {
+            var response = _courseTeacherService.UpdateCourseTeacher(id, tenantId, courseTeacherUpdateVM);
+            if (response != null)
+            {
+                return new ResponseResult<CourseTeacherResponseVM>(HttpStatusCode.OK, response, "CourseTeacher updated successfully");
+            }
+            return new ResponseResult<CourseTeacherResponseVM>(HttpStatusCode.BadGateway, response, "Failed to update CourseTeacher");
+        }
+
+        [HttpDelete("DeleteCourseTeacherByIdAndTenant/{id}/{tenantId}")]
+        public ResponseResult<bool> DeleteCourseTeacherByIdAndTenant([FromRoute] int id, [FromRoute] int tenantId)
+        {
+            var response = _courseTeacherService.DeleteCourseTeacherByIdAndTenant(id, tenantId);
+            if (response)
+            {
+                return new ResponseResult<bool>(HttpStatusCode.OK, response, "CourseTeacher deleted successfully");
+            }
+            return new ResponseResult<bool>(HttpStatusCode.BadGateway, response, "Failed to delete CourseTeacher");
         }
     }
 }
