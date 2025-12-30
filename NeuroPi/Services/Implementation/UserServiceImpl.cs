@@ -518,6 +518,33 @@ namespace NeuroPi.UserManagment.Services.Implementation
             }
         }
 
+        public bool ResetUserPassword(int id, int tenantId, AdminResetPasswordVM request, out string message)
+        {
+            message = string.Empty;
+
+            var user = _context.Users.FirstOrDefault(u => u.UserId == id && u.TenantId == tenantId && !u.IsDeleted);
+            if (user == null)
+            {
+                message = "User not found";
+                return false;
+            }
+
+            user.Password = request.NewPassword;
+            user.UpdatedOn = DateTime.UtcNow;
+
+            try
+            {
+                _context.SaveChanges();
+                message = "Password reset successfully";
+                return true;
+            }
+            catch
+            {
+                message = "Failed to reset password";
+                return false;
+            }
+        }
+
 
         public UsersProfileSummaryVM GetUserProfileSummary(int id, int tenantId)
         {

@@ -176,6 +176,40 @@ namespace NeuroPi.UserManagment.Controllers
             );
         }
 
+        [Authorize]
+        [HttpPut("{id}/reset-password")]
+        public ResponseResult<object> ResetPassword(
+            int id,
+            [FromQuery] int tenantId,
+            [FromBody] AdminResetPasswordVM request)
+        {
+            var result = _userService.ResetUserPassword(id, tenantId, request, out string message);
+
+            if (result)
+            {
+                return new ResponseResult<object>(
+                    HttpStatusCode.OK,
+                    null,
+                    message // "Password reset successfully"
+                );
+            }
+
+            if (message == "User not found")
+            {
+                return new ResponseResult<object>(
+                    HttpStatusCode.NotFound,
+                    null,
+                    message
+                );
+            }
+
+            return new ResponseResult<object>(
+                HttpStatusCode.BadRequest,
+                null,
+                message // "Failed to reset password"
+            );
+        }
+
 
         // GET api/user/{id}/profile-summary?tenantId=...
         [HttpGet("{id}/profile-summary")]

@@ -24,6 +24,8 @@ namespace NeuroPi.UserManagment.Services.Interface
 
         bool UpdateUserPassword(int id, int tenantId, UserUpdatePasswordVM request, out string message);
 
+        bool ResetUserPassword(int id, int tenantId, AdminResetPasswordVM request, out string message);
+
 
         UsersProfileSummaryVM GetUserProfileSummary(int id, int tenantId);
 
