@@ -35,6 +35,9 @@ namespace SchoolManagement.Model
         [ForeignKey("TenantId")]
         public virtual MTenant Tenant { get; set; } = null!;
 
+        [ForeignKey("BranchId")]
+        public MBranch Branch { get; set; }
+
 
 
         // Add other navigation properties like Course, Teacher, Branch if models exist

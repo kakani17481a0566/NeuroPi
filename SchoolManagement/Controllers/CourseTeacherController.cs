@@ -93,5 +93,16 @@ namespace SchoolManagement.Controllers
             }
             return new ResponseResult<bool>(HttpStatusCode.BadGateway, response, "Failed to delete CourseTeacher");
         }
+
+        [HttpGet("teacher/{teacherId}")]
+        public ResponseResult<List<CourseTeacherResponseVM>> GetCourseTeachersByTeacherId([FromRoute] int teacherId, [FromQuery] int tenantId)
+        {
+            var response = _courseTeacherService.GetCourseTeachersByTeacherId(teacherId, tenantId);
+            if (response == null || response.Count == 0)
+            {
+                return new ResponseResult<List<CourseTeacherResponseVM>>(HttpStatusCode.NotFound, response, "No data Found for the specified teacher");
+            }
+            return new ResponseResult<List<CourseTeacherResponseVM>>(HttpStatusCode.OK, response, "CourseTeachers fetched successfully");
+        }
     }
 }

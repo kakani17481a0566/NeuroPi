@@ -2,6 +2,7 @@
 using SchoolManagement.Data;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.CourseTeacher;
+using Microsoft.EntityFrameworkCore;
 
 namespace SchoolManagement.Services.Implementation
 {
@@ -98,6 +99,28 @@ namespace SchoolManagement.Services.Implementation
             _context.SaveChanges();
             return CourseTeacherResponseVM.ToViewModel(existingCourseTeacher);  
 
+        }
+
+        public List<CourseTeacherResponseVM> GetCourseTeachersByTeacherId(int teacherId, int tenantId)
+        {
+            return _context.CourseTeachers
+                .Include(x => x.Course)
+                .Include(x => x.Branch)
+                .Where(c => !c.IsDeleted && c.TenantId == tenantId && c.TeacherId == teacherId)
+                .Select(c => new CourseTeacherResponseVM
+                {
+                    Id = c.Id,
+                    CourseId = c.CourseId,
+                    TeacherId = c.TeacherId,
+                    BranchId = c.BranchId,
+                    TenantId = c.TenantId,
+                    CourseName = c.Course.Name,
+                    BranchName = c.Branch.Name,
+                    CreatedBy = c.CreatedBy,
+                    CreatedOn = c.CreatedOn,
+                    UpdatedBy = c.UpdatedBy,
+                    UpdatedOn = c.UpdatedOn,
+                }).ToList();
         }
     }   
 }

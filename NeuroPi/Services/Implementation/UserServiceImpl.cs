@@ -66,7 +66,8 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 RoleId = role.Role.RoleId,
                 RoleName = role?.Role?.Name,
                 departmentId = department?.DepartmentId ?? 0,
-                UserImageUrl = user.UserImageUrl
+                UserImageUrl = user.UserImageUrl,
+                LinkedStudents = (role?.Role?.Name?.ToUpper() == "PARENT") ? GetLinkedStudents(user.UserId, user.TenantId) : null
             };
 
             // ✅ Generate SAS Token for Login response too (Sidebar/Header usually use this)
@@ -141,6 +142,9 @@ namespace NeuroPi.UserManagment.Services.Implementation
             var userVMs = UserResponseVM.ToViewModelList(users);
 
             // Manual mapping for RoleName since AutoMapper isn't being used here
+            // Bulk fetch linked students for all parents in this tenant
+            var linkedStudentsMap = GetAllLinkedStudentsForTenant(tenantId);
+
             foreach (var vm in userVMs)
             {
                 var user = users.FirstOrDefault(u => u.UserId == vm.UserId);
@@ -148,6 +152,11 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 {
                     var role = user.UserRoles.FirstOrDefault(ur => !ur.IsDeleted);
                     vm.RoleName = role?.Role?.Name;
+
+                    if (vm.RoleName?.ToUpper() == "PARENT" && linkedStudentsMap.ContainsKey(vm.UserId))
+                    {
+                        vm.LinkedStudents = linkedStudentsMap[vm.UserId];
+                    }
                 }
             }
 
@@ -159,9 +168,154 @@ namespace NeuroPi.UserManagment.Services.Implementation
             var user=_context.Users.FirstOrDefault(u=>u.UserId==id && u.TenantId==tenantId && !u.IsDeleted);
             if(user != null)
             {
-                return UserResponseVM.ToViewModel(user);
+                var response = UserResponseVM.ToViewModel(user);
+                
+                // Get Role for this user to check if PARENT
+                var role = _context.UserRoles.Include(r => r.Role)
+                            .FirstOrDefault(ur => ur.UserId == id && ur.TenantId == tenantId && !ur.IsDeleted);
+                            
+                if (role?.Role?.Name?.ToUpper() == "PARENT")
+                {
+                    response.LinkedStudents = GetLinkedStudents(id, tenantId);
+                }
+                
+                return response;
             }
             return null;
+        }
+
+        private Dictionary<int, List<object>> GetAllLinkedStudentsForTenant(int tenantId)
+        {
+            try
+            {
+                var sql = @"
+                    SELECT 
+                        p.""user_id"" as ""ParentUserId"",
+                        s.""id"" as ""StudentId"", 
+                        s.""first_name"" as ""ResultName"", 
+                        s.""last_name"" as ""ResultLastName"",
+                        s.""reg_number"" as ""AdmissionNumber"",
+                        c.""name"" as ""CourseName"", 
+                        b.""name"" as ""BranchName"",
+                        s.""course_id"" as ""CourseId"",
+                        s.""branch_id"" as ""BranchId"" 
+                    FROM ""parents"" p 
+                    JOIN ""parent_student"" ps ON ps.""parent_id"" = p.""id"" 
+                    JOIN ""students"" s ON s.""id"" = ps.""student_id"" 
+                    LEFT JOIN ""course"" c ON c.""id"" = s.""course_id"" 
+                    LEFT JOIN ""branch"" b ON b.""id"" = s.""branch_id"" 
+                    WHERE p.""tenant_id"" = {0} AND p.""is_deleted"" = false AND ps.""is_deleted"" = false AND s.""is_deleted"" = false";
+
+                var result = new Dictionary<int, List<object>>();
+
+                using (var command = _context.Database.GetDbConnection().CreateCommand())
+                {
+                    command.CommandText = sql;
+                    command.CommandText = command.CommandText.Replace("{0}", tenantId.ToString());
+
+                    _context.Database.OpenConnection();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var row = new Dictionary<string, object>();
+                            int parentUserId = 0;
+                            // Read fields
+                            for (int i = 0; i < reader.FieldCount; i++)
+                            {
+                                var name = reader.GetName(i);
+                                var value = reader.GetValue(i);
+                                if (name == "ParentUserId")
+                                {
+                                    parentUserId = value == DBNull.Value ? 0 : Convert.ToInt32(value);
+                                }
+                                else
+                                {
+                                    row[name] = value == DBNull.Value ? null : value;
+                                }
+                            }
+
+                            if (parentUserId != 0)
+                            {
+                                if (!result.ContainsKey(parentUserId))
+                                {
+                                    result[parentUserId] = new List<object>();
+                                }
+                                result[parentUserId].Add(row);
+                            }
+                        }
+                    }
+                    _context.Database.CloseConnection();
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] Failed to fetch all linked students: {ex.Message}");
+                return new Dictionary<int, List<object>>();
+            }
+        }
+
+        private object GetLinkedStudents(int userId, int tenantId)
+        {
+            try 
+            {
+                var sql = @"
+                    SELECT 
+                        s.""id"" as ""StudentId"", 
+                        s.""first_name"" as ""ResultName"", 
+                        s.""last_name"" as ""ResultLastName"",
+                        s.""reg_number"" as ""AdmissionNumber"",
+                        c.""name"" as ""CourseName"", 
+                        b.""name"" as ""BranchName"",
+                        s.""course_id"" as ""CourseId"",
+                        s.""branch_id"" as ""BranchId"" 
+                    FROM ""parents"" p 
+                    JOIN ""parent_student"" ps ON ps.""parent_id"" = p.""id"" 
+                    JOIN ""students"" s ON s.""id"" = ps.""student_id"" 
+                    LEFT JOIN ""course"" c ON c.""id"" = s.""course_id"" 
+                    LEFT JOIN ""branch"" b ON b.""id"" = s.""branch_id"" 
+                    WHERE p.""user_id"" = {0} AND p.""tenant_id"" = {1} AND p.""is_deleted"" = false AND ps.""is_deleted"" = false AND s.""is_deleted"" = false";
+                    
+                var result = new List<Dictionary<string, object>>();
+                
+                using (var command = _context.Database.GetDbConnection().CreateCommand())
+                {
+                    command.CommandText = sql;
+                    // Parameter replacement for Raw SQL with {0} only works with FromSqlRaw, 
+                    // for generic command execution we need to replace manually or use parameters.
+                    // Since specific DbContext ExecuteSqlRaw doesn't return results easily without a type,
+                    // we'll construct the query string safely or use a DTO.
+                    // But here we need DYNAMIC structure.
+                    
+                    // Actually, let's use a simpler approach: 
+                    // Use FromSqlRaw with a dummy type? No.
+                    
+                    // Let's manually replace parameters since they are integers (safe-ish).
+                    command.CommandText = command.CommandText.Replace("{0}", userId.ToString()).Replace("{1}", tenantId.ToString());
+                    
+                    _context.Database.OpenConnection();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var row = new Dictionary<string, object>();
+                            for (int i = 0; i < reader.FieldCount; i++)
+                            {
+                                row[reader.GetName(i)] = reader.GetValue(i);
+                            }
+                            result.Add(row);
+                        }
+                    }
+                    _context.Database.CloseConnection();
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] Failed to fetch linked students: {ex.Message}");
+                return null;
+            }
         }
 
 
@@ -178,24 +332,88 @@ namespace NeuroPi.UserManagment.Services.Implementation
             var user = _context.Users.FirstOrDefault(u => u.UserId == id && u.TenantId == tenantId && !u.IsDeleted);
             if (user == null) return null;
 
-            user.Username = userUpdate.Username;
-            user.FirstName = userUpdate.FirstName;
-            user.MiddleName = userUpdate.MiddleName;
-            user.LastName = userUpdate.LastName;
-            user.Email = userUpdate.Email;
+            user.Username = userUpdate.Username ?? user.Username;
+            user.FirstName = userUpdate.FirstName ?? user.FirstName;
+            user.MiddleName = userUpdate.MiddleName ?? user.MiddleName;
+            user.LastName = userUpdate.LastName ?? user.LastName;
+            user.Email = userUpdate.Email ?? user.Email;
             if (!string.IsNullOrEmpty(userUpdate.Password))
             {
                 user.Password = userUpdate.Password;
             }
-            user.MobileNumber = userUpdate.MobileNumber;
-            user.AlternateNumber = userUpdate.AlternateNumber;
+            user.MobileNumber = userUpdate.MobileNumber ?? user.MobileNumber;
+            user.AlternateNumber = userUpdate.AlternateNumber ?? user.AlternateNumber;
             user.DateOfBirth = userUpdate.DateOfBirth;
-            user.Address = userUpdate.Address;
+            user.Address = userUpdate.Address ?? user.Address;
             user.UpdatedBy = userUpdate.UpdatedBy;
             user.UpdatedOn = DateTime.UtcNow;
             if (!string.IsNullOrEmpty(userUpdate.UserImageUrl))
             {
                 user.UserImageUrl = userUpdate.UserImageUrl;
+            }
+
+            // Handle Role Update/Assignment
+            if (!string.IsNullOrEmpty(userUpdate.RoleName))
+            {
+                var role = _context.Roles.FirstOrDefault(r => r.Name == userUpdate.RoleName && r.TenantId == tenantId);
+                if (role != null)
+                {
+                    var existingUserRole = _context.UserRoles.FirstOrDefault(ur => ur.UserId == id && ur.TenantId == tenantId && !ur.IsDeleted);
+                    if (existingUserRole != null)
+                    {
+                        // Update existing role if different
+                        if (existingUserRole.RoleId != role.RoleId)
+                        {
+                            existingUserRole.RoleId = role.RoleId;
+                            existingUserRole.UpdatedBy = userUpdate.UpdatedBy;
+                            existingUserRole.UpdatedOn = DateTime.UtcNow;
+                            _context.UserRoles.Update(existingUserRole);
+                        }
+                    }
+                    else
+                    {
+                        // Add new role
+                        var newUserRole = new MUserRole
+                        {
+                            UserId = id,
+                            RoleId = role.RoleId,
+                            TenantId = tenantId,
+                            CreatedBy = userUpdate.UpdatedBy ?? 0,
+                            CreatedOn = DateTime.UtcNow
+                        };
+                        _context.UserRoles.Add(newUserRole);
+                    }
+
+                    // Handles TEACHER logic
+                   if (userUpdate.RoleName.ToUpper() == "TEACHER")
+                   {
+                        var existingDept = _context.UserDepartments.FirstOrDefault(ud => ud.UserId == id && ud.DepartmentId == 1 && ud.TenantId == tenantId && !ud.IsDeleted);
+                        if (existingDept == null)
+                        {
+                             var userDept = new MUserDepartment
+                            {
+                                UserId = id,
+                                DepartmentId = 1, // Hardcoded
+                                TenantId = tenantId,
+                                CreatedBy = userUpdate.UpdatedBy ?? 0,
+                                CreatedOn = DateTime.UtcNow
+                            };
+                            _context.UserDepartments.Add(userDept);
+                        }
+                   }
+                   
+                   // Handles PARENT logic
+                   if (userUpdate.RoleName.ToUpper() == "PARENT")
+                   {
+                        // formatting: create parent if not exists
+                        // Using Raw SQL because MParent is in SchoolManagement namespace which is not referenced here
+                        var sql = @"INSERT INTO parents (user_id, tenant_id, created_by, created_on, is_deleted)
+                                    SELECT {0}, {1}, {2}, {3}, false
+                                    WHERE NOT EXISTS (SELECT 1 FROM parents WHERE user_id = {0} AND tenant_id = {1} AND is_deleted = false);";
+                        
+                         _context.Database.ExecuteSqlRaw(sql, id, tenantId, userUpdate.UpdatedBy ?? 0, DateTime.UtcNow);
+                   }
+                }
             }
 
             _context.SaveChanges();

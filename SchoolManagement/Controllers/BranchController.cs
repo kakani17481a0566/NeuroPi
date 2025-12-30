@@ -25,7 +25,7 @@ namespace SchoolManagement.Controllers
             return new ResponseResult<List<BranchResponseVM>>(HttpStatusCode.OK, branches, "All branches retrieved successfully");
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public ResponseResult<BranchResponseVM> GetBranchById(int id)
         {
             var branch = _branchService.GetBranchById(id);
@@ -36,6 +36,15 @@ namespace SchoolManagement.Controllers
 
         [HttpGet("tenant/{tenantId}")]
         public ResponseResult<List<BranchResponseVM>> GetBranchesByTenantId(int tenantId)
+        {
+            var branches = _branchService.GetBranchesByTenantId(tenantId);
+            return branches == null
+                ? new ResponseResult<List<BranchResponseVM>>(HttpStatusCode.NotFound, null, "No branches found for the specified tenant")
+                : new ResponseResult<List<BranchResponseVM>>(HttpStatusCode.OK, branches, "Branches retrieved successfully");
+        }
+
+        [HttpGet("by-tenant")]
+        public ResponseResult<List<BranchResponseVM>> GetBranchesByTenantIdWithQuery([FromQuery] int tenantId)
         {
             var branches = _branchService.GetBranchesByTenantId(tenantId);
             return branches == null

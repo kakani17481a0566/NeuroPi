@@ -25,6 +25,9 @@ namespace NeuroPi.UserManagment.ViewModel.User
         public int? UpdatedBy { get; set; } // Keep as int? to match MBaseModel
         public string? UserImageUrl { get; set; }
         public string? RoleName { get; set; }
+        public string? Password { get; set; }
+        
+        public object? LinkedStudents { get; set; }
 
 
 
@@ -48,7 +51,8 @@ namespace NeuroPi.UserManagment.ViewModel.User
                 CreatedOn = user.CreatedOn,
                 CreatedBy = user.CreatedBy,
                
-                UpdatedBy = user.UpdatedBy
+                UpdatedBy = user.UpdatedBy,
+                Password = user.Password
             };
         }
 

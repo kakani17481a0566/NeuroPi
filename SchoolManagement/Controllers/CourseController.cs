@@ -29,7 +29,7 @@ public class CourseController : ControllerBase
         return new ResponseResult<List<CourseVm>>(HttpStatusCode.OK, result, "All courses fetched successfully");
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     public ResponseResult<CourseVm> GetById(int id)
     {
         var result = _courseService.GetCourseById(id);
@@ -46,7 +46,14 @@ public class CourseController : ControllerBase
         return new ResponseResult<List<CourseVm>>(HttpStatusCode.OK, result, "Courses by tenant fetched successfully");
     }
 
-    [HttpPut("{id}/tenant/{tenantId}")]
+    [HttpGet("by-tenant")]
+    public ResponseResult<List<CourseVm>> GetByTenantWithQuery([FromQuery] int tenantId)
+    {
+        var result = _courseService.GetCoursesByTenantId(tenantId);
+        return new ResponseResult<List<CourseVm>>(HttpStatusCode.OK, result, "Courses by tenant fetched successfully");
+    }
+
+    [HttpPut("{id:int}/tenant/{tenantId}")]
     public ResponseResult<CourseVm> Update(int id, int tenantId, [FromBody] CourseUpdateVm courseUpdateVm)
     {
         var result = _courseService.UpdateCourse(id, tenantId, courseUpdateVm);
@@ -56,7 +63,7 @@ public class CourseController : ControllerBase
         return new ResponseResult<CourseVm>(HttpStatusCode.OK, result, "Course updated successfully");
     }
 
-    [HttpDelete("{id}/tenant/{tenantId}")]
+    [HttpDelete("{id:int}/tenant/{tenantId}")]
     public ResponseResult<string> Delete(int id, int tenantId)
     {
         var success = _courseService.DeleteCourseByIdAndTenantId(id, tenantId);

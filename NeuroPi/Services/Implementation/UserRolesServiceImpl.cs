@@ -59,6 +59,66 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
         public UserRoleVM Create(UserRoleCreateVM userRole)
         {
+            // 1. Check for EXACT match (User, Tenant, Role) - ignoring IsDeleted status to handle soft-deletes
+            var exactMatch = _context.UserRoles.FirstOrDefault(ur => 
+                ur.UserId == userRole.UserId && 
+                ur.TenantId == userRole.TenantId && 
+                ur.RoleId == userRole.RoleId);
+
+            if (exactMatch != null)
+            {
+                // Reactivate if deleted
+                if (exactMatch.IsDeleted)
+                {
+                    exactMatch.IsDeleted = false;
+                    exactMatch.UpdatedBy = userRole.CreatedBy;
+                    exactMatch.UpdatedOn = DateTime.UtcNow;
+                }
+
+                // Ensure no OTHER active roles exist for this tenant (enforce One Role Per Tenant)
+                var otherActiveRoles = _context.UserRoles.Where(ur => 
+                    ur.UserId == userRole.UserId && 
+                    ur.TenantId == userRole.TenantId && 
+                    ur.RoleId != userRole.RoleId && 
+                    !ur.IsDeleted).ToList();
+
+                foreach (var role in otherActiveRoles)
+                {
+                    role.IsDeleted = true;
+                    role.UpdatedBy = userRole.CreatedBy;
+                    role.UpdatedOn = DateTime.UtcNow;
+                }
+
+                _context.SaveChanges();
+
+                // Check "TEACHER" logic
+                CheckAndAssignTeacherDepartment(exactMatch.UserId, exactMatch.RoleId, exactMatch.TenantId, userRole.CreatedBy);
+
+                return new UserRoleVM
+                {
+                    UserRoleId = exactMatch.UserRoleId,
+                    UserId = exactMatch.UserId,
+                    RoleId = exactMatch.RoleId,
+                    TenantId = exactMatch.TenantId
+                };
+            }
+
+            // 2. If no exact match, check if there is ANY active role we need to replace
+            var existingActive = _context.UserRoles.FirstOrDefault(ur => 
+                ur.UserId == userRole.UserId && 
+                ur.TenantId == userRole.TenantId && 
+                !ur.IsDeleted);
+
+            if (existingActive != null)
+            {
+                // Soft delete the existing role
+                existingActive.IsDeleted = true;
+                existingActive.UpdatedBy = userRole.CreatedBy;
+                existingActive.UpdatedOn = DateTime.UtcNow;
+                // No SaveChanges here, we'll save together with the new one
+            }
+
+            // 3. Create new role
             var entity = new MUserRole
             {
                 UserId = userRole.UserId,
@@ -72,6 +132,9 @@ namespace NeuroPi.UserManagment.Services.Implementation
             _context.UserRoles.Add(entity);
             _context.SaveChanges();
 
+            // Check "TEACHER" logic
+            CheckAndAssignTeacherDepartment(entity.UserId, entity.RoleId, entity.TenantId, userRole.CreatedBy);
+
             return new UserRoleVM
             {
                 UserRoleId = entity.UserRoleId,
@@ -79,6 +142,28 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 RoleId = entity.RoleId,
                 TenantId = entity.TenantId
             };
+        }
+
+        private void CheckAndAssignTeacherDepartment(int userId, int roleId, int tenantId, int createdBy)
+        {
+            var role = _context.Roles.FirstOrDefault(r=> r.RoleId == roleId);
+            if (role != null && role.Name?.ToUpper() == "TEACHER")
+            {
+                var existingDept = _context.UserDepartments.FirstOrDefault(ud => ud.UserId == userId && ud.DepartmentId == 1 && ud.TenantId == tenantId && !ud.IsDeleted);
+                if (existingDept == null)
+                {
+                    var userDept = new MUserDepartment
+                    {
+                        UserId = userId,
+                        DepartmentId = 1, // Hardcoded
+                        TenantId = tenantId,
+                        CreatedBy = createdBy,
+                        CreatedOn = DateTime.UtcNow
+                    };
+                    _context.UserDepartments.Add(userDept);
+                    _context.SaveChanges();
+                }
+            }
         }
 
         public UserRoleVM Update(int id, UserRoleUpdateVM userRole)

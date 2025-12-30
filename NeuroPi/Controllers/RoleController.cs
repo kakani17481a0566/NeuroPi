@@ -86,6 +86,13 @@ namespace NeuroPi.UserManagment.Controllers
             return result != null ? new ResponseResult<List<RoleResponseVM>>(HttpStatusCode.OK, result, "Roles fetched successfully with tenant id") : new ResponseResult<List<RoleResponseVM>>(HttpStatusCode.NotFound, null, $"Roles Not found with tenantId {tenantId}");
         }
 
+        [HttpGet("by-tenant")]
+        public ResponseResult<List<RoleResponseVM>> GetAllRolesByTenantIdFromQuery([FromQuery] int tenantId)
+        {
+            var result = _roleService.GetAllRolesByTenantId(tenantId);
+            return result != null ? new ResponseResult<List<RoleResponseVM>>(HttpStatusCode.OK, result, "Roles fetched successfully with tenant id") : new ResponseResult<List<RoleResponseVM>>(HttpStatusCode.NotFound, null, $"Roles Not found with tenantId {tenantId}");
+        }
+
         [HttpGet("tenant/{tenantId}/id/{id}")]
         public ResponseResult<RoleResponseVM> GetRoleByTenantIdAndId(int tenantId, int id)
         {

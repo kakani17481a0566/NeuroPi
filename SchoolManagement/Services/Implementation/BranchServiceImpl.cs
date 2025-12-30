@@ -120,7 +120,12 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 }
 
                 courseTeacherVM.courses = courses;
-                courseTeacherVM.branchId = courseTeacher[0].BranchId;
+                
+                if (courseTeacher.Count > 0)
+                {
+                    courseTeacherVM.branchId = courseTeacher[0].BranchId;
+                }
+                
                 var currentWeek = _context.Weeks.FirstOrDefault(w => w.StartDate <= today && w.EndDate >= today && !w.IsDeleted);
 
                 courseTeacherVM.weekId = currentWeek?.Id ?? 0;

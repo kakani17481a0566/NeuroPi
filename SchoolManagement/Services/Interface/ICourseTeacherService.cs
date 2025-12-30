@@ -13,6 +13,7 @@ namespace SchoolManagement.Services.Interface
 
         CourseTeacherResponseVM UpdateCourseTeacher(int id, int tenantId, CourseTeacherUpdateVM courseTeacherUpdateVM);
         bool DeleteCourseTeacherByIdAndTenant(int id, int tenantId);
+        List<CourseTeacherResponseVM> GetCourseTeachersByTeacherId(int teacherId, int tenantId);
 
     }
 }

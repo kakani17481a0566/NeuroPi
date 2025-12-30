@@ -25,6 +25,7 @@ namespace NeuroPi.UserManagment.ViewModel.User
         public DateOnly DateOfBirth { get; set; }
         public string? Address { get; set; }
         public int TenantId { get; set; }  // Make TenantId nullable
+        public string? RoleName { get; set; }
 
 
         public int CreatedBy { get; set; }

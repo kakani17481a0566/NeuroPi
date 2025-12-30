@@ -12,6 +12,9 @@ namespace SchoolManagement.ViewModel.CourseTeacher
         public int BranchId { get; set; }
         
         public int TenantId { get; set; }
+
+        public string? CourseName { get; set; }
+        public string? BranchName { get; set; }
         public int CreatedBy { get; set; }
 
         public DateTime CreatedOn { get; set; }
@@ -28,6 +31,8 @@ namespace SchoolManagement.ViewModel.CourseTeacher
                 TeacherId = model.TeacherId,
                 BranchId = model.BranchId,
                 TenantId = model.TenantId,
+                CourseName = model.Course?.Name,
+                BranchName = model.Branch?.Name,
                 CreatedBy = model.CreatedBy,
                 CreatedOn = model.CreatedOn,
                 UpdatedBy = model.UpdatedBy,
