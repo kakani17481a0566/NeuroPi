@@ -346,7 +346,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 // Handle Role Assignment
                 if (!string.IsNullOrEmpty(request.RoleName))
                 {
-                    var role = _context.Roles.FirstOrDefault(r => r.Name == request.RoleName && r.TenantId == request.TenantId);
+                    var role = _context.Roles.FirstOrDefault(r => r.Name.ToLower() == request.RoleName.ToLower() && r.TenantId == request.TenantId);
                     if (role != null)
                     {
                         var newUserRole = new MUserRole
@@ -447,7 +447,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
             // Handle Role Update/Assignment
             if (!string.IsNullOrEmpty(userUpdate.RoleName))
             {
-                var role = _context.Roles.FirstOrDefault(r => r.Name == userUpdate.RoleName && r.TenantId == tenantId);
+                var role = _context.Roles.FirstOrDefault(r => r.Name.ToLower() == userUpdate.RoleName.ToLower() && r.TenantId == tenantId);
                 if (role != null)
                 {
                     var existingUserRole = _context.UserRoles.FirstOrDefault(ur => ur.UserId == id && ur.TenantId == tenantId && !ur.IsDeleted);
