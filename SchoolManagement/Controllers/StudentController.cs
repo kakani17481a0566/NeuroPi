@@ -87,7 +87,7 @@ namespace SchoolManagement.Controllers
             return new ResponseResult<StudentVM>(HttpStatusCode.OK, data, "Filtered students fetched successfully.");
         }
 
-        [HttpGet("/students/{courseId}/branch/{branchId}")]
+        [HttpGet("students/{courseId}/branch/{branchId}")]
         public ResponseResult< StudentsData> GetStudentDetails(int courseId,int branchId, DateTime dateTime, int tenantId)
         {
             var date = DateOnly.FromDateTime(dateTime);
@@ -192,7 +192,7 @@ namespace SchoolManagement.Controllers
                 "Students fetched successfully."
             );
         }
-        [HttpGet("/search/{name}")]
+        [HttpGet("search/{name}")]
         public ResponseResult<List<StudentFilterResponseVM>> GetAllStudentByNames(string name, [FromQuery] DateOnly? dob = null)
         {
             var result = _studentService.GetAllStudentsByName(name, dob);
