@@ -53,5 +53,12 @@ namespace NeuroPi.UserManagment.ViewModel.User
 
 
 
+        public List<LinkedStudentVM> LinkedStudents { get; set; }
+    }
+
+    public class LinkedStudentVM
+    {
+        public int StudentId { get; set; }
+        // Add other properties if needed
     }
 }

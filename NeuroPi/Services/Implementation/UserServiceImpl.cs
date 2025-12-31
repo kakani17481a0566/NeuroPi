@@ -381,6 +381,19 @@ namespace NeuroPi.UserManagment.Services.Implementation
                                         VALUES ({0}, {1}, {2}, {3}, false)";
 
                             _context.Database.ExecuteSqlRaw(sql, user.UserId, request.TenantId, request.CreatedBy, DateTime.UtcNow);
+
+                            // Handle Linked Students
+                            if (request.LinkedStudents != null && request.LinkedStudents.Count > 0)
+                            {
+                                foreach (var student in request.LinkedStudents)
+                                {
+                                    var linkSql = @"INSERT INTO parent_student (parent_id, student_id, tenant_id, created_by, created_on, is_deleted)
+                                                    SELECT id, {1}, {2}, {3}, {4}, false
+                                                    FROM parents
+                                                    WHERE user_id = {0} AND tenant_id = {2} AND is_deleted = false";
+                                    _context.Database.ExecuteSqlRaw(linkSql, user.UserId, student.StudentId, request.TenantId, request.CreatedBy, DateTime.UtcNow);
+                                }
+                            }
                         }
 
                         _context.SaveChanges();
@@ -491,6 +504,27 @@ namespace NeuroPi.UserManagment.Services.Implementation
                                     WHERE NOT EXISTS (SELECT 1 FROM parents WHERE user_id = {0} AND tenant_id = {1} AND is_deleted = false);";
                         
                          _context.Database.ExecuteSqlRaw(sql, id, tenantId, userUpdate.UpdatedBy ?? 0, DateTime.UtcNow);
+
+                         // Handle Linked Students
+                         if (userUpdate.LinkedStudents != null)
+                         {
+                             // Soft delete existing links for this parent (via subquery for parent_id)
+                             var deleteSql = @"UPDATE parent_student 
+                                               SET is_deleted = true, updated_by = {0}, updated_on = {1}
+                                               WHERE parent_id IN (SELECT id FROM parents WHERE user_id = {2} AND tenant_id = {3} AND is_deleted = false)
+                                               AND is_deleted = false";
+                             _context.Database.ExecuteSqlRaw(deleteSql, userUpdate.UpdatedBy ?? 0, DateTime.UtcNow, id, tenantId);
+
+                             // Insert new links
+                             foreach (var student in userUpdate.LinkedStudents)
+                             {
+                                 var linkSql = @"INSERT INTO parent_student (parent_id, student_id, tenant_id, created_by, created_on, is_deleted)
+                                                 SELECT id, {1}, {2}, {3}, {4}, false
+                                                 FROM parents
+                                                 WHERE user_id = {0} AND tenant_id = {2} AND is_deleted = false";
+                                 _context.Database.ExecuteSqlRaw(linkSql, id, student.StudentId, tenantId, userUpdate.UpdatedBy ?? 0, DateTime.UtcNow);
+                             }
+                         }
                    }
                 }
             }

@@ -193,15 +193,26 @@ namespace SchoolManagement.Controllers
             );
         }
         [HttpGet("/search/{name}")]
-        public ResponseResult<List<StudentFilterResponseVM>> GetAllStudentByNames(string name)
+        public ResponseResult<List<StudentFilterResponseVM>> GetAllStudentByNames(string name, [FromQuery] DateOnly? dob = null)
         {
-            var result = _studentService.GetAllStudentsByName(name);
+            var result = _studentService.GetAllStudentsByName(name, dob);
             if(result!=null && result.Count > 0)
             {
                 return new ResponseResult<List<StudentFilterResponseVM>>(HttpStatusCode.OK, result, "Students Fetched Successfully");
             }
             return new ResponseResult<List<StudentFilterResponseVM>>(HttpStatusCode.NotFound,result);
 
+        }
+
+        [HttpGet("by-parent-user/{userId}")]
+        public ResponseResult<List<StudentFilterResponseVM>> GetStudentsByParentUserId(int userId)
+        {
+            var result = _studentService.GetStudentsByParentUserId(userId);
+            if (result != null && result.Count > 0)
+            {
+                return new ResponseResult<List<StudentFilterResponseVM>>(HttpStatusCode.OK, result, "Students Fetched Successfully");
+            }
+            return new ResponseResult<List<StudentFilterResponseVM>>(HttpStatusCode.OK, new List<StudentFilterResponseVM>(), "No linked students found.");
         }
     }
  

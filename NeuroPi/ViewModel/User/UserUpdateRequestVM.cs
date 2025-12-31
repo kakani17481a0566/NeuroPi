@@ -23,7 +23,6 @@ namespace NeuroPi.UserManagment.ViewModel.User
 
         public int? UpdatedBy { get; set; }
         public string? UserImageUrl { get; set; }
-
-
+        public List<LinkedStudentVM> LinkedStudents { get; set; }
     }
 }

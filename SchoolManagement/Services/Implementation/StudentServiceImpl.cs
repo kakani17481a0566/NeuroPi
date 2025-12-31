@@ -719,17 +719,28 @@ namespace SchoolManagement.Services.Implementation
             }
         }
 
-        public List<StudentFilterResponseVM> GetAllStudentsByName(string name)
+        public List<StudentFilterResponseVM> GetAllStudentsByName(string name, DateOnly? dob = null)
         {
             List<StudentFilterResponseVM> result = new List<StudentFilterResponseVM>();
-            var StudentsList=_context.Students.Where(s =>EF.Functions.Like(s.Name.ToLower(), $"%{name.ToLower()}%") || EF.Functions.Like(s.LastName.ToLower(), $"%{name.ToLower()}%")).Include(e => e.Course).Include(b => b.Branch).ToList();
+            var query = _context.Students
+                .Include(e => e.Course)
+                .Include(b => b.Branch)
+                .Where(s => EF.Functions.Like(s.Name.ToLower(), $"%{name.ToLower()}%") || EF.Functions.Like(s.LastName.ToLower(), $"%{name.ToLower()}%"));
+
+            if (dob.HasValue)
+            {
+                query = query.Where(s => s.DateOfBirth == dob.Value);
+            }
+
+            var StudentsList = query.ToList();
+
             if (StudentsList != null)
             {
                 foreach (var student in StudentsList)
                 {
-                    StudentFilterResponseVM responseVM= new StudentFilterResponseVM();
-                    responseVM.StudentId=student.Id;
-                    responseVM.StudentName=student.FullName;
+                    StudentFilterResponseVM responseVM = new StudentFilterResponseVM();
+                    responseVM.StudentId = student.Id;
+                    responseVM.StudentName = student.FullName;
                     responseVM.courseId = student.CourseId;
                     responseVM.CourseName = student.Course.Name;
                     responseVM.BranchId = student.BranchId;
@@ -738,6 +749,35 @@ namespace SchoolManagement.Services.Implementation
                 }
                 return result;
 
+            }
+            return result;
+        }
+
+        public List<StudentFilterResponseVM> GetStudentsByParentUserId(int userId)
+        {
+            var result = new List<StudentFilterResponseVM>();
+            var parent = _context.Parents.FirstOrDefault(p => p.UserId == userId && !p.IsDeleted);
+            if (parent != null)
+            {
+                var linkedStudents = _context.ParentStudents
+                                             .Where(ps => ps.ParentId == parent.Id && !ps.IsDeleted)
+                                             .Include(ps => ps.Student).ThenInclude(s => s.Course)
+                                             .Include(ps => ps.Student).ThenInclude(s => s.Branch)
+                                             .Select(ps => ps.Student)
+                                             .Where(s => !s.IsDeleted)
+                                             .ToList();
+
+                foreach (var student in linkedStudents)
+                {
+                    StudentFilterResponseVM responseVM = new StudentFilterResponseVM();
+                    responseVM.StudentId = student.Id;
+                    responseVM.StudentName = student.FullName;
+                    responseVM.courseId = student.CourseId;
+                    responseVM.CourseName = student.Course?.Name;
+                    responseVM.BranchId = student.BranchId;
+                    responseVM.BranchName = student.Branch?.Name;
+                    result.Add(responseVM);
+                }
             }
             return result;
         }
