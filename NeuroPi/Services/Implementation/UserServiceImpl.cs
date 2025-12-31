@@ -324,6 +324,51 @@ namespace NeuroPi.UserManagment.Services.Implementation
             var user = UserRequestVM.ToModel(request);
             _context.Users.Add(user);
             _context.SaveChanges();
+
+            // Handle Role Assignment
+            if (!string.IsNullOrEmpty(request.RoleName))
+            {
+                var role = _context.Roles.FirstOrDefault(r => r.Name == request.RoleName && r.TenantId == request.TenantId);
+                if (role != null)
+                {
+                    var newUserRole = new MUserRole
+                    {
+                        UserId = user.UserId,
+                        RoleId = role.RoleId,
+                        TenantId = request.TenantId,
+                        CreatedBy = request.CreatedBy,
+                        CreatedOn = DateTime.UtcNow
+                    };
+                    _context.UserRoles.Add(newUserRole);
+
+                    // Handles TEACHER logic
+                    if (request.RoleName.ToUpper() == "TEACHER")
+                    {
+                        var userDept = new MUserDepartment
+                        {
+                            UserId = user.UserId,
+                            DepartmentId = 1, // Hardcoded
+                            TenantId = request.TenantId,
+                            CreatedBy = request.CreatedBy,
+                            CreatedOn = DateTime.UtcNow
+                        };
+                        _context.UserDepartments.Add(userDept);
+                    }
+
+                    // Handles PARENT logic
+                    if (request.RoleName.ToUpper() == "PARENT")
+                    {
+                        // Create parent entry
+                        var sql = @"INSERT INTO parents (user_id, tenant_id, created_by, created_on, is_deleted)
+                                    VALUES ({0}, {1}, {2}, {3}, false)";
+
+                        _context.Database.ExecuteSqlRaw(sql, user.UserId, request.TenantId, request.CreatedBy, DateTime.UtcNow);
+                    }
+
+                    _context.SaveChanges();
+                }
+            }
+
             return UserResponseVM.ToViewModel(user);
         }
 
