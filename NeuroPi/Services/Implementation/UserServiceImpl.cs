@@ -319,57 +319,84 @@ namespace NeuroPi.UserManagment.Services.Implementation
         }
 
 
-        public UserResponseVM AddUser(UserRequestVM request)
+        public UserResponseVM AddUser(UserRequestVM request, out string message)
         {
-            var user = UserRequestVM.ToModel(request);
-            _context.Users.Add(user);
-            _context.SaveChanges();
+            message = string.Empty;
 
-            // Handle Role Assignment
-            if (!string.IsNullOrEmpty(request.RoleName))
+            try
             {
-                var role = _context.Roles.FirstOrDefault(r => r.Name == request.RoleName && r.TenantId == request.TenantId);
-                if (role != null)
+                // 1. Check if username already exists
+                if (CheckUsernameExists(request.Username))
                 {
-                    var newUserRole = new MUserRole
-                    {
-                        UserId = user.UserId,
-                        RoleId = role.RoleId,
-                        TenantId = request.TenantId,
-                        CreatedBy = request.CreatedBy,
-                        CreatedOn = DateTime.UtcNow
-                    };
-                    _context.UserRoles.Add(newUserRole);
+                    message = "Username already exists";
+                    return null;
+                }
 
-                    // Handles TEACHER logic
-                    if (request.RoleName.ToUpper() == "TEACHER")
+                var user = UserRequestVM.ToModel(request);
+                _context.Users.Add(user);
+                _context.SaveChanges();
+
+                // Handle Role Assignment
+                if (!string.IsNullOrEmpty(request.RoleName))
+                {
+                    var role = _context.Roles.FirstOrDefault(r => r.Name == request.RoleName && r.TenantId == request.TenantId);
+                    if (role != null)
                     {
-                        var userDept = new MUserDepartment
+                        var newUserRole = new MUserRole
                         {
                             UserId = user.UserId,
-                            DepartmentId = 1, // Hardcoded
+                            RoleId = role.RoleId,
                             TenantId = request.TenantId,
                             CreatedBy = request.CreatedBy,
                             CreatedOn = DateTime.UtcNow
                         };
-                        _context.UserDepartments.Add(userDept);
+                        _context.UserRoles.Add(newUserRole);
+
+                        // Handles TEACHER logic
+                        if (request.RoleName.ToUpper() == "TEACHER")
+                        {
+                            var userDept = new MUserDepartment
+                            {
+                                UserId = user.UserId,
+                                DepartmentId = 1, // Hardcoded
+                                TenantId = request.TenantId,
+                                CreatedBy = request.CreatedBy,
+                                CreatedOn = DateTime.UtcNow
+                            };
+                            _context.UserDepartments.Add(userDept);
+                        }
+
+                        // Handles PARENT logic
+                        if (request.RoleName.ToUpper() == "PARENT")
+                        {
+                            // Create parent entry
+                            var sql = @"INSERT INTO parents (user_id, tenant_id, created_by, created_on, is_deleted)
+                                        VALUES ({0}, {1}, {2}, {3}, false)";
+
+                            _context.Database.ExecuteSqlRaw(sql, user.UserId, request.TenantId, request.CreatedBy, DateTime.UtcNow);
+                        }
+
+                        _context.SaveChanges();
                     }
-
-                    // Handles PARENT logic
-                    if (request.RoleName.ToUpper() == "PARENT")
-                    {
-                        // Create parent entry
-                        var sql = @"INSERT INTO parents (user_id, tenant_id, created_by, created_on, is_deleted)
-                                    VALUES ({0}, {1}, {2}, {3}, false)";
-
-                        _context.Database.ExecuteSqlRaw(sql, user.UserId, request.TenantId, request.CreatedBy, DateTime.UtcNow);
-                    }
-
-                    _context.SaveChanges();
                 }
-            }
 
-            return UserResponseVM.ToViewModel(user);
+                message = "User added successfully";
+                return UserResponseVM.ToViewModel(user);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] AddUser failed: {ex.Message}");
+                // Check if it's an inner exception from DB updates
+                if (ex.InnerException != null)
+                {
+                    message = $"Failed to add user: {ex.InnerException.Message}";
+                }
+                else
+                {
+                    message = $"Failed to add user: {ex.Message}";
+                }
+                return null;
+            }
         }
 
         public UserResponseVM UpdateUser(int id, int tenantId, UserUpdateRequestVM userUpdate)

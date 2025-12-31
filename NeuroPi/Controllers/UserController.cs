@@ -110,12 +110,12 @@ namespace NeuroPi.UserManagment.Controllers
         [HttpPost]
         public ResponseResult<UserResponseVM> AddUser([FromBody] UserRequestVM newUser)
         {
-            var createdUser = _userService.AddUser(newUser);
+            var createdUser = _userService.AddUser(newUser, out string message);
 
             if (createdUser != null)
-                return new ResponseResult<UserResponseVM>(HttpStatusCode.Created, createdUser, "User added successfully");
+                return new ResponseResult<UserResponseVM>(HttpStatusCode.Created, createdUser, message); // "User added successfully"
 
-            return new ResponseResult<UserResponseVM>(HttpStatusCode.BadRequest, null, "Failed to add user");
+            return new ResponseResult<UserResponseVM>(HttpStatusCode.BadRequest, null, message);
         }
 
         [HttpPut("{id}/image")]
