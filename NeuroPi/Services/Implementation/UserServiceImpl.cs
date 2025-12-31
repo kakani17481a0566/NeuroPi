@@ -332,6 +332,13 @@ namespace NeuroPi.UserManagment.Services.Implementation
                     return null;
                 }
 
+                // 2. Check if email already exists
+                if (CheckEmailExists(request.Email))
+                {
+                    message = "Email already exists";
+                    return null;
+                }
+
                 var user = UserRequestVM.ToModel(request);
                 _context.Users.Add(user);
                 _context.SaveChanges();
@@ -702,6 +709,12 @@ namespace NeuroPi.UserManagment.Services.Implementation
         {
             if (string.IsNullOrWhiteSpace(username)) return false;
             return _context.Users.Any(u => u.Username.ToLower() == username.ToLower() && !u.IsDeleted);
+        }
+
+        public bool CheckEmailExists(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email)) return false;
+            return _context.Users.Any(u => u.Email.ToLower() == email.ToLower() && !u.IsDeleted);
         }
 
     }
