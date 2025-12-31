@@ -546,6 +546,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
         }
 
 
+
         public UsersProfileSummaryVM GetUserProfileSummary(int id, int tenantId)
         {
             var sql = @"
@@ -625,6 +626,11 @@ namespace NeuroPi.UserManagment.Services.Implementation
             return summary;
         }
 
+        public bool CheckUsernameExists(string username)
+        {
+            if (string.IsNullOrWhiteSpace(username)) return false;
+            return _context.Users.Any(u => u.Username.ToLower() == username.ToLower() && !u.IsDeleted);
+        }
 
     }
 }

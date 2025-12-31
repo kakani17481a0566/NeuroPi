@@ -54,7 +54,7 @@ public class CourseController : ControllerBase
     }
 
     [HttpPut("{id:int}/tenant/{tenantId}")]
-    public ResponseResult<CourseVm> Update(int id, int tenantId, [FromBody] CourseUpdateVm courseUpdateVm)
+        public ResponseResult<CourseVm> Update(int id, int tenantId, [FromBody] CourseUpdateVm courseUpdateVm)
     {
         var result = _courseService.UpdateCourse(id, tenantId, courseUpdateVm);
         if (result == null)

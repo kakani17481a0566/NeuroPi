@@ -211,6 +211,7 @@ namespace NeuroPi.UserManagment.Controllers
         }
 
 
+
         // GET api/user/{id}/profile-summary?tenantId=...
         [HttpGet("{id}/profile-summary")]
         public ResponseResult<UsersProfileSummaryVM> GetUserProfileSummary(int id, [FromQuery] int tenantId)
@@ -223,7 +224,19 @@ namespace NeuroPi.UserManagment.Controllers
             return new ResponseResult<UsersProfileSummaryVM>(HttpStatusCode.NotFound, null, "User not found or no summary available");
         }
 
-
+        [HttpGet("check-username")]
+        public ResponseResult<bool> CheckUsername([FromQuery] string username)
+        {
+            try
+            {
+                bool exists = _userService.CheckUsernameExists(username);
+                return new ResponseResult<bool>(HttpStatusCode.OK, exists, exists ? "Username exists" : "Username is available");
+            }
+            catch (Exception ex)
+            {
+                return new ResponseResult<bool>(HttpStatusCode.InternalServerError, false, $"Error checking username: {ex.Message}");
+            }
+        }
 
     }
 }
