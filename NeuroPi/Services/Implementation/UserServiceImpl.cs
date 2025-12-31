@@ -523,28 +523,32 @@ namespace NeuroPi.UserManagment.Services.Implementation
                                                AND is_deleted = false";
                                 _context.Database.ExecuteSqlRaw(deleteSql, safeUpdatedBy, DateTime.UtcNow, id, tenantId);
 
-                                // Insert new links
-                                foreach (var student in userUpdate.LinkedStudents)
-                                {
-                                    Console.WriteLine($"[DEBUG] Linking StudentId: {student.StudentId} to ParentUserId: {id}");
-                                    var linkSql = @"INSERT INTO parent_student (parent_id, student_id, tenant_id, created_by, created_on, is_deleted)
+                                // Insert new links or Activate existing ones
+                             foreach (var student in userUpdate.LinkedStudents)
+                             {
+                                 Console.WriteLine($"[DEBUG] Linking StudentId: {student.StudentId} to ParentUserId: {id}");
+                                 // Postgres Upsert (ON CONFLICT)
+                                 var linkSql = @"INSERT INTO parent_student (parent_id, student_id, tenant_id, created_by, created_on, is_deleted)
                                                  SELECT id, {1}, {2}, {3}, {4}, false
                                                  FROM parents
-                                                 WHERE user_id = {0} AND tenant_id = {2} AND is_deleted = false";
-                                    _context.Database.ExecuteSqlRaw(linkSql, id, student.StudentId, tenantId, safeUpdatedBy, DateTime.UtcNow);
-                                }
-                            }
-                            else
-                            {
-                                Console.WriteLine("[DEBUG] LinkedStudents is NULL");
-                            }
-                        }
-                    }
+                                                 WHERE user_id = {0} AND tenant_id = {2} AND is_deleted = false
+                                                 ON CONFLICT (parent_id, student_id) 
+                                                 DO UPDATE SET is_deleted = false, updated_by = {3}, updated_on = {4}";
+                                 
+                                 _context.Database.ExecuteSqlRaw(linkSql, id, student.StudentId, tenantId, safeUpdatedBy, DateTime.UtcNow);
+                             }
+                         }
+                         else 
+                         {
+                             Console.WriteLine("[DEBUG] LinkedStudents is NULL");
+                         }
+                   }
                 }
+            }
 
-                _context.SaveChanges();
+            _context.SaveChanges();
 
-                return UserResponseVM.ToViewModel(user);
+            return UserResponseVM.ToViewModel(user);
             }
             catch (Exception ex)
             {
