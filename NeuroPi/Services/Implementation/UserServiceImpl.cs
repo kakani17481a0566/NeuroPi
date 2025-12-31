@@ -495,8 +495,10 @@ namespace NeuroPi.UserManagment.Services.Implementation
                    }
                    
                    // Handles PARENT logic
+                   Console.WriteLine($"[DEBUG] Checking Parent Logic. RoleName: {userUpdate.RoleName}");
                    if (userUpdate.RoleName.ToUpper() == "PARENT")
                    {
+                        Console.WriteLine($"[DEBUG] Entering Parent Logic. TenantId: {tenantId}, UserId: {id}");
                         // formatting: create parent if not exists
                         // Using Raw SQL because MParent is in SchoolManagement namespace which is not referenced here
                         var sql = @"INSERT INTO parents (user_id, tenant_id, created_by, created_on, is_deleted)
@@ -508,6 +510,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
                          // Handle Linked Students
                          if (userUpdate.LinkedStudents != null)
                          {
+                             Console.WriteLine($"[DEBUG] Processing LinkedStudents. Count: {userUpdate.LinkedStudents.Count}");
                              // Soft delete existing links for this parent (via subquery for parent_id)
                              var deleteSql = @"UPDATE parent_student 
                                                SET is_deleted = true, updated_by = {0}, updated_on = {1}
@@ -518,12 +521,17 @@ namespace NeuroPi.UserManagment.Services.Implementation
                              // Insert new links
                              foreach (var student in userUpdate.LinkedStudents)
                              {
+                                 Console.WriteLine($"[DEBUG] Linking StudentId: {student.StudentId} to ParentUserId: {id}");
                                  var linkSql = @"INSERT INTO parent_student (parent_id, student_id, tenant_id, created_by, created_on, is_deleted)
                                                  SELECT id, {1}, {2}, {3}, {4}, false
                                                  FROM parents
                                                  WHERE user_id = {0} AND tenant_id = {2} AND is_deleted = false";
                                  _context.Database.ExecuteSqlRaw(linkSql, id, student.StudentId, tenantId, userUpdate.UpdatedBy ?? 0, DateTime.UtcNow);
                              }
+                         }
+                         else 
+                         {
+                             Console.WriteLine("[DEBUG] LinkedStudents is NULL");
                          }
                    }
                 }
