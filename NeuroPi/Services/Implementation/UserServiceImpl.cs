@@ -421,125 +421,140 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
         public UserResponseVM UpdateUser(int id, int tenantId, UserUpdateRequestVM userUpdate)
         {
-            var user = _context.Users.FirstOrDefault(u => u.UserId == id && u.TenantId == tenantId && !u.IsDeleted);
-            if (user == null) return null;
+            try
+            {
+                var user = _context.Users.FirstOrDefault(u => u.UserId == id && u.TenantId == tenantId && !u.IsDeleted);
+                if (user == null) return null;
 
-            user.Username = userUpdate.Username ?? user.Username;
-            user.FirstName = userUpdate.FirstName ?? user.FirstName;
-            user.MiddleName = userUpdate.MiddleName ?? user.MiddleName;
-            user.LastName = userUpdate.LastName ?? user.LastName;
-            user.Email = userUpdate.Email ?? user.Email;
-            if (!string.IsNullOrEmpty(userUpdate.Password))
-            {
-                user.Password = userUpdate.Password;
-            }
-            user.MobileNumber = userUpdate.MobileNumber ?? user.MobileNumber;
-            user.AlternateNumber = userUpdate.AlternateNumber ?? user.AlternateNumber;
-            user.DateOfBirth = userUpdate.DateOfBirth;
-            user.Address = userUpdate.Address ?? user.Address;
-            user.UpdatedBy = userUpdate.UpdatedBy;
-            user.UpdatedOn = DateTime.UtcNow;
-            if (!string.IsNullOrEmpty(userUpdate.UserImageUrl))
-            {
-                user.UserImageUrl = userUpdate.UserImageUrl;
-            }
+                // Safe UpdatedBy
+                int safeUpdatedBy = (userUpdate.UpdatedBy.HasValue && userUpdate.UpdatedBy.Value > 0) ? userUpdate.UpdatedBy.Value : id;
 
-            // Handle Role Update/Assignment
-            if (!string.IsNullOrEmpty(userUpdate.RoleName))
-            {
-                var role = _context.Roles.FirstOrDefault(r => r.Name.ToLower() == userUpdate.RoleName.ToLower() && r.TenantId == tenantId);
-                if (role != null)
+                user.Username = userUpdate.Username ?? user.Username;
+                user.FirstName = userUpdate.FirstName ?? user.FirstName;
+                user.MiddleName = userUpdate.MiddleName ?? user.MiddleName;
+                user.LastName = userUpdate.LastName ?? user.LastName;
+                user.Email = userUpdate.Email ?? user.Email;
+                if (!string.IsNullOrEmpty(userUpdate.Password))
                 {
-                    var existingUserRole = _context.UserRoles.FirstOrDefault(ur => ur.UserId == id && ur.TenantId == tenantId && !ur.IsDeleted);
-                    if (existingUserRole != null)
-                    {
-                        // Update existing role if different
-                        if (existingUserRole.RoleId != role.RoleId)
-                        {
-                            existingUserRole.RoleId = role.RoleId;
-                            existingUserRole.UpdatedBy = userUpdate.UpdatedBy;
-                            existingUserRole.UpdatedOn = DateTime.UtcNow;
-                            _context.UserRoles.Update(existingUserRole);
-                        }
-                    }
-                    else
-                    {
-                        // Add new role
-                        var newUserRole = new MUserRole
-                        {
-                            UserId = id,
-                            RoleId = role.RoleId,
-                            TenantId = tenantId,
-                            CreatedBy = userUpdate.UpdatedBy ?? 0,
-                            CreatedOn = DateTime.UtcNow
-                        };
-                        _context.UserRoles.Add(newUserRole);
-                    }
+                    user.Password = userUpdate.Password;
+                }
+                user.MobileNumber = userUpdate.MobileNumber ?? user.MobileNumber;
+                user.AlternateNumber = userUpdate.AlternateNumber ?? user.AlternateNumber;
+                user.DateOfBirth = userUpdate.DateOfBirth;
+                user.Address = userUpdate.Address ?? user.Address;
+                user.UpdatedBy = safeUpdatedBy;
+                user.UpdatedOn = DateTime.UtcNow;
+                if (!string.IsNullOrEmpty(userUpdate.UserImageUrl))
+                {
+                    user.UserImageUrl = userUpdate.UserImageUrl;
+                }
 
-                    // Handles TEACHER logic
-                   if (userUpdate.RoleName.ToUpper() == "TEACHER")
-                   {
-                        var existingDept = _context.UserDepartments.FirstOrDefault(ud => ud.UserId == id && ud.DepartmentId == 1 && ud.TenantId == tenantId && !ud.IsDeleted);
-                        if (existingDept == null)
+                // Handle Role Update/Assignment
+                if (!string.IsNullOrEmpty(userUpdate.RoleName))
+                {
+                    var role = _context.Roles.FirstOrDefault(r => r.Name.ToLower() == userUpdate.RoleName.ToLower() && r.TenantId == tenantId);
+                    if (role != null)
+                    {
+                        var existingUserRole = _context.UserRoles.FirstOrDefault(ur => ur.UserId == id && ur.TenantId == tenantId && !ur.IsDeleted);
+                        if (existingUserRole != null)
                         {
-                             var userDept = new MUserDepartment
+                            // Update existing role if different
+                            if (existingUserRole.RoleId != role.RoleId)
+                            {
+                                existingUserRole.RoleId = role.RoleId;
+                                existingUserRole.UpdatedBy = safeUpdatedBy;
+                                existingUserRole.UpdatedOn = DateTime.UtcNow;
+                                _context.UserRoles.Update(existingUserRole);
+                            }
+                        }
+                        else
+                        {
+                            // Add new role
+                            var newUserRole = new MUserRole
                             {
                                 UserId = id,
-                                DepartmentId = 1, // Hardcoded
+                                RoleId = role.RoleId,
                                 TenantId = tenantId,
-                                CreatedBy = userUpdate.UpdatedBy ?? 0,
+                                CreatedBy = safeUpdatedBy, // Fallback for created by if new
                                 CreatedOn = DateTime.UtcNow
                             };
-                            _context.UserDepartments.Add(userDept);
+                            _context.UserRoles.Add(newUserRole);
                         }
-                   }
-                   
-                   // Handles PARENT logic
-                   Console.WriteLine($"[DEBUG] Checking Parent Logic. RoleName: {userUpdate.RoleName}");
-                   if (userUpdate.RoleName.ToUpper() == "PARENT")
-                   {
-                        Console.WriteLine($"[DEBUG] Entering Parent Logic. TenantId: {tenantId}, UserId: {id}");
-                        // formatting: create parent if not exists
-                        // Using Raw SQL because MParent is in SchoolManagement namespace which is not referenced here
-                        var sql = @"INSERT INTO parents (user_id, tenant_id, created_by, created_on, is_deleted)
+
+                        // Handles TEACHER logic
+                        if (userUpdate.RoleName.ToUpper() == "TEACHER")
+                        {
+                            var existingDept = _context.UserDepartments.FirstOrDefault(ud => ud.UserId == id && ud.DepartmentId == 1 && ud.TenantId == tenantId && !ud.IsDeleted);
+                            if (existingDept == null)
+                            {
+                                var userDept = new MUserDepartment
+                                {
+                                    UserId = id,
+                                    DepartmentId = 1, // Hardcoded
+                                    TenantId = tenantId,
+                                    CreatedBy = safeUpdatedBy,
+                                    CreatedOn = DateTime.UtcNow
+                                };
+                                _context.UserDepartments.Add(userDept);
+                            }
+                        }
+
+                        // Handles PARENT logic
+                        Console.WriteLine($"[DEBUG] Checking Parent Logic. RoleName: {userUpdate.RoleName}");
+                        if (userUpdate.RoleName.ToUpper() == "PARENT")
+                        {
+                            Console.WriteLine($"[DEBUG] Entering Parent Logic. TenantId: {tenantId}, UserId: {id}");
+                            // formatting: create parent if not exists
+                            // Using Raw SQL because MParent is in SchoolManagement namespace which is not referenced here
+                            var sql = @"INSERT INTO parents (user_id, tenant_id, created_by, created_on, is_deleted)
                                     SELECT {0}, {1}, {2}, {3}, false
                                     WHERE NOT EXISTS (SELECT 1 FROM parents WHERE user_id = {0} AND tenant_id = {1} AND is_deleted = false);";
-                        
-                         _context.Database.ExecuteSqlRaw(sql, id, tenantId, userUpdate.UpdatedBy ?? 0, DateTime.UtcNow);
 
-                         // Handle Linked Students
-                         if (userUpdate.LinkedStudents != null)
-                         {
-                             Console.WriteLine($"[DEBUG] Processing LinkedStudents. Count: {userUpdate.LinkedStudents.Count}");
-                             // Soft delete existing links for this parent (via subquery for parent_id)
-                             var deleteSql = @"UPDATE parent_student 
+                            _context.Database.ExecuteSqlRaw(sql, id, tenantId, safeUpdatedBy, DateTime.UtcNow);
+
+                            // Handle Linked Students
+                            if (userUpdate.LinkedStudents != null)
+                            {
+                                Console.WriteLine($"[DEBUG] Processing LinkedStudents. Count: {userUpdate.LinkedStudents.Count}");
+                                // Soft delete existing links for this parent (via subquery for parent_id)
+                                var deleteSql = @"UPDATE parent_student 
                                                SET is_deleted = true, updated_by = {0}, updated_on = {1}
                                                WHERE parent_id IN (SELECT id FROM parents WHERE user_id = {2} AND tenant_id = {3} AND is_deleted = false)
                                                AND is_deleted = false";
-                             _context.Database.ExecuteSqlRaw(deleteSql, userUpdate.UpdatedBy ?? 0, DateTime.UtcNow, id, tenantId);
+                                _context.Database.ExecuteSqlRaw(deleteSql, safeUpdatedBy, DateTime.UtcNow, id, tenantId);
 
-                             // Insert new links
-                             foreach (var student in userUpdate.LinkedStudents)
-                             {
-                                 Console.WriteLine($"[DEBUG] Linking StudentId: {student.StudentId} to ParentUserId: {id}");
-                                 var linkSql = @"INSERT INTO parent_student (parent_id, student_id, tenant_id, created_by, created_on, is_deleted)
+                                // Insert new links
+                                foreach (var student in userUpdate.LinkedStudents)
+                                {
+                                    Console.WriteLine($"[DEBUG] Linking StudentId: {student.StudentId} to ParentUserId: {id}");
+                                    var linkSql = @"INSERT INTO parent_student (parent_id, student_id, tenant_id, created_by, created_on, is_deleted)
                                                  SELECT id, {1}, {2}, {3}, {4}, false
                                                  FROM parents
                                                  WHERE user_id = {0} AND tenant_id = {2} AND is_deleted = false";
-                                 _context.Database.ExecuteSqlRaw(linkSql, id, student.StudentId, tenantId, userUpdate.UpdatedBy ?? 0, DateTime.UtcNow);
-                             }
-                         }
-                         else 
-                         {
-                             Console.WriteLine("[DEBUG] LinkedStudents is NULL");
-                         }
-                   }
+                                    _context.Database.ExecuteSqlRaw(linkSql, id, student.StudentId, tenantId, safeUpdatedBy, DateTime.UtcNow);
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("[DEBUG] LinkedStudents is NULL");
+                            }
+                        }
+                    }
                 }
+
+                _context.SaveChanges();
+
+                return UserResponseVM.ToViewModel(user);
             }
-
-            _context.SaveChanges();
-
-            return UserResponseVM.ToViewModel(user);
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] UpdateUser failed: {ex.Message}");
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"[ERROR] Inner Exception: {ex.InnerException.Message}");
+                }
+                return null;
+            }
         }
 
        
