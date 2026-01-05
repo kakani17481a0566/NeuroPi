@@ -238,5 +238,19 @@ namespace NeuroPi.UserManagment.Controllers
             }
         }
 
+        [HttpGet("check-first-time-login")]
+        public ResponseResult<bool> CheckFirstTimeLogin([FromQuery] string username, [FromQuery] int tenantId)
+        {
+            try
+            {
+                bool isFirstTime = _userService.CheckFirstTimeLogin(username, tenantId);
+                return new ResponseResult<bool>(HttpStatusCode.OK, isFirstTime, "Checked first time login status");
+            }
+            catch (Exception ex)
+            {
+                return new ResponseResult<bool>(HttpStatusCode.InternalServerError, false, $"Error checking first time login: {ex.Message}");
+            }
+        }
+
     }
 }

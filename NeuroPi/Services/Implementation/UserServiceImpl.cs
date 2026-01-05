@@ -782,5 +782,17 @@ namespace NeuroPi.UserManagment.Services.Implementation
             return _context.Users.Any(u => u.Email.ToLower() == email.ToLower() && !u.IsDeleted);
         }
 
+        public bool CheckFirstTimeLogin(string username, int tenantId)
+        {
+             var user = _context.Users.FirstOrDefault(u => 
+                u.Username.ToLower() == username.ToLower() && 
+                u.TenantId == tenantId && 
+                !u.IsDeleted);
+            
+            if (user == null) return false; 
+            
+            return user.FirstTimeLogin;
+        }
+
     }
 }

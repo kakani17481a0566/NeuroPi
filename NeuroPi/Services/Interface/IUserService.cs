@@ -31,6 +31,7 @@ namespace NeuroPi.UserManagment.Services.Interface
         UsersProfileSummaryVM GetUserProfileSummary(int id, int tenantId);
 
         bool CheckUsernameExists(string username);
+        bool CheckFirstTimeLogin(string username, int tenantId);
 
     }
 }
