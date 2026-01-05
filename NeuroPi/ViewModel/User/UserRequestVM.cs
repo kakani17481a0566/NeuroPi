@@ -46,8 +46,9 @@ namespace NeuroPi.UserManagment.ViewModel.User
                 Address = request.Address,
                 TenantId = request.TenantId,
                 CreatedBy = request.CreatedBy,
-                CreatedOn = DateTime.UtcNow
-
+             
+                CreatedOn = DateTime.UtcNow,
+                FirstTimeLogin = true // Default to true for new users
             };
         }
 

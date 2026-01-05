@@ -643,7 +643,9 @@ namespace NeuroPi.UserManagment.Services.Implementation
             }
 
             user.Password = request.NewPassword;
+            user.Password = request.NewPassword;
             user.UpdatedOn = DateTime.UtcNow;
+            user.FirstTimeLogin = false; // Reset first time login flag
 
             try
             {
@@ -670,7 +672,9 @@ namespace NeuroPi.UserManagment.Services.Implementation
             }
 
             user.Password = request.NewPassword;
+            user.Password = request.NewPassword;
             user.UpdatedOn = DateTime.UtcNow;
+            user.FirstTimeLogin = true; // Force password change on next login
 
             try
             {

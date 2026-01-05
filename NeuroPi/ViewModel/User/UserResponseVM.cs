@@ -26,6 +26,7 @@ namespace NeuroPi.UserManagment.ViewModel.User
         public string? UserImageUrl { get; set; }
         public string? RoleName { get; set; }
         public string? Password { get; set; }
+        public bool FirstTimeLogin { get; set; }
         
         public object? LinkedStudents { get; set; }
 
@@ -52,7 +53,8 @@ namespace NeuroPi.UserManagment.ViewModel.User
                 CreatedBy = user.CreatedBy,
                
                 UpdatedBy = user.UpdatedBy,
-                Password = user.Password
+                Password = user.Password,
+                FirstTimeLogin = user.FirstTimeLogin
             };
         }
 

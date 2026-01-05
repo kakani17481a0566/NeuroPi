@@ -58,6 +58,9 @@ namespace NeuroPi.UserManagment.Model
         [Column("user_image_url")]
         public string? UserImageUrl { get; set; }
 
+        [Column("first_time_login")]
+        public bool FirstTimeLogin { get; set; }
+
 
         // ----------------------------
         // Extended profile info
