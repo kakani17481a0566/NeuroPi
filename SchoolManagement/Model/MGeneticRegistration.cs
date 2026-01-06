@@ -202,6 +202,9 @@ namespace SchoolManagement.Model
         [Column("is_deleted")]
         public bool IsDeleted { get; set; } = false;
 
+        [Column("is_draft")]
+        public bool IsDraft { get; set; } = false;
+
         [Column("created_on")]
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
 

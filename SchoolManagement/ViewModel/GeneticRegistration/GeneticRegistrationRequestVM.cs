@@ -94,6 +94,7 @@ namespace SchoolManagement.ViewModel.GeneticRegistration
         public int? CreatedBy { get; set; }
         public int? UpdatedBy { get; set; }
         public bool IsDeleted { get; set; } = false;
+        public bool IsDraft { get; set; } = false;
 
         // ------------------------------------------------------------
         // Mapper: Converts ViewModel → Database Entity
@@ -186,6 +187,7 @@ namespace SchoolManagement.ViewModel.GeneticRegistration
                 CreatedBy = request.CreatedBy,
                 UpdatedBy = request.UpdatedBy,
                 IsDeleted = request.IsDeleted,
+                IsDraft = request.IsDraft,
                 CreatedOn = DateTime.UtcNow,
                 UpdatedOn = DateTime.UtcNow
             };
