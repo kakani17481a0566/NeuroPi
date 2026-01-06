@@ -70,7 +70,7 @@ namespace SchoolManagement.Controllers
                 BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
                 BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(containerName);
                 await containerClient.CreateIfNotExistsAsync();
-                await containerClient.SetAccessPolicyAsync(Azure.Storage.Blobs.Models.PublicAccessType.Blob);
+                // await containerClient.SetAccessPolicyAsync(Azure.Storage.Blobs.Models.PublicAccessType.Blob); // Removed to fix 500 error
 
                 string blobName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
                 BlobClient blobClient = containerClient.GetBlobClient(blobName);
@@ -80,7 +80,19 @@ namespace SchoolManagement.Controllers
                     await blobClient.UploadAsync(stream, true);
                 }
 
-                return Ok(new { Url = blobClient.Uri.ToString() });
+                // Generate SAS Token
+                var sasBuilder = new Azure.Storage.Sas.BlobSasBuilder
+                {
+                    BlobContainerName = containerName,
+                    BlobName = blobName,
+                    Resource = "b",
+                    ExpiresOn = DateTimeOffset.UtcNow.AddYears(100)
+                };
+                sasBuilder.SetPermissions(Azure.Storage.Sas.BlobSasPermissions.Read);
+
+                Uri sasUri = blobClient.GenerateSasUri(sasBuilder);
+
+                return Ok(new { Url = sasUri.ToString() });
             }
             catch (Exception ex)
             {
