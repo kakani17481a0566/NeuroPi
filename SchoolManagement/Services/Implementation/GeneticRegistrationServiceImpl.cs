@@ -160,6 +160,108 @@ namespace SchoolManagement.Services.Implementation
                 CreatedOn = record.CreatedOn,
                 UpdatedOn = record.UpdatedOn
             };
+            };
+        }
+
+        // ------------------------------------------------------------
+        // Get Latest Genetic Registration by UserId
+        // ------------------------------------------------------------
+        public GeneticRegistrationResponseVM? GetGeneticRegistrationByUserId(int userId)
+        {
+            var record = _context.GeneticRegistrations
+                .AsNoTracking()
+                .Where(gr => gr.UserId == userId && !gr.IsDeleted)
+                .OrderByDescending(gr => gr.CreatedOn)
+                .FirstOrDefault();
+
+            if (record == null)
+                return null;
+
+            return new GeneticRegistrationResponseVM
+            {
+                RegistrationNumber = record.RegistrationNumber,
+                UserId = record.UserId,
+                UserName = record.UserName,
+                GeneticId = record.GeneticId,
+
+                ClassName = record.ClassName,
+                Branch = record.Branch,
+
+                FatherName = record.FatherName,
+                FatherOccupation = record.FatherOccupation,
+                MotherName = record.MotherName,
+                MotherOccupation = record.MotherOccupation,
+                FatherDateOfBirth = record.FatherDateOfBirth,
+                MotherDateOfBirth = record.MotherDateOfBirth,
+
+                CountryCode = record.CountryCode,
+                ContactNumber = record.ContactNumber,
+                Email = record.Email,
+
+                Country = record.Country,
+                State = record.State,
+                City = record.City,
+
+                // 🔹 Biological Address
+                BiologicalCountry = record.BiologicalCountry,
+                BiologicalState = record.BiologicalState,
+                BiologicalCity = record.BiologicalCity,
+                IsBiologicalSame = record.IsBiologicalSame,
+
+                // 🔹 Guardian Info
+                HasGuardian = record.HasGuardian,
+                GuardianFirstName = record.GuardianFirstName,
+                GuardianMiddleName = record.GuardianMiddleName,
+                GuardianLastName = record.GuardianLastName,
+                GuardianOccupation = record.GuardianOccupation,
+                GuardianRelationship = record.GuardianRelationship,
+                GuardianContactNumber = record.GuardianContactNumber,
+                GuardianEmail = record.GuardianEmail,
+
+                // 🔹 Health & Lifestyle
+                DateOfBirth = record.DateOfBirth,
+                Age = record.Age,
+                Gender = record.Gender,
+                Height = record.Height,
+                Weight = record.Weight,
+                Consanguinity = record.Consanguinity,
+                ParentsOccupation = record.ParentsOccupation,
+                DietType = record.DietType,
+                Activity = record.Activity,
+                SleepDuration = record.SleepDuration,
+                SleepQuality = record.SleepQuality,
+                ScreenTime = record.ScreenTime,
+                FoodTiming = record.FoodTiming,
+
+                // 🔹 Nutrition
+                Fruits = record.Fruits,
+                Vegetables = record.Vegetables,
+                PlantBasedProtein = record.PlantBasedProtein,
+                AnimalBasedProtein = record.AnimalBasedProtein,
+                FoodFrequency = record.FoodFrequency,
+
+                // 🔹 Family & Medical
+                FamilyType = record.FamilyType,
+                Siblings = record.Siblings,
+                Vaccination = record.Vaccination,
+
+                // 🔹 Environment
+                NatureAccess = record.NatureAccess,
+                PollutionAir = record.PollutionAir,
+                PollutionNoise = record.PollutionNoise,
+                PollutionWater = record.PollutionWater,
+                PassiveSmoking = record.PassiveSmoking,
+                TravelTime = record.TravelTime,
+
+                // 🔹 Audit & Tenant Info
+                TenantId = record.TenantId,
+                CreatedBy = record.CreatedBy,
+                UpdatedBy = record.UpdatedBy,
+                IsDeleted = record.IsDeleted,
+                CreatedOn = record.CreatedOn,
+                UpdatedOn = record.UpdatedOn,
+                IsDraft = record.IsDraft // Ensure VM has this property too if updated previously
+            };
         }
 
         // ------------------------------------------------------------

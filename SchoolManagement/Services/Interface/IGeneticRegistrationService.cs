@@ -8,8 +8,6 @@ namespace SchoolManagement.Services.Interface
 
         GeneticRegistrationResponseVM GetGeneticRegistrationByGeneticIdOrRegistrationNumber(string GeneticId,string RegistrationNumber);
 
-
-
-
+        GeneticRegistrationResponseVM GetGeneticRegistrationByUserId(int userId);
     }
 }

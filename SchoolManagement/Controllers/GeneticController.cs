@@ -37,5 +37,16 @@ namespace SchoolManagement.Controllers
             }
             return new ResponseResult<GeneticRegistrationResponseVM>(HttpStatusCode.NoContent, geneticRegistration, $"No data found for the provided Genetic ID{geneticId} or Registration Number{registrationNumber}");
         }
+
+        [HttpGet("user/{userId}")]
+        public ResponseResult<GeneticRegistrationResponseVM> GetGeneticRegistrationByUserId(int userId)
+        {
+            var result = _geneticRegistrationService.GetGeneticRegistrationByUserId(userId);
+            if (result != null)
+            {
+                return new ResponseResult<GeneticRegistrationResponseVM>(HttpStatusCode.OK, result, "User registration retrieved successfully");
+            }
+            return new ResponseResult<GeneticRegistrationResponseVM>(HttpStatusCode.NoContent, null, "No registration found for this user");
+        }
     }
 }
