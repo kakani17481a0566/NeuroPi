@@ -98,6 +98,7 @@ namespace SchoolManagement.ViewModel.GeneticRegistration
         // -------------------- Audit Fields --------------------
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }
+        public bool IsDraft { get; set; }
 
         // -------------------- Convenience (optional) --------------------
         public string? CreatedOnFormatted => CreatedOn.ToString("dd-MMM-yyyy HH:mm");
