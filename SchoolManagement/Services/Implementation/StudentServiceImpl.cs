@@ -790,24 +790,34 @@ namespace SchoolManagement.Services.Implementation
                 if (user == null) return false;
 
                 // 2. Find or Create Parent
+                Console.WriteLine($"[DEBUG] Searching for parent with UserId: {userId}");
                 var parent = _context.Parents.FirstOrDefault(p => p.UserId == userId && p.TenantId == user.TenantId && !p.IsDeleted);
+                
                 if (parent == null)
                 {
+                    Console.WriteLine($"[DEBUG] Parent not found. Creating new parent for UserId: {userId}");
                     parent = new MParent
                     {
                         UserId = userId,
                         TenantId = user.TenantId,
-                        CreatedBy = userId, // Self-created contextually, or passed in
+                        CreatedBy = userId,
                         CreatedOn = DateTime.UtcNow
                     };
                     _context.Parents.Add(parent);
                     _context.SaveChanges();
+                    Console.WriteLine($"[DEBUG] Created new Parent. Id: {parent.Id}, UserId: {parent.UserId}");
+                }
+                else
+                {
+                    Console.WriteLine($"[DEBUG] Found existing Parent. Id: {parent.Id}, UserId: {parent.UserId}");
                 }
 
                 // 3. Get existing links (including deleted ones to restore if needed)
                 var existingLinks = _context.ParentStudents
                     .Where(ps => ps.ParentId == parent.Id)
                     .ToList();
+                
+                Console.WriteLine($"[DEBUG] Found {existingLinks.Count} existing links for ParentId: {parent.Id}");
 
                 var requestedStudentIds = studentIds.Distinct().ToList();
 
@@ -820,6 +830,7 @@ namespace SchoolManagement.Services.Implementation
                         // Enable if deleted
                         if (existingLink.IsDeleted)
                         {
+                            Console.WriteLine($"[DEBUG] Restoring link for StudentId: {studentId}");
                             existingLink.IsDeleted = false;
                             existingLink.UpdatedOn = DateTime.UtcNow;
                             existingLink.UpdatedBy = userId;
@@ -829,6 +840,7 @@ namespace SchoolManagement.Services.Implementation
                     else
                     {
                         // Create new link
+                        Console.WriteLine($"[DEBUG] Creating new link: ParentId={parent.Id}, StudentId={studentId}");
                         _context.ParentStudents.Add(new MParentStudent
                         {
                             ParentId = parent.Id,
