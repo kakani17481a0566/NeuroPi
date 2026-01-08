@@ -585,6 +585,7 @@ namespace NeuroPi.Nutrition.Services.Implementation
             // Focus Tags
             result.FocusTags = _context.NutritionalFocuses
                 .Where(x => !x.IsDeleted && x.TenantId == tenantId)
+
                 .Select(x => new Filters { Id = x.Id, Name = x.Name })
                 .ToList();
 
