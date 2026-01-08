@@ -160,7 +160,7 @@ namespace SchoolManagement.Services.Implementation
                 CreatedOn = record.CreatedOn,
                 UpdatedOn = record.UpdatedOn
             };
-            };
+
         }
 
         // ------------------------------------------------------------
