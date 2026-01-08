@@ -781,5 +781,82 @@ namespace SchoolManagement.Services.Implementation
             }
             return result;
         }
+        public bool UpdateLinkedStudents(int userId, List<int> studentIds)
+        {
+            try
+            {
+                // 1. Get User to find TenantId
+                var user = _userContext.Users.FirstOrDefault(u => u.UserId == userId && !u.IsDeleted);
+                if (user == null) return false;
+
+                // 2. Find or Create Parent
+                var parent = _context.Parents.FirstOrDefault(p => p.UserId == userId && p.TenantId == user.TenantId && !p.IsDeleted);
+                if (parent == null)
+                {
+                    parent = new MParent
+                    {
+                        UserId = userId,
+                        TenantId = user.TenantId,
+                        CreatedBy = userId, // Self-created contextually, or passed in
+                        CreatedOn = DateTime.UtcNow
+                    };
+                    _context.Parents.Add(parent);
+                    _context.SaveChanges();
+                }
+
+                // 3. Get existing links (including deleted ones to restore if needed)
+                var existingLinks = _context.ParentStudents
+                    .Where(ps => ps.ParentId == parent.Id)
+                    .ToList();
+
+                var requestedStudentIds = studentIds.Distinct().ToList();
+
+                // 4. Process links
+                foreach (var studentId in requestedStudentIds)
+                {
+                    var existingLink = existingLinks.FirstOrDefault(ps => ps.StudentId == studentId);
+                    if (existingLink != null)
+                    {
+                        // Enable if deleted
+                        if (existingLink.IsDeleted)
+                        {
+                            existingLink.IsDeleted = false;
+                            existingLink.UpdatedOn = DateTime.UtcNow;
+                            existingLink.UpdatedBy = userId;
+                            _context.ParentStudents.Update(existingLink);
+                        }
+                    }
+                    else
+                    {
+                        // Create new link
+                        _context.ParentStudents.Add(new MParentStudent
+                        {
+                            ParentId = parent.Id,
+                            StudentId = studentId,
+                            TenantId = user.TenantId,
+                            CreatedBy = userId,
+                            CreatedOn = DateTime.UtcNow
+                        });
+                    }
+                }
+
+                // 5. Remove links not in request
+                foreach (var link in existingLinks.Where(ps => !requestedStudentIds.Contains(ps.StudentId) && !ps.IsDeleted))
+                {
+                    link.IsDeleted = true;
+                    link.UpdatedOn = DateTime.UtcNow;
+                    link.UpdatedBy = userId;
+                    _context.ParentStudents.Update(link);
+                }
+
+                _context.SaveChanges();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating linked students: {ex.Message}");
+                return false;
+            }
+        }
     }
 }

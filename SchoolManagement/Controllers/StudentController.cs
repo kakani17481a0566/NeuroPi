@@ -214,6 +214,17 @@ namespace SchoolManagement.Controllers
             }
             return new ResponseResult<List<StudentFilterResponseVM>>(HttpStatusCode.OK, new List<StudentFilterResponseVM>(), "No linked students found.");
         }
+
+        [HttpPost("update-linked-students")]
+        public ResponseResult<bool> UpdateLinkedStudents([FromBody] LinkedStudentsUpdateVM request)
+        {
+            var result = _studentService.UpdateLinkedStudents(request.UserId, request.StudentIds);
+            if (result)
+            {
+                return new ResponseResult<bool>(HttpStatusCode.OK, true, "Linked students updated successfully.");
+            }
+            return new ResponseResult<bool>(HttpStatusCode.InternalServerError, false, "Failed to update linked students.");
+        }
     }
  
 
