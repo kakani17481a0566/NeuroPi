@@ -22,6 +22,8 @@ namespace NeuroPi.UserManagment.ViewModel.User
         public DateTime CreatedOn { get; set; }
         public int? CreatedBy { get; set; } // Keep as int? to match MBaseModel
 
+        public int? ParentId { get; set; } // Added ParentId property
+
         public int? UpdatedBy { get; set; } // Keep as int? to match MBaseModel
         public string? UserImageUrl { get; set; }
         public string? RoleName { get; set; }
