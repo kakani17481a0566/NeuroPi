@@ -556,32 +556,71 @@ namespace NeuroPi.UserManagment.Services.Implementation
                             if (userUpdate.LinkedStudents != null)
                             {
                                 Console.WriteLine($"[DEBUG] Processing LinkedStudents. Count: {userUpdate.LinkedStudents.Count}");
-                                // Soft delete existing links for this parent (via subquery for parent_id)
-                                var deleteSql = @"UPDATE parent_student 
-                                               SET is_deleted = true, updated_by = {0}, updated_on = {1}
-                                               WHERE parent_id IN (SELECT id FROM parents WHERE user_id = {2} AND tenant_id = {3} AND is_deleted = false)
-                                               AND is_deleted = false";
-                                _context.Database.ExecuteSqlRaw(deleteSql, safeUpdatedBy, DateTime.UtcNow, id, tenantId);
 
-                                // Insert new links or Activate existing ones
-                             foreach (var student in userUpdate.LinkedStudents)
-                             {
-                                 Console.WriteLine($"[DEBUG] Linking StudentId: {student.StudentId} to ParentUserId: {id}");
-                                 // Postgres Upsert (ON CONFLICT)
-                                 var linkSql = @"INSERT INTO parent_student (parent_id, student_id, tenant_id, created_by, created_on, is_deleted)
-                                                 SELECT id, {1}, {2}, {3}, {4}, false
-                                                 FROM parents
-                                                 WHERE user_id = {0} AND tenant_id = {2} AND is_deleted = false
-                                                 ON CONFLICT (parent_id, student_id) 
-                                                 DO UPDATE SET is_deleted = false, updated_by = {3}, updated_on = {4}";
-                                 
-                                 _context.Database.ExecuteSqlRaw(linkSql, id, student.StudentId, tenantId, safeUpdatedBy, DateTime.UtcNow);
-                             }
-                         }
-                         else 
-                         {
-                             Console.WriteLine("[DEBUG] LinkedStudents is NULL");
-                         }
+                                int parentIdToUse = 0;
+
+                                // 1. Try using explicitly passed ParentId
+                                if (userUpdate.ParentId.HasValue && userUpdate.ParentId.Value > 0)
+                                {
+                                    parentIdToUse = userUpdate.ParentId.Value;
+                                }
+                                else
+                                {
+                                    // 2. Fallback: Lookup parent_id from parents table using user_id
+                                    // This is needed if frontend didn't pass it, or if we just created the parent above
+                                    try 
+                                    {
+                                        var pIdHelperSql = "SELECT id FROM parents WHERE user_id = {0} AND tenant_id = {1} AND is_deleted = false LIMIT 1";
+                                        using (var command = _context.Database.GetDbConnection().CreateCommand())
+                                        {
+                                            command.CommandText = pIdHelperSql.Replace("{0}", id.ToString()).Replace("{1}", tenantId.ToString());
+                                            _context.Database.OpenConnection();
+                                            var result = command.ExecuteScalar();
+                                            if (result != null && result != DBNull.Value)
+                                            {
+                                                parentIdToUse = Convert.ToInt32(result);
+                                            }
+                                            _context.Database.CloseConnection();
+                                        }
+                                    }
+                                    catch(Exception ex)
+                                    {
+                                        Console.WriteLine($"[ERROR] Failed to lookup parent ID: {ex.Message}");
+                                    }
+                                }
+
+                                if (parentIdToUse > 0)
+                                {
+                                    Console.WriteLine($"[DEBUG] Using ParentId: {parentIdToUse}");
+
+                                    // Soft delete existing links for this parent
+                                    var deleteSql = @"UPDATE parent_student 
+                                                   SET is_deleted = true, updated_by = {0}, updated_on = {1}
+                                                   WHERE parent_id = {2} AND tenant_id = {3} AND is_deleted = false";
+                                    _context.Database.ExecuteSqlRaw(deleteSql, safeUpdatedBy, DateTime.UtcNow, parentIdToUse, tenantId);
+
+                                    // Insert new links or Activate existing ones
+                                    foreach (var student in userUpdate.LinkedStudents)
+                                    {
+                                        Console.WriteLine($"[DEBUG] Linking StudentId: {student.StudentId} to ParentId: {parentIdToUse}");
+                                        // Postgres Upsert (ON CONFLICT)
+                                        var linkSql = @"INSERT INTO parent_student (parent_id, student_id, tenant_id, created_by, created_on, is_deleted)
+                                                     VALUES ({0}, {1}, {2}, {3}, {4}, false)
+                                                     ON CONFLICT (parent_id, student_id) 
+                                                     DO UPDATE SET is_deleted = false, updated_by = {3}, updated_on = {4}";
+                                     
+                                        _context.Database.ExecuteSqlRaw(linkSql, parentIdToUse, student.StudentId, tenantId, safeUpdatedBy, DateTime.UtcNow);
+                                    }
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"[ERROR] Could not determine ParentId for User {id}. Linking skipped.");
+                                }
+                            }
+                            else 
+                            {
+                                Console.WriteLine("[DEBUG] LinkedStudents is NULL");
+                            }
                    }
                 }
             }
