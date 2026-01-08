@@ -144,6 +144,33 @@ namespace NeuroPi.UserManagment.Services.Implementation
             // Manual mapping for RoleName since AutoMapper isn't being used here
             // Bulk fetch linked students for all parents in this tenant
             var linkedStudentsMap = GetAllLinkedStudentsForTenant(tenantId);
+            
+            // Fetch all UserIds from parents table for this tenant to check for PARENT role
+            var parentUserIds = new HashSet<int>();
+            try
+            {
+                var parentSql = @"SELECT ""user_id"" FROM ""parents"" WHERE ""tenant_id"" = {0} AND ""is_deleted"" = false";
+                using (var command = _context.Database.GetDbConnection().CreateCommand())
+                {
+                    command.CommandText = parentSql.Replace("{0}", tenantId.ToString());
+                    _context.Database.OpenConnection();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            if (!reader.IsDBNull(0))
+                            {
+                                parentUserIds.Add(reader.GetInt32(0));
+                            }
+                        }
+                    }
+                    _context.Database.CloseConnection();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] Failed to fetch parent user IDs: {ex.Message}");
+            }
 
             foreach (var vm in userVMs)
             {
@@ -152,6 +179,12 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 {
                     var role = user.UserRoles.FirstOrDefault(ur => !ur.IsDeleted);
                     vm.RoleName = role?.Role?.Name;
+                    
+                    // Override rule: IF user is in parents table, they ARE a PARENT
+                    if (parentUserIds.Contains(vm.UserId))
+                    {
+                        vm.RoleName = "PARENT";
+                    }
 
                     if (vm.RoleName?.ToUpper() == "PARENT" && linkedStudentsMap.ContainsKey(vm.UserId))
                     {
