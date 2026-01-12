@@ -117,5 +117,14 @@ namespace SchoolManagement.Controllers
                 ? new ResponseResult<List<ParentWithStudentsResponseVM>>(HttpStatusCode.NotFound, null, "parent not found")
                 : new ResponseResult<List<ParentWithStudentsResponseVM>>(HttpStatusCode.OK, result, "Details fetched Successfully");
         }
+
+        [HttpPut("update-profile")]
+        public ResponseResult<bool> UpdateProfile([FromBody] ParentProfileUpdateVM request)
+        {
+            var result = _service.UpdateProfile(request);
+            return result
+                ? new ResponseResult<bool>(HttpStatusCode.OK, true, "Profile updated successfully")
+                : new ResponseResult<bool>(HttpStatusCode.BadRequest, false, "Failed to update profile");
+        }
     }
 }
