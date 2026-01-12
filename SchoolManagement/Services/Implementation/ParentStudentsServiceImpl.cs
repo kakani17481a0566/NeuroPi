@@ -269,13 +269,21 @@ namespace SchoolManagement.Services.Implementation
             user.LastName = request.LastName;
             user.Email = request.Email;
             user.MobileNumber = request.MobileNumber;
-            user.DateOfBirth = request.DateOfBirth;
-            user.WeddingAnniversaryDate = request.WeddingAnniversaryDate;
+            
+            // Fix: Convert DateTime? to DateOnly?
+            user.DateOfBirth = request.DateOfBirth.HasValue ? DateOnly.FromDateTime(request.DateOfBirth.Value) : null;
+            user.WeddingAnniversaryDate = request.WeddingAnniversaryDate.HasValue ? DateOnly.FromDateTime(request.WeddingAnniversaryDate.Value) : null;
+            
             user.SpouseName = request.SpouseName;
-            user.Address = request.Address;
-            user.City = request.City;
-            user.State = request.State;
-            user.Pincode = request.Pincode;
+
+            // Fix: MUser does not have City, State, Pincode. Merge into Address.
+            var addressParts = new List<string>();
+            if (!string.IsNullOrWhiteSpace(request.Address)) addressParts.Add(request.Address);
+            if (!string.IsNullOrWhiteSpace(request.City)) addressParts.Add(request.City);
+            if (!string.IsNullOrWhiteSpace(request.State)) addressParts.Add(request.State);
+            if (!string.IsNullOrWhiteSpace(request.Pincode)) addressParts.Add(request.Pincode);
+            
+            user.Address = string.Join(", ", addressParts);
             
             user.UpdatedBy = request.UpdatedBy;
             user.UpdatedOn = System.DateTime.UtcNow;
