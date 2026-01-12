@@ -87,7 +87,20 @@ namespace SchoolManagement.Services.Implementation
             student.BranchId = request.BranchId;
             student.TenantId = request.TenantId;
             student.UpdatedOn = DateTime.UtcNow;
+            student.UpdatedOn = DateTime.UtcNow;
             student.UpdatedBy = request.UpdatedBy;
+
+            // Update extra profile fields
+            if (request.DateOfBirth.HasValue)
+                student.DateOfBirth = DateOnly.FromDateTime(request.DateOfBirth.Value);
+            
+            student.Gender = request.Gender;
+            student.BloodGroup = request.BloodGroup;
+            student.RegNumber = request.AdmissionNumber; // Map AdmissionNumber to RegNumber
+            student.AdmissionGrade = request.AdmissionGrade;
+            
+            if (request.DateOfJoining.HasValue)
+                student.DateOfJoining = DateOnly.FromDateTime(request.DateOfJoining.Value);
 
             _context.SaveChanges();
             return StudentResponseVM.ToViewModel(student);
