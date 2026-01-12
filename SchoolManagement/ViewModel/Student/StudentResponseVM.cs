@@ -30,7 +30,6 @@ namespace SchoolManagement.ViewModel.Students
                 CourseName = student.Course?.Name,
                 TenantId = student.TenantId,
                 BranchId = student.BranchId,
-                BranchId = student.BranchId,
                 BranchName = student.Branch?.Name,
                 
                 // Map new fields
