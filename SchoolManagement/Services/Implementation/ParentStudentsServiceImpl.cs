@@ -253,5 +253,36 @@ namespace SchoolManagement.Services.Implementation
             return response.ToList();
         }
 
+        public bool UpdateProfile(ParentProfileUpdateVM request)
+        {
+            // Find parent and include User to update user details
+            var parent = _db.Parents
+                .Include(p => p.User)
+                .FirstOrDefault(p => p.UserId == request.UserId && p.TenantId == request.TenantId && !p.IsDeleted);
+
+            if (parent == null || parent.User == null) return false;
+
+            var user = parent.User;
+
+            // Update User fields
+            user.FirstName = request.FirstName;
+            user.LastName = request.LastName;
+            user.Email = request.Email;
+            user.MobileNumber = request.MobileNumber;
+            user.DateOfBirth = request.DateOfBirth;
+            user.WeddingAnniversaryDate = request.WeddingAnniversaryDate;
+            user.SpouseName = request.SpouseName;
+            user.Address = request.Address;
+            user.City = request.City;
+            user.State = request.State;
+            user.Pincode = request.Pincode;
+            
+            user.UpdatedBy = request.UpdatedBy;
+            user.UpdatedOn = System.DateTime.UtcNow;
+
+            _db.SaveChanges();
+            return true;
+        }
+
     }
 }          
