@@ -265,15 +265,29 @@ namespace SchoolManagement.Services.Implementation
         }
 
         // ------------------------------------------------------------
-        // Get All Genetic Registrations by UserId
+        // Get All Genetic Registrations by Created By (logged-in user)
         // ------------------------------------------------------------
         public List<GeneticRegistrationResponseVM> GetAllUserSubmissions(int userId)
         {
+            Console.WriteLine($"🔍 GetAllUserSubmissions called with userId: {userId}");
+            
             var records = _context.GeneticRegistrations
                 .AsNoTracking()
-                .Where(gr => gr.UserId == userId && !gr.IsDeleted)
+                .Where(gr => gr.CreatedBy.HasValue && gr.CreatedBy.Value == userId && !gr.IsDeleted)
                 .OrderByDescending(gr => gr.CreatedOn)
                 .ToList();
+
+            Console.WriteLine($"📊 Query returned {records.Count} records");
+            
+            // Debug: Check all records for this user without filters
+            var allRecords = _context.GeneticRegistrations
+                .AsNoTracking()
+                .Where(gr => gr.CreatedBy == userId)
+                .ToList();
+            Console.WriteLine($"📊 Total records with CreatedBy={userId}: {allRecords.Count}");
+            
+            var deletedCount = allRecords.Count(r => r.IsDeleted);
+            Console.WriteLine($"📊 Deleted records: {deletedCount}");
 
             if (records == null || !records.Any())
                 return new List<GeneticRegistrationResponseVM>();

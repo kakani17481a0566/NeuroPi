@@ -57,7 +57,9 @@ namespace SchoolManagement.Controllers
             {
                 return new ResponseResult<List<GeneticRegistrationResponseVM>>(HttpStatusCode.OK, result, $"Retrieved {result.Count} submission(s) successfully");
             }
-            return new ResponseResult<List<GeneticRegistrationResponseVM>>(HttpStatusCode.NoContent, new List<GeneticRegistrationResponseVM>(), "No submissions found for this user");
+            // Return 200 OK with empty list instead of 204 NoContent
+            // 204 cannot have a response body, which causes serialization errors
+            return new ResponseResult<List<GeneticRegistrationResponseVM>>(HttpStatusCode.OK, new List<GeneticRegistrationResponseVM>(), "No submissions found for this user");
         }
     }
 }
