@@ -267,27 +267,20 @@ namespace SchoolManagement.Services.Implementation
         // ------------------------------------------------------------
         // Get All Genetic Registrations by Created By (logged-in user)
         // ------------------------------------------------------------
-        public List<GeneticRegistrationResponseVM> GetAllUserSubmissions(int userId)
+        public List<GeneticRegistrationResponseVM> GetAllUserSubmissions(int userId, bool includeDeleted = false)
         {
-            Console.WriteLine($"🔍 GetAllUserSubmissions called with userId: {userId}");
-            
-            var records = _context.GeneticRegistrations
+            var query = _context.GeneticRegistrations
                 .AsNoTracking()
-                .Where(gr => gr.CreatedBy.HasValue && gr.CreatedBy.Value == userId && !gr.IsDeleted)
-                .OrderByDescending(gr => gr.CreatedOn)
-                .ToList();
+                .Where(gr => gr.CreatedBy.HasValue && gr.CreatedBy.Value == userId);
 
-            Console.WriteLine($"📊 Query returned {records.Count} records");
-            
-            // Debug: Check all records for this user without filters
-            var allRecords = _context.GeneticRegistrations
-                .AsNoTracking()
-                .Where(gr => gr.CreatedBy == userId)
-                .ToList();
-            Console.WriteLine($"📊 Total records with CreatedBy={userId}: {allRecords.Count}");
-            
-            var deletedCount = allRecords.Count(r => r.IsDeleted);
-            Console.WriteLine($"📊 Deleted records: {deletedCount}");
+            // Filter by deleted status if not including deleted
+            if (!includeDeleted)
+            {
+                query = query.Where(gr => !gr.IsDeleted);
+            }
+
+            var records = query.OrderByDescending(gr => gr.CreatedOn).ToList();
+
 
             if (records == null || !records.Any())
                 return new List<GeneticRegistrationResponseVM>();
@@ -377,6 +370,30 @@ namespace SchoolManagement.Services.Implementation
                 UpdatedOn = record.UpdatedOn,
                 IsDraft = record.IsDraft
             }).ToList();
+        }
+
+        // ------------------------------------------------------------
+        // Delete Submission (Soft Delete)
+        // ------------------------------------------------------------
+        public bool DeleteSubmission(string registrationNumber, int userId)
+        {
+            var record = _context.GeneticRegistrations
+                .FirstOrDefault(gr => gr.RegistrationNumber == registrationNumber && !gr.IsDeleted);
+
+            if (record == null)
+                return false;
+
+            // Verify user owns this submission
+            if (record.CreatedBy != userId)
+                return false;
+
+            // Soft delete
+            record.IsDeleted = true;
+            record.UpdatedOn = DateTime.UtcNow;
+            record.UpdatedBy = userId;
+
+            _context.SaveChanges();
+            return true;
         }
 
 
