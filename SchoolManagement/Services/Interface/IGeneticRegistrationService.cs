@@ -10,6 +10,8 @@ namespace SchoolManagement.Services.Interface
 
         GeneticRegistrationResponseVM GetGeneticRegistrationByUserId(int userId);
 
+        List<GeneticRegistrationResponseVM> GetAllSubmissions(bool includeDeleted = true);
+
         List<GeneticRegistrationResponseVM> GetAllUserSubmissions(int userId, bool includeDeleted = false);
 
         bool DeleteSubmission(string registrationNumber, int userId);

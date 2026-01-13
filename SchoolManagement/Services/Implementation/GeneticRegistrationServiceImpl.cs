@@ -265,6 +265,94 @@ namespace SchoolManagement.Services.Implementation
         }
 
         // ------------------------------------------------------------
+        // Get All Genetic Registrations (for admin/master view)
+        // ------------------------------------------------------------
+        public List<GeneticRegistrationResponseVM> GetAllSubmissions(bool includeDeleted = true)
+        {
+            var query = _context.GeneticRegistrations
+                .AsNoTracking();
+
+            // Filter by deleted status if not including deleted
+            if (!includeDeleted)
+            {
+                query = query.Where(gr => !gr.IsDeleted);
+            }
+
+            var records = query.OrderByDescending(gr => gr.CreatedOn).ToList();
+
+            if (records == null || !records.Any())
+                return new List<GeneticRegistrationResponseVM>();
+
+            return records.Select(gr => new GeneticRegistrationResponseVM
+            {
+                RegistrationNumber = gr.RegistrationNumber,
+                GeneticId = gr.GeneticId,
+                UserId = gr.UserId,
+                UserName = gr.UserName,
+                ClassName = gr.ClassName,
+                Branch = gr.Branch,
+                FatherName = gr.FatherName,
+                FatherOccupation = gr.FatherOccupation,
+                MotherName = gr.MotherName,
+                MotherOccupation = gr.MotherOccupation,
+                FatherDateOfBirth = gr.FatherDateOfBirth,
+                MotherDateOfBirth = gr.MotherDateOfBirth,
+                CountryCode = gr.CountryCode,
+                ContactNumber = gr.ContactNumber,
+                Email = gr.Email,
+                Country = gr.Country,
+                State = gr.State,
+                City = gr.City,
+                BiologicalCountry = gr.BiologicalCountry,
+                BiologicalState = gr.BiologicalState,
+                BiologicalCity = gr.BiologicalCity,
+                IsBiologicalSame = gr.IsBiologicalSame,
+                HasGuardian = gr.HasGuardian,
+                GuardianFirstName = gr.GuardianFirstName,
+                GuardianMiddleName = gr.GuardianMiddleName,
+                GuardianLastName = gr.GuardianLastName,
+                GuardianOccupation = gr.GuardianOccupation,
+                GuardianRelationship = gr.GuardianRelationship,
+                GuardianContactNumber = gr.GuardianContactNumber,
+                GuardianEmail = gr.GuardianEmail,
+                DateOfBirth = gr.DateOfBirth,
+                Age = gr.Age,
+                Gender = gr.Gender,
+                Height = gr.Height,
+                Weight = gr.Weight,
+                FoodFrequency = gr.FoodFrequency,
+                Consanguinity = gr.Consanguinity,
+                ParentsOccupation = gr.ParentsOccupation,
+                DietType = gr.DietType,
+                PlantBasedProtein = gr.PlantBasedProtein,
+                AnimalBasedProtein = gr.AnimalBasedProtein,
+                Activity = gr.Activity,
+                SleepDuration = gr.SleepDuration,
+                SleepQuality = gr.SleepQuality,
+                ScreenTime = gr.ScreenTime,
+                FoodTiming = gr.FoodTiming,
+                Fruits = gr.Fruits,
+                Vegetables = gr.Vegetables,
+                FamilyType = gr.FamilyType,
+                Siblings = gr.Siblings,
+                Vaccination = gr.Vaccination,
+                NatureAccess = gr.NatureAccess,
+                PollutionAir = gr.PollutionAir,
+                PollutionNoise = gr.PollutionNoise,
+                PollutionWater = gr.PollutionWater,
+                PassiveSmoking = gr.PassiveSmoking,
+                TravelTime = gr.TravelTime,
+                CreatedBy = gr.CreatedBy,
+                UpdatedBy = gr.UpdatedBy,
+                TenantId = gr.TenantId,
+                IsDeleted = gr.IsDeleted,
+                IsDraft = gr.IsDraft,
+                CreatedOn = gr.CreatedOn,
+                UpdatedOn = gr.UpdatedOn
+            }).ToList();
+        }
+
+        // ------------------------------------------------------------
         // Get All Genetic Registrations by Created By (logged-in user)
         // ------------------------------------------------------------
         public List<GeneticRegistrationResponseVM> GetAllUserSubmissions(int userId, bool includeDeleted = false)
