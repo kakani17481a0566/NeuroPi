@@ -48,5 +48,16 @@ namespace SchoolManagement.Controllers
             }
             return new ResponseResult<GeneticRegistrationResponseVM>(HttpStatusCode.NoContent, null, "No registration found for this user");
         }
+
+        [HttpGet("user/{userId}/all")]
+        public ResponseResult<List<GeneticRegistrationResponseVM>> GetAllUserSubmissions(int userId)
+        {
+            var result = _geneticRegistrationService.GetAllUserSubmissions(userId);
+            if (result != null && result.Any())
+            {
+                return new ResponseResult<List<GeneticRegistrationResponseVM>>(HttpStatusCode.OK, result, $"Retrieved {result.Count} submission(s) successfully");
+            }
+            return new ResponseResult<List<GeneticRegistrationResponseVM>>(HttpStatusCode.NoContent, new List<GeneticRegistrationResponseVM>(), "No submissions found for this user");
+        }
     }
 }
