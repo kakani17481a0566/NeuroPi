@@ -506,6 +506,48 @@ namespace SchoolManagement.Services.Implementation
         }
 
         // ------------------------------------------------------------
+        // Get Dashboard Stats 
+        // ------------------------------------------------------------
+        public GeneticDashboardStatsVM GetDashboardStats()
+        {
+            var query = _context.GeneticRegistrations.AsNoTracking();
+
+            // Aggregates
+            var total = query.Count();
+            var deleted = query.Count(r => r.IsDeleted);
+            var drafts = query.Count(r => r.IsDraft && !r.IsDeleted);
+            var completed = query.Count(r => !r.IsDraft && !r.IsDeleted);
+
+            // Monthly Trends (Last 12 months for example, or all time)
+            // Grouping by Month/Year.
+            // Note: EF Core GroupBy might be tricky depending on provider, switching to client eval for small datasets is okay
+            // but for scalability, better to select needed fields first.
+            
+            var monthlyData = query
+                .Select(r => new { r.CreatedOn, r.IsDraft, r.IsDeleted })
+                .ToList()
+                .GroupBy(r => new { r.CreatedOn.Year, r.CreatedOn.Month })
+                .OrderBy(g => g.Key.Year).ThenBy(g => g.Key.Month)
+                .Select(g => new MonthlyStatVM
+                {
+                    Month = new DateTime(g.Key.Year, g.Key.Month, 1).ToString("MMM yyyy"),
+                    Total = g.Count(),
+                    Completed = g.Count(x => !x.IsDraft && !x.IsDeleted),
+                    Drafts = g.Count(x => x.IsDraft && !x.IsDeleted)
+                })
+                .ToList();
+
+            return new GeneticDashboardStatsVM
+            {
+                TotalRegistrations = total,
+                DeletedRegistrations = deleted,
+                DraftRegistrations = drafts,
+                CompletedRegistrations = completed,
+                MonthlyStats = monthlyData
+            };
+        }
+
+        // ------------------------------------------------------------
         // Helper: Safe substring to avoid exceptions
         // ------------------------------------------------------------
         private static string SafeSubstring(string input, int length)

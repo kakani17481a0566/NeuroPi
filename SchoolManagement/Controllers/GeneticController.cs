@@ -83,5 +83,12 @@ namespace SchoolManagement.Controllers
             }
             return new ResponseResult<string>(HttpStatusCode.BadRequest, null, "Failed to delete submission. Either submission not found or you don't have permission.");
         }
+
+        [HttpGet("dashboard-stats")]
+        public ResponseResult<GeneticDashboardStatsVM> GetDashboardStats()
+        {
+            var result = _geneticRegistrationService.GetDashboardStats();
+            return new ResponseResult<GeneticDashboardStatsVM>(HttpStatusCode.OK, result, "Dashboard stats retrieved successfully");
+        }
     }
 }

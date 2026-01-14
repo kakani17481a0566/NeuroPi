@@ -15,5 +15,7 @@ namespace SchoolManagement.Services.Interface
         List<GeneticRegistrationResponseVM> GetAllUserSubmissions(int userId, bool includeDeleted = false);
 
         bool DeleteSubmission(string registrationNumber, int userId);
+
+        GeneticDashboardStatsVM GetDashboardStats();
     }
 }
