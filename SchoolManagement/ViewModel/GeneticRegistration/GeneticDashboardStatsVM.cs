@@ -10,6 +10,8 @@ namespace SchoolManagement.ViewModel.GeneticRegistration
         public int DraftRegistrations { get; set; }
         public int DeletedRegistrations { get; set; }
 
+        public List<MonthlyStatVM> MonthlyStats { get; set; }
+        public List<BranchStatVM> TopBranches { get; set; }
         public List<LocationStatVM> TopLocations { get; set; }
 
         public List<GenderStatVM> GenderStats { get; set; }
