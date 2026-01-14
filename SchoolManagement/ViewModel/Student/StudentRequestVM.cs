@@ -9,6 +9,14 @@
         public int CreatedBy { get; set; }
         public int UpdatedBy { get; set; }
 
+        // Added for Profile Update
+        public DateTime? DateOfBirth { get; set; }
+        public string? Gender { get; set; }
+        public string? BloodGroup { get; set; }
+        public string? AdmissionNumber { get; set; }
+        public string? AdmissionGrade { get; set; }
+        public DateTime? DateOfJoining { get; set; }
+
         public Model.MStudent ToModel()
         {
             return new Model.MStudent

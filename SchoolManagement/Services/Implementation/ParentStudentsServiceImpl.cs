@@ -253,5 +253,44 @@ namespace SchoolManagement.Services.Implementation
             return response.ToList();
         }
 
+        public bool UpdateProfile(ParentProfileUpdateVM request)
+        {
+            // Find parent and include User to update user details
+            var parent = _db.Parents
+                .Include(p => p.User)
+                .FirstOrDefault(p => p.UserId == request.UserId && p.TenantId == request.TenantId && !p.IsDeleted);
+
+            if (parent == null || parent.User == null) return false;
+
+            var user = parent.User;
+
+            // Update User fields
+            user.FirstName = request.FirstName;
+            user.LastName = request.LastName;
+            user.Email = request.Email;
+            user.MobileNumber = request.MobileNumber;
+            
+            // Fix: Convert DateTime? to DateOnly?
+            user.DateOfBirth = request.DateOfBirth.HasValue ? DateOnly.FromDateTime(request.DateOfBirth.Value) : null;
+            user.WeddingAnniversaryDate = request.WeddingAnniversaryDate.HasValue ? DateOnly.FromDateTime(request.WeddingAnniversaryDate.Value) : null;
+            
+            user.SpouseName = request.SpouseName;
+
+            // Fix: MUser does not have City, State, Pincode. Merge into Address.
+            var addressParts = new List<string>();
+            if (!string.IsNullOrWhiteSpace(request.Address)) addressParts.Add(request.Address);
+            if (!string.IsNullOrWhiteSpace(request.City)) addressParts.Add(request.City);
+            if (!string.IsNullOrWhiteSpace(request.State)) addressParts.Add(request.State);
+            if (!string.IsNullOrWhiteSpace(request.Pincode)) addressParts.Add(request.Pincode);
+            
+            user.Address = string.Join(", ", addressParts);
+            
+            user.UpdatedBy = request.UpdatedBy;
+            user.UpdatedOn = System.DateTime.UtcNow;
+
+            _db.SaveChanges();
+            return true;
+        }
+
     }
 }          

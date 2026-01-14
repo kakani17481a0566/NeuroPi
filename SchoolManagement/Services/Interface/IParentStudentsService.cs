@@ -20,8 +20,9 @@ namespace SchoolManagement.Services.Interface
 
         List<ParentWithStudentsResponseVM> GetAllParentsWithStudentsByTenantIdAndBranchIdAndCourseId(int tenantId, int courseId, int branchId);
 
-
-
         CourseTeacherVM GetParentDetails(int userId, int tenantId);
+
+        // New method for full profile update
+        bool UpdateProfile(ParentProfileUpdateVM request);
     }
 }
