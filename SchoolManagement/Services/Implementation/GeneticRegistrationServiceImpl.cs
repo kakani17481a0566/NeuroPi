@@ -537,13 +537,59 @@ namespace SchoolManagement.Services.Implementation
                 })
                 .ToList();
 
+            // Top Branches
+            var topBranches = query
+                .Where(r => !r.IsDeleted && !r.IsDraft && !string.IsNullOrEmpty(r.Branch))
+                .GroupBy(r => r.Branch)
+                .Select(g => new { Name = g.Key, Count = g.Count() })
+                .OrderByDescending(x => x.Count)
+                .Take(5)
+                .ToList()
+                .Select(x => new BranchStatVM { BranchName = x.Name, Count = x.Count })
+                .ToList();
+
+            // Top Locations (State)
+            var topLocations = query
+                .Where(r => !r.IsDeleted && !r.IsDraft && !string.IsNullOrEmpty(r.State))
+                .GroupBy(r => r.State)
+                .Select(g => new { Name = g.Key, Count = g.Count() })
+                .OrderByDescending(x => x.Count)
+                .Take(5)
+                .ToList()
+                .Select(x => new LocationStatVM { Location = x.Name, Count = x.Count })
+                .ToList();
+
+            // Gender Stats
+            var genderStats = query
+                .Where(r => !r.IsDeleted && !r.IsDraft && !string.IsNullOrEmpty(r.Gender))
+                .GroupBy(r => r.Gender)
+                .Select(g => new { Gender = g.Key, Count = g.Count() })
+                .ToList()
+                .Select(x => new GenderStatVM { Gender = x.Gender, Count = x.Count })
+                .ToList();
+
+            // Time-based Stats
+            var today = DateTime.UtcNow.Date;
+            var startOfWeek = today.AddDays(-(int)today.DayOfWeek);
+            var startOfMonth = new DateTime(today.Year, today.Month, 1);
+
+            var countToday = query.Count(r => r.CreatedOn >= today);
+            var countWeek = query.Count(r => r.CreatedOn >= startOfWeek);
+            var countMonth = query.Count(r => r.CreatedOn >= startOfMonth);
+
             return new GeneticDashboardStatsVM
             {
                 TotalRegistrations = total,
                 DeletedRegistrations = deleted,
                 DraftRegistrations = drafts,
                 CompletedRegistrations = completed,
-                MonthlyStats = monthlyData
+                MonthlyStats = monthlyData,
+                TopBranches = topBranches,
+                TopLocations = topLocations,
+                GenderStats = genderStats,
+                RegistrationsToday = countToday,
+                RegistrationsThisWeek = countWeek,
+                RegistrationsThisMonth = countMonth
             };
         }
 
