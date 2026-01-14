@@ -95,5 +95,21 @@ namespace NeuroPi.UserManagment.Controllers
             }
             return new ResponseResult<PermissionResponseVM>(HttpStatusCode.NotFound, null, "Permissions not found ");
         }
+        [HttpGet("/getrolePermissions")]
+        public string GetRolePermissions()
+        {
+            string result =_permissionService.GetByPermissionId(1);
+            //string result= """
+            //     {
+            //         id: "dashboards.home",
+            //         path: path(ROOT_DASHBOARDS, "/week"),
+            //         type: NAV_TYPE_ITEM,
+            //         title: "Week Plan",
+            //         transKey: "nav.dashboards.week",
+            //         Icon: CalendarDaysIcon,
+            //       }
+            //    """;
+            return result;
+        }
     }
 }

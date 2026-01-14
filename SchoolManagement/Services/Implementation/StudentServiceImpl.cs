@@ -666,6 +666,10 @@ namespace SchoolManagement.Services.Implementation
                     };
                 }
             }
+            catch (InvalidOperationException)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
                 throw new Exception($"Registration failed: {ex.InnerException?.Message ?? ex.Message}", ex);

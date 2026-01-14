@@ -19,5 +19,6 @@ namespace NeuroPi.UserManagment.Services.Interface
         List<PermissionResponseVM> GetAllPermissionsByTenantId(int tenantId);
 
         PermissionResponseVM GetByIdAndTenantId(int id,int tenantId);
+        string GetByPermissionId(int id);
     }
 }

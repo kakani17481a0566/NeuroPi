@@ -67,6 +67,21 @@ namespace NeuroPi.UserManagment.Services.Implementation
             
         }
 
+        public   string GetByPermissionId(int id)
+        {
+            var response= _context.Permissions.Where(p => !p.IsDeleted && p.TenantId==id).ToList();
+            string result = "";
+            if (response != null)
+            {
+                foreach(var s in response)
+                {
+                    result += s.Description+",";
+                }
+                return result;
+            }
+            return null;
+        }
+
         public List<PermissionResponseVM> GetPermissions()
         {
             var result = _context.Permissions.Where(p => !p.IsDeleted).ToList();
