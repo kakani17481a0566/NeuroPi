@@ -4,15 +4,12 @@ namespace SchoolManagement.Services.Interface
 {
     public interface IItemHeaderService
     {
-        public List<ItemHeaderResponseVM> GetAll();
-         ItemHeaderVM GetById(int id);
-         ItemHeaderVM CreateItemHeader(ItemHeaderRequestVM request);
-         ItemHeaderVM UpdateItemHeader(int id, ItemHeaderRequestVM request);
-         
-        ItemHeaderVM DeleteItemHeader(int id);
+        List<ItemHeaderResponseVM> GetAll();
+        ItemHeaderVM GetById(int id);
+        ItemHeaderResponseVM CreateItemHeader(ItemHeaderRequestVM request); // Changed return to ResponseVM
+        ItemHeaderResponseVM UpdateItemHeader(int id, ItemHeaderRequestVM request); // Changed return to ResponseVM
+        bool DeleteItemHeader(int id); // Changed return to bool
         List<ItemHeaderResponseVM> GetAllByTenantId(int tenantId); 
         ItemHeaderVM GetByIdAndTenantId(int id, int tenantId);
-
-
     }
 }
