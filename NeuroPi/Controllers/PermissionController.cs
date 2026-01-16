@@ -97,10 +97,10 @@ namespace NeuroPi.UserManagment.Controllers
             return new ResponseResult<PermissionResponseVM>(HttpStatusCode.NotFound, null, "Permissions not found ");
         }
         [HttpGet("/getrolePermissions")]
-        public List<PermissionDescriptionVM>  GetRolePermissions( int roleId)
+        public ResponseResult<List<PermissionDescriptionVM>> GetRolePermissions( int roleId)
         {
             List<PermissionDescriptionVM> result =_permissionService.GetByPermissionId(roleId);
-             return result;
+            return new ResponseResult<List<PermissionDescriptionVM>>(HttpStatusCode.OK, result, "Permissions fetched successfully by using tenant id");
         }
     }
 }
