@@ -13,5 +13,7 @@ namespace SchoolManagement.Services.Interface
         ResponseResult<int> AddPayment(AddPaymentRequest request);
         ResponseResult<int> AddBill(AddBillRequest request);
 
+        ResponseResult<FeeStatsVM> GetBranchFeeStats(int tenantId, int branchId);
+
     }
 }

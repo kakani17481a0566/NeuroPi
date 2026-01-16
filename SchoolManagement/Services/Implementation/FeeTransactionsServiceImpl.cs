@@ -440,5 +440,40 @@ namespace SchoolManagement.Services.Implementation
                 );
             }
         }
+
+        public ResponseResult<FeeStatsVM> GetBranchFeeStats(int tenantId, int branchId)
+        {
+            try
+            {
+                var transactions = (from ft in _db.FeeTransactions
+                                    join s in _db.Students on ft.StudentId equals s.Id
+                                    where ft.TenantId == tenantId
+                                       && s.BranchId == branchId
+                                       && !ft.IsDeleted
+                                    select new { ft.Debit, ft.Credit });
+
+                var stats = new FeeStatsVM
+                {
+                    TotalFee = transactions.Sum(t => t.Debit),
+                    TotalPaid = transactions.Sum(t => t.Credit)
+                };
+
+                stats.PendingFee = stats.TotalFee - stats.TotalPaid;
+
+                return new ResponseResult<FeeStatsVM>(
+                    HttpStatusCode.OK,
+                    stats,
+                    "Branch fee stats retrieved successfully."
+                );
+            }
+            catch (Exception ex)
+            {
+                return new ResponseResult<FeeStatsVM>(
+                    HttpStatusCode.InternalServerError,
+                    null,
+                    $"Error fetching branch stats: {ex.Message}"
+                );
+            }
+        }
     }
 }
