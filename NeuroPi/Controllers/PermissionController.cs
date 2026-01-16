@@ -1,8 +1,9 @@
-﻿using System.Net;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using NeuroPi.UserManagment.Response;
 using NeuroPi.UserManagment.Services.Interface;
 using NeuroPi.UserManagment.ViewModel.Permissions;
+using NeuroPi.UserManagment.ViewModel.RolePermission;
+using System.Net;
 
 namespace NeuroPi.UserManagment.Controllers
 {
@@ -96,20 +97,10 @@ namespace NeuroPi.UserManagment.Controllers
             return new ResponseResult<PermissionResponseVM>(HttpStatusCode.NotFound, null, "Permissions not found ");
         }
         [HttpGet("/getrolePermissions")]
-        public string GetRolePermissions()
+        public List<PermissionDescriptionVM>  GetRolePermissions( int roleId)
         {
-            string result =_permissionService.GetByPermissionId(1);
-            //string result= """
-            //     {
-            //         id: "dashboards.home",
-            //         path: path(ROOT_DASHBOARDS, "/week"),
-            //         type: NAV_TYPE_ITEM,
-            //         title: "Week Plan",
-            //         transKey: "nav.dashboards.week",
-            //         Icon: CalendarDaysIcon,
-            //       }
-            //    """;
-            return result;
+            List<PermissionDescriptionVM> result =_permissionService.GetByPermissionId(roleId);
+             return result;
         }
     }
 }

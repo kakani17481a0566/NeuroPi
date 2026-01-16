@@ -1,5 +1,6 @@
 ﻿using NeuroPi.UserManagment.Model;
 using NeuroPi.UserManagment.ViewModel.Permissions;
+using NeuroPi.UserManagment.ViewModel.RolePermission;
 
 namespace NeuroPi.UserManagment.Services.Interface
 {
@@ -19,6 +20,6 @@ namespace NeuroPi.UserManagment.Services.Interface
         List<PermissionResponseVM> GetAllPermissionsByTenantId(int tenantId);
 
         PermissionResponseVM GetByIdAndTenantId(int id,int tenantId);
-        string GetByPermissionId(int id);
+        List<PermissionDescriptionVM> GetByPermissionId(int id);
     }
 }

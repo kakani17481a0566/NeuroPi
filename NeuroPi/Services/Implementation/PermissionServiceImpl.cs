@@ -1,7 +1,10 @@
-﻿using NeuroPi.UserManagment.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using NeuroPi.UserManagment.Data;
 using NeuroPi.UserManagment.Model;
 using NeuroPi.UserManagment.Services.Interface;
 using NeuroPi.UserManagment.ViewModel.Permissions;
+using NeuroPi.UserManagment.ViewModel.RolePermission;
+using System.Text.Json;
 
 namespace NeuroPi.UserManagment.Services.Implementation
 {
@@ -67,15 +70,16 @@ namespace NeuroPi.UserManagment.Services.Implementation
             
         }
 
-        public   string GetByPermissionId(int id)
+        public  List<PermissionDescriptionVM> GetByPermissionId(int id)
         {
-            var response= _context.Permissions.Where(p => !p.IsDeleted && p.TenantId==id).ToList();
-            string result = "";
+            var response= _context.RolePermissions.Where(r=>r.RoleId ==id && !r.IsDeleted).Include(r=>r.Permission).ToList();
+            List<PermissionDescriptionVM> result= new List<PermissionDescriptionVM>();
             if (response != null)
             {
                 foreach(var s in response)
                 {
-                    result += s.Description+",";
+                    var details = JsonSerializer.Deserialize<PermissionDescriptionVM>(s.Permission.Description);
+                    result.Add(details);
                 }
                 return result;
             }
