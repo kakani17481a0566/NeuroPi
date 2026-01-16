@@ -144,6 +144,10 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 
 
 
+// News Service
+builder.Services.AddHttpClient();
+builder.Services.AddScoped<INewsService, NewsServiceImpl>();
+
 // EF DbContexts
 builder.Services.AddDbContext<NeuroPiDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
