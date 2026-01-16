@@ -14,6 +14,8 @@ namespace SchoolManagement.Services.Interface
         ResponseResult<int> AddBill(AddBillRequest request);
 
         ResponseResult<FeeStatsVM> GetBranchFeeStats(int tenantId, int branchId);
+        ResponseResult<List<FeeReportTransactionVM>> GetBranchTransactions(int tenantId, int branchId, int limit);
+        ResponseResult<List<FeeHistoryVM>> GetBranchFeeHistory(int tenantId, int branchId);
 
     }
 }

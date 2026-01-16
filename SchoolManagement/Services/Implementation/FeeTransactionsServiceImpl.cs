@@ -238,7 +238,10 @@ namespace SchoolManagement.Services.Implementation
                                     Debit = ft.Debit,
                                     Credit = ft.Credit,
                                     TrxStatus = ft.TrxStatus,
-                                    PaymentType = m.Name ?? "Annual"
+                                    // Removed duplicate assignment lines
+
+                                    PaymentType = m.Name ?? "Annual",
+                                    StudentName = s.Name // Added
                                 }).ToList();
 
             if (!transactions.Any())
@@ -319,7 +322,10 @@ namespace SchoolManagement.Services.Implementation
                                     Debit = ft.Debit,
                                     Credit = ft.Credit,
                                     TrxStatus = ft.TrxStatus,
-                                    PaymentType = m.Name ?? "Annual"
+                                    // Removed duplicate assignment lines
+
+                                    PaymentType = m.Name ?? "Annual",
+                                    StudentName = s.Name // Added
                                 })
                                 .Take(limit)
                                 .ToList();
@@ -474,6 +480,97 @@ namespace SchoolManagement.Services.Implementation
                     $"Error fetching branch stats: {ex.Message}"
                 );
             }
+        }
+
+        public ResponseResult<List<FeeReportTransactionVM>> GetBranchTransactions(int tenantId, int branchId, int limit)
+        {
+            var transactions = (from ft in _db.FeeTransactions
+                                join s in _db.Students on ft.StudentId equals s.Id
+                                join fs in _db.FeeStructures on ft.FeeStructureId equals fs.Id
+                                join fp in _db.FeePackages
+                                      on new { ft.FeeStructureId, s.CourseId, ft.TenantId }
+                                   equals new { FeeStructureId = fp.FeeStructureId, fp.CourseId, fp.TenantId }
+                                      into fpJoin
+                                from fp in fpJoin.DefaultIfEmpty()
+                                join m in _db.Masters on fp.PaymentPeriod equals m.Id into mJoin
+                                from m in mJoin.DefaultIfEmpty()
+                                where ft.TenantId == tenantId
+                                   && s.BranchId == branchId
+                                   && !ft.IsDeleted
+                                   && ft.TrxDate <= DateTime.UtcNow
+                                orderby ft.TrxDate descending
+                                select new FeeReportTransactionVM
+                                {
+                                    Id = ft.Id,
+                                    TenantId = ft.TenantId,
+                                    FeeStructureId = ft.FeeStructureId,
+                                    FeeStructureName = fs.Name,
+                                    StudentId = ft.StudentId,
+                                    TrxDate = ft.TrxDate,
+                                    TrxMonth = ft.TrxDate.ToString("MMM"),
+                                    TrxYear = ft.TrxDate.Year.ToString(),
+                                    TrxType = ft.TrxType,
+                                    TrxName = ft.TrxName,
+                                    Debit = ft.Debit,
+                                    Credit = ft.Credit,
+                                    TrxStatus = ft.TrxStatus,
+                                    PaymentType = m.Name ?? "Annual",
+                                    StudentName = s.Name
+                                })
+                                .Take(limit)
+                                .ToList();
+
+            return new ResponseResult<List<FeeReportTransactionVM>>(
+                HttpStatusCode.OK,
+                transactions,
+                $"Retrieved {transactions.Count} branch transactions."
+            );
+        }
+
+        public ResponseResult<List<FeeHistoryVM>> GetBranchFeeHistory(int tenantId, int branchId)
+        {
+            var today = DateTime.UtcNow;
+            var startOfYear = new DateTime(today.Year, 1, 1);
+
+            // Fetch transactions for the current year
+            var transactions = (from ft in _db.FeeTransactions
+                                join s in _db.Students on ft.StudentId equals s.Id
+                                where ft.TenantId == tenantId
+                                   && s.BranchId == branchId
+                                   && !ft.IsDeleted
+                                   && ft.TrxDate >= startOfYear
+                                select new { ft.TrxDate, ft.Credit, ft.Debit })
+                                .ToList();
+
+            // Aggregate by month
+            var aggregated = transactions
+                .GroupBy(t => t.TrxDate.Month)
+                .Select(g => new
+                {
+                    Month = g.Key,
+                    Collected = g.Sum(x => x.Credit),
+                    Generated = g.Sum(x => x.Debit)
+                })
+                .OrderBy(x => x.Month)
+                .ToList();
+
+            var result = new List<FeeHistoryVM>();
+            for (int i = 1; i <= 12; i++)
+            {
+                var monthData = aggregated.FirstOrDefault(x => x.Month == i);
+                result.Add(new FeeHistoryVM
+                {
+                    Month = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(i),
+                    Collected = monthData?.Collected ?? 0,
+                    Generated = monthData?.Generated ?? 0
+                });
+            }
+
+            return new ResponseResult<List<FeeHistoryVM>>(
+                HttpStatusCode.OK,
+                result,
+                "Branch fee history retrieved successfully."
+            );
         }
     }
 }

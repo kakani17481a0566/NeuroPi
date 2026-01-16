@@ -45,6 +45,21 @@ namespace SchoolManagement.Controllers
             return _feeTransactionsService.GetBranchFeeStats(tenantId, branchId);
         }
 
+        [HttpGet("branch-transactions/{tenantId:int}/{branchId:int}")]
+        public ResponseResult<List<FeeReportTransactionVM>> GetBranchTransactions(
+            int tenantId, 
+            int branchId, 
+            [FromQuery] int limit = 5)
+        {
+            return _feeTransactionsService.GetBranchTransactions(tenantId, branchId, limit);
+        }
+
+        [HttpGet("branch-history/{tenantId:int}/{branchId:int}")]
+        public ResponseResult<List<FeeHistoryVM>> GetBranchFeeHistory(int tenantId, int branchId)
+        {
+            return _feeTransactionsService.GetBranchFeeHistory(tenantId, branchId);
+        }
+
         [HttpPost("add-payment")]
         public ResponseResult<int> AddPayment([FromBody] AddPaymentRequest request)
         {

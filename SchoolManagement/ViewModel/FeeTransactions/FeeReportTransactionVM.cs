@@ -7,6 +7,7 @@
         public int FeeStructureId { get; set; }
         public string FeeStructureName { get; set; } = string.Empty; // joined from fee_structure
         public int StudentId { get; set; }
+        public string StudentName { get; set; } = string.Empty;
         public DateTime TrxDate { get; set; }
         public string TrxMonth { get; set; } = string.Empty; // e.g. "Sep"
         public string TrxYear { get; set; } = string.Empty;  // e.g. "2025"
