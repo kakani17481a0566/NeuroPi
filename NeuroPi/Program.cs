@@ -134,7 +134,7 @@ builder.Services.AddScoped<IUserDepartmentService, UserDepartmentServiceImpl>();
 builder.Services.AddScoped<IConfigService, ConfigServiceImpl>();
 builder.Services.AddScoped<IUserRolesService, UserRolesServiceImpl>();
 builder.Services.AddScoped<IUserService, UserServiceImpl>();
-
+builder.Services.AddHttpClient<INewsArticle, NewsArticleServiceImpl>();
 // -------------------------------------------
 // Build App
 // -------------------------------------------
@@ -143,8 +143,8 @@ var app = builder.Build();
 // -------------------------------------------
 // Middleware Pipeline
 // -------------------------------------------
-    app.UseSwagger();
-    app.UseSwaggerUI();
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseCors("AllowAll");
 app.UseHttpsRedirection();
