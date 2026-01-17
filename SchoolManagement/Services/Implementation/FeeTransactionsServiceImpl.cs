@@ -625,5 +625,73 @@ namespace SchoolManagement.Services.Implementation
                 return new ResponseResult<List<StudentListVM>>(HttpStatusCode.InternalServerError, null, $"Error fetching completed payments: {ex.Message}");
             }
         }
+
+        public ResponseResult<List<StudentPendingFeeVM>> GetPendingPayments(int tenantId, int branchId)
+        {
+            try
+            {
+                // 1. Fetch raw transaction data
+                var studentTransactions = (from ft in _db.FeeTransactions
+                                           join s in _db.Students on ft.StudentId equals s.Id
+                                           where ft.TenantId == tenantId && s.BranchId == branchId && !ft.IsDeleted
+                                           select new { ft.StudentId, ft.Debit, ft.Credit })
+                                           .ToList();
+
+                // 2. Group and calculate pending amounts in memory
+                var pendingStudents = studentTransactions
+                    .GroupBy(x => x.StudentId)
+                    .Select(g => new
+                    {
+                        StudentId = g.Key,
+                        TotalFee = g.Sum(x => x.Debit),
+                        TotalPaid = g.Sum(x => x.Credit)
+                    })
+                    .Select(x => new
+                    {
+                        x.StudentId,
+                        x.TotalFee,
+                        PendingAmount = x.TotalFee - x.TotalPaid
+                    })
+                    .Where(x => x.PendingAmount > 0 && x.TotalFee > 0)
+                    .ToList();
+
+                if (!pendingStudents.Any())
+                {
+                    return new ResponseResult<List<StudentPendingFeeVM>>(HttpStatusCode.OK, new List<StudentPendingFeeVM>(), "No students found with pending payments.");
+                }
+
+                // 3. Fetch Student Details
+                var pendingStudentIds = pendingStudents.Select(p => p.StudentId).ToList();
+                
+                var students = _db.Students
+                    .Include(s => s.Course)
+                    .Where(s => pendingStudentIds.Contains(s.Id))
+                    .Select(s => new { s.Id, s.Name, s.LastName, CourseName = s.Course.Name })
+                    .ToList();
+
+                // 4. Merge details with calculated pending amount
+                var result = pendingStudents
+                    .Join(students,
+                          p => p.StudentId,
+                          s => s.Id,
+                          (p, s) => new StudentPendingFeeVM
+                          {
+                              StudentId = s.Id,
+                              StudentName = $"{s.Name} {s.LastName}".Trim(),
+                              CourseName = s.CourseName,
+                              TotalFee = p.TotalFee,
+                              PendingAmount = p.PendingAmount,
+                              PendingPercentage = (double)((p.PendingAmount / p.TotalFee) * 100)
+                          })
+                    .OrderByDescending(x => x.PendingPercentage)
+                    .ToList();
+
+                return new ResponseResult<List<StudentPendingFeeVM>>(HttpStatusCode.OK, result, $"Found {result.Count} students with pending payments.");
+            }
+            catch (Exception ex)
+            {
+                return new ResponseResult<List<StudentPendingFeeVM>>(HttpStatusCode.InternalServerError, null, $"Error fetching pending payments: {ex.Message}");
+            }
+        }
     }
 }

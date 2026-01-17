@@ -61,10 +61,16 @@ namespace SchoolManagement.Controllers
             return _feeTransactionsService.GetBranchFeeHistory(tenantId, branchId);
         }
 
-        [HttpGet("completed-payments/{tenantId:int}/{branchId:int}")]
+        [HttpGet("completed-payments/{tenantId}/{branchId}")]
         public ResponseResult<List<StudentListVM>> GetCompletedPayments(int tenantId, int branchId)
         {
             return _feeTransactionsService.GetCompletedPayments(tenantId, branchId);
+        }
+
+        [HttpGet("pending-payments/{tenantId}/{branchId}")]
+        public ResponseResult<List<StudentPendingFeeVM>> GetPendingPayments(int tenantId, int branchId)
+        {
+            return _feeTransactionsService.GetPendingPayments(tenantId, branchId);
         }
 
         [HttpPost("add-payment")]

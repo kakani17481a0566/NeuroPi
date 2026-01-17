@@ -18,6 +18,7 @@ namespace SchoolManagement.Services.Interface
         ResponseResult<List<FeeReportTransactionVM>> GetBranchTransactions(int tenantId, int branchId, int limit);
         ResponseResult<List<FeeHistoryVM>> GetBranchFeeHistory(int tenantId, int branchId);
         ResponseResult<List<StudentListVM>> GetCompletedPayments(int tenantId, int branchId);
+        ResponseResult<List<StudentPendingFeeVM>> GetPendingPayments(int tenantId, int branchId);
 
     }
 }
