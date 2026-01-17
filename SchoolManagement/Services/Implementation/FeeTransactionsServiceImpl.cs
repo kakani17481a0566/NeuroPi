@@ -577,27 +577,46 @@ namespace SchoolManagement.Services.Implementation
         {
             try
             {
-                var completedStudents = (from ft in _db.FeeTransactions
-                                         join s in _db.Students on ft.StudentId equals s.Id
-                                         join c in _db.Courses on s.CourseId equals c.Id
-                                         where ft.TenantId == tenantId && s.BranchId == branchId && !ft.IsDeleted
-                                         group ft by new { s.Id, s.Name, s.LastName, CourseName = c.Name } into g
-                                         let totalDebit = g.Sum(x => x.Debit)
-                                         let totalCredit = g.Sum(x => x.Credit)
-                                         where totalDebit > 0 && (totalDebit - totalCredit) <= 0
-                                         select new StudentListVM
-                                         {
-                                             Id = g.Key.Id,
-                                             FirstName = g.Key.Name,
-                                             LastName = g.Key.LastName,
-                                             CourseName = g.Key.CourseName,
-                                             BranchName = ""
-                                         }).ToList();
+                // 1. Fetch all transactions for this branch to calculate balances
+                // Executing this part on DB
+                var studentTransactions = (from ft in _db.FeeTransactions
+                                           join s in _db.Students on ft.StudentId equals s.Id
+                                           where ft.TenantId == tenantId && s.BranchId == branchId && !ft.IsDeleted
+                                           select new { ft.StudentId, ft.Debit, ft.Credit })
+                                           .ToList();
 
-                if (!completedStudents.Any())
+                // 2. Perform Grouping and Filtering in Memory (Client-side)
+                // This avoids EF Core translation exceptions for complex GroupBy queries
+                var paidStudentIds = studentTransactions
+                    .GroupBy(x => x.StudentId)
+                    .Select(g => new
+                    {
+                        StudentId = g.Key,
+                        TotalDebit = g.Sum(x => x.Debit),
+                        TotalCredit = g.Sum(x => x.Credit)
+                    })
+                    .Where(x => x.TotalDebit > 0 && (x.TotalDebit - x.TotalCredit) <= 0)
+                    .Select(x => x.StudentId)
+                    .ToList();
+
+                if (!paidStudentIds.Any())
                 {
                     return new ResponseResult<List<StudentListVM>>(HttpStatusCode.OK, new List<StudentListVM>(), "No students found with completed payments.");
                 }
+
+                // 3. Fetch Student Details for the identified IDs
+                var completedStudents = _db.Students
+                    .Include(s => s.Course)
+                    .Where(s => paidStudentIds.Contains(s.Id))
+                    .Select(s => new StudentListVM
+                    {
+                        Id = s.Id,
+                        FirstName = s.Name,
+                        LastName = s.LastName ?? "",
+                        CourseName = s.Course.Name,
+                        BranchName = ""
+                    })
+                    .ToList();
 
                 return new ResponseResult<List<StudentListVM>>(HttpStatusCode.OK, completedStudents, $"Found {completedStudents.Count} students with completed payments.");
             }
