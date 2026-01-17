@@ -26,5 +26,8 @@ namespace SchoolManagement.Model
 
         [ForeignKey(nameof(TenantId))]
         public virtual MTenant Tenant { get; set; }
+
+        [ForeignKey(nameof(AssessmentId))]
+        public virtual MAssessment Assessment { get; set; }
     }
 }
