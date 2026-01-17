@@ -693,5 +693,76 @@ namespace SchoolManagement.Services.Implementation
                 return new ResponseResult<List<StudentPendingFeeVM>>(HttpStatusCode.InternalServerError, null, $"Error fetching pending payments: {ex.Message}");
             }
         }
+        public ResponseResult<FeeStatsVM> GetTenantFeeStats(int tenantId)
+        {
+            try
+            {
+                var transactions = (from ft in _db.FeeTransactions
+                                    where ft.TenantId == tenantId && !ft.IsDeleted
+                                    select new { ft.Debit, ft.Credit })
+                                    .ToList();
+
+                var stats = new FeeStatsVM
+                {
+                    TotalFee = transactions.Sum(t => t.Debit),
+                    TotalPaid = transactions.Sum(t => t.Credit)
+                };
+                stats.PendingFee = stats.TotalFee - stats.TotalPaid;
+
+                return new ResponseResult<FeeStatsVM>(HttpStatusCode.OK, stats, "Tenant fee stats retrieved successfully.");
+            }
+            catch (Exception ex)
+            {
+                return new ResponseResult<FeeStatsVM>(HttpStatusCode.InternalServerError, null, $"Error fetching tenant stats: {ex.Message}");
+            }
+        }
+
+        public ResponseResult<List<BranchFeeStatsVM>> GetBranchWiseFeeStats(int tenantId)
+        {
+            try
+            {
+                // 1. Get stats grouped by branch from transactions
+                var branchStats = (from ft in _db.FeeTransactions
+                                   join s in _db.Students on ft.StudentId equals s.Id
+                                   where ft.TenantId == tenantId && !ft.IsDeleted
+                                   select new { s.BranchId, ft.Debit, ft.Credit })
+                                  .GroupBy(x => x.BranchId)
+                                  .Select(g => new
+                                  {
+                                      BranchId = g.Key,
+                                      TotalFee = g.Sum(x => x.Debit),
+                                      TotalPaid = g.Sum(x => x.Credit)
+                                  })
+                                  .ToList();
+
+                // 2. Get Branch Names
+                var branchIds = branchStats.Select(b => b.BranchId).ToList();
+                var branches = _db.Branches
+                    .Where(b => branchIds.Contains(b.Id))
+                    .Select(b => new { b.Id, b.Name })
+                    .ToList();
+
+                // 3. Join and project
+                var result = branchStats.Join(branches,
+                    stat => stat.BranchId,
+                    branch => branch.Id,
+                    (stat, branch) => new BranchFeeStatsVM
+                    {
+                        BranchId = stat.BranchId,
+                        BranchName = branch.Name,
+                        TotalFee = stat.TotalFee,
+                        TotalPaid = stat.TotalPaid,
+                        PendingFee = stat.TotalFee - stat.TotalPaid
+                    })
+                    .OrderBy(x => x.BranchName)
+                    .ToList();
+
+                return new ResponseResult<List<BranchFeeStatsVM>>(HttpStatusCode.OK, result, $"Retrieved stats for {result.Count} branches.");
+            }
+            catch (Exception ex)
+            {
+                return new ResponseResult<List<BranchFeeStatsVM>>(HttpStatusCode.InternalServerError, null, $"Error fetching branch-wise stats: {ex.Message}");
+            }
+        }
     }
 }

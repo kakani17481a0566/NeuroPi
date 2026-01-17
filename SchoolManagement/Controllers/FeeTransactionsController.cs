@@ -84,5 +84,17 @@ namespace SchoolManagement.Controllers
         {
             return _feeTransactionsService.AddBill(request);
         }
+
+        [HttpGet("tenant-stats/{tenantId:int}")]
+        public ResponseResult<FeeStatsVM> GetTenantFeeStats(int tenantId)
+        {
+            return _feeTransactionsService.GetTenantFeeStats(tenantId);
+        }
+
+        [HttpGet("branch-wise-stats/{tenantId:int}")]
+        public ResponseResult<List<BranchFeeStatsVM>> GetBranchWiseFeeStats(int tenantId)
+        {
+            return _feeTransactionsService.GetBranchWiseFeeStats(tenantId);
+        }
     }
 }
