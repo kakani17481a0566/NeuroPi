@@ -2,6 +2,7 @@
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.FeeTransactions;
 using SchoolManagement.Response;
+using SchoolManagement.ViewModel.Student;
 
 namespace SchoolManagement.Controllers
 {
@@ -58,6 +59,12 @@ namespace SchoolManagement.Controllers
         public ResponseResult<List<FeeHistoryVM>> GetBranchFeeHistory(int tenantId, int branchId)
         {
             return _feeTransactionsService.GetBranchFeeHistory(tenantId, branchId);
+        }
+
+        [HttpGet("completed-payments/{tenantId:int}/{branchId:int}")]
+        public ResponseResult<List<StudentListVM>> GetCompletedPayments(int tenantId, int branchId)
+        {
+            return _feeTransactionsService.GetCompletedPayments(tenantId, branchId);
         }
 
         [HttpPost("add-payment")]

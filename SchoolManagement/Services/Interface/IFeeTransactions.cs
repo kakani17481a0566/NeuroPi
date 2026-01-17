@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using SchoolManagement.Response;
 using SchoolManagement.ViewModel.FeeTransactions;
+using SchoolManagement.ViewModel.Student;
 
 namespace SchoolManagement.Services.Interface
 {
@@ -16,6 +17,7 @@ namespace SchoolManagement.Services.Interface
         ResponseResult<FeeStatsVM> GetBranchFeeStats(int tenantId, int branchId);
         ResponseResult<List<FeeReportTransactionVM>> GetBranchTransactions(int tenantId, int branchId, int limit);
         ResponseResult<List<FeeHistoryVM>> GetBranchFeeHistory(int tenantId, int branchId);
+        ResponseResult<List<StudentListVM>> GetCompletedPayments(int tenantId, int branchId);
 
     }
 }

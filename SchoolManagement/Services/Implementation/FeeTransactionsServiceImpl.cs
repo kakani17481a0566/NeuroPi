@@ -4,6 +4,7 @@ using SchoolManagement.Model;
 using SchoolManagement.Response;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.FeeTransactions;
+using SchoolManagement.ViewModel.Student;
 using System.Net;
 
 namespace SchoolManagement.Services.Implementation
@@ -571,6 +572,39 @@ namespace SchoolManagement.Services.Implementation
                 result,
                 "Branch fee history retrieved successfully."
             );
+        }
+        public ResponseResult<List<StudentListVM>> GetCompletedPayments(int tenantId, int branchId)
+        {
+            try
+            {
+                var completedStudents = (from ft in _db.FeeTransactions
+                                         join s in _db.Students on ft.StudentId equals s.Id
+                                         join c in _db.Courses on s.CourseId equals c.Id
+                                         where ft.TenantId == tenantId && s.BranchId == branchId && !ft.IsDeleted
+                                         group ft by new { s.Id, s.Name, s.LastName, CourseName = c.Name } into g
+                                         let totalDebit = g.Sum(x => x.Debit)
+                                         let totalCredit = g.Sum(x => x.Credit)
+                                         where totalDebit > 0 && (totalDebit - totalCredit) <= 0
+                                         select new StudentListVM
+                                         {
+                                             Id = g.Key.Id,
+                                             FirstName = g.Key.Name,
+                                             LastName = g.Key.LastName,
+                                             CourseName = g.Key.CourseName,
+                                             BranchName = ""
+                                         }).ToList();
+
+                if (!completedStudents.Any())
+                {
+                    return new ResponseResult<List<StudentListVM>>(HttpStatusCode.OK, new List<StudentListVM>(), "No students found with completed payments.");
+                }
+
+                return new ResponseResult<List<StudentListVM>>(HttpStatusCode.OK, completedStudents, $"Found {completedStudents.Count} students with completed payments.");
+            }
+            catch (Exception ex)
+            {
+                return new ResponseResult<List<StudentListVM>>(HttpStatusCode.InternalServerError, null, $"Error fetching completed payments: {ex.Message}");
+            }
         }
     }
 }
