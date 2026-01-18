@@ -1,7 +1,9 @@
 using SchoolManagement.Model;
+using NeuroPi.UserManagment.Model;
+using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace SchoolManagement.ViewModel.Roles
+namespace SchoolManagement.ViewModel
 {
     public class RolesRequestVM
     {
@@ -12,14 +14,16 @@ namespace SchoolManagement.ViewModel.Roles
         
         public int CreatedBy { get; set; }
 
-        public static MRoles ToModel(RolesRequestVM request) =>
-            new MRoles
+        public static MRole ToModel(RolesRequestVM vm)
+        {
+            return new MRole
             {
-                Name = request.Name,
-                TenantId = request.TenantId,
-                CreatedBy = request.CreatedBy,
+                Name = vm.Name,
+                TenantId = vm.TenantId,
+                CreatedBy = vm.CreatedBy,
                 CreatedOn = DateTime.UtcNow,
                 IsDeleted = false
             };
+        }
     }
 }

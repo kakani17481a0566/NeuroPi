@@ -16,7 +16,7 @@ namespace SchoolManagement.Data
 
         public DbSet<MTenant> Tenants { get; set; }
         public DbSet<MUser> Users { get; set; }  // Add if missing
-        public DbSet<MRoles> Roles { get; set; }
+        public DbSet<MRole> Roles { get; set; }
 
 
 
