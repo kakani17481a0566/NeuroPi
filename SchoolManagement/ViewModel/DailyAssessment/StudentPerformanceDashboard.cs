@@ -17,6 +17,14 @@
         public decimal? OverallAverageScore { get; set; }
         public decimal? ClassAverageScore { get; set; }
         public decimal? AttendancePercentage { get; set; }
+        
+        // Advanced Insights
+        public int? ClassRank { get; set; }
+        public int? TotalStudents { get; set; }
+        public decimal? ConsistencyScore { get; set; }
+
+        public Dictionary<string, int> GradeDistribution { get; set; } = new();
+
         public int TotalAssessments { get; set; }
     }
 

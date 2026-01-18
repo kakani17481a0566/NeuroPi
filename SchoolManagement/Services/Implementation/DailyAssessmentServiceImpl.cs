@@ -512,7 +512,7 @@ namespace SchoolManagement.Services.Implementation
         {
             var student = _context.Students
                 .Where(s => s.Id == studentId && s.TenantId == tenantId && !s.IsDeleted)
-                .Select(s => new { s.Id, s.Name, s.StudentImageUrl })
+                .Select(s => new { s.Id, s.Name, s.StudentImageUrl, s.CourseId, s.BranchId })
                 .FirstOrDefault();
 
             if (student == null) return null;
@@ -637,8 +637,14 @@ namespace SchoolManagement.Services.Implementation
                 // Calculate KPIs
                 TotalAssessments = assessments.Count,
                 OverallAverageScore = CalculateOverallAverage(assessments),
-                ClassAverageScore = CalculateClassAverage(student.Id, tenantId, assessments), // Implementing logic inline or via helper
-                AttendancePercentage = CalculateAttendance(student.Id, tenantId)
+                ClassAverageScore = CalculateClassAverage(student.Id, tenantId, assessments),
+                AttendancePercentage = CalculateAttendance(student.Id, tenantId),
+                
+                // Advanced Insights
+                ClassRank = CalculateClassRank(student.Id, tenantId, student.CourseId, student.BranchId),
+                TotalStudents = GetClassSize(tenantId, student.CourseId, student.BranchId),
+                ConsistencyScore = CalculateConsistencyScore(assessments),
+                GradeDistribution = CalculateGradeDistribution(assessments)
             };
         }
 
@@ -699,6 +705,113 @@ namespace SchoolManagement.Services.Implementation
                 : 0;
         }
 
+        private int? CalculateClassRank(int studentId, int tenantId, int? courseId, int? branchId)
+        {
+            if (courseId == null || branchId == null) return null;
+
+            // Simple rank based on Overall Average Score of all assessments ever
+            // In reality, this should be time-bound (e.g. current term), but for now "All Time"
+            
+            // 1. Get all students in this class
+            var classmates = _context.Students
+                .Where(s => !s.IsDeleted && s.TenantId == tenantId && s.CourseId == courseId && s.BranchId == branchId)
+                .Select(s => s.Id)
+                .ToList();
+
+            if (!classmates.Any()) return null;
+
+            // 2. Calculate Avg for each student
+            var studentAverages = new Dictionary<int, decimal>();
+
+            // Optimisation: Retrieve all relevant assessments in one query instead of N
+            var allAssessments = _context.DailyAssessments
+                .Where(a => !a.IsDeleted && a.TenantId == tenantId && a.BranchId == branchId && 
+                            classmates.Contains(a.StudentId) && a.Grade != null)
+                .Select(a => new { a.StudentId, Min = a.Grade.MinPercentage, Max = a.Grade.MaxPercentage })
+                .ToList();
+
+            foreach(var sId in classmates)
+            {
+                var sAssessments = allAssessments.Where(x => x.StudentId == sId).ToList();
+                if (sAssessments.Any())
+                {
+                    decimal avg = sAssessments.Average(a => (a.Min + a.Max) / 2m);
+                    studentAverages[sId] = avg;
+                }
+                else
+                {
+                    studentAverages[sId] = 0;
+                }
+            }
+
+            // 3. Rank
+            var sortedRanks = studentAverages.OrderByDescending(x => x.Value).Select(x => x.Key).ToList();
+            var rank = sortedRanks.IndexOf(studentId) + 1;
+
+            return rank > 0 ? rank : null;
+        }
+
+        private int? GetClassSize(int tenantId, int? courseId, int? branchId)
+        {
+            if (courseId == null || branchId == null) return null;
+            return _context.Students.Count(s => !s.IsDeleted && s.TenantId == tenantId && s.CourseId == courseId && s.BranchId == branchId);
+        }
+
+        private decimal? CalculateConsistencyScore(List<MDailyAssessment> assessments)
+        {
+            // Standard Deviation of scores? Or submission consistency?
+            // Let's go with "Performance Consistency" = 100 - (StdDev / MaxScore * 100)
+            // A higher score means more consistent (less variance).
+            
+            var scores = assessments
+                .Where(a => a.Grade != null)
+                .Select(a => (double)((a.Grade.MinPercentage + a.Grade.MaxPercentage) / 2m))
+                .ToList();
+
+            if (scores.Count < 2) return null; // Need comparison points
+
+            double avg = scores.Average();
+            double sumOfSquares = scores.Sum(val => Math.Pow(val - avg, 2));
+            double stdDev = Math.Sqrt(sumOfSquares / (scores.Count - 1));
+
+            // Normalize consistency to 0-100 scale. 
+            // If StdDev is 0 (perfect consistency), Score is 100.
+            // If StdDev is high (e.g., 25), Score drops. 
+            // Formula: 100 - StdDev. (Min 0).
+            
+            decimal consistency = (decimal)Math.Max(0, 100 - stdDev);
+            return Math.Round(consistency, 1);
+        }
+
+        private Dictionary<string, int> CalculateGradeDistribution(List<MDailyAssessment> assessments)
+        {
+            var distribution = new Dictionary<string, int>();
+
+            var grades = assessments
+                .Where(a => a.Grade != null && !string.IsNullOrEmpty(a.Grade.Name))
+                .Select(a => a.Grade.Name.ToUpper()) // Normalize case
+                .ToList();
+
+            foreach (var g in grades)
+            {
+                // Simplify grades if needed (e.g. A+ -> A) depending on requirements on frontend.
+                // Assuming we want exact grade names for now, or just the first char. 
+                // Let's stick to the first char as per previous frontend logic for consistency.
+                
+                string key = g.Substring(0, 1); // "A+", "A-" becomes "A"
+                if (validGrades.Contains(key)) 
+                {
+                     if (!distribution.ContainsKey(key))
+                        distribution[key] = 0;
+                    distribution[key]++;
+                }
+            }
+
+            return distribution; 
+        }
+
+        private static readonly HashSet<string> validGrades = new HashSet<string> { "A", "B", "C", "D", "F" };
+
 
 
         public DailyAssessmentPerformanceSummaryResponse GetPerformanceSummaryForStudent(
@@ -719,7 +832,8 @@ namespace SchoolManagement.Services.Implementation
                 .Select(s => new StudentInfoVm
                 {
                     StudentId = s.Id,
-                    StudentName = s.Name
+                    StudentName = s.Name,
+                    StudentImageUrl = s.StudentImageUrl
                 })
                 .FirstOrDefault();
 
