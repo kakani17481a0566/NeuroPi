@@ -65,6 +65,7 @@ builder.Services.AddScoped<IBooksService, BooksServiceImpl>();
 builder.Services.AddScoped<IUtilitesService, UtilitiesServiceImpl>();
 builder.Services.AddScoped<IItemService, ItemServiceImpl>();
 builder.Services.AddScoped<IPrefixSuffixService, PrefixSuffixServiceImpl>();
+builder.Services.AddScoped<IRolesService, RolesServiceImpl>();
 
 // School Domain Services
 builder.Services.AddScoped<IStudentService, StudentServiceImpl>();
