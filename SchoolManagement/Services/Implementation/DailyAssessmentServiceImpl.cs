@@ -632,8 +632,71 @@ namespace SchoolManagement.Services.Implementation
                     Results = yearlyResults
                 },
 
-                AssessmentWise = groupedAssessments
+                AssessmentWise = groupedAssessments,
+
+                // Calculate KPIs
+                TotalAssessments = assessments.Count,
+                OverallAverageScore = CalculateOverallAverage(assessments),
+                ClassAverageScore = CalculateClassAverage(student.Id, tenantId, assessments), // Implementing logic inline or via helper
+                AttendancePercentage = CalculateAttendance(student.Id, tenantId)
             };
+        }
+
+        // Helper methods for calculations
+        private decimal? CalculateOverallAverage(List<MDailyAssessment> assessments)
+        {
+            var scores = assessments
+                .Where(a => a.Grade != null)
+                .Select(a => (a.Grade.MinPercentage + a.Grade.MaxPercentage) / 2m)
+                .ToList();
+
+            return scores.Any() ? Math.Round(scores.Average(), 2) : (decimal?)null;
+        }
+
+        private decimal? CalculateClassAverage(int studentId, int tenantId, List<MDailyAssessment> studentAssessments)
+        {
+            // Find student's course/branch from one of the assessments or student record (better from student record used earlier)
+            // Re-querying specifically for peer stats to ensure accuracy
+            var studentInfo = _context.Students
+                 .Where(s => s.Id == studentId && !s.IsDeleted)
+                 .Select(s => new { s.CourseId, s.BranchId })
+                 .FirstOrDefault();
+
+            if (studentInfo == null) return null;
+
+            // Get all valid scores for this course and branch (excluding deletions)
+             var classScores = _context.DailyAssessments
+                .Where(a => !a.IsDeleted && 
+                            a.TenantId == tenantId && 
+                            // Equal Course logic might need link via Student table if CourseId not on Assessment 
+                            // (Assessment links to Student, Student has CourseId)
+                             _context.Students.Any(s => s.Id == a.StudentId && s.CourseId == studentInfo.CourseId && s.BranchId == studentInfo.BranchId) &&
+                            a.Grade != null)
+                .Select(a => (a.Grade.MinPercentage + a.Grade.MaxPercentage) / 2m)
+                .ToList();
+
+             return classScores.Any() ? Math.Round(classScores.Average(), 2) : (decimal?)null;
+        }
+
+        private decimal? CalculateAttendance(int studentId, int tenantId)
+        {
+            // Assuming academic year based logic or all time? 
+            // For now, let's take all time or simple percentage of marked attendance
+            // Attendance Percentage = (Present Days / Total Marked Days) * 100
+            
+            var attendanceRecords = _context.StudentAttendance
+                .Where(a => !a.IsDeleted && a.StudentId == studentId && a.TenantId == tenantId)
+                .Select(a => new { a.FromTime, a.ToTime })
+                .ToList();
+
+            if (!attendanceRecords.Any()) return null;
+
+            int presentCount = attendanceRecords.Count(a => a.FromTime != TimeSpan.Zero);
+            int totalDays = attendanceRecords.Count;
+
+            return totalDays > 0 
+                ? Math.Round(((decimal)presentCount / totalDays) * 100m, 2) 
+                : 0;
         }
 
 

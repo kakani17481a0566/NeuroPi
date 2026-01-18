@@ -12,6 +12,12 @@
         public PerformanceBreakdown Yearly { get; set; }
 
         public List<AssessmentGroup> AssessmentWise { get; set; } = new();
+
+        // KPIs
+        public decimal? OverallAverageScore { get; set; }
+        public decimal? ClassAverageScore { get; set; }
+        public decimal? AttendancePercentage { get; set; }
+        public int TotalAssessments { get; set; }
     }
 
     public class PerformanceBreakdown
