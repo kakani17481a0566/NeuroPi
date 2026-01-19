@@ -11,7 +11,10 @@ namespace SchoolManagement.ViewModel.PostTransactionMaster
 
         public int TenantId { get; set; }
 
+
         public List<PosItem> Items { get; set; }
+
+        public string PaymentMethod { get; set; }
 
 
         

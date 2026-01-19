@@ -38,6 +38,7 @@ namespace SchoolManagement.Services.Implementation
             posResult.student = student;
             posResult.invoiceNumber = "INV-MSI-" + transactionId;
             posResult.status = "Paid";
+            posResult.payment.method = request.PaymentMethod;
             posResult.items = request.Items;
             double price = 0;
             double gstValue = 0;
