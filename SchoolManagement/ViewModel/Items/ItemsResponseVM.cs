@@ -13,8 +13,9 @@ namespace SchoolManagement.ViewModel.Items
         public int TenantId { get; set; }
 
         public string? Description { get; set; }   // ✅ added
-        public string? ItemCode { get; set; }      // ✅ added
-        public bool IsGroup { get; set; }          // ✅ added
+        public string? ItemCode { get; set; }      
+        public bool IsGroup { get; set; }          
+        public string? Image { get; set; }
 
         public int CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }
