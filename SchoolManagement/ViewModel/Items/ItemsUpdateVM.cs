@@ -11,6 +11,7 @@
 
         public string? Description { get; set; }
         public string? ItemCode { get; set; }
+        public Microsoft.AspNetCore.Http.IFormFile? Image { get; set; }
         public bool IsGroup { get; set; } = false;
 
         // Audit

@@ -15,6 +15,9 @@ namespace SchoolManagement.ViewModel.Items
 
         public string? Description { get; set; }
         public string? ItemCode { get; set; }
+        
+        // 🔹 File Upload
+        public Microsoft.AspNetCore.Http.IFormFile? Image { get; set; }
 
         // 🔹 Group flag
         public bool IsGroup { get; set; } = false;
