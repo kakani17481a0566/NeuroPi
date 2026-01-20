@@ -180,13 +180,19 @@ namespace SchoolManagement.Services.Implementation
     // Response models for CoinGecko API
     public class CoinGeckoResponse
     {
+        [System.Text.Json.Serialization.JsonPropertyName("bitcoin")]
         public CoinData Bitcoin { get; set; }
+        
+        [System.Text.Json.Serialization.JsonPropertyName("ethereum")]
         public CoinData Ethereum { get; set; }
     }
 
     public class CoinData
     {
+        [System.Text.Json.Serialization.JsonPropertyName("usd")]
         public decimal Usd { get; set; }
+        
+        [System.Text.Json.Serialization.JsonPropertyName("usd_24h_change")]
         public decimal Usd24hChange { get; set; }
     }
 }
