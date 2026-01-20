@@ -29,5 +29,31 @@ namespace SchoolManagement.Controllers
 
             return new ResponseResult<List<NewsViewModel>>(HttpStatusCode.OK, result, "Financial news retrieved successfully");
         }
+
+        [HttpGet("market-ticker")]
+        public async Task<ResponseResult<List<MarketTickerViewModel>>> GetMarketTicker()
+        {
+            var result = await _newsService.GetMarketTickerAsync();
+
+            if (result == null || !result.Any())
+            {
+                return new ResponseResult<List<MarketTickerViewModel>>(HttpStatusCode.NotFound, null, "No market data found.");
+            }
+
+            return new ResponseResult<List<MarketTickerViewModel>>(HttpStatusCode.OK, result, "Market ticker data retrieved successfully");
+        }
+
+        [HttpGet("flash-updates")]
+        public async Task<ResponseResult<List<FlashUpdateViewModel>>> GetFlashUpdates()
+        {
+            var result = await _newsService.GetFlashUpdatesAsync();
+
+            if (result == null || !result.Any())
+            {
+                return new ResponseResult<List<FlashUpdateViewModel>>(HttpStatusCode.NotFound, null, "No flash updates found.");
+            }
+
+            return new ResponseResult<List<FlashUpdateViewModel>>(HttpStatusCode.OK, result, "Flash updates retrieved successfully");
+        }
     }
 }
