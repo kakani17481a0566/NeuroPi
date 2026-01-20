@@ -64,8 +64,17 @@ namespace SchoolManagement.Services.Implementation
             try
             {
                 // Yahoo Finance API - Free, no API key required
-                // Using CSV format for simplicity
-                var symbols = new[] { "BTC-USD", "ETH-USD" };
+                // Including Indian market indices and stocks
+                var symbols = new[] 
+                { 
+                    "^NSEI",           // NIFTY 50
+                    "^BSESN",          // SENSEX
+                    "RELIANCE.NS",     // Reliance Industries
+                    "TCS.NS",          // TCS
+                    "INFY.NS",         // Infosys
+                    "BTC-USD",         // Bitcoin
+                    "ETH-USD"          // Ethereum
+                };
 
                 foreach (var symbol in symbols)
                 {
@@ -90,10 +99,26 @@ namespace SchoolManagement.Services.Implementation
                                     var previousClose = meta.PreviousClose;
                                     var change = ((currentPrice - previousClose) / previousClose) * 100;
 
+                                    // Format symbol for display
+                                    var displaySymbol = symbol switch
+                                    {
+                                        "^NSEI" => "NIFTY 50",
+                                        "^BSESN" => "SENSEX",
+                                        "RELIANCE.NS" => "RELIANCE",
+                                        "TCS.NS" => "TCS",
+                                        "INFY.NS" => "INFOSYS",
+                                        "BTC-USD" => "BTC",
+                                        "ETH-USD" => "ETH",
+                                        _ => symbol.Replace(".NS", "").Replace("-USD", "")
+                                    };
+
+                                    // Format price based on symbol type
+                                    var priceFormat = symbol.Contains("USD") ? $"${currentPrice:N0}" : $"₹{currentPrice:N2}";
+
                                     marketData.Add(new MarketTickerViewModel
                                     {
-                                        Symbol = symbol.Replace("-USD", ""),
-                                        Price = $"${currentPrice:N0}",
+                                        Symbol = displaySymbol,
+                                        Price = priceFormat,
                                         Change = Math.Abs(change).ToString("F2"),
                                         Positive = change >= 0
                                     });
@@ -130,6 +155,20 @@ namespace SchoolManagement.Services.Implementation
         {
             return new List<MarketTickerViewModel>
             {
+                new MarketTickerViewModel
+                {
+                    Symbol = "NIFTY 50",
+                    Price = "₹23,645.50",
+                    Change = "0.85",
+                    Positive = true
+                },
+                new MarketTickerViewModel
+                {
+                    Symbol = "SENSEX",
+                    Price = "₹78,234.25",
+                    Change = "0.72",
+                    Positive = true
+                },
                 new MarketTickerViewModel
                 {
                     Symbol = "BTC",
