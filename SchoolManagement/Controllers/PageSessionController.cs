@@ -19,7 +19,8 @@ namespace SchoolManagement.Controllers
         [HttpPost("start")]
         public ResponseResult<long> StartSession([FromBody] SessionStartRequest request)
         {
-            var sessionId = _sessionService.StartSession(request.PageName, request.UserId, request.TenantId);
+            var ipAddress = request.IpAddress ?? HttpContext.Connection.RemoteIpAddress?.ToString();
+            var sessionId = _sessionService.StartSession(request.PageName, request.UserId, request.TenantId, ipAddress);
             return new ResponseResult<long>(HttpStatusCode.OK, sessionId, "Session started");
         }
 
@@ -39,5 +40,6 @@ namespace SchoolManagement.Controllers
         public string PageName { get; set; }
         public int? UserId { get; set; }
         public int? TenantId { get; set; }
+        public string? IpAddress { get; set; }
     }
 }

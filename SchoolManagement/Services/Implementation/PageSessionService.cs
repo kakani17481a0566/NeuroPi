@@ -15,13 +15,14 @@ namespace SchoolManagement.Services.Implementation
             _db = db;
         }
 
-        public long StartSession(string pageName, int? userId, int? tenantId)
+        public long StartSession(string pageName, int? userId, int? tenantId, string ipAddress)
         {
             var session = new MPageSessionLog
             {
                 page_name = pageName,
                 user_id = userId,
                 tenant_id = tenantId,
+                ip_address = ipAddress,
                 page_open_time = DateTime.UtcNow
             };
 

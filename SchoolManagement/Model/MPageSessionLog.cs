@@ -23,6 +23,9 @@ namespace SchoolManagement.Model
         [Column("page_close_time")]
         public DateTime? page_close_time { get; set; }
 
+        [Column("ip_address")]
+        public string? ip_address { get; set; }
+
         [Column("tenant_id")]
         public int? tenant_id { get; set; }
     }
