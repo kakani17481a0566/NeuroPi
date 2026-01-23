@@ -1,8 +1,9 @@
 using SchoolManagement.Data;
 using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
-using System;
+using System.Collections.Generic;
 using System.Linq;
+using SchoolManagement.ViewModel.PageSession;
 
 namespace SchoolManagement.Services.Implementation
 {
@@ -42,6 +43,29 @@ namespace SchoolManagement.Services.Implementation
                 return true;
             }
             return false;
+        }
+
+        public List<PageSessionLogDto> GetSessionLogs()
+        {
+            var query = from p in _db.PageSessionLogs
+                        join u in _db.Users on p.user_id equals u.UserId into userJoin
+                        from u in userJoin.DefaultIfEmpty()
+                        orderby p.page_open_time descending
+                        select new PageSessionLogDto
+                        {
+                            Id = p.id,
+                            IpAddress = p.ip_address,
+                            PageName = p.page_name,
+                            FirstName = u != null ? u.FirstName : null,
+                            LastName = u != null ? u.LastName : null,
+                            PageOpenTime = p.page_open_time,
+                            PageCloseTime = p.page_close_time,
+                            TimeSpentSeconds = p.page_close_time.HasValue 
+                                ? (p.page_close_time.Value - p.page_open_time).TotalSeconds 
+                                : (double?)null
+                        };
+
+            return query.ToList();
         }
     }
 }

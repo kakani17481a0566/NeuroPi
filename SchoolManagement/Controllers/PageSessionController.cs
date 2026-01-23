@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagement.Services.Interface;
 using NeuroPi.UserManagment.Response;
+using SchoolManagement.ViewModel.PageSession;
+using System.Collections.Generic;
 using System.Net;
 
 namespace SchoolManagement.Controllers
@@ -44,6 +46,13 @@ namespace SchoolManagement.Controllers
                 return new ResponseResult<bool>(HttpStatusCode.OK, true, "Session ended");
             
             return new ResponseResult<bool>(HttpStatusCode.NotFound, false, "Session not found");
+        }
+
+        [HttpGet("logs")]
+        public ResponseResult<List<PageSessionLogDto>> GetLogs()
+        {
+            var logs = _sessionService.GetSessionLogs();
+            return new ResponseResult<List<PageSessionLogDto>>(HttpStatusCode.OK, logs, "Logs retrieved successfully");
         }
     }
 
