@@ -153,6 +153,8 @@ namespace SchoolManagement.Data
 
         public DbSet<MGeneticRegistration> GeneticRegistrations { get; set; }
 
+        public DbSet<MPageSessionLog> PageSessionLogs { get; set; }
+
 
 
 

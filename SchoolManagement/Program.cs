@@ -108,6 +108,7 @@ builder.Services.AddScoped<ILibraryTransactionsService, LibraryTransactionServic
 builder.Services.AddScoped<IPosTransactionMasterService, PosTransactionMasterServiceImpl>();
 builder.Services.AddScoped<IPosTransactionDetailService, PosTransactionDetailServiceImpl>();
 builder.Services.AddScoped<IGeneticRegistrationService, GeneticRegistrationServiceImpl>();
+builder.Services.AddScoped<IPageSessionService, PageSessionService>();
 
 
 // ViewModel-based Services
