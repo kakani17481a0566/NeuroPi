@@ -20,6 +20,10 @@ namespace SchoolManagement.ViewModel.ItemBranch
 
         public DateTime? UpdatedOn { get; set; }
 
+        public string? ItemName { get; set; }
+        public string? ItemCode { get; set; }
+        public string? CategoryName { get; set; }
+
         public static ItemBranchResponseVM ToViewModel(MItemBranch itemBranch)
         {
             return new ItemBranchResponseVM

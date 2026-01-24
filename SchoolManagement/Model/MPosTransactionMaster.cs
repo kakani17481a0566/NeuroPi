@@ -19,8 +19,12 @@ namespace SchoolManagement.Model
         public DateOnly Date { get; set; }
         [Column ("tenant_id")]
         [ForeignKey("Tenant")]
-
         public int TenantId { get; set; }
+
+        [Column("payment_method")]
+        [NotMapped]
+        public string PaymentMethod { get; set; }
+
         public virtual MStudent student { get; set; }
         public virtual MStudent Tenant { get; set; }
 

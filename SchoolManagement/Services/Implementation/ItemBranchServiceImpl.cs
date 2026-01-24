@@ -1,4 +1,5 @@
-﻿using SchoolManagement.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using SchoolManagement.Data;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.ItemBranch;
 
@@ -134,7 +135,33 @@ namespace SchoolManagement.Services.Implementation
             existingItemBranch.UpdatedOn = DateTime.UtcNow;
             _context.SaveChanges();
             return ItemBranchResponseVM.ToViewModel(existingItemBranch);
+        }
 
+        public List<ItemBranchResponseVM> GetItemsByBranchId(int branchId)
+        {
+            return _context.ItemBranch
+                .Include(ib => ib.Item)
+                .ThenInclude(i => i.ItemCategory)
+                .Where(ib => !ib.IsDeleted && ib.BranchId == branchId)
+                .Select(ib => new ItemBranchResponseVM
+                {
+                    Id = ib.Id,
+                    ItemId = ib.ItemId,
+                    BranchId = ib.BranchId,
+                    ItemQuantity = ib.ItemQuantity,
+                    ItemPrice = ib.ItemPrice,
+                    ItemCost = ib.ItemCost,
+                    ItemReOrderLevel = ib.ItemReOrderLevel,
+                    ItemLocationId = ib.ItemLocationId,
+                    TenantId = ib.TenantId,
+                    ItemName = ib.Item.Name,
+                    ItemCode = ib.Item.ItemCode,
+                    CategoryName = ib.Item.ItemCategory.Name,
+                    CreatedBy = ib.CreatedBy,
+                    CreatedOn = ib.CreatedOn,
+                    UpdatedBy = ib.UpdatedBy,
+                    UpdatedOn = ib.UpdatedOn
+                }).ToList();
         }
     }
 }

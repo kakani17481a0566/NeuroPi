@@ -94,5 +94,15 @@ namespace SchoolManagement.Controllers
             return new ResponseResult<bool>(HttpStatusCode.BadGateway, response, $"Failed to delete ItemBranch with id {id} for the specified tenant");
         }
 
+        [HttpGet("GetItemsByBranchId/{branchId}")]
+        public ResponseResult<List<ItemBranchResponseVM>> GetItemsByBranchId([FromRoute] int branchId)
+        {
+            var response = _itemBranchService.GetItemsByBranchId(branchId);
+            if (response == null || response.Count == 0)
+            {
+                return new ResponseResult<List<ItemBranchResponseVM>>(HttpStatusCode.NotFound, response, "No items found for the specified branch");
+            }
+            return new ResponseResult<List<ItemBranchResponseVM>>(HttpStatusCode.OK, response, "Items fetched successfully");
+        }
     }
 }

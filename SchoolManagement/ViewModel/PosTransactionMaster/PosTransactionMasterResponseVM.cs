@@ -1,4 +1,4 @@
-﻿namespace SchoolManagement.ViewModel.PostTransactionMaster
+﻿namespace SchoolManagement.ViewModel.PosTransactionMaster
 {
     public class PosTransactionMasterResponseVM
     {
@@ -12,5 +12,8 @@
         public string StudentName { get; set; }
 
         public string BranchName { get; set; }
+
+        public double TotalAmount { get; set; }
+        public string? StudentImageUrl { get; set; }
     }
 }
