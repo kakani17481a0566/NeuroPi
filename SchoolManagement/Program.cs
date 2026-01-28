@@ -110,6 +110,8 @@ builder.Services.AddScoped<IPosTransactionDetailService, PosTransactionDetailSer
 builder.Services.AddScoped<IGeneticRegistrationService, GeneticRegistrationServiceImpl>();
 builder.Services.AddScoped<IPageSessionService, PageSessionService>();
 
+builder.Services.AddScoped<IInventoryTransferService, InventoryTransferServiceImpl>();
+
 
 // ViewModel-based Services
 builder.Services.AddScoped<IVwComprehensiveTimeTablesService, VwComprehensiveTimeTablesService>();

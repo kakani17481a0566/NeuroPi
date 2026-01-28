@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using NeuroPi.UserManagment.Response;
+using NeuroPi.CommonLib.Model;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.PosTransactionDetail;
 using SchoolManagement.ViewModel.PosTransactionMaster;

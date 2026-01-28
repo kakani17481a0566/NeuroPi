@@ -25,8 +25,7 @@ namespace SchoolManagement.ViewModel.PosTransactionMaster
             return new MPosTransactionMaster
             {
                 StudentId = requestVM.StudentId,
-                TenantId = requestVM.TenantId,
-                PaymentMethod = requestVM.PaymentMethod
+                TenantId = requestVM.TenantId
             };
         }
     }
