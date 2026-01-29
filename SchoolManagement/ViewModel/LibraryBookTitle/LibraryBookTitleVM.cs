@@ -1,8 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SchoolManagement.ViewModel.ItemHeader
+namespace SchoolManagement.ViewModel.LibraryBookTitle
 {
-    public class ItemHeaderVM
+    public class LibraryBookTitleVM
     {
         public int Id { get; set; }
         public string Title { get; set; }

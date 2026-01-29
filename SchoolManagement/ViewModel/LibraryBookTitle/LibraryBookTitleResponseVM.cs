@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.Primitives;
+using Microsoft.Extensions.Primitives;
 
-namespace SchoolManagement.ViewModel.ItemHeader
+namespace SchoolManagement.ViewModel.LibraryBookTitle
 {
-    public class ItemHeaderResponseVM
+    public class LibraryBookTitleResponseVM
     {
         public int BookId { get; set; }
 
@@ -21,11 +21,8 @@ namespace SchoolManagement.ViewModel.ItemHeader
         public string Author { get; set; }
 
         public PublisherAddress PublisherAddress { get; set; }
-
-
-
     }
-   public  class Book
+    public  class Book
     {
         public  string title { get; set; }
 
@@ -39,5 +36,4 @@ namespace SchoolManagement.ViewModel.ItemHeader
         public string line { get; set; }
 
     }
-
 }

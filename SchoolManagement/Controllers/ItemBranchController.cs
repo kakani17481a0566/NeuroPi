@@ -104,5 +104,12 @@ namespace SchoolManagement.Controllers
             }
             return new ResponseResult<List<ItemBranchResponseVM>>(HttpStatusCode.OK, response, "Items fetched successfully");
         }
+
+        [HttpGet("GetBranchStockForItem/{itemId}/{tenantId}")]
+        public ResponseResult<List<ItemBranchResponseVM>> GetBranchStockForItem([FromRoute] int itemId, [FromRoute] int tenantId)
+        {
+            var response = _itemBranchService.GetBranchStockForItem(itemId, tenantId);
+            return new ResponseResult<List<ItemBranchResponseVM>>(HttpStatusCode.OK, response ?? new List<ItemBranchResponseVM>(), "Stock details fetched.");
+        }
     }
 }

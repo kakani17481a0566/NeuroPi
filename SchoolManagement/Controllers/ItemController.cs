@@ -18,10 +18,10 @@ namespace SchoolManagement.Controllers
     [ApiController]
     public class ItemController : ControllerBase
     {
-        private readonly IItemService ItemService;
-        public ItemController(IItemService _ItemService)
+        private readonly ILibraryBookCopyService _libraryBookCopyService;
+        public ItemController(ILibraryBookCopyService libraryBookCopyService)
         {
-            ItemService = _ItemService;
+            _libraryBookCopyService = libraryBookCopyService;
 
         }
 
@@ -30,7 +30,7 @@ namespace SchoolManagement.Controllers
         [HttpGet]
         public ResponseResult<List<ItemVM>> GetAll()
         {
-            var response = ItemService.GetAll();
+            var response = _libraryBookCopyService.GetAll();
             if (response == null)
             {
                 return new ResponseResult<List<ItemVM>>(HttpStatusCode.NotFound, response, "No data Found");
@@ -40,7 +40,7 @@ namespace SchoolManagement.Controllers
         [HttpGet("{id}")]
         public ResponseResult<ItemVM> GetById([FromRoute] int id)
         {
-            var response = ItemService.GetById(id);
+            var response = _libraryBookCopyService.GetById(id);
             if (response != null)
             {
                 return new ResponseResult<ItemVM>(HttpStatusCode.OK, response, "Item is fetched successfully");
@@ -51,7 +51,7 @@ namespace SchoolManagement.Controllers
         [HttpGet("Item/tenantId")]
         public ResponseResult<ItemVM> GetByIdAndTenantId([FromQuery(Name = "id")] int id, [FromQuery(Name = "tenantId")] int tenantId)
         {
-            var response = ItemService.GetByIdAndTenantId(id, tenantId);
+            var response = _libraryBookCopyService.GetByIdAndTenantId(id, tenantId);
             if (response != null)
             {
                 return new ResponseResult<ItemVM>(HttpStatusCode.OK, response, "Item is fetched successfully");
@@ -62,7 +62,7 @@ namespace SchoolManagement.Controllers
         [HttpGet("Item/tenant/{id}")]
         public ResponseResult<List<ItemVM>> GetAllItems([FromRoute] int id)
         {
-            var response =ItemService.GetAllByTenantId(id);
+            var response =_libraryBookCopyService.GetAllByTenantId(id);
 
             if (response == null)
             {
@@ -75,7 +75,7 @@ namespace SchoolManagement.Controllers
         [HttpDelete("/Item/{id}/{tenantId}")]
         public ResponseResult<ItemVM> DeleteByIdAndTenantId([FromRoute] int id, [FromRoute] int tenantId)
         {
-            var response = ItemService.DeleteByIdAndTenantId(id, tenantId);
+            var response = _libraryBookCopyService.DeleteByIdAndTenantId(id, tenantId);
             if (response != null)
             {
                 return new ResponseResult<ItemVM>(HttpStatusCode.OK, response, "Deleted Successfully");
@@ -86,7 +86,7 @@ namespace SchoolManagement.Controllers
         [HttpPost]
         public ResponseResult<ItemVM> AddItem([FromBody] ItemRequestVM request)
         {
-            var response = ItemService.CreateItem(request);
+            var response = _libraryBookCopyService.CreateLibraryBookCopy(request);
             if (response != null)
             {
                 return new ResponseResult<ItemVM>(HttpStatusCode.OK, response, "created  successfully");

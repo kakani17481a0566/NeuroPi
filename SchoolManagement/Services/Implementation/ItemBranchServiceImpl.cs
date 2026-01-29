@@ -163,5 +163,22 @@ namespace SchoolManagement.Services.Implementation
                     UpdatedOn = ib.UpdatedOn
                 }).ToList();
         }
+
+        public List<ItemBranchResponseVM> GetBranchStockForItem(int itemId, int tenantId)
+        {
+            return _context.ItemBranch
+                .Include(ib => ib.Branch)
+                .Where(ib => !ib.IsDeleted && ib.ItemId == itemId && ib.TenantId == tenantId)
+                .Select(ib => new ItemBranchResponseVM
+                {
+                    Id = ib.Id,
+                    BranchId = ib.BranchId,
+                    BranchName = ib.Branch.Name,
+                    ItemQuantity = ib.ItemQuantity,
+                    ItemPrice = ib.ItemPrice,
+                    ItemId = ib.ItemId
+                })
+                .ToList();
+        }
     }
 }

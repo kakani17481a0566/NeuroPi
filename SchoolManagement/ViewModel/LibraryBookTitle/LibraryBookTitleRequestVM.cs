@@ -1,6 +1,6 @@
-﻿namespace SchoolManagement.ViewModel.ItemHeader
+namespace SchoolManagement.ViewModel.LibraryBookTitle
 {
-    public class ItemHeaderRequestVM
+    public class LibraryBookTitleRequestVM
     {
         public int? CategoryId { get; set; }
         public int? MinAge { get; set; }

@@ -18,5 +18,6 @@ namespace SchoolManagement.Services.Interface
 
         bool DeleteItemBranchByIdAndTenant(int id, int tenantId);
         List<ItemBranchResponseVM> GetItemsByBranchId(int branchId);
+        List<ItemBranchResponseVM> GetBranchStockForItem(int itemId, int tenantId);
     }
 }

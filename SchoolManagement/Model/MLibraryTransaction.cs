@@ -1,4 +1,4 @@
-﻿using SchoolManagement.ViewModel.ItemHeader;
+﻿
 using SchoolManagement.ViewModel.Student;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -22,7 +22,7 @@ namespace SchoolManagement.Model
         [Column("book_id")]
         public int BookId { get; set; }
         [ForeignKey("BookId")]
-        public MItemHeader Book { get; set; }
+        public MLibraryBookTitle Book { get; set; }
         [Column("check_in")]
         public DateOnly CheckIn { get; set; }
         [Column("check_out")]

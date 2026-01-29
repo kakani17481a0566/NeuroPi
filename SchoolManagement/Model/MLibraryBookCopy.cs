@@ -5,8 +5,8 @@ using NeuroPi.UserManagment.Model;
 
 namespace SchoolManagement.Model
 {
-    [Table("item")]  // map explicitly to your table name (lowercase)
-    public class MItem : MBaseModel
+    [Table("library_book_copies")]  // map explicitly to your table name (lowercase)
+    public class MLibraryBookCopy : MBaseModel
     {
         [Key]
         [Column("id")]   

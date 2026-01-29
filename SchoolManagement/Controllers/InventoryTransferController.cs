@@ -33,7 +33,6 @@ namespace SchoolManagement.Controllers
         public ResponseResult<List<InventoryTransferResponseVM>> GetMyRequests(int branchId)
         {
             // Assuming TenantId 1 for now or fetching from User Context in real app
-            // Ideally should limit by user context to prevent IDOR, but keeping simple as per existing style.
             int tenantId = 1; 
             return _service.GetRequestsByBranch(branchId, tenantId);
         }

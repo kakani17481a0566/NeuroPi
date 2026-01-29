@@ -3,7 +3,7 @@ using SchoolManagement.ViewModel.Master;
 
 namespace SchoolManagement.Services.Interface
     {
-        public interface IItemService
+        public interface ILibraryBookCopyService
         {
             List<ItemVM> GetAll();
             List<ItemVM> GetAllByTenantId(int id);
@@ -12,7 +12,7 @@ namespace SchoolManagement.Services.Interface
             ItemVM GetByIdAndTenantId(int id, int TenantId);
             ItemVM UpdateByIdAndTenantId(int Id, int TenantId, UpdateItemVM request);
             ItemVM DeleteByIdAndTenantId(int Id, int TenantId);
-        ItemVM CreateItem(ItemRequestVM request);
+            ItemVM CreateLibraryBookCopy(ItemRequestVM request);
        
 
        

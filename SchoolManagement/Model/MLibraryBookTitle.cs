@@ -6,9 +6,9 @@ namespace SchoolManagement.Model
 
 {
 
-    [Table("item_header", Schema = "public")]
+    [Table("library_book_titles", Schema = "public")]
 
-    public class MItemHeader : MBaseModel
+    public class MLibraryBookTitle : MBaseModel
     {
         [Key]
         [Column("id")]

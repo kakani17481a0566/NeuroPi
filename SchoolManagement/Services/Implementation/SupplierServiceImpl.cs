@@ -19,12 +19,12 @@ namespace SchoolManagement.Services.Implementation
 
         public List<SupplierVM> GetAllSuppliers()
         {
-            var suppliers = _dbcontext.Supplier.Where(s => !s.is_delete).ToList();
+            var suppliers = _dbcontext.Supplier.Where(s => !s.IsDeleted).ToList();
             return suppliers.Select(SupplierVM.FromModel).ToList();
         }
         public SupplierVM GetSupplierById(int id)
         {
-            var suppliers = _dbcontext.Supplier.FirstOrDefault(s => s.Id == id && !s.is_delete);
+            var suppliers = _dbcontext.Supplier.FirstOrDefault(s => s.Id == id && !s.IsDeleted);
             return SupplierVM.FromModel(suppliers);
         }
         public SupplierVM CreateSupplier(SupplierVM supplier)
@@ -48,7 +48,7 @@ namespace SchoolManagement.Services.Implementation
         }
         public SupplierVM UpdateSupplier(int id, SupplierVM supplier)
         {
-            var existingSupplier = _dbcontext.Supplier.FirstOrDefault(s => s.Id == id && !s.is_delete);
+            var existingSupplier = _dbcontext.Supplier.FirstOrDefault(s => s.Id == id && !s.IsDeleted);
             if (existingSupplier == null)
             {
                 return null;
@@ -56,19 +56,19 @@ namespace SchoolManagement.Services.Implementation
             existingSupplier.Name = supplier.Name;
             existingSupplier.Contact_id = supplier.Contact_id;
             existingSupplier.Tenant_id = supplier.Tenant_id;
-            existingSupplier.Updated_on = DateTime.UtcNow;
-            existingSupplier.Updated_by = supplier.Updated_by;
+            existingSupplier.UpdatedOn = DateTime.UtcNow;
+            existingSupplier.UpdatedBy = supplier.Updated_by;
             _dbcontext.SaveChanges();
             return SupplierVM.FromModel(existingSupplier);
         }
         public bool DeleteSupplier(int id)
         {
-            var existingSupplier = _dbcontext.Supplier.FirstOrDefault(s => s.Id == id && !s.is_delete);
+            var existingSupplier = _dbcontext.Supplier.FirstOrDefault(s => s.Id == id && !s.IsDeleted);
             if (existingSupplier == null)
             {
                 return false;
             }
-            existingSupplier.is_delete = true;
+            existingSupplier.IsDeleted = true;
             _dbcontext.SaveChanges();
             return true;
         }

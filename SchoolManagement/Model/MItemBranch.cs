@@ -34,10 +34,25 @@ namespace SchoolManagement.Model
         [Column("item_rol")]
         public int ItemReOrderLevel { get; set; }
 
+        [Column("item_max_level")]
+        public int? ItemMaxLevel { get; set; }
+
+        [Column("last_purchase_cost")]
+        public decimal? LastPurchaseCost { get; set; }
+
+        [Column("average_cost")]
+        public decimal? AverageCost { get; set; }
+
+        [Column("last_stock_count_date")]
+        public DateTime? LastStockCountDate { get; set; }
+
+        [Column("last_movement_date")]
+        public DateTime? LastMovementDate { get; set; }
+
         [Column("item_location_id")]
-        public int ItemLocationId { get; set; }
+        public int? ItemLocationId { get; set; }
         [ForeignKey(nameof(ItemLocationId))]
-        public MItemLocation ItemLocation { get; set; }
+        public MItemLocation? ItemLocation { get; set; }
 
         [Required]
         [Column("tenant_id")]

@@ -8,7 +8,7 @@
         public int ItemPrice { get; set; }
         public int ItemCost { get; set; }
         public int ItemReOrderLevel { get; set; }
-        public int ItemLocationId { get; set; }
+        public int? ItemLocationId { get; set; }
 
         public int? UpdatedBy { get; set; }
 

@@ -143,39 +143,41 @@ namespace SchoolManagement.Services.Implementation
         public ItemsFilterResponse GetItemsByTenant(int tenantId)
         {
             // ⚡ 1️⃣ Use projection directly in EF (avoid materializing full entities first)
-            var itemsQuery = _context.ItemBranch
-                .Where(e => !e.IsDeleted && e.TenantId == tenantId)
-                .Select(e => new
-                {
-                    e.ItemId,
-                    e.Item.Name,
-                    e.Item.CategoryId,
-                    CategoryName = e.Item.ItemCategory.Name,
-                    e.Item.Height,
-                    e.ItemPrice,
-                    e.ItemQuantity,
-                    Image = _context.ItemsImages
-                        .Where(img => !img.IsDeleted && img.ItemId == e.Item.Id)
-                        .Select(img => img.Image)
-                        .FirstOrDefault()
-                })
-                .AsNoTracking(); // ✅ skip change tracking for read-only queries
+            // Group by Item to avoid duplicates if multiple branches exist
+            var itemsQuery = from i in _context.Items
+                             join c in _context.ItemCategory on i.CategoryId equals c.Id
+                             join ib in _context.ItemBranch on i.Id equals ib.ItemId into itemBranches
+                             from ib in itemBranches.DefaultIfEmpty()
+                             where i.TenantId == tenantId && !i.IsDeleted && (ib == null || !ib.IsDeleted)
+                             group new { i, c, ib } by new
+                             {
+                                 i.Id,
+                                 i.Name,
+                                 i.CategoryId,
+                                 CategoryName = c.Name,
+                                 i.Size,
+                                 i.ParentItemId
+                             } into g
+                             select new ItemsResponse
+                             {
+                                 Id = g.Key.Id,
+                                 Name = g.Key.Name,
+                                 CategoryId = g.Key.CategoryId,
+                                 CategoryName = g.Key.CategoryName,
+                                 Status = g.Sum(x => x.ib != null ? x.ib.ItemQuantity : 0) > 0 ? "Available" : "Not Available",
+                                 Size = g.Key.Size ?? 0,
+                                 ParentItemId = g.Key.ParentItemId,
+                                 Price = g.Max(x => x.ib != null ? x.ib.ItemPrice : 0),
+                                 ItemQuantity = g.Sum(x => x.ib != null ? x.ib.ItemQuantity : 0),
+                                 Image = _context.ItemsImages
+                                     .Where(img => !img.IsDeleted && (img.ItemId == g.Key.Id || (g.Key.ParentItemId != null && img.ItemId == g.Key.ParentItemId)))
+                                     .OrderBy(img => img.ItemId == g.Key.Id ? 0 : 1)
+                                     .Select(img => img.Image)
+                                     .FirstOrDefault()
+                             };
 
-            var items = itemsQuery.ToList();
-
-            // ⚡ 2️⃣ Directly map to DTOs (no second DB roundtrip)
-            var result = items.Select(i => new ItemsResponse
-            {
-                Id = i.ItemId,
-                Name = i.Name,
-                CategoryId = i.CategoryId,
-                CategoryName = i.CategoryName,
-                Size = i.Height,
-                Price = i.ItemPrice,
-                ItemQuantity = i.ItemQuantity,
-                Status = i.ItemQuantity > 0 ? "Available" : "Not Available",
-                Image = i.Image
-            }).ToList();
+            var items = itemsQuery.AsNoTracking().ToList(); // ✅ skip change tracking for read-only queries
+            var result = items;
 
             // ⚡ 3️⃣ Compute filters in-memory efficiently
             var filters = new ItemsFilters
@@ -221,6 +223,8 @@ namespace SchoolManagement.Services.Implementation
             existing.Height = vm.Height ?? existing.Height;
             existing.Width = vm.Width ?? existing.Width;
             existing.Depth = vm.Depth ?? existing.Depth;
+            existing.Size = vm.Size ?? existing.Size;
+            existing.ParentItemId = vm.ParentItemId ?? existing.ParentItemId;
             existing.Description = vm.Description;
             existing.ItemCode = vm.ItemCode;
             existing.IsGroup = vm.IsGroup;
@@ -283,6 +287,8 @@ namespace SchoolManagement.Services.Implementation
                     Height = vm.Height ?? 0,
                     Width = vm.Width ?? 0,
                     Depth = vm.Depth ?? 0,
+                    Size = vm.Size,
+                    ParentItemId = vm.ParentItemId,
                     Description = vm.Description,
                     ItemCode = vm.ItemCode,
                     IsGroup = vm.IsGroup || vm.GroupItems.Any(),

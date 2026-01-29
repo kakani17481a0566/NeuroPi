@@ -12,6 +12,7 @@
         public string CategoryName { get; set; }
         public string Status { get; set; }
         public int Size { get; set; }
+        public int? ParentItemId { get; set; }
         public int Price { get; set; }
         public int ItemQuantity { get; set; }
     }

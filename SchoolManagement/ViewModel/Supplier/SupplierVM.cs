@@ -23,11 +23,11 @@ namespace SchoolManagement.ViewModel.Supplier
                 Name = s.Name,
                 Contact_id = s.Contact_id,
                 Tenant_id = s.Tenant_id,
-                Created_On = s.Created_On,
-                Created_by = s.Created_by,
-                Updated_on = s.Updated_on,
-                Updated_by = s.Updated_by,
-                is_delete = s.is_delete
+                Created_On = s.CreatedOn,
+                Created_by = s.CreatedBy,
+                Updated_on = s.UpdatedOn ?? DateTime.MinValue,
+                Updated_by = s.UpdatedBy ?? 0,
+                is_delete = s.IsDeleted
             };
         }
 

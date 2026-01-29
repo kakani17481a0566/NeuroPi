@@ -9,6 +9,8 @@ namespace SchoolManagement.ViewModel.Items
         public int Height { get; set; }
         public int Width { get; set; }
         public int Depth { get; set; }
+        public int? Size { get; set; }
+        public int? ParentItemId { get; set; }
         public string Name { get; set; } = string.Empty;
         public int TenantId { get; set; }
 
@@ -31,6 +33,8 @@ namespace SchoolManagement.ViewModel.Items
                 Height = items.Height,
                 Width = items.Width,
                 Depth = items.Depth,
+                Size = items.Size,
+                ParentItemId = items.ParentItemId,
                 Name = items.Name,
                 TenantId = items.TenantId,
                 Description = items.Description,   // ✅ mapped

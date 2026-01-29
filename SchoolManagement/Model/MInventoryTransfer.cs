@@ -26,6 +26,9 @@ namespace SchoolManagement.Model
         [Column("quantity")]
         public int Quantity { get; set; }
 
+        [Column("size")]
+        public int? Size { get; set; }
+
         // Source Branch (Nullable for Refills)
         [Column("from_branch_id")]
         public int? FromBranchId { get; set; }
@@ -39,6 +42,12 @@ namespace SchoolManagement.Model
 
         [ForeignKey("ToBranchId")]
         public virtual MBranch ToBranch { get; set; }
+
+        [Column("supplier_id")]
+        public int? SupplierId { get; set; }
+
+        [ForeignKey("SupplierId")]
+        public virtual MSupplier? Supplier { get; set; }
 
         // Workflow
         [Column("status")]

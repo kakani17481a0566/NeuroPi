@@ -1,18 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Data;
 using SchoolManagement.Services.Interface;
-using SchoolManagement.ViewModel.ItemHeader;
+using SchoolManagement.ViewModel.LibraryBookTitle;
 
 namespace SchoolManagement.Services.Implementation
 {
-    public class ItemHeaderServiceImpl : IItemHeaderService
+    public class LibraryBookTitleServiceImpl : ILibraryBookTitleService
     {
         private readonly SchoolManagementDb _context;
-        public ItemHeaderServiceImpl(SchoolManagementDb context)
+        public LibraryBookTitleServiceImpl(SchoolManagementDb context)
         {
             _context = context;
         }
-        public ItemHeaderResponseVM CreateItemHeader(ItemHeaderRequestVM request)
+        public LibraryBookTitleResponseVM CreateLibraryBookTitle(LibraryBookTitleRequestVM request)
         {
             var genre = _context.generes.FirstOrDefault(g => g.Name == request.Category && g.TenantId == request.TenantId);
             int? genreId = genre?.Id;
@@ -33,7 +33,7 @@ namespace SchoolManagement.Services.Implementation
                 genreId = newGenre.Id;
             }
 
-            var itemHeader = new Model.MItemHeader
+            var libraryBookTitle = new Model.MLibraryBookTitle
             {
                 Title = request.Title,
                 AuthorName = request.Author,
@@ -45,36 +45,36 @@ namespace SchoolManagement.Services.Implementation
                 CategoryId = request.CategoryId // Optional if passed directly
             };
 
-            _context.ItemHeaders.Add(itemHeader);
+            _context.LibraryBookTitles.Add(libraryBookTitle);
             _context.SaveChanges();
 
             // Return mapped response
-            return new ItemHeaderResponseVM
+            return new LibraryBookTitleResponseVM
             {
-                BookId = itemHeader.Id,
-                CreatedOn = itemHeader.CreatedOn,
-                Book = new Book { title = itemHeader.Title, coverImg = "" },
-                Price = itemHeader.Price,
+                BookId = libraryBookTitle.Id,
+                CreatedOn = libraryBookTitle.CreatedOn,
+                Book = new Book { title = libraryBookTitle.Title, coverImg = "" },
+                Price = libraryBookTitle.Price,
                 Stock = request.Stock ?? 0, // Mocked persistence
                 Status = request.Status ?? "available", // Mocked persistence
                 category = request.Category,
-                Author = itemHeader.AuthorName,
+                Author = libraryBookTitle.AuthorName,
                 PublisherAddress = new PublisherAddress { street = "", line = "" }
             };
         }
 
-        public bool DeleteItemHeader(int id)
+        public bool DeleteLibraryBookTitle(int id)
         {
-            var item = _context.ItemHeaders.Find(id);
+            var item = _context.LibraryBookTitles.Find(id);
             if (item == null) return false;
 
             item.IsDeleted = true;
-            _context.ItemHeaders.Update(item);
+            _context.LibraryBookTitles.Update(item);
             _context.SaveChanges();
             return true;
         }
 
-        public List<ItemHeaderResponseVM> GetAll()
+        public List<LibraryBookTitleResponseVM> GetAll()
         {
             throw new NotImplementedException();
         }
@@ -82,19 +82,19 @@ namespace SchoolManagement.Services.Implementation
        
         
 
-        public ItemHeaderVM GetById(int id)
+        public LibraryBookTitleVM GetById(int id)
         {
             throw new NotImplementedException();
         }
 
-        public ItemHeaderVM GetByIdAndTenantId(int id, int tenantId)
+        public LibraryBookTitleVM GetByIdAndTenantId(int id, int tenantId)
         {
             throw new NotImplementedException();
         }
 
-        public ItemHeaderResponseVM UpdateItemHeader(int id, ItemHeaderRequestVM request)
+        public LibraryBookTitleResponseVM UpdateLibraryBookTitle(int id, LibraryBookTitleRequestVM request)
         {
-            var item = _context.ItemHeaders.Find(id);
+            var item = _context.LibraryBookTitles.Find(id);
             if (item == null) return null;
 
             item.Title = request.Title ?? item.Title;
@@ -111,7 +111,7 @@ namespace SchoolManagement.Services.Implementation
                 else
                 {
                     // Create new genre if update specifies a new one
-                     var newGenre = new Model.MGenere
+                    var newGenre = new Model.MGenere
                     {
                         Name = request.Category,
                         TenantId = item.TenantId,
@@ -124,10 +124,10 @@ namespace SchoolManagement.Services.Implementation
                 }
             }
             
-            _context.ItemHeaders.Update(item);
+            _context.LibraryBookTitles.Update(item);
             _context.SaveChanges();
 
-            return new ItemHeaderResponseVM
+            return new LibraryBookTitleResponseVM
             {
                 BookId = item.Id,
                 CreatedOn = item.CreatedOn,
@@ -140,12 +140,12 @@ namespace SchoolManagement.Services.Implementation
             };
         }
 
-        public List<ItemHeaderResponseVM> GetAllByTenantId(int tenantId)
+        public List<LibraryBookTitleResponseVM> GetAllByTenantId(int tenantId)
         {
-            var result = (from ih in _context.ItemHeaders
+            var result = (from ih in _context.LibraryBookTitles
                           join g in _context.generes on ih.GenreId equals g.Id
                           where ih.TenantId == tenantId && !ih.IsDeleted
-                          select new ItemHeaderResponseVM
+                          select new LibraryBookTitleResponseVM
                           {
                               BookId = ih.Id,
                               CreatedOn = ih.CreatedOn,
