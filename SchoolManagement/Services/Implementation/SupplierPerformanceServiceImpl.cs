@@ -32,7 +32,7 @@ namespace SchoolManagement.Services.Implementation
                     QuantityAccuracyPct = request.QuantityAccuracyPct,
                     Notes = request.Notes,
                     TenantId = tenantId,
-                    CreatedBy = userId,
+                    CreatedBy = userId == 0 ? null : userId,
                     CreatedOn = DateTime.UtcNow
                 };
 

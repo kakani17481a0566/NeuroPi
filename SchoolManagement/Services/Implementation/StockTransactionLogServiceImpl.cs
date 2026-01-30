@@ -46,7 +46,7 @@ namespace SchoolManagement.Services.Implementation
                     UomCode = request.UomCode ?? "EA",
                     SerialNumberId = request.SerialNumberId,
                     TenantId = tenantId,
-                    CreatedBy = userId
+                    CreatedBy = userId == 0 ? null : userId
                 };
 
                 _context.StockTransactionLogs.Add(log);
@@ -56,8 +56,9 @@ namespace SchoolManagement.Services.Implementation
                 {
                     branchItem.ItemQuantity = log.QuantityAfter ?? 0;
                     branchItem.LastMovementDate = log.TransactionDate;
-                    branchItem.UpdatedBy = userId;
+                    branchItem.UpdatedBy = userId == 0 ? null : userId;
                     branchItem.UpdatedOn = DateTime.UtcNow;
+                    branchItem.IsDeleted = false; // Reactivate if it was deleted
                 }
                 else
                 {
@@ -69,7 +70,7 @@ namespace SchoolManagement.Services.Implementation
                         ItemQuantity = log.QuantityAfter ?? 0,
                         LastMovementDate = log.TransactionDate,
                         TenantId = tenantId,
-                        CreatedBy = userId,
+                        CreatedBy = userId, // MItemBranch uses MBaseModel.CreatedBy (int), cannot set null.
                         CreatedOn = DateTime.UtcNow,
                         ItemPrice = 0,
                         ItemCost = 0,

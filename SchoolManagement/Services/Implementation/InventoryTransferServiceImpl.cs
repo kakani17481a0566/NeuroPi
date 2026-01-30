@@ -46,7 +46,7 @@ namespace SchoolManagement.Services.Implementation
                     CreatedBy = request.CreatedBy,
                     CreatedOn = DateTime.UtcNow,
                     IsDeleted = false,
-                    SupplierId = request.SupplierId,
+                    SupplierId = (request.SupplierId == 0) ? null : request.SupplierId,
                     Size = request.Size
                 };
 
@@ -88,9 +88,9 @@ namespace SchoolManagement.Services.Implementation
                 if (approval.Status == "REJECTED")
                 {
                     transfer.Status = "REJECTED";
-                    transfer.ApprovedBy = approval.ApprovedBy;
+                    transfer.ApprovedBy = approval.ApprovedBy == 0 ? null : approval.ApprovedBy;
                     transfer.ApprovalDate = DateTime.UtcNow;
-                    transfer.UpdatedBy = approval.ApprovedBy;
+                    transfer.UpdatedBy = approval.ApprovedBy == 0 ? null : approval.ApprovedBy;
                     transfer.UpdatedOn = DateTime.UtcNow;
                     _context.SaveChanges();
                     transaction.Commit();
@@ -136,7 +136,7 @@ namespace SchoolManagement.Services.Implementation
                         _supplierPerformanceService.RecordPerformance(new SupplierPerformanceRequestVM
                         {
                             SupplierId = transfer.SupplierId.Value,
-                            PoId = transfer.Id, // Mapping Transfer ID to PO ID
+                            PoId = null, // transfer.Id cannot be used as PO ID because it FK references purchase_order_header
                             DeliveryDate = DateTime.UtcNow,
                             ExpectedDate = DateTime.UtcNow, // Simplified for now
                             OnTimeDelivery = true,
@@ -147,9 +147,9 @@ namespace SchoolManagement.Services.Implementation
                     }
 
                     transfer.Status = "APPROVED";
-                    transfer.ApprovedBy = approval.ApprovedBy;
+                    transfer.ApprovedBy = approval.ApprovedBy == 0 ? null : approval.ApprovedBy;
                     transfer.ApprovalDate = DateTime.UtcNow;
-                    transfer.UpdatedBy = approval.ApprovedBy;
+                    transfer.UpdatedBy = approval.ApprovedBy == 0 ? null : approval.ApprovedBy;
                     transfer.UpdatedOn = DateTime.UtcNow;
 
                     _context.SaveChanges();
