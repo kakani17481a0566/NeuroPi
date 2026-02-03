@@ -20,6 +20,8 @@ namespace NeuroPi.CommonLib.Model
 
 
 
+
+
         [Column("updated_by")]
 
         public int? UpdatedBy { get; set; }
