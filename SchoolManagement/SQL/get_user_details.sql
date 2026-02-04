@@ -1,21 +1,25 @@
 -- SQL Script to get User Details (Username, Email, Role, Branch, Course)
 -- This script joins users, roles, employees, students, and parents tables.
 
-SELECT 
+SELECT DISTINCT 
+    u.user_id AS "User ID",
     u.username AS "Username",
     u.email AS "Email",
+    r.role_id AS "Role ID",
     r.name AS "Role",
     
-    -- Branch Name: Priority -> Employee Branch -> Student Branch -> Child's Branch
-    COALESCE(b_emp.name, b_stu.name, b_child.name) AS "Branch",
+    -- Branch Name: Priority -> Employee Branch -> Child's Branch
+    COALESCE(b_emp.id, b_child.id) AS "Branch ID",
+    COALESCE(b_emp.name, b_child.name) AS "Branch",
     
-    -- Course Name: Priority -> Student Course -> Child's Course
-    COALESCE(c_stu.name, c_child.name) AS "Course",
+    -- Course Name: Priority -> Child's Course
+    COALESCE(c_child.id) AS "Course ID",
+    COALESCE(c_child.name) AS "Course",
 
     -- Additional context to identify source (Optional)
     CASE 
         WHEN emp.id IS NOT NULL THEN 'Employee'
-        WHEN stu.id IS NOT NULL THEN 'Student'
+        -- Student direct login does not exist
         WHEN p.id IS NOT NULL THEN 'Parent'
         ELSE 'User'
     END AS "User Type"
@@ -30,10 +34,7 @@ LEFT JOIN roles r ON ur.role_id = r.role_id
 LEFT JOIN employee emp ON u.user_id = emp.user_id
 LEFT JOIN branch b_emp ON emp.branch_id = b_emp.id
 
--- Join Student Details (Assuming Username matches Reg Number for Students)
-LEFT JOIN students stu ON u.username = stu.reg_number AND stu.is_deleted = false
-LEFT JOIN branch b_stu ON stu.branch_id = b_stu.id
-LEFT JOIN course c_stu ON stu.course_id = c_stu.id
+-- Student Direct Join Removed (Students are not Users)
 
 -- Join Parent Details
 LEFT JOIN parents p ON u.user_id = p.user_id AND p.is_deleted = false
@@ -43,6 +44,9 @@ LEFT JOIN branch b_child ON child.branch_id = b_child.id
 LEFT JOIN course c_child ON child.course_id = c_child.id
 
 WHERE u.is_deleted = false
+AND u.email NOT ILIKE '%test%'
+AND u.email NOT ILIKE '%string%'
+AND u.username NOT ILIKE 'test%'
 
 -- Order by Username
-ORDER BY u.username;
+ORDER BY r.name, u.username;
