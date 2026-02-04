@@ -27,6 +27,7 @@ CREATE TABLE form_sections (
     updated_on TIMESTAMP,
     updated_by INT,
     is_deleted BOOLEAN DEFAULT FALSE
+    
 );
 
 -- 3. Form Fields

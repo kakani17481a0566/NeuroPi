@@ -40,6 +40,8 @@ namespace SchoolManagement.Data
 
 
         // New School Management DbSets
+
+        public DbSet<MAcademicYear> academicyear { get; set; }
         public DbSet<MSubject> subjects { get; set; }
         public DbSet<MCourse> Courses { get; set; }
         public DbSet<MCourseSubject> course_subject { get; set; }
