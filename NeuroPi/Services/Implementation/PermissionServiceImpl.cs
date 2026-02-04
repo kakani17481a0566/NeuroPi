@@ -72,13 +72,13 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
         public  List<PermissionDescriptionVM> GetByPermissionId(int id)
         {
-            var response= _context.RolePermissions.Where(r=>r.RoleId ==id && !r.IsDeleted).Include(r=>r.Permission).ToList();
+            var response= _context.RolePermissions.Where(r=>r.RoleId ==id && !r.IsDeleted).Include(r=>r.Menu).ToList();
             List<PermissionDescriptionVM> result= new List<PermissionDescriptionVM>();
             if (response != null)
             {
                 foreach(var s in response)
                 {
-                    var details = JsonSerializer.Deserialize<PermissionDescriptionVM>(s.Permission.Description);
+                    var details = JsonSerializer.Deserialize<PermissionDescriptionVM>(s.Menu.Name);
                     result.Add(details);
                 }
                 return result;

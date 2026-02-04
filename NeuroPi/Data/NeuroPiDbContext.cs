@@ -23,6 +23,10 @@ namespace NeuroPi.UserManagment.Data
         public DbSet<MUserDepartment> UserDepartments { get; set; }
         public DbSet<MAuditLog> AuditLogs { get; set; }
         public DbSet<MConfig> Configs { get; set; }
+        public DbSet<MMainMenu> MainMenus { get; set; }
+        public DbSet<MMenu> Menu { get; set; }
+
+
 
 
 
@@ -42,7 +46,7 @@ namespace NeuroPi.UserManagment.Data
 
             // Composite indexes
             modelBuilder.Entity<MRolePermission>()
-                .HasIndex(rp => new { rp.RoleId, rp.PermissionId })
+                .HasIndex(rp => new { rp.RoleId, rp.MenuId })
                 .IsUnique();
 
             modelBuilder.Entity<MUserRole>()
@@ -74,6 +78,10 @@ namespace NeuroPi.UserManagment.Data
                 .WithOne(ur => ur.Role)
                 .HasForeignKey(ur => ur.RoleId)
                 .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<MMenu>()
+                 .HasOne(m => m.MainMenu)
+                 .WithMany(m => m.Menus)
+                 .HasForeignKey(m => m.MainMenuId);
 
 
             modelBuilder.Entity<UsersProfileSummaryVM>().HasNoKey();

@@ -34,11 +34,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 return null;
             }
             result.RoleId = rolePermission.RoleId;
-            result.PermissionId = rolePermission.PermissionId;
-            result.CanCreate = rolePermission.CanCreate;
-            result.CanRead = rolePermission.CanRead;
-            result.CanUpdate = rolePermission.CanUpdate;
-            result.CanDelete = rolePermission.CanDelete;
+            result.MenuId = rolePermission.PermissionId;
             result.UpdatedBy = rolePermission.UpdatedBy;
             result.UpdatedOn = DateTime.UtcNow;
 
@@ -101,7 +97,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
         public List<RolePermissionDescVM> GetRolePermissionByRoleIdAndTenantId(int roleId, int tenantId)
         {
-            var rolePermission = _context.RolePermissions.Where(r => r.RoleId == roleId && r.TenantId == tenantId && !r.IsDeleted).Include(r=>r.Permission).ToList();
+            var rolePermission = _context.RolePermissions.Where(r => r.RoleId == roleId && r.TenantId == tenantId && !r.IsDeleted).Include(r=>r.Menu).ToList();
             if (rolePermission != null)
             {
                 return RolePermissionDescVM.ToViewModelList(rolePermission);

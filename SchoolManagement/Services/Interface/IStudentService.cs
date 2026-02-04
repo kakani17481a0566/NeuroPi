@@ -32,6 +32,7 @@ namespace SchoolManagement.Services.Interface
         List<StudentFilterResponseVM> GetAllStudentsByName(string name, DateOnly? dob = null);
         List<StudentFilterResponseVM> GetStudentsByParentUserId(int userId);
         bool UpdateLinkedStudents(int userId, List<int> studentIds);
+        string SendMessage(string email);
 
     }
 }

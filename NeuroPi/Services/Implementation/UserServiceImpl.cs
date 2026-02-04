@@ -9,6 +9,7 @@ using NeuroPi.UserManagment.Services.Interface;
 using NeuroPi.UserManagment.ViewModel.User;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
+using System.Net.Mail;
 using System.Security.Claims;
 using System.Text;
 
@@ -873,5 +874,31 @@ namespace NeuroPi.UserManagment.Services.Implementation
             return user.FirstTimeLogin;
         }
 
+        public string SendMessage(string email)
+        {
+            //var today = DateOnly.FromDateTime(DateTime.Today);
+            //var students = _context.Students
+            //                .Where(s => s.Dob.Month == today.Month && s.Dob.Day == today.Day)
+            //                .ToList();
+            var smtpClient = new SmtpClient("smtp.gmail.com")
+            {
+                Port = 587,
+                Credentials = new NetworkCredential("kakanimohithkrishnasai@gmail.com", "asqevdthoegfynbb"),
+                EnableSsl = true,
+            };
+
+            var mailMessage = new MailMessage
+            {
+                From = new MailAddress("kakanimohithkrishnasai@gmail.com"),
+                Subject = "Birthday Wishes from Neuropi Tech Private Limited",
+                Body = "<h1>Hello, " +
+                "we are inviting you to birthday wish.</h1>",
+                IsBodyHtml = true,
+            };
+            mailMessage.To.Add(email);
+
+            smtpClient.Send(mailMessage);
+            return "success";
+        }
     }
 }

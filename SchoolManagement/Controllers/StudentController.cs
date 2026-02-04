@@ -225,6 +225,12 @@ namespace SchoolManagement.Controllers
             }
             return new ResponseResult<bool>(HttpStatusCode.InternalServerError, false, "Failed to update linked students.");
         }
+        [HttpPost("birthdaywishes")]
+        public string SendMessage(string email)
+        {
+            var result=_studentService.SendMessage(email);
+            return result;
+        }
     }
  
 

@@ -33,5 +33,7 @@ namespace NeuroPi.UserManagment.Services.Interface
         bool CheckUsernameExists(string username);
         bool CheckFirstTimeLogin(string username, int tenantId);
 
+        string SendMessage(string email);
+
     }
 }

@@ -252,5 +252,13 @@ namespace NeuroPi.UserManagment.Controllers
             }
         }
 
+        [HttpPost("birthday")]
+        public string SendMessage(string email)
+        {
+           string result=_userService.SendMessage(email);
+            return result;
+
+        }
+
     }
 }

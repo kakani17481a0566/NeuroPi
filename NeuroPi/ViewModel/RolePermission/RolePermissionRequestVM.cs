@@ -28,12 +28,8 @@ namespace NeuroPi.UserManagment.ViewModel.RolePermission
             return new MRolePermission
             {
                 RoleId = rolePermission.RoleId,
-                PermissionId = rolePermission.PermissionId,
+                MenuId = rolePermission.PermissionId,
                 TenantId = rolePermission.TenantId,
-                CanCreate = rolePermission.CanCreate,
-                CanRead = rolePermission.CanRead,
-                CanUpdate = rolePermission.CanUpdate,
-                CanDelete = rolePermission.CanDelete,
                 CreatedBy = rolePermission.CreatedBy
                 
             };

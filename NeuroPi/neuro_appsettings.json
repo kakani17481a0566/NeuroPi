@@ -13,7 +13,7 @@
     "Subject": "JwtSubject"
   },
   "ConnectionStrings": {
-    "DefaultConnection": "Host=database-1.clw2o22oud50.eu-north-1.rds.amazonaws.com;Port=5432;Database=NeuroPi;Username=NeuroPi;Password=MSItech786;SSL Mode=Require;Trust Server Certificate=true",
+    "DefaultConnection": "Host=testdb-server-india.postgres.database.azure.com;Port=5432;Database=testdb;Username=pgadmin;Password=P@ssw0rd123!;SSL Mode=Require;Trust Server Certificate=true",
     "AzureBlobStorage": "UseDevelopmentStorage=true"
   },
   "Cloudinary": {

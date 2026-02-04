@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.CognitiveServices.Speech.Transcription;
+﻿using Microsoft.CognitiveServices.Speech.Transcription;
 using Microsoft.EntityFrameworkCore;
 using NeuroPi.UserManagment.Data;
 using NeuroPi.UserManagment.Model;
@@ -7,13 +6,10 @@ using SchoolManagement.Data;
 using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.Student;
-using SchoolManagement.ViewModel.StudentRegistration;
 using SchoolManagement.ViewModel.Students;
 using SchoolManagement.ViewModel.Subject;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Transactions;
+using System.Net;
+using System.Net.Mail;
 
 namespace SchoolManagement.Services.Implementation
 {
@@ -886,6 +882,101 @@ namespace SchoolManagement.Services.Implementation
                 Console.WriteLine($"Error updating linked students: {ex.Message}");
                 return false;
             }
+        }
+
+
+        public string SendMessage(string email)
+        {
+            var today = DateOnly.FromDateTime(DateTime.Today);
+            var students = _context.Students
+                            .Where(s => s.DateOfBirth.Value.Month == today.Month && s.DateOfBirth.Value.Day == today.Day && !s.IsDeleted)
+                            .ToList();
+            var smtpClient = new SmtpClient("smtp.gmail.com")
+            {
+                Port = 587,
+                Credentials = new NetworkCredential("saivardhansvmobiles@gmail.com", "qzqqqqkaexvcbbtr"),
+                EnableSsl = true,
+            };
+
+            var body = """
+                    <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 20px auto; padding: 30px; border-radius: 20px; text-align: center; background: linear-gradient(to bottom, #ffffff, #f0f7ff); color: #333; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eef2f7;">
+            
+                     <div style="margin-bottom: 20px;">
+                     <span>Dear </span>
+                     <span style="font-size: 12px; letter-spacing: 2px; color: #57606f; text-transform: uppercase;">A Special Message From</span>
+                     <h2 style="color: #003366; margin: 5px 0; font-size: 24px;">My School Italy</h2>
+    </div>
+
+    <div style="font-size: 50px; margin-bottom: 15px;">🎂</div>
+
+    <h1 style="color: #ff4757; font-size: 32px; margin-bottom: 10px;">Happy Birthday!</h1>
+
+    <p style="font-size: 18px; line-height: 1.6; color: #2f3542; margin-top: 0;">
+        Today is a wonderful day to celebrate <b>you</b>!<br/>
+        On behalf of everyone at <span style="color: #003366; font-weight: bold;">My School Italy</span>, 
+        we wish you a day filled with joy, laughter, and endless discovery.
+    </p>
+
+    <p style="font-size: 15px; color: #57606f; margin-bottom: 30px; padding: 0 20px;">
+        "Every child is a different kind of flower, and all together, they make this world a beautiful garden."
+    </p>
+
+    <div style="display: block; text-align: center; margin-top: 20px;">
+        <div style="display: inline-block; width: 45%; margin: 1%; vertical-align: middle;">
+            <img src="https://hitex-hyderabad.myschoolitaly.com/wp-content/uploads/2025/03/The-Neuroscientific-European-Childcare-PDF_12-x-4-ft_Backside.png" 
+                 alt="Celebration Banner" 
+                 style="width: 100%; border-radius: 10px; border: 2px solid #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+        </div>
+        <div style="display: inline-block; width: 45%; margin: 1%; vertical-align: middle;">
+            <img src="https://neuropi.ai/images/N.png" 
+                 alt="Neuropi Logo" 
+                 style="width: 100%; border-radius: 10px; border: 2px solid #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+        </div>
+    </div>
+
+    <div style="margin-top: 35px; border-top: 1px solid #ddd; padding-top: 20px;">
+        <p style="margin-bottom: 5px; font-weight: bold; color: #003366;">Warmest Regards,</p>
+        <p style="margin-top: 0; font-size: 16px; color: #747d8c;">The My School Italy Team 😊</p>
+    </div>
+</div>
+"""; 
+
+            var mailMessage = new MailMessage
+            {
+                From = new MailAddress("saivardhansvmobiles@gmail.com"),
+                Subject = "Birthday Wishes from Neuropi Tech Private Limited",
+                Body = body,
+                IsBodyHtml = true,
+            };
+            mailMessage.To.Add(email);
+
+            smtpClient.Send(mailMessage);
+            //foreach (var student in students)
+            //{
+            //    var parents=_context.ParentStudents.Where(s=>s.ParentId ==student.Id && !s.IsDeleted).ToList();
+            //    if (parents != null)
+            //    {
+            //        foreach (var parent in parents)
+            //        {
+            //            var users = _context.Parents.Where(p => p.UserId == parent.Id).Include(p=>p.User).ToList();
+            //            if (users != null)
+            //            {
+            //                foreach (var user in users)
+            //                {
+            //                    if (user.User.Email != null)
+            //                    {
+            //                        mailMessage.To.Add(user.User.Email);
+
+            //                        smtpClient.Send(mailMessage);
+            //                    }
+            //                }
+            //            }
+            //        }
+
+            //    }
+
+            //}
+            return "success";
         }
     }
 }

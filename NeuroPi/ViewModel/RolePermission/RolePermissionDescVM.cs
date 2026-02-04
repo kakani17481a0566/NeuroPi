@@ -21,9 +21,9 @@ namespace NeuroPi.UserManagment.ViewModel.RolePermission
             {
                 RolePermissionId = rolePermission.RolePermissionId,
                 RoleId = rolePermission.RoleId,
-                PermissionId = rolePermission.PermissionId,
-                PermissionName = rolePermission.Permission.Name,
-                PermissionDescription = rolePermission.Permission.Description,
+                PermissionId = rolePermission.MenuId,
+                PermissionName = rolePermission.Menu.Name,
+                PermissionDescription = rolePermission.Menu.Name,
                 TenantId = rolePermission.TenantId
 
             };

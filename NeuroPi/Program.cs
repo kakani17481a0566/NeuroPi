@@ -135,6 +135,8 @@ builder.Services.AddScoped<IConfigService, ConfigServiceImpl>();
 builder.Services.AddScoped<IUserRolesService, UserRolesServiceImpl>();
 builder.Services.AddScoped<IUserService, UserServiceImpl>();
 builder.Services.AddHttpClient<INewsArticle, NewsArticleServiceImpl>();
+builder.Services.AddScoped<IMainMenuService, MainMenuServiceImpl>();
+
 // -------------------------------------------
 // Build App
 // -------------------------------------------
