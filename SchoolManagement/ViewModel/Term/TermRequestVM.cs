@@ -9,6 +9,7 @@ namespace SchoolManagement.ViewModel.Term
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public int TenantId { get; set; }
+        public int AcademicYearId { get; set; }
 
         public int CreatedBy { get; set; }
 
@@ -20,6 +21,7 @@ namespace SchoolManagement.ViewModel.Term
                 StartDate = this.StartDate,
                 EndDate = this.EndDate,
                 TenantId = this.TenantId,
+                AcademicYearId = this.AcademicYearId,
                 CreatedBy = this.CreatedBy,
                 CreatedOn = DateTime.UtcNow,
                 IsDeleted = false

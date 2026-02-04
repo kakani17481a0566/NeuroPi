@@ -45,6 +45,14 @@ namespace SchoolManagement.Services.Implementation
             return TermResponseVM.FromModel(term);
         }
 
+        public List<TermResponseVM> GetByAcademicYearId(int academicYearId)
+        {
+            return _dbContext.Terms
+                .Where(t => !t.IsDeleted && t.AcademicYearId == academicYearId)
+                .Select(TermResponseVM.FromModel)
+                .ToList();
+        }
+
         public TermResponseVM Create(TermRequestVM termVM)
         {
             var term = termVM.ToModel();
@@ -63,6 +71,7 @@ namespace SchoolManagement.Services.Implementation
             term.Name = termVM.Name;
             term.StartDate = termVM.StartDate;
             term.EndDate = termVM.EndDate;
+            term.AcademicYearId = termVM.AcademicYearId;
             term.UpdatedOn = DateTime.UtcNow;
             term.UpdatedBy = termVM.UpdatedBy;
 

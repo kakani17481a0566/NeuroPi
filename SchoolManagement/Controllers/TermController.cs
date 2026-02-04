@@ -49,6 +49,13 @@ namespace SchoolManagement.Controllers
             return new ResponseResult<TermResponseVM>(HttpStatusCode.OK, result);
         }
 
+        [HttpGet("GetByAcademicYearId/{academicYearId}")]
+        public ResponseResult<List<TermResponseVM>> GetByAcademicYearId(int academicYearId)
+        {
+            var result = _termService.GetByAcademicYearId(academicYearId);
+            return new ResponseResult<List<TermResponseVM>>(HttpStatusCode.OK, result);
+        }
+
         [HttpPost("Post")]
         public ResponseResult<TermResponseVM> Post([FromBody] TermRequestVM termVM)
         {

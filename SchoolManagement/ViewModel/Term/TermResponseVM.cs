@@ -10,6 +10,7 @@ namespace SchoolManagement.ViewModel.Term
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public int TenantId { get; set; }
+        public int AcademicYearId { get; set; }
 
         public static TermResponseVM FromModel(MTerm term)
         {
@@ -20,7 +21,8 @@ namespace SchoolManagement.ViewModel.Term
                 Name = term.Name,
                 StartDate = term.StartDate,
                 EndDate = term.EndDate,
-                TenantId = term.TenantId
+                TenantId = term.TenantId,
+                AcademicYearId = term.AcademicYearId
             };
         }
     }
