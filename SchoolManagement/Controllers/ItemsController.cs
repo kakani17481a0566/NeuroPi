@@ -90,7 +90,7 @@ namespace SchoolManagement.Controllers
         //Create new Item
         //POST: api/items
         [HttpPost]
-        public ResponseResult<ItemsResponseVM> Create([FromBody] ItemsRequestVM itemsRequestVM)
+        public ResponseResult<ItemsResponseVM> Create([FromForm] ItemsRequestVM itemsRequestVM)
         {
             if (itemsRequestVM == null)
             {
@@ -103,7 +103,7 @@ namespace SchoolManagement.Controllers
         //Update Item
         //PUT: api/items/{id}/{tenantId}
         [HttpPut("{id}/{tenantId}")]
-        public ResponseResult<ItemsResponseVM> Update([FromRoute] int id, [FromRoute] int tenantId, [FromBody] ItemsUpdateVM itemsUpdateVM)
+        public ResponseResult<ItemsResponseVM> Update([FromRoute] int id, [FromRoute] int tenantId, [FromForm] ItemsUpdateVM itemsUpdateVM)
         {
             if (itemsUpdateVM == null)
             {

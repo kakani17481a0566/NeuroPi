@@ -11,7 +11,7 @@ namespace SchoolManagement.ViewModel.ItemBranch
         public int ItemPrice { get; set; }
         public int ItemCost { get; set; }
         public int ItemReOrderLevel { get; set; }
-        public int ItemLocationId { get; set; }
+        public int? ItemLocationId { get; set; }
         public int TenantId { get; set; }
         public int CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }
@@ -19,6 +19,11 @@ namespace SchoolManagement.ViewModel.ItemBranch
         public int? UpdatedBy { get; set; }
 
         public DateTime? UpdatedOn { get; set; }
+
+        public string? ItemName { get; set; }
+        public string? ItemCode { get; set; }
+        public string? CategoryName { get; set; }
+        public string? BranchName { get; set; }
 
         public static ItemBranchResponseVM ToViewModel(MItemBranch itemBranch)
         {

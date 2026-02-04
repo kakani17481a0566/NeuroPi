@@ -47,7 +47,7 @@ builder.Services.AddScoped<VisitorInterface, VisitorServiceImpl>();
 builder.Services.AddScoped<IPhoneLogService, PhoneLogServiceImpl>();
 builder.Services.AddScoped<ISupplierBranchService, SupplierBranchImpl>();
 builder.Services.AddScoped<SupplierInterface, SupplierServiceImpl>();
-builder.Services.AddScoped<IItemService, ItemServiceImpl>();
+
 builder.Services.AddScoped<IItemSupplierService, ItemSupplierServiceImpl>();
 builder.Services.AddScoped<IOrders, OrderServiceImpl>();
 
@@ -63,8 +63,9 @@ builder.Services.AddScoped<IMasterService, MasterServiceImpl>();
 builder.Services.AddScoped<IMasterTypeService, MasterTypeServiceImpl>();
 builder.Services.AddScoped<IBooksService, BooksServiceImpl>();
 builder.Services.AddScoped<IUtilitesService, UtilitiesServiceImpl>();
-builder.Services.AddScoped<IItemService, ItemServiceImpl>();
+
 builder.Services.AddScoped<IPrefixSuffixService, PrefixSuffixServiceImpl>();
+builder.Services.AddScoped<IRolesService, RolesServiceImpl>();
 
 // School Domain Services
 builder.Services.AddScoped<IStudentService, StudentServiceImpl>();
@@ -107,7 +108,21 @@ builder.Services.AddScoped<ILibraryTransactionsService, LibraryTransactionServic
 builder.Services.AddScoped<IPosTransactionMasterService, PosTransactionMasterServiceImpl>();
 builder.Services.AddScoped<IPosTransactionDetailService, PosTransactionDetailServiceImpl>();
 builder.Services.AddScoped<IGeneticRegistrationService, GeneticRegistrationServiceImpl>();
+builder.Services.AddScoped<IPageSessionService, PageSessionService>();
 
+builder.Services.AddScoped<IInventoryTransferService, InventoryTransferServiceImpl>();
+
+// Global Inventory Management Services
+builder.Services.AddScoped<IStocktakeService, StocktakeServiceImpl>();
+builder.Services.AddScoped<IItemUomService, ItemUomServiceImpl>();
+builder.Services.AddScoped<ICostHistoryService, CostHistoryServiceImpl>();
+builder.Services.AddScoped<IStockTransactionLogService, StockTransactionLogServiceImpl>();
+builder.Services.AddScoped<IStockAdjustmentReasonService, StockAdjustmentReasonServiceImpl>();
+builder.Services.AddScoped<ISupplierPerformanceService, SupplierPerformanceServiceImpl>();
+builder.Services.AddScoped<IInventoryDashboardService, InventoryDashboardServiceImpl>();
+builder.Services.AddScoped<IInventoryExplorerService, InventoryExplorerServiceImpl>();
+builder.Services.AddScoped<IItemBatchesService, ItemBatchesServiceImpl>();
+builder.Services.AddScoped<IItemSerialNumbersService, ItemSerialNumbersServiceImpl>();
 
 // ViewModel-based Services
 builder.Services.AddScoped<IVwComprehensiveTimeTablesService, VwComprehensiveTimeTablesService>();
@@ -130,7 +145,7 @@ builder.Services.AddScoped<ICorporateService, CorporateServiceImpl>();
 builder.Services.AddScoped<IFeeTransactions, FeeTransactionsServiceImpl>();
 
 
-builder.Services.AddScoped<IItemHeaderService, ItemHeaderServiceImpl>();
+builder.Services.AddScoped<ILibraryBookTitleService, LibraryBookTitleServiceImpl>();
 
 builder.Services.AddScoped<ITableFilesService, TableFilesServiceImpl>();
 
@@ -143,6 +158,10 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 
 
 
+
+// News Service
+builder.Services.AddHttpClient();
+builder.Services.AddScoped<INewsService, NewsServiceImpl>();
 
 // EF DbContexts
 builder.Services.AddDbContext<NeuroPiDbContext>(options =>

@@ -36,6 +36,7 @@ public class StudentInfoVm
 {
     public int StudentId { get; set; }
     public string StudentName { get; set; }
+    public string StudentImageUrl { get; set; }
     public decimal? AverageScore { get; set; }
     public decimal? StandardDeviation { get; set; }
 }

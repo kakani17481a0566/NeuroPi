@@ -124,6 +124,7 @@ namespace SchoolManagement.Controllers
         // GET: api/master/getByMasterTypeId/{masterTypeId}/{tenantId}
         // Developed by: Vardhan
         [HttpGet("/getByMasterTypeId/{masterTypeId}/{tenantId}")]
+        [HttpGet("/api/getByMasterTypeId/{masterTypeId}/{tenantId}")]
         public ResponseResult<List<Object>> GetAllMastersByMasterTypeId([FromRoute] int masterTypeId, [FromRoute] int tenantId, bool isUtilites=false)
         {
             List<object> response;

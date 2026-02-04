@@ -21,6 +21,12 @@ namespace SchoolManagement.Model
         [ForeignKey(nameof(CategoryId))]
         public virtual MItemCategory ItemCategory { get; set; }
 
+        [Column("parent_item_id")]
+        public int? ParentItemId { get; set; }
+
+        [ForeignKey(nameof(ParentItemId))]
+        public virtual MItems ParentItem { get; set; }
+
         [Column("height")]
         public int Height { get; set; }
 
@@ -29,6 +35,9 @@ namespace SchoolManagement.Model
 
         [Column("depth")]
         public int Depth { get; set; }
+
+        [Column("size")]
+        public int? Size { get; set; }
 
         [Required]
         [Column("tenant_id")]
@@ -46,5 +55,21 @@ namespace SchoolManagement.Model
 
         [Column("item_code")]
         public string? ItemCode { get; set; }
+
+        [Column("base_uom")]
+        [StringLength(10)]
+        public string? BaseUom { get; set; }
+
+        [Column("is_batch_tracked")]
+        public bool IsBatchTracked { get; set; } = false;
+
+        [Column("is_serialized")]
+        public bool IsSerialized { get; set; } = false;
+
+        [Column("min_order_quantity")]
+        public int? MinOrderQuantity { get; set; }
+
+        [Column("lead_time_days")]
+        public int? LeadTimeDays { get; set; }
     }
 }

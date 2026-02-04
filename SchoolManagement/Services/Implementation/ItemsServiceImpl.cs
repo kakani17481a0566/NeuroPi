@@ -10,9 +10,14 @@ namespace SchoolManagement.Services.Implementation
     public class ItemsServiceImpl : IItemsService
     {
         private readonly SchoolManagementDb _context;
-        public ItemsServiceImpl(SchoolManagementDb context)
+        private readonly Microsoft.AspNetCore.Hosting.IWebHostEnvironment _environment;
+        private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
+
+        public ItemsServiceImpl(SchoolManagementDb context, Microsoft.AspNetCore.Hosting.IWebHostEnvironment environment, Microsoft.Extensions.Configuration.IConfiguration configuration)
         {
             _context = context;
+            _environment = environment;
+            _configuration = configuration;
         }
 
         // 🔹 Create normal item
@@ -25,7 +30,52 @@ namespace SchoolManagement.Services.Implementation
             _context.Items.Add(newItem);
             _context.SaveChanges();
 
-            return ItemsResponseVM.ToViewModel(newItem);
+             // 🔹 Handle Image Upload
+            if (itemsRequestVM.Image != null && itemsRequestVM.Image.Length > 0)
+            {
+                var imageUrl = UploadFile(itemsRequestVM.Image);
+                if (!string.IsNullOrEmpty(imageUrl))
+                {
+                    var itemImage = new MItemsImage
+                    {
+                        ItemId = newItem.Id,
+                        Image = imageUrl,
+                        TenantId = newItem.TenantId,
+                        CreatedOn = DateTime.UtcNow,
+                        CreatedBy = newItem.CreatedBy,
+                        IsDeleted = false
+                    };
+                    _context.ItemsImages.Add(itemImage);
+                    _context.SaveChanges();
+                }
+            }
+
+            var resultVM = ItemsResponseVM.ToViewModel(newItem);
+            
+             // 🔹 Handle Image Upload
+            if (itemsRequestVM.Image != null && itemsRequestVM.Image.Length > 0)
+            {
+                var imageUrl = UploadFile(itemsRequestVM.Image);
+                if (!string.IsNullOrEmpty(imageUrl))
+                {
+                    var itemImage = new MItemsImage
+                    {
+                        ItemId = newItem.Id,
+                        Image = imageUrl,
+                        TenantId = newItem.TenantId,
+                        CreatedOn = DateTime.UtcNow,
+                        CreatedBy = newItem.CreatedBy,
+                        IsDeleted = false
+                    };
+                    _context.ItemsImages.Add(itemImage);
+                    _context.SaveChanges();
+                    
+                    // Set image in response
+                    resultVM.Image = imageUrl;
+                }
+            }
+
+            return resultVM;
         }
 
         // 🔹 Soft delete
@@ -93,39 +143,41 @@ namespace SchoolManagement.Services.Implementation
         public ItemsFilterResponse GetItemsByTenant(int tenantId)
         {
             // ⚡ 1️⃣ Use projection directly in EF (avoid materializing full entities first)
-            var itemsQuery = _context.ItemBranch
-                .Where(e => !e.IsDeleted && e.TenantId == tenantId)
-                .Select(e => new
-                {
-                    e.ItemId,
-                    e.Item.Name,
-                    e.Item.CategoryId,
-                    CategoryName = e.Item.ItemCategory.Name,
-                    e.Item.Height,
-                    e.ItemPrice,
-                    e.ItemQuantity,
-                    Image = _context.ItemsImages
-                        .Where(img => !img.IsDeleted && img.ItemId == e.Item.Id)
-                        .Select(img => img.Image)
-                        .FirstOrDefault()
-                })
-                .AsNoTracking(); // ✅ skip change tracking for read-only queries
+            // Group by Item to avoid duplicates if multiple branches exist
+            var itemsQuery = from i in _context.Items
+                             join c in _context.ItemCategory on i.CategoryId equals c.Id
+                             join ib in _context.ItemBranch on i.Id equals ib.ItemId into itemBranches
+                             from ib in itemBranches.DefaultIfEmpty()
+                             where i.TenantId == tenantId && !i.IsDeleted && (ib == null || !ib.IsDeleted)
+                             group new { i, c, ib } by new
+                             {
+                                 i.Id,
+                                 i.Name,
+                                 i.CategoryId,
+                                 CategoryName = c.Name,
+                                 i.Size,
+                                 i.ParentItemId
+                             } into g
+                             select new ItemsResponse
+                             {
+                                 Id = g.Key.Id,
+                                 Name = g.Key.Name,
+                                 CategoryId = g.Key.CategoryId,
+                                 CategoryName = g.Key.CategoryName,
+                                 Status = g.Sum(x => x.ib != null ? x.ib.ItemQuantity : 0) > 0 ? "Available" : "Not Available",
+                                 Size = g.Key.Size ?? 0,
+                                 ParentItemId = g.Key.ParentItemId,
+                                 Price = g.Max(x => x.ib != null ? x.ib.ItemPrice : 0),
+                                 ItemQuantity = g.Sum(x => x.ib != null ? x.ib.ItemQuantity : 0),
+                                 Image = _context.ItemsImages
+                                     .Where(img => !img.IsDeleted && (img.ItemId == g.Key.Id || (g.Key.ParentItemId != null && img.ItemId == g.Key.ParentItemId)))
+                                     .OrderBy(img => img.ItemId == g.Key.Id ? 0 : 1)
+                                     .Select(img => img.Image)
+                                     .FirstOrDefault()
+                             };
 
-            var items = itemsQuery.ToList();
-
-            // ⚡ 2️⃣ Directly map to DTOs (no second DB roundtrip)
-            var result = items.Select(i => new ItemsResponse
-            {
-                Id = i.ItemId,
-                Name = i.Name,
-                CategoryId = i.CategoryId,
-                CategoryName = i.CategoryName,
-                Size = i.Height,
-                Price = i.ItemPrice,
-                ItemQuantity = i.ItemQuantity,
-                Status = i.ItemQuantity > 0 ? "Available" : "Not Available",
-                Image = i.Image
-            }).ToList();
+            var items = itemsQuery.AsNoTracking().ToList(); // ✅ skip change tracking for read-only queries
+            var result = items;
 
             // ⚡ 3️⃣ Compute filters in-memory efficiently
             var filters = new ItemsFilters
@@ -171,6 +223,8 @@ namespace SchoolManagement.Services.Implementation
             existing.Height = vm.Height ?? existing.Height;
             existing.Width = vm.Width ?? existing.Width;
             existing.Depth = vm.Depth ?? existing.Depth;
+            existing.Size = vm.Size ?? existing.Size;
+            existing.ParentItemId = vm.ParentItemId ?? existing.ParentItemId;
             existing.Description = vm.Description;
             existing.ItemCode = vm.ItemCode;
             existing.IsGroup = vm.IsGroup;
@@ -178,7 +232,38 @@ namespace SchoolManagement.Services.Implementation
             existing.UpdatedOn = DateTime.UtcNow;
 
             _context.SaveChanges();
-            return ItemsResponseVM.ToViewModel(existing);
+
+            var resultVM = ItemsResponseVM.ToViewModel(existing);
+
+            // 🔹 Handle Image Update
+            if (vm.Image != null && vm.Image.Length > 0)
+            {
+                var imageUrl = UploadFile(vm.Image);
+                if (!string.IsNullOrEmpty(imageUrl))
+                {
+                    var existingImage = _context.ItemsImages.FirstOrDefault(img => !img.IsDeleted && img.ItemId == existing.Id);
+                    if (existingImage != null)
+                    {
+                        existingImage.Image = imageUrl;
+                        existingImage.UpdatedOn = DateTime.UtcNow; 
+                    }
+                    else
+                    {
+                        var itemImage = new MItemsImage
+                        {
+                            ItemId = existing.Id,
+                            Image = imageUrl,
+                            TenantId = existing.TenantId,
+                            CreatedOn = DateTime.UtcNow,
+                            IsDeleted = false
+                        };
+                        _context.ItemsImages.Add(itemImage);
+                    }
+                    _context.SaveChanges();
+                    resultVM.Image = imageUrl;
+                }
+            }
+            return resultVM;
         }
 
         // 🔹 Create item + group children
@@ -202,6 +287,8 @@ namespace SchoolManagement.Services.Implementation
                     Height = vm.Height ?? 0,
                     Width = vm.Width ?? 0,
                     Depth = vm.Depth ?? 0,
+                    Size = vm.Size,
+                    ParentItemId = vm.ParentItemId,
                     Description = vm.Description,
                     ItemCode = vm.ItemCode,
                     IsGroup = vm.IsGroup || vm.GroupItems.Any(),
@@ -284,6 +371,79 @@ namespace SchoolManagement.Services.Implementation
             }
 
             return response;
+        }
+
+        // 🔹 Helper to upload file
+        private string UploadFile(Microsoft.AspNetCore.Http.IFormFile file)
+        {
+             try
+            {
+                if (file == null || file.Length == 0) return null;
+
+                string connectionString = _configuration.GetSection("AzureBlobStorage:ConnectionString").Value;
+                bool useDevelopmentStorage = connectionString == "UseDevelopmentStorage=true";
+
+                if (useDevelopmentStorage)
+                {
+                    // Local Storage
+                    var uploadsFolder = Path.Combine(_environment.WebRootPath ?? _environment.ContentRootPath, "uploads");
+                    if (!Directory.Exists(uploadsFolder))
+                        Directory.CreateDirectory(uploadsFolder);
+
+                    string fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+                    string filePath = Path.Combine(uploadsFolder, fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        file.CopyTo(stream);
+                    }
+
+                    // Return relative path or full URL depending on need. Returning relative path assuming hosted correctly.
+                    // Or constructing simplified URL.
+                    // NOTE: Context.Request is not available in Service. We return a relative path or rely on hardcoded base if needed.
+                    // For now, let's return "/uploads/filename"
+                    return $"/uploads/{fileName}";
+                }
+                else
+                {
+                    // Azure Storage
+                     string containerName = "student-docs"; // Reusing container or make configurable
+                     if (string.IsNullOrEmpty(connectionString)) return null;
+
+                     Azure.Storage.Blobs.BlobServiceClient blobServiceClient = new Azure.Storage.Blobs.BlobServiceClient(connectionString);
+                     Azure.Storage.Blobs.BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(containerName);
+                     containerClient.CreateIfNotExists();
+                     // containerClient.SetAccessPolicy(Azure.Storage.Blobs.Models.PublicAccessType.Blob);
+
+                     string blobName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+                     Azure.Storage.Blobs.BlobClient blobClient = containerClient.GetBlobClient(blobName);
+
+                     using (var stream = file.OpenReadStream())
+                     {
+                         blobClient.Upload(stream, true);
+                     }
+                     
+                     // SAS or Public URL? GeneralController usage suggests SAS generation.
+                     // Copying SAS logic.
+                    var sasBuilder = new Azure.Storage.Sas.BlobSasBuilder
+                    {
+                        BlobContainerName = containerName,
+                        BlobName = blobName,
+                        Resource = "b",
+                        ExpiresOn = DateTimeOffset.UtcNow.AddYears(100)
+                    };
+                    sasBuilder.SetPermissions(Azure.Storage.Sas.BlobSasPermissions.Read);
+
+                    Uri sasUri = blobClient.GenerateSasUri(sasBuilder);
+                    return sasUri.ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log failure
+                Console.WriteLine($"Upload failed: {ex.Message}");
+                return null;
+            }
         }
     }
 }

@@ -10,7 +10,7 @@ namespace SchoolManagement.ViewModel.ItemBranch
         public int ItemPrice { get; set; }
         public int ItemCost { get; set; }
         public int ItemReOrderLevel { get; set; }
-        public int ItemLocationId { get; set; }
+        public int? ItemLocationId { get; set; }
         public int TenantId { get; set; }
         public int CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }

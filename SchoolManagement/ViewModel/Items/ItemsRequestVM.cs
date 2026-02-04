@@ -8,13 +8,18 @@ namespace SchoolManagement.ViewModel.Items
         public string Name { get; set; } = string.Empty;
         public int CategoryId { get; set; }
         public int TenantId { get; set; }
+        public int? ParentItemId { get; set; }
 
         public int? Height { get; set; }
         public int? Width { get; set; }
         public int? Depth { get; set; }
+        public int? Size { get; set; }
 
         public string? Description { get; set; }
         public string? ItemCode { get; set; }
+        
+        // 🔹 File Upload
+        public Microsoft.AspNetCore.Http.IFormFile? Image { get; set; }
 
         // 🔹 Group flag
         public bool IsGroup { get; set; } = false;
@@ -36,9 +41,11 @@ namespace SchoolManagement.ViewModel.Items
                 Name = this.Name,
                 CategoryId = this.CategoryId,
                 TenantId = this.TenantId,
+                ParentItemId = this.ParentItemId,
                 Height = this.Height ?? 0,
                 Width = this.Width ?? 0,
                 Depth = this.Depth ?? 0,
+                Size = this.Size,
                 Description = this.Description,
                 ItemCode = this.ItemCode,
                 IsGroup = this.IsGroup,

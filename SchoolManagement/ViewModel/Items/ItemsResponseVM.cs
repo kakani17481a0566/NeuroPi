@@ -9,12 +9,15 @@ namespace SchoolManagement.ViewModel.Items
         public int Height { get; set; }
         public int Width { get; set; }
         public int Depth { get; set; }
+        public int? Size { get; set; }
+        public int? ParentItemId { get; set; }
         public string Name { get; set; } = string.Empty;
         public int TenantId { get; set; }
 
         public string? Description { get; set; }   // ✅ added
-        public string? ItemCode { get; set; }      // ✅ added
-        public bool IsGroup { get; set; }          // ✅ added
+        public string? ItemCode { get; set; }      
+        public bool IsGroup { get; set; }          
+        public string? Image { get; set; }
 
         public int CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }
@@ -30,6 +33,8 @@ namespace SchoolManagement.ViewModel.Items
                 Height = items.Height,
                 Width = items.Width,
                 Depth = items.Depth,
+                Size = items.Size,
+                ParentItemId = items.ParentItemId,
                 Name = items.Name,
                 TenantId = items.TenantId,
                 Description = items.Description,   // ✅ mapped

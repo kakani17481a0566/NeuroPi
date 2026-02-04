@@ -4,6 +4,7 @@ using SchoolManagement.Model;
 using SchoolManagement.Response;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.FeeTransactions;
+using SchoolManagement.ViewModel.Student;
 using System.Net;
 
 namespace SchoolManagement.Services.Implementation
@@ -238,7 +239,10 @@ namespace SchoolManagement.Services.Implementation
                                     Debit = ft.Debit,
                                     Credit = ft.Credit,
                                     TrxStatus = ft.TrxStatus,
-                                    PaymentType = m.Name ?? "Annual"
+                                    // Removed duplicate assignment lines
+
+                                    PaymentType = m.Name ?? "Annual",
+                                    StudentName = s.Name // Added
                                 }).ToList();
 
             if (!transactions.Any())
@@ -319,7 +323,10 @@ namespace SchoolManagement.Services.Implementation
                                     Debit = ft.Debit,
                                     Credit = ft.Credit,
                                     TrxStatus = ft.TrxStatus,
-                                    PaymentType = m.Name ?? "Annual"
+                                    // Removed duplicate assignment lines
+
+                                    PaymentType = m.Name ?? "Annual",
+                                    StudentName = s.Name // Added
                                 })
                                 .Take(limit)
                                 .ToList();
@@ -438,6 +445,323 @@ namespace SchoolManagement.Services.Implementation
                     0,
                     $"Error adding bill: {ex.Message}"
                 );
+            }
+        }
+
+        public ResponseResult<FeeStatsVM> GetBranchFeeStats(int tenantId, int branchId)
+        {
+            try
+            {
+                var transactions = (from ft in _db.FeeTransactions
+                                    join s in _db.Students on ft.StudentId equals s.Id
+                                    where ft.TenantId == tenantId
+                                       && s.BranchId == branchId
+                                       && !ft.IsDeleted
+                                    select new { ft.Debit, ft.Credit });
+
+                var stats = new FeeStatsVM
+                {
+                    TotalFee = transactions.Sum(t => t.Debit),
+                    TotalPaid = transactions.Sum(t => t.Credit)
+                };
+
+                stats.PendingFee = stats.TotalFee - stats.TotalPaid;
+
+                return new ResponseResult<FeeStatsVM>(
+                    HttpStatusCode.OK,
+                    stats,
+                    "Branch fee stats retrieved successfully."
+                );
+            }
+            catch (Exception ex)
+            {
+                return new ResponseResult<FeeStatsVM>(
+                    HttpStatusCode.InternalServerError,
+                    null,
+                    $"Error fetching branch stats: {ex.Message}"
+                );
+            }
+        }
+
+        public ResponseResult<List<FeeReportTransactionVM>> GetBranchTransactions(int tenantId, int branchId, int limit)
+        {
+            var transactions = (from ft in _db.FeeTransactions
+                                join s in _db.Students on ft.StudentId equals s.Id
+                                join fs in _db.FeeStructures on ft.FeeStructureId equals fs.Id
+                                join fp in _db.FeePackages
+                                      on new { ft.FeeStructureId, s.CourseId, ft.TenantId }
+                                   equals new { FeeStructureId = fp.FeeStructureId, fp.CourseId, fp.TenantId }
+                                      into fpJoin
+                                from fp in fpJoin.DefaultIfEmpty()
+                                join m in _db.Masters on fp.PaymentPeriod equals m.Id into mJoin
+                                from m in mJoin.DefaultIfEmpty()
+                                where ft.TenantId == tenantId
+                                   && s.BranchId == branchId
+                                   && !ft.IsDeleted
+                                   && ft.TrxDate <= DateTime.UtcNow
+                                orderby ft.TrxDate descending
+                                select new FeeReportTransactionVM
+                                {
+                                    Id = ft.Id,
+                                    TenantId = ft.TenantId,
+                                    FeeStructureId = ft.FeeStructureId,
+                                    FeeStructureName = fs.Name,
+                                    StudentId = ft.StudentId,
+                                    TrxDate = ft.TrxDate,
+                                    TrxMonth = ft.TrxDate.ToString("MMM"),
+                                    TrxYear = ft.TrxDate.Year.ToString(),
+                                    TrxType = ft.TrxType,
+                                    TrxName = ft.TrxName,
+                                    Debit = ft.Debit,
+                                    Credit = ft.Credit,
+                                    TrxStatus = ft.TrxStatus,
+                                    PaymentType = m.Name ?? "Annual",
+                                    StudentName = s.Name
+                                })
+                                .Take(limit)
+                                .ToList();
+
+            return new ResponseResult<List<FeeReportTransactionVM>>(
+                HttpStatusCode.OK,
+                transactions,
+                $"Retrieved {transactions.Count} branch transactions."
+            );
+        }
+
+        public ResponseResult<List<FeeHistoryVM>> GetBranchFeeHistory(int tenantId, int branchId)
+        {
+            var today = DateTime.UtcNow;
+            var startOfYear = new DateTime(today.Year, 1, 1);
+
+            // Fetch transactions for the current year
+            var transactions = (from ft in _db.FeeTransactions
+                                join s in _db.Students on ft.StudentId equals s.Id
+                                where ft.TenantId == tenantId
+                                   && s.BranchId == branchId
+                                   && !ft.IsDeleted
+                                   && ft.TrxDate >= startOfYear
+                                select new { ft.TrxDate, ft.Credit, ft.Debit })
+                                .ToList();
+
+            // Aggregate by month
+            var aggregated = transactions
+                .GroupBy(t => t.TrxDate.Month)
+                .Select(g => new
+                {
+                    Month = g.Key,
+                    Collected = g.Sum(x => x.Credit),
+                    Generated = g.Sum(x => x.Debit)
+                })
+                .OrderBy(x => x.Month)
+                .ToList();
+
+            var result = new List<FeeHistoryVM>();
+            for (int i = 1; i <= 12; i++)
+            {
+                var monthData = aggregated.FirstOrDefault(x => x.Month == i);
+                result.Add(new FeeHistoryVM
+                {
+                    Month = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(i),
+                    Collected = monthData?.Collected ?? 0,
+                    Generated = monthData?.Generated ?? 0
+                });
+            }
+
+            return new ResponseResult<List<FeeHistoryVM>>(
+                HttpStatusCode.OK,
+                result,
+                "Branch fee history retrieved successfully."
+            );
+        }
+        public ResponseResult<List<StudentListVM>> GetCompletedPayments(int tenantId, int branchId)
+        {
+            try
+            {
+                // 1. Fetch all transactions for this branch to calculate balances
+                // Executing this part on DB
+                var studentTransactions = (from ft in _db.FeeTransactions
+                                           join s in _db.Students on ft.StudentId equals s.Id
+                                           where ft.TenantId == tenantId && s.BranchId == branchId && !ft.IsDeleted
+                                           select new { ft.StudentId, ft.Debit, ft.Credit })
+                                           .ToList();
+
+                // 2. Perform Grouping and Filtering in Memory (Client-side)
+                // This avoids EF Core translation exceptions for complex GroupBy queries
+                var paidStudentIds = studentTransactions
+                    .GroupBy(x => x.StudentId)
+                    .Select(g => new
+                    {
+                        StudentId = g.Key,
+                        TotalDebit = g.Sum(x => x.Debit),
+                        TotalCredit = g.Sum(x => x.Credit)
+                    })
+                    .Where(x => x.TotalDebit > 0 && (x.TotalDebit - x.TotalCredit) <= 0)
+                    .Select(x => x.StudentId)
+                    .ToList();
+
+                if (!paidStudentIds.Any())
+                {
+                    return new ResponseResult<List<StudentListVM>>(HttpStatusCode.OK, new List<StudentListVM>(), "No students found with completed payments.");
+                }
+
+                // 3. Fetch Student Details for the identified IDs
+                var completedStudents = _db.Students
+                    .Include(s => s.Course)
+                    .Where(s => paidStudentIds.Contains(s.Id))
+                    .Select(s => new StudentListVM
+                    {
+                        Id = s.Id,
+                        FirstName = s.Name,
+                        LastName = s.LastName ?? "",
+                        CourseName = s.Course.Name,
+                        BranchName = ""
+                    })
+                    .ToList();
+
+                return new ResponseResult<List<StudentListVM>>(HttpStatusCode.OK, completedStudents, $"Found {completedStudents.Count} students with completed payments.");
+            }
+            catch (Exception ex)
+            {
+                return new ResponseResult<List<StudentListVM>>(HttpStatusCode.InternalServerError, null, $"Error fetching completed payments: {ex.Message}");
+            }
+        }
+
+        public ResponseResult<List<StudentPendingFeeVM>> GetPendingPayments(int tenantId, int branchId)
+        {
+            try
+            {
+                // 1. Fetch raw transaction data
+                var studentTransactions = (from ft in _db.FeeTransactions
+                                           join s in _db.Students on ft.StudentId equals s.Id
+                                           where ft.TenantId == tenantId && s.BranchId == branchId && !ft.IsDeleted
+                                           select new { ft.StudentId, ft.Debit, ft.Credit })
+                                           .ToList();
+
+                // 2. Group and calculate pending amounts in memory
+                var pendingStudents = studentTransactions
+                    .GroupBy(x => x.StudentId)
+                    .Select(g => new
+                    {
+                        StudentId = g.Key,
+                        TotalFee = g.Sum(x => x.Debit),
+                        TotalPaid = g.Sum(x => x.Credit)
+                    })
+                    .Select(x => new
+                    {
+                        x.StudentId,
+                        x.TotalFee,
+                        PendingAmount = x.TotalFee - x.TotalPaid
+                    })
+                    .Where(x => x.PendingAmount > 0 && x.TotalFee > 0)
+                    .ToList();
+
+                if (!pendingStudents.Any())
+                {
+                    return new ResponseResult<List<StudentPendingFeeVM>>(HttpStatusCode.OK, new List<StudentPendingFeeVM>(), "No students found with pending payments.");
+                }
+
+                // 3. Fetch Student Details
+                var pendingStudentIds = pendingStudents.Select(p => p.StudentId).ToList();
+                
+                var students = _db.Students
+                    .Include(s => s.Course)
+                    .Where(s => pendingStudentIds.Contains(s.Id))
+                    .Select(s => new { s.Id, s.Name, s.LastName, CourseName = s.Course.Name })
+                    .ToList();
+
+                // 4. Merge details with calculated pending amount
+                var result = pendingStudents
+                    .Join(students,
+                          p => p.StudentId,
+                          s => s.Id,
+                          (p, s) => new StudentPendingFeeVM
+                          {
+                              StudentId = s.Id,
+                              StudentName = $"{s.Name} {s.LastName}".Trim(),
+                              CourseName = s.CourseName,
+                              TotalFee = p.TotalFee,
+                              PendingAmount = p.PendingAmount,
+                              PendingPercentage = (double)((p.PendingAmount / p.TotalFee) * 100)
+                          })
+                    .OrderByDescending(x => x.PendingPercentage)
+                    .ToList();
+
+                return new ResponseResult<List<StudentPendingFeeVM>>(HttpStatusCode.OK, result, $"Found {result.Count} students with pending payments.");
+            }
+            catch (Exception ex)
+            {
+                return new ResponseResult<List<StudentPendingFeeVM>>(HttpStatusCode.InternalServerError, null, $"Error fetching pending payments: {ex.Message}");
+            }
+        }
+        public ResponseResult<FeeStatsVM> GetTenantFeeStats(int tenantId)
+        {
+            try
+            {
+                var transactions = (from ft in _db.FeeTransactions
+                                    where ft.TenantId == tenantId && !ft.IsDeleted
+                                    select new { ft.Debit, ft.Credit })
+                                    .ToList();
+
+                var stats = new FeeStatsVM
+                {
+                    TotalFee = transactions.Sum(t => t.Debit),
+                    TotalPaid = transactions.Sum(t => t.Credit)
+                };
+                stats.PendingFee = stats.TotalFee - stats.TotalPaid;
+
+                return new ResponseResult<FeeStatsVM>(HttpStatusCode.OK, stats, "Tenant fee stats retrieved successfully.");
+            }
+            catch (Exception ex)
+            {
+                return new ResponseResult<FeeStatsVM>(HttpStatusCode.InternalServerError, null, $"Error fetching tenant stats: {ex.Message}");
+            }
+        }
+
+        public ResponseResult<List<BranchFeeStatsVM>> GetBranchWiseFeeStats(int tenantId)
+        {
+            try
+            {
+                // 1. Get stats grouped by branch from transactions
+                var branchStats = (from ft in _db.FeeTransactions
+                                   join s in _db.Students on ft.StudentId equals s.Id
+                                   where ft.TenantId == tenantId && !ft.IsDeleted
+                                   select new { s.BranchId, ft.Debit, ft.Credit })
+                                  .GroupBy(x => x.BranchId)
+                                  .Select(g => new
+                                  {
+                                      BranchId = g.Key,
+                                      TotalFee = g.Sum(x => x.Debit),
+                                      TotalPaid = g.Sum(x => x.Credit)
+                                  })
+                                  .ToList();
+
+                // 2. Get Branch Names
+                var branchIds = branchStats.Select(b => b.BranchId).ToList();
+                var branches = _db.Branches
+                    .Where(b => branchIds.Contains(b.Id))
+                    .Select(b => new { b.Id, b.Name })
+                    .ToList();
+
+                // 3. Join and project
+                var result = branchStats.Join(branches,
+                    stat => stat.BranchId,
+                    branch => branch.Id,
+                    (stat, branch) => new BranchFeeStatsVM
+                    {
+                        BranchId = stat.BranchId,
+                        BranchName = branch.Name,
+                        TotalFee = stat.TotalFee,
+                        TotalPaid = stat.TotalPaid,
+                        PendingFee = stat.TotalFee - stat.TotalPaid
+                    })
+                    .OrderBy(x => x.BranchName)
+                    .ToList();
+
+                return new ResponseResult<List<BranchFeeStatsVM>>(HttpStatusCode.OK, result, $"Retrieved stats for {result.Count} branches.");
+            }
+            catch (Exception ex)
+            {
+                return new ResponseResult<List<BranchFeeStatsVM>>(HttpStatusCode.InternalServerError, null, $"Error fetching branch-wise stats: {ex.Message}");
             }
         }
     }

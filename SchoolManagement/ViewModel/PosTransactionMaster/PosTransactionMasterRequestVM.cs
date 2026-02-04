@@ -2,7 +2,7 @@
 using SchoolManagement.ViewModel.PosTransactionMaster;
 using System.ComponentModel.DataAnnotations;
 
-namespace SchoolManagement.ViewModel.PostTransactionMaster
+namespace SchoolManagement.ViewModel.PosTransactionMaster
 {
     public class PosTransactionMasterRequestVM
     {
@@ -11,7 +11,10 @@ namespace SchoolManagement.ViewModel.PostTransactionMaster
 
         public int TenantId { get; set; }
 
+
         public List<PosItem> Items { get; set; }
+
+        public string PaymentMethod { get; set; }
 
 
         
@@ -22,8 +25,7 @@ namespace SchoolManagement.ViewModel.PostTransactionMaster
             return new MPosTransactionMaster
             {
                 StudentId = requestVM.StudentId,
-                TenantId = requestVM.TenantId,
-                
+                TenantId = requestVM.TenantId
             };
         }
     }

@@ -16,6 +16,7 @@ namespace SchoolManagement.Data
 
         public DbSet<MTenant> Tenants { get; set; }
         public DbSet<MUser> Users { get; set; }  // Add if missing
+        public DbSet<MRole> Roles { get; set; }
 
 
 
@@ -24,7 +25,7 @@ namespace SchoolManagement.Data
         public DbSet<MInstitution> Institutions { get; set; }
         public DbSet<MMasterType> MasterTypes { get; set; }
         public DbSet<MMaster> Masters { get; set; }
-        public DbSet<MItemHeader> ItemHeaders { get; set; }
+        public DbSet<MLibraryBookTitle> LibraryBookTitles { get; set; }
         public DbSet<MItems> Items { get; set; }
         public DbSet<MLibBookRecord> LibBookRecords { get; set; }
         public DbSet<MBook> Books { get; set; }
@@ -77,7 +78,7 @@ namespace SchoolManagement.Data
 
         public DbSet<MItems> items { get; set; }
 
-        public DbSet<MItem> item { get; set; }
+        public DbSet<MLibraryBookCopy> LibraryBookCopies { get; set; }
 
         public DbSet<MItemCategory> ItemCategory { get; set; }
 
@@ -152,7 +153,21 @@ namespace SchoolManagement.Data
 
         public DbSet<MGeneticRegistration> GeneticRegistrations { get; set; }
 
+        public DbSet<MPageSessionLog> PageSessionLogs { get; set; }
 
+        // ========================================
+        // GLOBAL INVENTORY MANAGEMENT SYSTEM
+        // ========================================
+        public DbSet<MItemUom> ItemUoms { get; set; }
+        public DbSet<MItemCostHistory> ItemCostHistory { get; set; }
+        public DbSet<MStockAdjustmentReason> StockAdjustmentReasons { get; set; }
+        public DbSet<MStocktakeHeader> StocktakeHeaders { get; set; }
+        public DbSet<MStocktakeLine> StocktakeLines { get; set; }
+        public DbSet<MSupplierPerformance> SupplierPerformance { get; set; }
+        public DbSet<MItemSerialNumber> ItemSerialNumbers { get; set; }
+        public DbSet<MItemBatch> ItemBatches { get; set; }
+        public DbSet<MStockTransactionLog> StockTransactionLogs { get; set; }
+        public DbSet<MInventoryTransfer> InventoryTransfers { get; set; }
 
 
 

@@ -19,6 +19,9 @@ namespace NeuroPi.CommonLib.Model
         public DateTime? UpdatedOn { get; set; }
 
 
+
+
+
         [Column("updated_by")]
 
         public int? UpdatedBy { get; set; }

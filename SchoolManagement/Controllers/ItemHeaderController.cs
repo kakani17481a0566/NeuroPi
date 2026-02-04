@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using NeuroPi.UserManagment.Response;
 using SchoolManagement.Services.Interface;
-using SchoolManagement.ViewModel.ItemHeader;
+using SchoolManagement.ViewModel.LibraryBookTitle;
 using System.Net;
 
 namespace SchoolManagement.Controllers
@@ -11,46 +11,46 @@ namespace SchoolManagement.Controllers
     [ApiController]
     public class ItemHeaderController : ControllerBase
     {
-        private readonly IItemHeaderService _itemHeaderService;
+        private readonly ILibraryBookTitleService _libraryBookTitleService;
 
-        public ItemHeaderController(IItemHeaderService itemHeaderService)
+        public ItemHeaderController(ILibraryBookTitleService libraryBookTitleService)
         {
-            _itemHeaderService = itemHeaderService;
+            _libraryBookTitleService = libraryBookTitleService;
         }
 
         [HttpGet("{tenantId}")]
-        public ResponseResult<List<ItemHeaderResponseVM>> GetAllByTenantId([FromRoute] int tenantId)
+        public ResponseResult<List<LibraryBookTitleResponseVM>> GetAllByTenantId([FromRoute] int tenantId)
         {
-            var response = _itemHeaderService.GetAllByTenantId(tenantId);
+            var response = _libraryBookTitleService.GetAllByTenantId(tenantId);
             if (response == null || response.Count == 0)
             {
-                return new ResponseResult<List<ItemHeaderResponseVM>>(HttpStatusCode.OK, new List<ItemHeaderResponseVM>(), "No data Found");
+                return new ResponseResult<List<LibraryBookTitleResponseVM>>(HttpStatusCode.OK, new List<LibraryBookTitleResponseVM>(), "No data Found");
             }
-            return new ResponseResult<List<ItemHeaderResponseVM>>(HttpStatusCode.OK, response, "Item Headers fetched successfully");
+            return new ResponseResult<List<LibraryBookTitleResponseVM>>(HttpStatusCode.OK, response, "Item Headers fetched successfully");
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] ItemHeaderRequestVM request)
+        public IActionResult Create([FromBody] LibraryBookTitleRequestVM request)
         {
-            var result = _itemHeaderService.CreateItemHeader(request);
-            return new ResponseResult<ItemHeaderResponseVM>(HttpStatusCode.Created, result, "Book created successfully");
+            var result = _libraryBookTitleService.CreateLibraryBookTitle(request);
+            return new ResponseResult<LibraryBookTitleResponseVM>(HttpStatusCode.Created, result, "Book created successfully");
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] ItemHeaderRequestVM request)
+        public IActionResult Update(int id, [FromBody] LibraryBookTitleRequestVM request)
         {
-            var result = _itemHeaderService.UpdateItemHeader(id, request);
+            var result = _libraryBookTitleService.UpdateLibraryBookTitle(id, request);
             if (result == null)
             {
                 return new ResponseResult<string>(HttpStatusCode.NotFound, null, "Book not found");
             }
-            return new ResponseResult<ItemHeaderResponseVM>(HttpStatusCode.OK, result, "Book updated successfully");
+            return new ResponseResult<LibraryBookTitleResponseVM>(HttpStatusCode.OK, result, "Book updated successfully");
         }
 
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var result = _itemHeaderService.DeleteItemHeader(id);
+            var result = _libraryBookTitleService.DeleteLibraryBookTitle(id);
              if (!result)
             {
                 return new ResponseResult<string>(HttpStatusCode.NotFound, null, "Book not found");

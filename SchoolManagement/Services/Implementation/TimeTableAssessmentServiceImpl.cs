@@ -1,6 +1,7 @@
 ﻿using SchoolManagement.Data;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.TimeTableAssessment;
+using Microsoft.EntityFrameworkCore;
 
 namespace SchoolManagement.Services.Implementation
 {
@@ -39,6 +40,10 @@ namespace SchoolManagement.Services.Implementation
         public List<TimeTableAssessmentResponseVM> GetAllTimeTableAssessments()
         {
             var assessments = _context.TimeTableAssessments
+                .Include(a => a.Assessment)
+                .ThenInclude(a => a.AssessmentSkill)
+                .Include(a => a.Assessment)
+                .ThenInclude(a => a.Topic)
                 .Where(a => !a.IsDeleted)
                 .ToList();
             return assessments.Select(TimeTableAssessmentResponseVM.ToViewModel).ToList();
@@ -47,6 +52,10 @@ namespace SchoolManagement.Services.Implementation
         public TimeTableAssessmentResponseVM GetTimeTableAssessmentById(int id)
         {
             var assessment = _context.TimeTableAssessments
+                .Include(a => a.Assessment)
+                .ThenInclude(a => a.AssessmentSkill)
+                .Include(a => a.Assessment)
+                .ThenInclude(a => a.Topic)
                 .FirstOrDefault(a => a.Id == id && !a.IsDeleted);
             if (assessment == null)
             {
@@ -59,6 +68,10 @@ namespace SchoolManagement.Services.Implementation
         public TimeTableAssessmentResponseVM GetTimeTableAssessmentByTenantIdAndId(int tenantId, int id)
         {
             var assessment = _context.TimeTableAssessments
+                .Include(a => a.Assessment)
+                .ThenInclude(a => a.AssessmentSkill)
+                .Include(a => a.Assessment)
+                .ThenInclude(a => a.Topic)
                 .FirstOrDefault(a => a.Id == id && a.TenantId == tenantId && !a.IsDeleted);
             if (assessment == null)
             {
@@ -70,6 +83,10 @@ namespace SchoolManagement.Services.Implementation
         public List<TimeTableAssessmentResponseVM> GetTimeTableAssessmentsByTenantId(int tenantId)
         {
             var assessments = _context.TimeTableAssessments
+                .Include(a => a.Assessment)
+                .ThenInclude(a => a.AssessmentSkill)
+                .Include(a => a.Assessment)
+                .ThenInclude(a => a.Topic)
                 .Where(a => a.TenantId == tenantId && !a.IsDeleted)
                 .ToList();
             return assessments.Select(TimeTableAssessmentResponseVM.ToViewModel).ToList();
@@ -79,6 +96,10 @@ namespace SchoolManagement.Services.Implementation
         public List<TimeTableAssessmentResponseVM> GetTimeTableAssessmentsByTimeTableId(int timeTableId, int tenantId)
         {
             var assessments = _context.TimeTableAssessments
+                .Include(a => a.Assessment)
+                .ThenInclude(a => a.AssessmentSkill)
+                .Include(a => a.Assessment)
+                .ThenInclude(a => a.Topic)
                 .Where(a => a.TimeTableId == timeTableId && a.TenantId == tenantId && !a.IsDeleted)
                 .ToList();
             return assessments.Select(TimeTableAssessmentResponseVM.ToViewModel).ToList();

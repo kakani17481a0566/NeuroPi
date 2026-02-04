@@ -2,6 +2,7 @@
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.FeeTransactions;
 using SchoolManagement.Response;
+using SchoolManagement.ViewModel.Student;
 
 namespace SchoolManagement.Controllers
 {
@@ -39,6 +40,39 @@ namespace SchoolManagement.Controllers
             return _feeTransactionsService.GetRecentTransactions(tenantId, branchId, courseId, limit);
         }
 
+        [HttpGet("branch-stats/{tenantId:int}/{branchId:int}")]
+        public ResponseResult<FeeStatsVM> GetBranchFeeStats(int tenantId, int branchId)
+        {
+            return _feeTransactionsService.GetBranchFeeStats(tenantId, branchId);
+        }
+
+        [HttpGet("branch-transactions/{tenantId:int}/{branchId:int}")]
+        public ResponseResult<List<FeeReportTransactionVM>> GetBranchTransactions(
+            int tenantId, 
+            int branchId, 
+            [FromQuery] int limit = 5)
+        {
+            return _feeTransactionsService.GetBranchTransactions(tenantId, branchId, limit);
+        }
+
+        [HttpGet("branch-history/{tenantId:int}/{branchId:int}")]
+        public ResponseResult<List<FeeHistoryVM>> GetBranchFeeHistory(int tenantId, int branchId)
+        {
+            return _feeTransactionsService.GetBranchFeeHistory(tenantId, branchId);
+        }
+
+        [HttpGet("completed-payments/{tenantId}/{branchId}")]
+        public ResponseResult<List<StudentListVM>> GetCompletedPayments(int tenantId, int branchId)
+        {
+            return _feeTransactionsService.GetCompletedPayments(tenantId, branchId);
+        }
+
+        [HttpGet("pending-payments/{tenantId}/{branchId}")]
+        public ResponseResult<List<StudentPendingFeeVM>> GetPendingPayments(int tenantId, int branchId)
+        {
+            return _feeTransactionsService.GetPendingPayments(tenantId, branchId);
+        }
+
         [HttpPost("add-payment")]
         public ResponseResult<int> AddPayment([FromBody] AddPaymentRequest request)
         {
@@ -49,6 +83,18 @@ namespace SchoolManagement.Controllers
         public ResponseResult<int> AddBill([FromBody] AddBillRequest request)
         {
             return _feeTransactionsService.AddBill(request);
+        }
+
+        [HttpGet("tenant-stats/{tenantId:int}")]
+        public ResponseResult<FeeStatsVM> GetTenantFeeStats(int tenantId)
+        {
+            return _feeTransactionsService.GetTenantFeeStats(tenantId);
+        }
+
+        [HttpGet("branch-wise-stats/{tenantId:int}")]
+        public ResponseResult<List<BranchFeeStatsVM>> GetBranchWiseFeeStats(int tenantId)
+        {
+            return _feeTransactionsService.GetBranchWiseFeeStats(tenantId);
         }
     }
 }

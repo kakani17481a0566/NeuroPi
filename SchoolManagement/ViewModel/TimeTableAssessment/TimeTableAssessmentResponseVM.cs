@@ -1,4 +1,5 @@
 ﻿using SchoolManagement.Model;
+using SchoolManagement.ViewModel.Assessment;
 
 namespace SchoolManagement.ViewModel.TimeTableAssessment
 {
@@ -20,6 +21,8 @@ namespace SchoolManagement.ViewModel.TimeTableAssessment
 
         public DateTime? UpdatedOn { get; set; }
 
+        public AssessmentResponseVM Assessment { get; set; }
+
 
         public static TimeTableAssessmentResponseVM ToViewModel(MTimeTableAssessment model)
         {
@@ -34,7 +37,9 @@ namespace SchoolManagement.ViewModel.TimeTableAssessment
                 CreatedBy = model.CreatedBy,
                 CreatedOn = model.CreatedOn,
                 UpdatedBy = model.UpdatedBy,
-                UpdatedOn = model.UpdatedOn
+               
+                UpdatedOn = model.UpdatedOn,
+                Assessment = model.Assessment != null ? AssessmentResponseVM.FromModel(model.Assessment) : null
             };
         }
 
