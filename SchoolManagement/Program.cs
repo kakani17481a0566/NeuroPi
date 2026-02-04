@@ -42,6 +42,7 @@ builder.Services.AddScoped<IUserRolesService, UserRolesServiceImpl>();
 builder.Services.AddScoped<IUserService, UserServiceImpl>();
 builder.Services.AddScoped<IAudioTranscriptionService, AudioTranscriptionServiceImpl>();
 builder.Services.AddScoped<ApiKeyService>();
+builder.Services.AddScoped<IMainMenuService, MainMenuServiceImpl>();
 
 builder.Services.AddScoped<VisitorInterface, VisitorServiceImpl>();
 builder.Services.AddScoped<IPhoneLogService, PhoneLogServiceImpl>();
