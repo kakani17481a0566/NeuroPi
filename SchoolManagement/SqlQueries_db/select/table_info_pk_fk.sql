@@ -1,6 +1,12 @@
 select C.table_name ,c.ordinal_position ,c.column_name ,c.data_type ,c.column_default  from information_schema."columns" c 
 where c.table_name  in (
-        'item_suppliers'
+        'item_suppliers',
+        'academic_year',
+        'term',
+        'roles',
+        'role_permissions',
+        'main_menu',
+        'menu'
   )
 order by c.table_name ,c.ordinal_position ;
 
@@ -22,5 +28,13 @@ JOIN unnest(con.confkey) WITH ORDINALITY AS tgt_cols(attnum, ord) ON src_cols.or
 JOIN pg_attribute src_col ON src_col.attnum = src_cols.attnum AND src_col.attrelid = con.conrelid
 JOIN pg_attribute tgt_col ON tgt_col.attnum = tgt_cols.attnum AND tgt_col.attrelid = con.confrelid
 WHERE con.contype = 'f'  -- Foreign key
-  AND src_table.relname = 'item_suppliers'
+  AND src_table.relname in (
+        'item_suppliers',
+        'academic_year',
+        'term',
+        'roles',
+        'role_permissions',
+        'main_menu',
+        'menu'
+  )
 ORDER BY src_table.relname, src_cols.ord;
