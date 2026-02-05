@@ -24,6 +24,6 @@ namespace NeuroPi.UserManagment.Model
 
         // Navigation properties
         public virtual MTenant Tenant { get; set; }
-        public virtual ICollection<MRolePermission> RolePermissions { get; set; } = new List<MRolePermission>();
+        //public virtual ICollection<MRolePermission> RolePermissions { get; set; } = new List<MRolePermission>();
     }
 }

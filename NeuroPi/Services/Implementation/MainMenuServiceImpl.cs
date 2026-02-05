@@ -14,31 +14,35 @@ namespace NeuroPi.UserManagment.Services.Implementation
         }
         public List<MainMenuResponseVM> GetAllMainMenus(int roleId)
         {
-            var result=_context.MainMenus.Where(m=>!m.IsDeleted).ToList();
-            var menuResults=_context.Menu.Where(m=>!m.IsDeleted).ToList();
-            if (result.Count > 0)
-            { 
-                    var menus = menuResults.Select(item => new MenuResponseVM
+            List<MainMenuResponseVM> responseVMs = new List<MainMenuResponseVM>();
+            var roleMenu = _context.RolePermissions.Where(r => r.RoleId == roleId && !r.IsDeleted).Include(i => i.Menu.MainMenu).ToList();
+            if (roleMenu != null)
+            {
+
+                return roleMenu.Select(r => new MainMenuResponseVM()
+                {
+                    id = r.Menu.MainMenu.Name,
+                    path = r.Menu.MainMenu.Path,
+                    title = r.Menu.MainMenu.Title,
+                    type = r.Menu.MainMenu.Type,
+                    transkey = r.Menu.MainMenu.Transkey,
+                    Icon = r.Menu.MainMenu.Icon,
+                    childs = r.Menu.MainMenu.Menus.Select(r => new MenuResponseVM()
                     {
-                        id = item.Name,
-                        path = item.Path,
-                        type = item.Type,
-                        title = item.Title,
-                        transkey = item.TransKey,
-                        Icon = item.Icon
-                    }).ToList();
-                    var responseVMs = result.Select(menu => new MainMenuResponseVM
-                    {
-                        id = menu.Name,
-                        path = menu.Path,
-                        type = menu.Type,
-                        title = menu.Title,
-                        transkey = menu.Transkey,
-                        Icon = menu.Icon,
-                        childs = menus
-                    }).ToList();
-                return responseVMs;
+                        id = r.Name,
+                        path = r.Path,
+                        type = r.Type,
+                        title = r.Title,
+                        transkey = r.TransKey,
+                        Icon=r.Icon
+
+                    }).ToList(),
+
+                }).GroupBy(x => x.id)
+                  .Select(g => g.First()).ToList();
+
             }
+
             return null;
         }
 

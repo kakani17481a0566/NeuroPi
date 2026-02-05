@@ -48,6 +48,10 @@ namespace NeuroPi.UserManagment.Data
             modelBuilder.Entity<MRolePermission>()
                 .HasIndex(rp => new { rp.RoleId, rp.MenuId })
                 .IsUnique();
+            modelBuilder.Entity<MRolePermission>()
+                .HasOne(r=>r.Menu).WithMany(r=>r.RolePermissions).HasForeignKey(r => r.MenuId);
+            modelBuilder.Entity<MRolePermission>()
+                .HasOne(r => r.Role).WithMany(r => r.RolePermissions).HasForeignKey(r => r.RoleId);
 
             modelBuilder.Entity<MUserRole>()
                 .HasIndex(ur => new { ur.UserId, ur.RoleId })

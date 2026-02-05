@@ -16,10 +16,10 @@ namespace NeuroPi.UserManagment.Controllers
         {
           _mainMenuService = mainMenuService;  
         }
-        [HttpGet]
-        public ResponseResult<List<MainMenuResponseVM>> GetAllMainMenus()
+        [HttpGet("/{roleId}")]
+        public ResponseResult<List<MainMenuResponseVM>> GetAllMainMenus( int roleId)
         {
-            var result=_mainMenuService.GetAllMainMenus(1);
+            var result=_mainMenuService.GetAllMainMenus(roleId);
             return new ResponseResult<List<MainMenuResponseVM>>(HttpStatusCode.OK, result, "all menus fetched successfully");
         }
         [HttpGet("/menuoptins")]

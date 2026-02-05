@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using CloudinaryDotNet.Actions;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NeuroPi.UserManagment.Model
 {
@@ -27,6 +28,8 @@ namespace NeuroPi.UserManagment.Model
         public int MainMenuId {  get; set; }
         [ForeignKey(nameof(MainMenuId))]
         public MMainMenu MainMenu { get; set; }
+
+        public ICollection<MRolePermission> RolePermissions { get; set; }
 
 
     }
