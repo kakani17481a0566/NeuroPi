@@ -21,6 +21,8 @@ namespace NeuroPi.UserManagment.Services.Interface
 
         bool DeleteByIdAndTenantId(int id, int tenantId);
 
+        string AddMenus(List<RolePermissionRequestVM> menulists);
+
         
     }
 }

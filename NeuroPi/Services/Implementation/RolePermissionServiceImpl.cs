@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NeuroPi.UserManagment.Data;
+using NeuroPi.UserManagment.Model;
 using NeuroPi.UserManagment.Services.Interface;
 using NeuroPi.UserManagment.ViewModel.RolePermission;
 
@@ -103,6 +104,24 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 return RolePermissionDescVM.ToViewModelList(rolePermission);
             }
             return null;
+        }
+
+        public string AddMenus(List<RolePermissionRequestVM> menulists)
+        {
+            var result=_context.RolePermissions.Where(r=>!r.IsDeleted).ToList();
+            foreach (var menu in menulists)
+            {
+                if(!result.Any(m=>m.RoleId == menu.RoleId && m.MenuId == menu.MenuId))
+                {
+                    var newPermission = RolePermissionRequestVM.ToModel(menu);
+                    newPermission.CreatedOn = DateTime.UtcNow;
+                    _context.RolePermissions.Add(newPermission);
+                    _context.SaveChanges();
+                }
+
+            }
+            return "saved";
+            
         }
     }
 }

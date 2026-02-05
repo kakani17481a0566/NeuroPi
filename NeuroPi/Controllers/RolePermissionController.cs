@@ -148,6 +148,13 @@ namespace NeuroPi.UserManagment.Controllers
             
            
         }
+        [HttpPost("/permission")]
+        public ResponseResult<string> AddPermissions([FromBody]List<RolePermissionRequestVM> pemissionList)
+        {
+            var result = _rolePermissionService.AddMenus(pemissionList);
+            return new ResponseResult<string>(HttpStatusCode.OK, result, "All permissions added");
+
+        }
         
 
 

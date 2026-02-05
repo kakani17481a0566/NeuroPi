@@ -14,7 +14,7 @@ namespace NeuroPi.UserManagment.Services.Implementation
         }
         public List<MainMenuResponseVM> GetAllMainMenus(int roleId)
         {
-            List<MainMenuResponseVM> responseVMs = new List<MainMenuResponseVM>();
+           
             var roleMenu = _context.RolePermissions.Where(r => r.RoleId == roleId && !r.IsDeleted).Include(i => i.Menu.MainMenu).ToList();
             if (roleMenu != null)
             {

@@ -8,19 +8,13 @@ namespace NeuroPi.UserManagment.ViewModel.RolePermission
        
         public int RoleId { get; set; }
 
-        public int PermissionId { get; set; }
+        public int MenuId { get; set; }
 
         public int TenantId { get; set; }
 
-        public int CanCreate { get; set; }
+        public int createdBy { get; set; }
 
-        public int CanRead { get; set; }
-
-        public int CanUpdate { get; set; }
-
-        public int CanDelete { get; set; }
-
-        public int CreatedBy { get; set; }
+        public string Permissions {  get; set; }
 
 
         public static MRolePermission ToModel(RolePermissionRequestVM rolePermission)
@@ -28,10 +22,10 @@ namespace NeuroPi.UserManagment.ViewModel.RolePermission
             return new MRolePermission
             {
                 RoleId = rolePermission.RoleId,
-                MenuId = rolePermission.PermissionId,
+                MenuId = rolePermission.MenuId,
                 TenantId = rolePermission.TenantId,
-                CreatedBy = rolePermission.CreatedBy
-                
+                CreatedBy=rolePermission.createdBy,
+                Permissions = rolePermission.Permissions
             };
         }
     }
