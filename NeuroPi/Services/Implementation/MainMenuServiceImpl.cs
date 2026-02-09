@@ -69,5 +69,19 @@ namespace NeuroPi.UserManagment.Services.Implementation
             }
             return null;
         }
+
+        public List<MenuOptionsVM> GetOptions(int roleId)
+        {
+           var rolemenus=_context.RolePermissions.Where(r=>!r.IsDeleted && r.RoleId==roleId).ToList();
+           var menus=_context.Menu.Include(m=>m.MainMenu).Where(r=>!r.IsDeleted).ToList();
+            IEnumerable<int> assignedIds = rolemenus.Select(menu => menu.MenuId);
+            IEnumerable<int> completeIds = menus.Select(menu => menu.Id);
+            IEnumerable<int> remainingMenuIds = completeIds.Except(assignedIds);
+              var options = menus.Where(m => remainingMenuIds.Contains(m.Id)).GroupBy(m => m.MainMenu.Title)
+                .Select(g => new MenuOptionsVM {
+                    mainMenus = g.Key,menuOptions = g.Select(m => new Menu{Id = m.Id, Name = m.Title}).ToList()}).ToList();
+            return options;
+
+        }
     }
 }
