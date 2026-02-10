@@ -19,7 +19,7 @@ namespace NeuroPi.UserManagment.Controllers
         {
             _mainMenuService = mainMenuService;
         }
-        [HttpGet("/{roleId}")]
+        [HttpGet("roleId/{roleId}")]
         public ResponseResult<List<MainMenuResponseVM>> GetAllMainMenus(int roleId)
         {
             var result = _mainMenuService.GetAllMainMenus(roleId);
@@ -41,18 +41,11 @@ namespace NeuroPi.UserManagment.Controllers
         public string GenerateQrCode(string inputData, int pixelsPerModule = 20)
         {
             using var qrGenerator = new QRCodeGenerator();
-            // Set error correction level (L, M, Q, H) - Q is 15%
             using var qrCodeData = qrGenerator.CreateQrCode(inputData, QRCodeGenerator.ECCLevel.Q);
             using var qrCode = new QRCode(qrCodeData);
-
-            // GetGraphic returns a Bitmap. For cross-platform compatibility, you can use a MemoryStream
             using Bitmap qrCodeAsBitmap = qrCode.GetGraphic(pixelsPerModule);
             using var memoryStream = new MemoryStream();
-
-            // Save the bitmap to a memory stream as PNG format
             qrCodeAsBitmap.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
-
-            // Convert to Base64 string
             string base64String = Convert.ToBase64String(memoryStream.ToArray());
             return "data:image/png;base64," + base64String;
         }
