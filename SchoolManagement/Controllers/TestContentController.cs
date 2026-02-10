@@ -16,19 +16,19 @@ namespace SchoolManagement.Controllers
             this.testContent = testContent;
             
         }
-        [HttpPost("/test")]
+        [HttpPost("test")]
         public string AddImage(TestContentVM testContentVM)
         {
             return testContent.AddDetails(testContentVM);
         }
 
-        [HttpGet("/{testId}")]
+        [HttpGet("{testId}")]
         public List<ImageDb> GetImages(int testId, int relationId)
         {
             return testContent.GetImages(testId, relationId);
 
         }
-        [HttpPost("/updateimage/{text}")]
+        [HttpPost("updateimage/{text}")]
         public string InsertImage(IFormFile file, string text)
         {
             string result = testContent.InsertImage(file, text);

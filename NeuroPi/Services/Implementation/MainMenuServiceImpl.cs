@@ -12,13 +12,23 @@ namespace NeuroPi.UserManagment.Services.Implementation
         public MainMenuServiceImpl(NeuroPiDbContext context) {
             _context = context;
         }
+        
         public List<MainMenuResponseVM> GetAllMainMenus(int roleId)
         {
-           
-            var roleMenu = _context.RolePermissions.Where(r => r.RoleId == roleId && !r.IsDeleted).Include(i => i.Menu.MainMenu).ToList();
+            // Get all menu IDs that this role has permission for
+            var roleMenuIds = _context.RolePermissions
+                .Where(r => r.RoleId == roleId && !r.IsDeleted)
+                .Select(r => r.MenuId)
+                .ToHashSet();
+
+            var roleMenu = _context.RolePermissions
+                .Where(r => r.RoleId == roleId && !r.IsDeleted)
+                .Include(i => i.Menu.MainMenu)
+                .ThenInclude(mm => mm.Menus) // Include all menus under the main menu
+                .ToList();
+
             if (roleMenu != null)
             {
-
                 return roleMenu.Select(r => new MainMenuResponseVM()
                 {
                     id = r.Menu.MainMenu.Name,
@@ -27,20 +37,21 @@ namespace NeuroPi.UserManagment.Services.Implementation
                     type = r.Menu.MainMenu.Type,
                     transkey = r.Menu.MainMenu.Transkey,
                     Icon = r.Menu.MainMenu.Icon,
-                    childs = r.Menu.MainMenu.Menus.Select(r => new MenuResponseVM()
-                    {
-                        id = r.Name,
-                        path = r.Path,
-                        type = r.Type,
-                        title = r.Title,
-                        transkey = r.TransKey,
-                        Icon=r.Icon
-
-                    }).ToList(),
+                    // ✅ FIX: Only include child menus that the role has permission for
+                    childs = r.Menu.MainMenu.Menus
+                        .Where(m => roleMenuIds.Contains(m.Id) && !m.IsDeleted)
+                        .Select(m => new MenuResponseVM()
+                        {
+                            id = m.Name,
+                            path = m.Path,
+                            type = m.Type,
+                            title = m.Title,
+                            transkey = m.TransKey,
+                            Icon = m.Icon
+                        }).ToList(),
 
                 }).GroupBy(x => x.id)
                   .Select(g => g.First()).ToList();
-
             }
 
             return null;
@@ -82,6 +93,59 @@ namespace NeuroPi.UserManagment.Services.Implementation
                     mainMenus = g.Key,menuOptions = g.Select(m => new Menu{Id = m.Id, Name = m.Title}).ToList()}).ToList();
             return options;
 
+        }
+
+        // CRUD operations
+        public List<MMenu> GetMenusByTenant(int tenantId)
+        {
+            return _context.Menu
+                .Where(m => m.TenantId == tenantId && !m.IsDeleted)
+                .OrderBy(m => m.Name)
+                .ToList();
+        }
+
+        public MMenu GetMenuById(int id, int tenantId)
+        {
+            return _context.Menu
+                .FirstOrDefault(m => m.Id == id && m.TenantId == tenantId && !m.IsDeleted);
+        }
+
+        public MMenu CreateMenu(MMenu menu)
+        {
+            menu.IsDeleted = false;
+            _context.Menu.Add(menu);
+            _context.SaveChanges();
+            return menu;
+        }
+
+        public MMenu UpdateMenu(int id, int tenantId, MMenu menu)
+        {
+            var existing = _context.Menu
+                .FirstOrDefault(m => m.Id == id && m.TenantId == tenantId && !m.IsDeleted);
+            
+            if (existing == null) return null;
+
+            existing.Name = menu.Name;
+            existing.Title = menu.Title;
+            existing.Path = menu.Path;
+            existing.Icon = menu.Icon;
+            existing.TransKey = menu.TransKey;
+            existing.Type = menu.Type;
+
+            _context.SaveChanges();
+            return existing;
+        }
+
+        public bool DeleteMenu(int id, int tenantId)
+        {
+            var menu = _context.Menu
+                .FirstOrDefault(m => m.Id == id && m.TenantId == tenantId && !m.IsDeleted);
+            
+            if (menu == null) return false;
+
+            menu.IsDeleted = true;
+            _context.SaveChanges();
+            return true;
         }
     }
 }
