@@ -12,7 +12,7 @@ namespace NeuropiForms.ViewModels.Forms
         public bool? IsPublished { get; set; }
         public double? VersionId { get; set; }
         public int? MaxVersions { get; set; }
-        public int? ComplintensId { get; set; }
+        public int? ComplianceId { get; set; }
         public int? StorageTypeId { get; set; }
         public string StorageId { get; set; }
         public int? AppId { get; set; }

@@ -30,11 +30,11 @@ namespace NeuropiForms.Models
         [Column("max_versions")]
         public int? MaxVersions { get; set; }
 
-        [Column("complintens_id")]
-        public int? ComplintensId { get; set; }
+        [Column("compliance_id")]
+        public int? ComplianceId { get; set; }
 
-        [ForeignKey("ComplintensId")]
-        public virtual MComplintensStatus MComplintensStatus { get; set; }
+        [ForeignKey("ComplianceId")]
+        public virtual MComplianceStatus MComplianceStatus { get; set; }
 
         [Column("storage_type_id")]
         public int? StorageTypeId { get; set; }

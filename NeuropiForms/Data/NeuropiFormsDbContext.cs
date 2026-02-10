@@ -8,8 +8,8 @@ namespace NeuropiForms.Data
         {
         }
 
-        public DbSet<Models.MComplintensMaster> ComplintensMasters { get; set; }
-        public DbSet<Models.MComplintensStatus> ComplintensStatuses { get; set; }
+        public DbSet<Models.MComplianceMaster> ComplianceMasters { get; set; }
+        public DbSet<Models.MComplianceStatus> ComplianceStatuses { get; set; }
         public DbSet<Models.MGroupModel> Groups { get; set; }
         public DbSet<Models.MListModel> Lists { get; set; }
         public DbSet<Models.MSection> Sections { get; set; }

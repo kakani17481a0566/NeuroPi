@@ -57,7 +57,7 @@ namespace NeuropiForms.Services.Impl
             existingForm.IsPublished = form.IsPublished;
             existingForm.VersionId = form.VersionId;
             existingForm.MaxVersions = form.MaxVersions;
-            existingForm.ComplintensId = form.ComplintensId;
+            existingForm.ComplianceId = form.ComplianceId;
             existingForm.StorageTypeId = form.StorageTypeId;
             existingForm.StorageId = form.StorageId;
             existingForm.AppId = form.AppId;

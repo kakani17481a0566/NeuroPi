@@ -3,8 +3,8 @@ using NeuroPi.CommonLib.Model;
 
 namespace NeuropiForms.Models
 {
-    [Table("complintens_master")]
-    public class MComplintensMaster : MBaseModel
+    [Table("compliance_master")]
+    public class MComplianceMaster : MBaseModel
 
     {
         [Column("id")]
