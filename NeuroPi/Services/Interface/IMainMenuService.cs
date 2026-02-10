@@ -9,8 +9,6 @@ namespace NeuroPi.UserManagment.Services.Interface
         List<MainMenuResponseVM> GetAllMainMenus(int roleId);
         List<MenuOptionsVM> GetMenuOptions();
         List<MenuOptionsVM> GetOptions(int roleId);
-        
-        // CRUD operations
         List<MMenu> GetMenusByTenant(int tenantId);
         MMenu GetMenuById(int id, int tenantId);
         MMenu CreateMenu(MMenu menu);
