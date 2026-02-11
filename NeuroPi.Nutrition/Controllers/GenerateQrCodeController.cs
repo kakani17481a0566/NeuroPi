@@ -14,7 +14,7 @@ namespace NeuroPi.Nutrition.Controllers
         public readonly GenerateQrCodeService qrCodeService;
         public GenerateQrCodeController(GenerateQrCodeService _qrCodeService)
         {
-            qrCodeService= _qrCodeService;
+            qrCodeService = _qrCodeService;
         }
         //[HttpPost("/generateqrcode")]
         //public string GenerateQrCode()
@@ -29,8 +29,11 @@ namespace NeuroPi.Nutrition.Controllers
         [HttpPost("/register")]
         public string RegisterForCarpedium([FromBody] QrCodeRequestVM carpedium)
         {
-            var result= qrCodeService.AddCarpidiumDetails(carpedium);
+            var result = qrCodeService.AddCarpidiumDetails(carpedium);
             return result;
+
+            
+        }
 
         [HttpGet("/guests")]
         public ActionResult<List<MCarpedium>> GetGuestList()
