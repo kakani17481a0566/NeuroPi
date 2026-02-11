@@ -37,6 +37,8 @@ builder.Services.AddScoped<IUserGene, UserGeneServiceImpl>();
 builder.Services.AddScoped<IUserFeedback, UserFeedbackServiceImpl>();
 builder.Services.AddScoped<ITimetable, TimetableServiceImpl>();
 builder.Services.AddScoped<IUserGamesStatuses, UserGamesStatusesImpl>();
+builder.Services.AddScoped<GenerateQrCodeService, GenerateQrCodeServiceImpl>();
+
 
 
 

@@ -58,6 +58,9 @@ namespace NeuroPi.Nutrition.Data
         public DbSet<MTimetable> Timetables { get; set; }
         public DbSet<MUserGamesStatus> UserGamesStatuses { get; set; }
 
+        public DbSet<MCarpedium> Carpedium { get; set; }
+
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
