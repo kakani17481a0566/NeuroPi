@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NeuroPi.Nutrition.Services.Interface;
 using NeuroPi.Nutrition.ViewModel.QrCode;
+using NeuroPi.Nutrition.Model;
+using System.Collections.Generic;
 
 
 namespace NeuroPi.Nutrition.Controllers
@@ -30,6 +32,10 @@ namespace NeuroPi.Nutrition.Controllers
             var result= qrCodeService.AddCarpidiumDetails(carpedium);
             return result;
 
+        [HttpGet("/guests")]
+        public ActionResult<List<MCarpedium>> GetGuestList()
+        {
+            return qrCodeService.GetGuestList();
         }
     }
 }

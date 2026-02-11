@@ -1,4 +1,6 @@
 ﻿using NeuroPi.Nutrition.ViewModel.QrCode;
+using NeuroPi.Nutrition.Model;
+using System.Collections.Generic;
 
 namespace NeuroPi.Nutrition.Services.Interface
 {
@@ -8,5 +10,7 @@ namespace NeuroPi.Nutrition.Services.Interface
         QrCodeValidationResponseVM ValidateQrCode(Guid code);
 
         string AddCarpidiumDetails(QrCodeRequestVM qrCode);
+
+        List<MCarpedium> GetGuestList();
     }
 }

@@ -1,5 +1,8 @@
 ﻿using NeuroPi.Nutrition.Data;
+using NeuroPi.Nutrition.Model;
 using NeuroPi.Nutrition.Services.Interface;
+using System.Collections.Generic;
+using System.Linq;
 using NeuroPi.Nutrition.ViewModel.QrCode;
 using QRCoder;
 using System.Drawing;
@@ -284,6 +287,11 @@ namespace NeuroPi.Nutrition.Services.Implementation
                 return qrcode;
             }
             return "The Student had already reached maximum passes if needed kindly contact My School Italy";
+        }
+
+        public List<MCarpedium> GetGuestList()
+        {
+            return context.Carpedium.OrderByDescending(c => c.Id).ToList();
         }
     }
 }
