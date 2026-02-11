@@ -5,7 +5,7 @@ namespace NeuroPi.Nutrition.Services.Interface
     public interface GenerateQrCodeService
     {
         //string GenerateQrCode();
-        string ValidateQrCode(Guid code);
+        QrCodeValidationResponseVM ValidateQrCode(Guid code);
 
         string AddCarpidiumDetails(QrCodeRequestVM qrCode);
     }

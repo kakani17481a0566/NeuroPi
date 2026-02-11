@@ -20,7 +20,7 @@ namespace NeuroPi.Nutrition.Controllers
         //    return qrCodeService.GenerateQrCode();
         //}
         [HttpPut("/validation")]
-        public string ValidateQrCode([FromHeader] Guid code)
+        public ActionResult<QrCodeValidationResponseVM> ValidateQrCode([FromHeader] Guid code)
         {
             return qrCodeService.ValidateQrCode(code);
         }

@@ -235,17 +235,41 @@ namespace NeuroPi.Nutrition.Services.Implementation
             return "success";
         }
 
-        public string ValidateQrCode(Guid code)
+        public QrCodeValidationResponseVM ValidateQrCode(Guid code)
         {
-            var result= context.Carpedium.Where(c=>!c.IsDeleted).FirstOrDefault(c=>c.QrCode==code);
-            if (result != null)
-            {
-                result.IsDeleted = true;
-                context.SaveChanges();
-                return "validated";
+            var record = context.Carpedium.FirstOrDefault(c => c.QrCode == code);
 
+            if (record == null)
+            {
+                return new QrCodeValidationResponseVM { Status = "NotFound", Message = "QR Code not found" };
             }
-            return "already validated";
+
+            if (record.IsDeleted)
+            {
+                return new QrCodeValidationResponseVM
+                {
+                    Status = "AlreadyUsed",
+                    Message = "QR Code already used",
+                    StudentName = record.StudentName,
+                    VisitorName = record.Name,
+                    Gender = record.Gender,
+                    ValidationTime = DateTime.Now
+                };
+            }
+
+            // Valid case
+            record.IsDeleted = true;
+            context.SaveChanges();
+
+            return new QrCodeValidationResponseVM
+            {
+                Status = "Valid",
+                Message = "Access Granted",
+                StudentName = record.StudentName,
+                VisitorName = record.Name,
+                Gender = record.Gender,
+                ValidationTime = DateTime.Now
+            };
         }
 
         public string AddCarpidiumDetails(QrCodeRequestVM qrCode)
