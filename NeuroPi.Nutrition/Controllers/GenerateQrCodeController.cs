@@ -1,9 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using NeuroPi.Nutrition.Services.Interface;
 using NeuroPi.Nutrition.ViewModel.QrCode;
-using QRCoder;
-using System.Drawing;
+
 
 namespace NeuroPi.Nutrition.Controllers
 {
@@ -16,11 +14,11 @@ namespace NeuroPi.Nutrition.Controllers
         {
             qrCodeService= _qrCodeService;
         }
-        [HttpPost("/generateqrcode")]
-        public string GenerateQrCode()
-        {
-            return qrCodeService.GenerateQrCode();
-        }
+        //[HttpPost("/generateqrcode")]
+        //public string GenerateQrCode()
+        //{
+        //    return qrCodeService.GenerateQrCode();
+        //}
         [HttpPut("/validation")]
         public string ValidateQrCode([FromHeader] Guid code)
         {
