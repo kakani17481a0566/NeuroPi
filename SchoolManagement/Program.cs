@@ -70,6 +70,7 @@ builder.Services.AddScoped<IRolesService, RolesServiceImpl>();
 
 // School Domain Services
 builder.Services.AddScoped<IStudentService, StudentServiceImpl>();
+builder.Services.AddScoped<ICarpidumService, CarpidumServiceImpl>();
 builder.Services.AddScoped<ISubjectService, SubjectServiceImpl>();
 builder.Services.AddScoped<ICourseService, CourseServiceImpl>();
 builder.Services.AddScoped<ICourseSubjectService, CourseSubjectServiceImpl>();

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NeuroPi.Nutrition.Services.Interface;
 using NeuroPi.Nutrition.ViewModel.QrCode;
-using NeuroPi.Nutrition.Model;
+using NeuroPi.CommonLib.Model;
 using System.Collections.Generic;
 
 
@@ -36,7 +36,7 @@ namespace NeuroPi.Nutrition.Controllers
         }
 
         [HttpGet("/guests")]
-        public ActionResult<List<MCarpedium>> GetGuestList()
+        public ActionResult<List<MCarpidum>> GetGuestList()
         {
             return qrCodeService.GetGuestList();
         }

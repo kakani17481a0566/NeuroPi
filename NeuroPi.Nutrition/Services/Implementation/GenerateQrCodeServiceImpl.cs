@@ -1,5 +1,5 @@
 ﻿using NeuroPi.Nutrition.Data;
-using NeuroPi.Nutrition.Model;
+using NeuroPi.CommonLib.Model;
 using NeuroPi.Nutrition.Services.Interface;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,49 +17,28 @@ namespace NeuroPi.Nutrition.Services.Implementation
         public GenerateQrCodeServiceImpl(NeutritionDbContext _context)
         {
             context = _context;
-            
         }
-        public string GenerateQrCode(string gmail,string name,string studentName,string gender,Guid qrcode)
+
+        public string GenerateQrCode(string gmail, string name, string studentName, string gender, string qrcode)
         {           
-                    var inputData = qrcode.ToString();
-                    using var qrGenerator = new QRCodeGenerator();
-                    using var qrCodeData = qrGenerator.CreateQrCode(inputData, QRCodeGenerator.ECCLevel.Q);
-                    using var qrCode = new QRCode(qrCodeData);
-                    using Bitmap qrCodeAsBitmap = qrCode.GetGraphic(20);
-                    using var memoryStream = new MemoryStream();
-                    qrCodeAsBitmap.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
-                    string base64String = Convert.ToBase64String(memoryStream.ToArray());
-                    sendEmail(gmail,name,studentName, gender, base64String);
-                    return "data:image/png;base64," + base64String;
+            var inputData = qrcode;
+            using var qrGenerator = new QRCodeGenerator();
+            using var qrCodeData = qrGenerator.CreateQrCode(inputData, QRCodeGenerator.ECCLevel.Q);
+            using var qrCode = new QRCode(qrCodeData);
+            using Bitmap qrCodeAsBitmap = qrCode.GetGraphic(20);
+            using var memoryStream = new MemoryStream();
+            qrCodeAsBitmap.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
+            string base64String = Convert.ToBase64String(memoryStream.ToArray());
+            sendEmail(gmail, name, studentName, gender, base64String);
+            return "data:image/png;base64," + base64String;
         }
 
-        //        public string sendEmail(string email,string name,string studentName,string gender,string base64)
-        //        {
-        //            var smtpClient = new SmtpClient("smtp.gmail.com")
-        //            {
-        //                Port = 587,
-        //                Credentials = new NetworkCredential("kakanimohithkrishnasai@gmail.com", "vcewdxucyhcjhskp"),
-        //                EnableSsl = true,
-        //            };
-
-        //            var mailMessage = new MailMessage
-        //            {
-        //                From = new MailAddress("kakanimohithkrishnasai@gmail.com"),
-        //                Subject = "Carpedium Invitation from My School Italy and Neuropi Ai",
-        //                Body = GetVisitorPassEmailBody(name, studentName, gender, base64),
-        //                IsBodyHtml = true,
-        //            };
-        //            mailMessage.To.Add(email);
-
-        //            smtpClient.Send(mailMessage);
-        //            return "success";
-        //        }
         public static string GetVisitorPassEmailBody(
         string name,
         string studentName,
         string gender)
         {
-            return $@"
+             return $@"
 <!DOCTYPE html>
 <html>
 <head>
@@ -178,17 +157,16 @@ namespace NeuroPi.Nutrition.Services.Implementation
 </body>
 </html>
 "
-
        ;
         }
 
 
         public string sendEmail(
-    string email,
-    string name,
-    string studentName,
-    string gender,
-    string base64)
+            string email,
+            string name,
+            string studentName,
+            string gender,
+            string base64)
         {
             var smtpClient = new SmtpClient("smtp.gmail.com")
             {
@@ -207,7 +185,15 @@ namespace NeuroPi.Nutrition.Services.Implementation
                 IsBodyHtml = true
             };
 
-            mailMessage.To.Add(email);
+            if (!string.IsNullOrWhiteSpace(email))
+            {
+                mailMessage.To.Add(email);
+            }
+            else
+            {
+                // handle missing email if necessary
+                return "email missing";
+            }
 
             string body = GetVisitorPassEmailBody(
                 name,
@@ -240,12 +226,42 @@ namespace NeuroPi.Nutrition.Services.Implementation
 
         public QrCodeValidationResponseVM ValidateQrCode(Guid code)
         {
-            var record = context.Carpedium.FirstOrDefault(c => c.QrCode == code);
+            string codeStr = code.ToString();
+            
+            var query = from c in context.Carpidum
+                        join s in context.Students on c.StudentId equals s.Id into students
+                        from subStudent in students.DefaultIfEmpty()
+                        
+                        // Join Course
+                        join co in context.Courses on subStudent.CourseId equals co.Id into courses
+                        from subCourse in courses.DefaultIfEmpty()
 
-            if (record == null)
+                        // Join Branch
+                        join b in context.Branches on subStudent.BranchId equals b.Id into branches
+                        from subBranch in branches.DefaultIfEmpty()
+
+                        where c.QrCode == codeStr
+                        select new { c, subStudent, subCourse, subBranch };
+
+            var result = query.FirstOrDefault();
+
+            if (result == null)
             {
                 return new QrCodeValidationResponseVM { Status = "NotFound", Message = "QR Code not found" };
             }
+
+            var record = result.c;
+            var student = result.subStudent;
+            var course = result.subCourse;
+            var branch = result.subBranch;
+
+            string studentName = student != null ? (student.Name + " " + (student.LastName ?? "")).Trim() : "Unknown";
+            string gender = ""; // User requested to hide gender
+            string visitorName = !string.IsNullOrEmpty(record.GuardianName) ? record.GuardianName : record.ParentType;
+            
+            string? courseName = course?.Name;
+            string? branchName = branch?.Name;
+            string? batch = student?.AdmissionGrade;
 
             if (record.IsDeleted)
             {
@@ -253,45 +269,102 @@ namespace NeuroPi.Nutrition.Services.Implementation
                 {
                     Status = "AlreadyUsed",
                     Message = "QR Code already used",
-                    StudentName = record.StudentName,
-                    VisitorName = record.Name,
-                    Gender = record.Gender,
+                    StudentName = studentName,
+                    VisitorName = visitorName,
+                    Gender = gender,
+                    CourseName = courseName,
+                    BranchName = branchName,
+                    Batch = batch,
                     ValidationTime = DateTime.Now
                 };
             }
 
             // Valid case
             record.IsDeleted = true;
+            record.UpdatedOn = DateTime.UtcNow;
             context.SaveChanges();
 
             return new QrCodeValidationResponseVM
             {
                 Status = "Valid",
                 Message = "Access Granted",
-                StudentName = record.StudentName,
-                VisitorName = record.Name,
-                Gender = record.Gender,
+                StudentName = studentName,
+                VisitorName = visitorName,
+                Gender = gender,
+                CourseName = courseName,
+                BranchName = branchName,
+                Batch = batch,
                 ValidationTime = DateTime.Now
             };
         }
 
         public string AddCarpidiumDetails(QrCodeRequestVM qrCode)
         {
-            var response = context.Carpedium.Where(c => !c.IsDeleted && c.StudentName.Trim().ToLower() == qrCode.StudentName.Trim().ToLower()).ToList();
-            if (response.Count() != 2)
+            if (qrCode.StudentId > 0)
             {
-                var carpediumModel = QrCodeRequestVM.ToModel(qrCode);
-                string qrcode = GenerateQrCode(carpediumModel.gmail, carpediumModel.Name, carpediumModel.StudentName, carpediumModel.Gender, carpediumModel.QrCode);
-                context.Add(carpediumModel);
-                context.SaveChanges();
-                return qrcode;
+                var count = context.Carpidum.Count(c => !c.IsDeleted && c.StudentId == qrCode.StudentId);
+                if (count >= 2)
+                {
+                    return "The Student had already reached maximum passes if needed kindly contact My School Italy";
+                }
             }
-            return "The Student had already reached maximum passes if needed kindly contact My School Italy";
+            
+            // ToModel returns MCarpidum (CommonLib)
+            var carpidumModel = QrCodeRequestVM.ToModel(qrCode);
+            
+            // Use request VM properties for email, as carpidumModel doesn't have them
+            string qrcodeGenerated = GenerateQrCode(
+                carpidumModel.Email, 
+                carpidumModel.GuardianName, // Mapped from Name 
+                qrCode.StudentName, // Direct from VM
+                qrCode.Gender,      // Direct from VM
+                carpidumModel.QrCode
+            );
+            
+            context.Carpidum.Add(carpidumModel);
+            context.SaveChanges();
+            
+            return qrcodeGenerated;
         }
 
-        public List<MCarpedium> GetGuestList()
+        public List<MCarpidum> GetGuestList()
         {
-            return context.Carpedium.OrderByDescending(c => c.Id).ToList();
+            var query = from c in context.Carpidum
+                        join s in context.Students on c.StudentId equals s.Id into students
+                        from subStudent in students.DefaultIfEmpty()
+                        
+                        // Join Course
+                        join co in context.Courses on subStudent.CourseId equals co.Id into courses
+                        from subCourse in courses.DefaultIfEmpty()
+
+                        // Join Branch
+                        join b in context.Branches on subStudent.BranchId equals b.Id into branches
+                        from subBranch in branches.DefaultIfEmpty()
+
+                        orderby c.Id descending
+                        select new { c, subStudent, subCourse, subBranch };
+
+            var list = query.ToList();
+
+            return list.Select(x => {
+                var carpidum = x.c;
+                if (x.subStudent != null)
+                {
+                    carpidum.StudentName = (x.subStudent.Name + " " + (x.subStudent.LastName ?? "")).Trim();
+                    carpidum.Gender = ""; // User requested to hide gender
+                    carpidum.Batch = x.subStudent.AdmissionGrade;
+                }
+                else
+                {
+                    carpidum.StudentName = "Unknown";
+                    carpidum.Gender = "";
+                }
+                
+                carpidum.CourseName = x.subCourse?.Name;
+                carpidum.BranchName = x.subBranch?.Name;
+
+                return carpidum;
+            }).ToList();
         }
     }
 }

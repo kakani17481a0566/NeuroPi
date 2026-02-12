@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NeuroPi.UserManagment.Model;
 using SchoolManagement.Model;
+using CommonLibModel = NeuroPi.CommonLib.Model;
 using SchoolManagement.ViewModel.ItemSupplier;
 using SchoolManagement.ViewModel.VwTermPlanDetails;
 using static SchoolManagement.Model.MTableFiles;
@@ -57,6 +58,7 @@ namespace SchoolManagement.Data
         public DbSet<MGrade> Grades { get; set; }
         public DbSet<MParent> Parents { get; set; }
         public DbSet<MStudent> Students { get; set; }
+        public DbSet<CommonLibModel.MCarpidum> Carpidum { get; set; }
 
         public DbSet<MParentStudent> ParentStudents { get; set; }
         public DbSet<MTimeTableTopic> TimeTableTopics { get; set; }

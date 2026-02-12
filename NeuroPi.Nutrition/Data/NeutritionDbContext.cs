@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NeuroPi.CommonLib.Model.Nutrition;
 using NeuroPi.Nutrition.Model;
+using NeuroPi.CommonLib.Model;
 using System.Reflection.Emit;
 
 
@@ -57,8 +58,11 @@ namespace NeuroPi.Nutrition.Data
         public DbSet<MResourceInstruction> ResourceInstructions { get; set; }
         public DbSet<MTimetable> Timetables { get; set; }
         public DbSet<MUserGamesStatus> UserGamesStatuses { get; set; }
+        public DbSet<MStudent> Students { get; set; }
+        public DbSet<MCourse> Courses { get; set; }
+        public DbSet<MBranch> Branches { get; set; }
 
-        public DbSet<MCarpedium> Carpedium { get; set; }
+        public DbSet<MCarpidum> Carpidum { get; set; }
 
 
 

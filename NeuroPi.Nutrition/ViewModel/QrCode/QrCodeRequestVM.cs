@@ -1,29 +1,30 @@
-﻿using NeuroPi.Nutrition.Model;
+﻿using NeuroPi.CommonLib.Model;
 
 namespace NeuroPi.Nutrition.ViewModel.QrCode
 {
     public class QrCodeRequestVM
     {
-        public string Name { get; set; }
-
+        public string Name { get; set; } // Guardian Name
         public string Gender { get; set; }
-
-        public string Gmail { get; set; }
-
+        public string Gmail { get; set; } // Email
         public string StudentName { get; set; }
+        
+        // New required fields
+        public int StudentId { get; set; }
+        public string ParentType { get; set; } = "OTHERS"; // Default
+        public int TenantId { get; set; } 
 
-        public static MCarpedium ToModel(QrCodeRequestVM qrCodeRequest)
+        public static MCarpidum ToModel(QrCodeRequestVM qrCodeRequest)
         {
-            return new MCarpedium
+            return new MCarpidum
             {
-                Name = qrCodeRequest.Name,
-                Gender = qrCodeRequest.Gender,
-                StudentName = qrCodeRequest.StudentName,
-                gmail = qrCodeRequest.Gmail,
-                QrCode = Guid.NewGuid()
-
+                GuardianName = qrCodeRequest.Name, 
+                Email = qrCodeRequest.Gmail,
+                QrCode = Guid.NewGuid().ToString(),
+                TenantId = qrCodeRequest.TenantId,
+                IsDeleted = false,
+                CreatedOn = DateTime.UtcNow
             };
         }
-
     }
 }
