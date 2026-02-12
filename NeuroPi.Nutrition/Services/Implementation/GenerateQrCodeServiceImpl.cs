@@ -409,8 +409,8 @@ namespace NeuroPi.Nutrition.Services.Implementation
                 return false;
             }
 
-            pass.IsDeleted = true;
-            pass.UpdatedOn = DateTime.UtcNow;
+            // Hard delete - permanently remove from database
+            context.Carpidum.Remove(pass);
             context.SaveChanges();
             return true;
         }
