@@ -400,5 +400,19 @@ namespace NeuroPi.Nutrition.Services.Implementation
                 return carpidum;
             }).ToList();
         }
+
+        public bool DeletePass(int id)
+        {
+            var pass = context.Carpidum.FirstOrDefault(c => c.Id == id);
+            if (pass == null)
+            {
+                return false;
+            }
+
+            pass.IsDeleted = true;
+            pass.UpdatedOn = DateTime.UtcNow;
+            context.SaveChanges();
+            return true;
+        }
     }
 }

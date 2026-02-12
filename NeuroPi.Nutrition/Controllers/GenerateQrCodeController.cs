@@ -45,5 +45,16 @@ namespace NeuroPi.Nutrition.Controllers
         {
             return qrCodeService.GetPassesByStudentId(studentId);
         }
+
+        [HttpDelete("id/{id}")]
+        public ActionResult<bool> DeletePass(int id)
+        {
+            var result = qrCodeService.DeletePass(id);
+            if (result)
+            {
+                return Ok(true);
+            }
+            return NotFound(false);
+        }
     }
 }

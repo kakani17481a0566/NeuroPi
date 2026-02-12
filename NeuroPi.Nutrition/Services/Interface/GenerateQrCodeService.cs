@@ -12,5 +12,6 @@ namespace NeuroPi.Nutrition.Services.Interface
         string AddCarpidiumDetails(QrCodeRequestVM qrCode);
         List<MCarpidum> GetGuestList();
         List<MCarpidum> GetPassesByStudentId(int studentId);
+        bool DeletePass(int id);
     }
 }
