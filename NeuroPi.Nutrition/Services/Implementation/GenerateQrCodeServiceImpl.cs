@@ -8,6 +8,7 @@ using QRCoder;
 using System.Drawing;
 using System.Net;
 using System.Net.Mail;
+using Microsoft.EntityFrameworkCore;
 
 namespace NeuroPi.Nutrition.Services.Implementation
 {
