@@ -228,16 +228,17 @@ namespace NeuroPi.Nutrition.Services.Implementation
         {
             string codeStr = code.ToString();
             
-            var query = from c in context.Carpidum
-                        join s in context.Students on c.StudentId equals s.Id into students
+            // Optimized query with AsNoTracking for read-only operation
+            var query = from c in context.Carpidum.AsNoTracking()
+                        join s in context.Students.AsNoTracking() on c.StudentId equals s.Id into students
                         from subStudent in students.DefaultIfEmpty()
                         
                         // Join Course
-                        join co in context.Courses on subStudent.CourseId equals co.Id into courses
+                        join co in context.Courses.AsNoTracking() on subStudent.CourseId equals co.Id into courses
                         from subCourse in courses.DefaultIfEmpty()
 
                         // Join Branch
-                        join b in context.Branches on subStudent.BranchId equals b.Id into branches
+                        join b in context.Branches.AsNoTracking() on subStudent.BranchId equals b.Id into branches
                         from subBranch in branches.DefaultIfEmpty()
 
                         where c.QrCode == codeStr
@@ -263,27 +264,7 @@ namespace NeuroPi.Nutrition.Services.Implementation
             string? branchName = branch?.Name;
             string? batch = student?.AdmissionGrade;
 
-            if (record.IsDeleted)
-            {
-                return new QrCodeValidationResponseVM
-                {
-                    Status = "AlreadyUsed",
-                    Message = "QR Code already used",
-                    StudentName = studentName,
-                    VisitorName = visitorName,
-                    Gender = gender,
-                    CourseName = courseName,
-                    BranchName = branchName,
-                    Batch = batch,
-                    ValidationTime = DateTime.Now
-                };
-            }
-
-            // Valid case
-            record.IsDeleted = true;
-            record.UpdatedOn = DateTime.UtcNow;
-            context.SaveChanges();
-
+            // Validation is read-only - just check if pass is valid, don't mark as used
             return new QrCodeValidationResponseVM
             {
                 Status = "Valid",
