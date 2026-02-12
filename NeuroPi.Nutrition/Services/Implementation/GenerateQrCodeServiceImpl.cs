@@ -300,14 +300,7 @@ namespace NeuroPi.Nutrition.Services.Implementation
 
         public string AddCarpidiumDetails(QrCodeRequestVM qrCode)
         {
-            if (qrCode.StudentId > 0)
-            {
-                var count = context.Carpidum.Count(c => !c.IsDeleted && c.StudentId == qrCode.StudentId);
-                if (count >= 2)
-                {
-                    return "The Student had already reached maximum passes if needed kindly contact My School Italy";
-                }
-            }
+            // Limit removed - allow unlimited passes per student
             
             // ToModel returns MCarpidum (CommonLib)
             var carpidumModel = QrCodeRequestVM.ToModel(qrCode);
