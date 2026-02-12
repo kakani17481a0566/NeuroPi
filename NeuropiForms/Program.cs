@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using NeuropiForms.Data;
+using NeuropiForms.Services.Implementation;
+using NeuropiForms.Services.Interface;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +16,8 @@ builder.Services.AddDbContext<NeuropiForms.Data.NeuropiFormsDbContext>(options =
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<NeuropiForms.Services.Interface.IFormService, NeuropiForms.Services.Impl.FormServiceImpl>();
+builder.Services.AddScoped<IFormSubmissionService, FormSubmissionServiceImpl>();
+
 builder.Services.AddControllers();
 
 
