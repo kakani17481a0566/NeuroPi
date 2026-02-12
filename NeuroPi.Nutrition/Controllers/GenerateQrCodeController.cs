@@ -16,17 +16,17 @@ namespace NeuroPi.Nutrition.Controllers
         {
             qrCodeService = _qrCodeService;
         }
-        //[HttpPost("/generateqrcode")]
+        //[HttpPost("generateqrcode")]
         //public string GenerateQrCode()
         //{
         //    return qrCodeService.GenerateQrCode();
         //}
-        [HttpPut("/validation")]
+        [HttpPut("validation")]
         public ActionResult<QrCodeValidationResponseVM> ValidateQrCode([FromHeader] Guid code)
         {
             return qrCodeService.ValidateQrCode(code);
         }
-        [HttpPost("/register")]
+        [HttpPost("register")]
         public string RegisterForCarpedium([FromBody] QrCodeRequestVM carpedium)
         {
             var result = qrCodeService.AddCarpidiumDetails(carpedium);
@@ -35,10 +35,15 @@ namespace NeuroPi.Nutrition.Controllers
             
         }
 
-        [HttpGet("/guests")]
+        [HttpGet("guests")]
         public ActionResult<List<MCarpidum>> GetGuestList()
         {
             return qrCodeService.GetGuestList();
+        }
+        [HttpGet("student/{studentId}")]
+        public ActionResult<List<MCarpidum>> GetPassesByStudentId(int studentId)
+        {
+            return qrCodeService.GetPassesByStudentId(studentId);
         }
     }
 }

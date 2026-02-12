@@ -23,7 +23,9 @@ namespace NeuroPi.Nutrition.ViewModel.QrCode
                 QrCode = Guid.NewGuid().ToString(),
                 TenantId = qrCodeRequest.TenantId,
                 IsDeleted = false,
-                CreatedOn = DateTime.UtcNow
+                CreatedOn = DateTime.UtcNow,
+                StudentId = qrCodeRequest.StudentId,
+                ParentType = qrCodeRequest.ParentType
             };
         }
     }

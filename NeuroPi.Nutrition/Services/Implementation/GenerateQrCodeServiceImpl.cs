@@ -366,5 +366,46 @@ namespace NeuroPi.Nutrition.Services.Implementation
                 return carpidum;
             }).ToList();
         }
+        public List<MCarpidum> GetPassesByStudentId(int studentId)
+        {
+            var query = from c in context.Carpidum
+                        join s in context.Students on c.StudentId equals s.Id into students
+                        from subStudent in students.DefaultIfEmpty()
+
+                        // Join Course
+                        join co in context.Courses on subStudent.CourseId equals co.Id into courses
+                        from subCourse in courses.DefaultIfEmpty()
+
+                        // Join Branch
+                        join b in context.Branches on subStudent.BranchId equals b.Id into branches
+                        from subBranch in branches.DefaultIfEmpty()
+
+                        where c.StudentId == studentId && !c.IsDeleted
+                        orderby c.CreatedOn descending
+                        select new { c, subStudent, subCourse, subBranch };
+
+            var list = query.ToList();
+
+            return list.Select(x =>
+            {
+                var carpidum = x.c;
+                if (x.subStudent != null)
+                {
+                    carpidum.StudentName = (x.subStudent.Name + " " + (x.subStudent.LastName ?? "")).Trim();
+                    carpidum.Gender = ""; // User requested to hide gender
+                    carpidum.Batch = x.subStudent.AdmissionGrade;
+                }
+                else
+                {
+                    carpidum.StudentName = "Unknown";
+                    carpidum.Gender = "";
+                }
+
+                carpidum.CourseName = x.subCourse?.Name;
+                carpidum.BranchName = x.subBranch?.Name;
+
+                return carpidum;
+            }).ToList();
+        }
     }
 }
