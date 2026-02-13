@@ -1,4 +1,5 @@
 using NeuroPi.Nutrition.Data;
+using Microsoft.EntityFrameworkCore;
 using NeuroPi.Nutrition.Model;
 using NeuroPi.Nutrition.Services.Interface;
 using NeuroPi.Nutrition.ViewModel.VipPass;
@@ -190,7 +191,7 @@ namespace NeuroPi.Nutrition.Services.Implementation
         {
             string codeStr = code.ToString();
 
-            var pass = context.VipCarpidum
+            var pass = context.VipCarpidum.IgnoreQueryFilters()
                 .FirstOrDefault(v => v.QrCode.ToString() == codeStr);
 
             if (pass == null)

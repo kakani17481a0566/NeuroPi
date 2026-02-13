@@ -238,7 +238,7 @@ namespace NeuroPi.Nutrition.Services.Implementation
             string codeStr = code.ToString();
             
             // Query without AsNoTracking to allow updates
-            var query = from c in context.Carpidum
+            var query = from c in context.Carpidum.IgnoreQueryFilters()
                         join s in context.Students.AsNoTracking() on c.StudentId equals s.Id into students
                         from subStudent in students.DefaultIfEmpty()
                         
@@ -258,7 +258,7 @@ namespace NeuroPi.Nutrition.Services.Implementation
             if (result == null)
             {
                 // Fallback: Check VIP Pass Table
-                var vipPass = context.VipCarpidum
+                var vipPass = context.VipCarpidum.IgnoreQueryFilters()
                     .FirstOrDefault(v => v.QrCode.ToString() == codeStr);
 
                 if (vipPass != null)
