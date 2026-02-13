@@ -278,6 +278,8 @@ namespace NeuroPi.Nutrition.Services.Implementation
                     // Mark VIP pass as used
                     vipPass.IsDeleted = true;
                     vipPass.UpdatedOn = DateTime.UtcNow;
+                    
+                    context.VipCarpidum.Update(vipPass);
                     context.SaveChanges();
 
                     return new QrCodeValidationResponseVM
@@ -314,6 +316,9 @@ namespace NeuroPi.Nutrition.Services.Implementation
             // Mark as used (Soft Delete paradigm for 'Attended')
             record.IsDeleted = true;
             record.UpdatedOn = DateTime.UtcNow;
+            
+            // Ensure the entity is tracked and marked as modified
+            context.Carpidum.Update(record);
             context.SaveChanges();
 
             var student = result.subStudent;

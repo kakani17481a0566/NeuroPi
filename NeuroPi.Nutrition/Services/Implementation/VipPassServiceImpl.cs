@@ -218,6 +218,8 @@ namespace NeuroPi.Nutrition.Services.Implementation
             // Mark as used (Soft Delete)
             pass.IsDeleted = true;
             pass.UpdatedOn = DateTime.UtcNow;
+
+            context.VipCarpidum.Update(pass);
             context.SaveChanges();
 
             return new VipValidationResponseVM
