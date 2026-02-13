@@ -59,7 +59,13 @@ namespace NeuroPi.Nutrition.Services.Implementation
                 .Where(v => v.VipEmail == vipEmail && !v.IsDeleted)
                 .ToList();
 
-            if (!passes.Any()) return false;
+            if (!passes.Any()) 
+            {
+                Console.WriteLine($"SendPassesViaEmail: No passes found for email {vipEmail}");
+                return false;
+            }
+
+            Console.WriteLine($"SendPassesViaEmail: Found {passes.Count} passes for {vipEmail}. Preparing email...");
 
             try
             {
@@ -92,11 +98,12 @@ namespace NeuroPi.Nutrition.Services.Implementation
 
                 foreach (var pass in passes)
                 {
+                    Console.WriteLine($"SendPassesViaEmail: Generating PDF for pass {pass.Id}...");
                     string qrCodeStr = pass.QrCode.ToString();
                     using var qrGenerator = new QRCodeGenerator();
                     using var qrCodeData = qrGenerator.CreateQrCode(qrCodeStr, QRCodeGenerator.ECCLevel.Q);
                     using var qrCode = new QRCode(qrCodeData);
-                    using Bitmap qrCodeAsBitmap = qrCode.GetGraphic(20);
+                    using Bitmap qrCodeAsBitmap = qrCode.GetGraphic(5);
                     
                     using var memoryStream = new MemoryStream();
                     qrCodeAsBitmap.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
@@ -117,14 +124,16 @@ namespace NeuroPi.Nutrition.Services.Implementation
                     mailMessage.Attachments.Add(new Attachment(pdfStream, $"{cleanVipName}_{pass.Id}.pdf", MediaTypeNames.Application.Pdf));
                 }
 
+                Console.WriteLine("SendPassesViaEmail: Sending email via SMTP...");
                 await smtpClient.SendMailAsync(mailMessage);
+                Console.WriteLine("SendPassesViaEmail: Email sent successfully.");
 
                 return true;
             }
             catch (Exception ex)
             {
                 // Better logging if possible, but keeping console for now
-                Console.WriteLine($"Email Error: {ex.ToString()}");
+                Console.WriteLine($"SendPassesViaEmail Error: {ex.ToString()}");
                 return false;
             }
         }
