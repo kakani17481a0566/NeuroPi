@@ -21,7 +21,7 @@ namespace NeuroPi.Nutrition.Controllers
         }
 
         [HttpPost("generate")]
-        public ActionResult<List<MVipCarpidum>> GenerateBulkPasses([FromBody] VipBulkPassRequestVM request)
+        public async Task<ActionResult<List<MVipCarpidum>>> GenerateBulkPasses([FromBody] VipBulkPassRequestVM request)
         {
             try
             {
@@ -30,7 +30,7 @@ namespace NeuroPi.Nutrition.Controllers
                 if (request.SendEmail)
                 {
                     // Trigger email sending asynchronously
-                    _ = vipPassService.SendPassesViaEmail(request.VipEmail);
+                    await vipPassService.SendPassesViaEmail(request.VipEmail);
                 }
 
                 return Ok(passes);

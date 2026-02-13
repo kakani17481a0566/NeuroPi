@@ -63,7 +63,7 @@ namespace NeuroPi.Nutrition.Services.Implementation
 
             try
             {
-                var smtpClient = new SmtpClient("smtp.gmail.com")
+                using var smtpClient = new SmtpClient("smtp.gmail.com")
                 {
                     Port = 587,
                     Credentials = new NetworkCredential(
@@ -73,7 +73,7 @@ namespace NeuroPi.Nutrition.Services.Implementation
                     EnableSsl = true,
                 };
 
-                var mailMessage = new MailMessage
+                using var mailMessage = new MailMessage
                 {
                     From = new MailAddress("kakanimohithkrishnasai@gmail.com"),
                     Subject = "VIP Carpe Diem Invitation from My School Italy and Neuropi Ai",
@@ -85,7 +85,11 @@ namespace NeuroPi.Nutrition.Services.Implementation
                 string vipName = passes.First().VipName;
                 string body = GetVipPassEmailBody(vipName, passes);
 
-                AlternateView htmlView = AlternateView.CreateAlternateViewFromString(body, null, "text/html");
+                mailMessage.Body = body;
+                // Add AlternateView for HTML body
+                var htmlView = AlternateView.CreateAlternateViewFromString(body, null, MediaTypeNames.Text.Html);
+                mailMessage.AlternateViews.Add(htmlView);
+
                 foreach (var pass in passes)
                 {
                     string qrCodeStr = pass.QrCode.ToString();
@@ -99,23 +103,28 @@ namespace NeuroPi.Nutrition.Services.Implementation
                     byte[] qrBytes = memoryStream.ToArray();
 
                     // Generate PDF for this single pass
-                    // We pass a list containing just this one pass to reuse the existing generator
                     var singlePassList = new List<(int PassId, byte[] QrCodeBytes)> { (pass.Id, qrBytes) };
                     byte[] pdfBytes = VipPassPdfGenerator.GenerateVipPassesPdf(vipName, singlePassList);
 
+                    // Create stream for attachment - will be disposed by MailMessage
+                    var pdfStream = new MemoryStream(pdfBytes); 
+                    
                     // Attach with specific name: {VipName}_{PassId}.pdf
-                    string cleanVipName = vipName.Replace(" ", "_");
-                    mailMessage.Attachments.Add(new Attachment(new MemoryStream(pdfBytes), $"{cleanVipName}_{pass.Id}.pdf", "application/pdf"));
+                    // Sanitize filename to remove invalid chars
+                    string cleanVipName = string.Join("_", vipName.Split(Path.GetInvalidFileNameChars()));
+                    cleanVipName = cleanVipName.Replace(" ", "_");
+                    
+                    mailMessage.Attachments.Add(new Attachment(pdfStream, $"{cleanVipName}_{pass.Id}.pdf", MediaTypeNames.Application.Pdf));
                 }
 
-                mailMessage.AlternateViews.Add(htmlView);
                 await smtpClient.SendMailAsync(mailMessage);
 
                 return true;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Email Error: {ex.Message}");
+                // Better logging if possible, but keeping console for now
+                Console.WriteLine($"Email Error: {ex.ToString()}");
                 return false;
             }
         }
