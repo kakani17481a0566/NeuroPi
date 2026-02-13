@@ -63,6 +63,7 @@ namespace NeuroPi.Nutrition.Data
         public DbSet<MBranch> Branches { get; set; }
 
         public DbSet<MCarpidum> Carpidum { get; set; }
+        public DbSet<MVipCarpidum> VipCarpidum { get; set; }
 
 
 

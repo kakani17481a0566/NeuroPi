@@ -38,6 +38,7 @@ builder.Services.AddScoped<IUserFeedback, UserFeedbackServiceImpl>();
 builder.Services.AddScoped<ITimetable, TimetableServiceImpl>();
 builder.Services.AddScoped<IUserGamesStatuses, UserGamesStatusesImpl>();
 builder.Services.AddScoped<GenerateQrCodeService, GenerateQrCodeServiceImpl>();
+builder.Services.AddScoped<IVipPassService, VipPassServiceImpl>();
 
 
 

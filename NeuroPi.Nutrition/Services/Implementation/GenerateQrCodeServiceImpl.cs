@@ -106,6 +106,14 @@ namespace NeuroPi.Nutrition.Services.Implementation
                     <td><strong>Event Date</strong></td>
                     <td>28 <sup> th </sup> Feburary  2026</td>
                 </tr>
+                <tr>
+                    <td><strong>Venue</strong></td>
+                    <td>
+                        <strong>Ashray Conventions</strong><br/>
+                        Near Hitech city Metro, Hyderabad<br/>
+                        <a href='https://maps.app.goo.gl/twAGzoyvyfzfCdCj7' style='color:#8b0000; font-size:11px;'>View on Google Maps</a>
+                    </td>
+                </tr>
             </table>
 
             <!-- QR Code -->
@@ -249,6 +257,42 @@ namespace NeuroPi.Nutrition.Services.Implementation
 
             if (result == null)
             {
+                // Fallback: Check VIP Pass Table
+                var vipPass = context.VipCarpidum
+                    .FirstOrDefault(v => v.QrCode.ToString() == codeStr);
+
+                if (vipPass != null)
+                {
+                    // VIP Pass found - Handle Validation
+                    if (vipPass.IsDeleted)
+                    {
+                        return new QrCodeValidationResponseVM
+                        {
+                            Status = "AlreadyUsed",
+                            Message = "VIP Pass Already Used",
+                            VisitorName = vipPass.VipName,
+                            StudentName = "VIP Access"
+                        };
+                    }
+
+                    // Mark VIP pass as used
+                    vipPass.IsDeleted = true;
+                    vipPass.UpdatedOn = DateTime.UtcNow;
+                    context.SaveChanges();
+
+                    return new QrCodeValidationResponseVM
+                    {
+                        Status = "Valid",
+                        Message = "Access Granted (VIP)",
+                        VisitorName = vipPass.VipName,
+                        StudentName = "VIP Access",
+                        CourseName = "VIP",
+                        BranchName = "VIP",
+                        Batch = "VIP",
+                        ValidationTime = DateTime.Now
+                    };
+                }
+
                 return new QrCodeValidationResponseVM { Status = "NotFound", Message = "QR Code not found" };
             }
 
