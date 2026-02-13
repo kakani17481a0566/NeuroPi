@@ -229,8 +229,8 @@ namespace NeuroPi.Nutrition.Services.Implementation
         {
             string codeStr = code.ToString();
             
-            // Optimized query with AsNoTracking for read-only operation
-            var query = from c in context.Carpidum.AsNoTracking()
+            // Query without AsNoTracking to allow updates
+            var query = from c in context.Carpidum
                         join s in context.Students.AsNoTracking() on c.StudentId equals s.Id into students
                         from subStudent in students.DefaultIfEmpty()
                         
@@ -253,6 +253,25 @@ namespace NeuroPi.Nutrition.Services.Implementation
             }
 
             var record = result.c;
+
+            // Check if already used/deleted
+            if (record.IsDeleted)
+            {
+                // If it's deleted, it counts as "Already Used" / "Attended"
+                return new QrCodeValidationResponseVM 
+                { 
+                    Status = "AlreadyUsed", 
+                    Message = "QR Code Already Used",
+                     StudentName = result.subStudent != null ? (result.subStudent.Name + " " + (result.subStudent.LastName ?? "")).Trim() : "Unknown",
+                    VisitorName = !string.IsNullOrEmpty(record.GuardianName) ? record.GuardianName : record.ParentType,
+                };
+            }
+
+            // Mark as used (Soft Delete paradigm for 'Attended')
+            record.IsDeleted = true;
+            record.UpdatedOn = DateTime.UtcNow;
+            context.SaveChanges();
+
             var student = result.subStudent;
             var course = result.subCourse;
             var branch = result.subBranch;
@@ -265,7 +284,6 @@ namespace NeuroPi.Nutrition.Services.Implementation
             string? branchName = branch?.Name;
             string? batch = student?.AdmissionGrade;
 
-            // Validation is read-only - just check if pass is valid, don't mark as used
             return new QrCodeValidationResponseVM
             {
                 Status = "Valid",
@@ -391,8 +409,9 @@ namespace NeuroPi.Nutrition.Services.Implementation
                 return false;
             }
 
-            // Hard delete - permanently remove from database
-            context.Carpidum.Remove(pass);
+            // Soft delete - mark as deleted
+            pass.IsDeleted = true;
+            pass.UpdatedOn = DateTime.UtcNow;
             context.SaveChanges();
             return true;
         }
