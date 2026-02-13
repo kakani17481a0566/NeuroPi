@@ -86,8 +86,6 @@ namespace NeuroPi.Nutrition.Services.Implementation
                 string body = GetVipPassEmailBody(vipName, passes);
 
                 AlternateView htmlView = AlternateView.CreateAlternateViewFromString(body, null, "text/html");
-                var pdfPasses = new List<(int PassId, byte[] QrCodeBytes)>();
-
                 foreach (var pass in passes)
                 {
                     string qrCodeStr = pass.QrCode.ToString();
@@ -96,15 +94,19 @@ namespace NeuroPi.Nutrition.Services.Implementation
                     using var qrCode = new QRCode(qrCodeData);
                     using Bitmap qrCodeAsBitmap = qrCode.GetGraphic(20);
                     
-                    var memoryStream = new MemoryStream();
+                    using var memoryStream = new MemoryStream();
                     qrCodeAsBitmap.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
                     byte[] qrBytes = memoryStream.ToArray();
-                    pdfPasses.Add((pass.Id, qrBytes));
-                }
 
-                // Generate and attach PDF
-                byte[] pdfBytes = VipPassPdfGenerator.GenerateVipPassesPdf(vipName, pdfPasses);
-                mailMessage.Attachments.Add(new Attachment(new MemoryStream(pdfBytes), $"VIP_Passes_{vipName.Replace(" ", "_")}.pdf", "application/pdf"));
+                    // Generate PDF for this single pass
+                    // We pass a list containing just this one pass to reuse the existing generator
+                    var singlePassList = new List<(int PassId, byte[] QrCodeBytes)> { (pass.Id, qrBytes) };
+                    byte[] pdfBytes = VipPassPdfGenerator.GenerateVipPassesPdf(vipName, singlePassList);
+
+                    // Attach with specific name: {VipName}_{PassId}.pdf
+                    string cleanVipName = vipName.Replace(" ", "_");
+                    mailMessage.Attachments.Add(new Attachment(new MemoryStream(pdfBytes), $"{cleanVipName}_{pass.Id}.pdf", "application/pdf"));
+                }
 
                 mailMessage.AlternateViews.Add(htmlView);
                 await smtpClient.SendMailAsync(mailMessage);
