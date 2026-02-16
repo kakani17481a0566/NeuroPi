@@ -30,16 +30,16 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
 
         // login
-        public UserLogInSucessVM LogIn(string username, string password)
+        public UserLogInSucessVM LogIn(string identifier, string password)
         {
-            Console.WriteLine($"[INFO] Login attempt for username: {username}");
+            Console.WriteLine($"[INFO] Login attempt for identifier: {identifier}");
 
             var user = _context.Users.FirstOrDefault(u =>
-                !u.IsDeleted && u.Username == username && u.Password == password);
+                !u.IsDeleted && (u.Username == identifier || u.Email == identifier || u.MobileNumber == identifier) && u.Password == password);
 
             if (user == null)
             {
-                Console.WriteLine($"[WARN] Login failed: User not found or incorrect password for username: {username}");
+                Console.WriteLine($"[WARN] Login failed: User not found or incorrect password for identifier: {identifier}");
                 return null;
             }
 
@@ -50,6 +50,15 @@ namespace NeuroPi.UserManagment.Services.Implementation
                 .Include(u => u.User)
                 .FirstOrDefault(r => !r.IsDeleted && r.UserId == user.UserId && r.TenantId == user.TenantId);
 
+            if (role == null)
+            {
+                Console.WriteLine($"[WARN] Role is NULL for UserId: {user.UserId}, TenantId: {user.TenantId}");
+            }
+            else
+            {
+                 Console.WriteLine($"[INFO] Role Found: {role.Role?.Name} (ID: {role.RoleId})");
+            }
+
             var department = _context.UserDepartments
                 .FirstOrDefault(d => d.UserId == user.UserId && !d.IsDeleted);
 
@@ -57,14 +66,14 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
             var response = new UserLogInSucessVM
             {
-                UserName = username,
-                FirstName = role.User.FirstName,
-                LastName = role.User.LastName,
+                UserName = user.Username,
+                FirstName = user.FirstName, // Use user object directly
+                LastName = user.LastName,   // Use user object directly
                 TenantId = user.TenantId,
                 UserId = user.UserId,
                 token = GenerateJwtToken(user),
                 UserProfile = UserResponseVM.ToViewModel(user),
-                RoleId = role.Role.RoleId,
+                RoleId = role?.Role?.RoleId ?? 0,
                 RoleName = role?.Role?.Name,
                 departmentId = department?.DepartmentId ?? 0,
                 UserImageUrl = user.UserImageUrl,

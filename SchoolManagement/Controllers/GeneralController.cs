@@ -55,7 +55,7 @@ namespace SchoolManagement.Controllers
                 }
                 catch (Exception ex)
                 {
-                    return StatusCode(500, $"Local file storage error: {ex.Message}");
+                    return StatusCode(500, $"Local file storage error: {ex.Message}. Internal: {ex.InnerException?.Message}");
                 }
             }
 
@@ -63,14 +63,13 @@ namespace SchoolManagement.Controllers
             string containerName = "student-docs";
 
             if (string.IsNullOrEmpty(connectionString))
-                return StatusCode(500, "Azure Blob Storage connection string is missing.");
+                return StatusCode(500, "Azure Blob Storage connection string is missing in configuration.");
 
             try
             {
                 BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
                 BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(containerName);
                 await containerClient.CreateIfNotExistsAsync();
-                // await containerClient.SetAccessPolicyAsync(Azure.Storage.Blobs.Models.PublicAccessType.Blob); // Removed to fix 500 error
 
                 string blobName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
                 BlobClient blobClient = containerClient.GetBlobClient(blobName);
@@ -86,7 +85,7 @@ namespace SchoolManagement.Controllers
                     BlobContainerName = containerName,
                     BlobName = blobName,
                     Resource = "b",
-                    ExpiresOn = DateTimeOffset.UtcNow.AddYears(100)
+                    ExpiresOn = DateTimeOffset.UtcNow.AddYears(1) // Reduced from 100 for safety, but still very long
                 };
                 sasBuilder.SetPermissions(Azure.Storage.Sas.BlobSasPermissions.Read);
 
@@ -96,7 +95,7 @@ namespace SchoolManagement.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(500, $"Internal server error during Azure upload: {ex.Message}. Details: {ex.InnerException?.Message}");
             }
         }
     }
