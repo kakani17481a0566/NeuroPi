@@ -39,7 +39,7 @@ namespace NeuropiForms.Controllers
             }
             return new ResponseResult<FormSubmissionResponseVM>(HttpStatusCode.NotFound, result, "Not Found");
         }
-        [HttpGet]
+        [HttpGet("/allFormSubmission")]
         public ResponseResult<List<FormSubmissionResponseVM>> GetAllFormSubmissions()
         {
             var result = FormSubmissionService.GetAllFormSubmissions();
