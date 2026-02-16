@@ -4,6 +4,11 @@ using NeuroPi.Nutrition.Interface;
 using NeuroPi.Nutrition.Services.Implementation;
 using NeuroPi.Nutrition.Services.Interface;
 
+// --------------------------------------
+// 🛠️ Global Fix: PostgreSQL DateTime issue
+// --------------------------------------
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Controllers + Swagger

@@ -237,16 +237,14 @@ namespace NeuroPi.Nutrition.Services.Implementation
         {
             string codeStr = code.ToString();
             
-            // Query without AsNoTracking to allow updates
+            // 1. Try to find in Carpidum (regular student passes) first
             var query = from c in context.Carpidum.IgnoreQueryFilters()
                         join s in context.Students.AsNoTracking() on c.StudentId equals s.Id into students
                         from subStudent in students.DefaultIfEmpty()
                         
-                        // Join Course
                         join co in context.Courses.AsNoTracking() on subStudent.CourseId equals co.Id into courses
                         from subCourse in courses.DefaultIfEmpty()
 
-                        // Join Branch
                         join b in context.Branches.AsNoTracking() on subStudent.BranchId equals b.Id into branches
                         from subBranch in branches.DefaultIfEmpty()
 
@@ -255,96 +253,83 @@ namespace NeuroPi.Nutrition.Services.Implementation
 
             var result = query.FirstOrDefault();
 
-            if (result == null)
+            if (result != null)
             {
-                // Fallback: Check VIP Pass Table
-                var vipPass = context.VipCarpidum.IgnoreQueryFilters()
-                    .FirstOrDefault(v => v.QrCode.ToString() == codeStr);
+                var record = result.c;
 
-                if (vipPass != null)
+                if (record.IsDeleted)
                 {
-                    // VIP Pass found - Handle Validation
-                    if (vipPass.IsDeleted)
-                    {
-                        return new QrCodeValidationResponseVM
-                        {
-                            Status = "AlreadyUsed",
-                            Message = "VIP Pass Already Used",
-                            VisitorName = vipPass.VipName,
-                            StudentName = "VIP Access"
-                        };
-                    }
-
-                    // Mark VIP pass as used
-                    vipPass.IsDeleted = true;
-                    vipPass.UpdatedOn = DateTime.UtcNow;
-                    
-                    context.VipCarpidum.Update(vipPass);
-                    context.SaveChanges();
-
-                    return new QrCodeValidationResponseVM
-                    {
-                        Status = "Valid",
-                        Message = "Access Granted (VIP)",
-                        VisitorName = vipPass.VipName,
-                        StudentName = "VIP Access",
-                        CourseName = "VIP",
-                        BranchName = "VIP",
-                        Batch = "VIP",
-                        ValidationTime = DateTime.Now
+                    return new QrCodeValidationResponseVM 
+                    { 
+                        Status = "AlreadyUsed", 
+                        Message = "QR Code Already Used",
+                        StudentName = result.subStudent != null ? (result.subStudent.Name + " " + (result.subStudent.LastName ?? "")).Trim() : "Unknown",
+                        VisitorName = !string.IsNullOrEmpty(record.GuardianName) ? record.GuardianName : record.ParentType,
                     };
                 }
 
-                return new QrCodeValidationResponseVM { Status = "NotFound", Message = "QR Code not found" };
-            }
+                // Internal Mark as Used
+                record.IsDeleted = true;
+                record.UpdatedOn = DateTime.UtcNow;
+                
+                context.Carpidum.Update(record);
+                context.SaveChanges();
 
-            var record = result.c;
+                var student = result.subStudent;
+                var course = result.subCourse;
+                var branch = result.subBranch;
 
-            // Check if already used/deleted
-            if (record.IsDeleted)
-            {
-                // If it's deleted, it counts as "Already Used" / "Attended"
-                return new QrCodeValidationResponseVM 
-                { 
-                    Status = "AlreadyUsed", 
-                    Message = "QR Code Already Used",
-                     StudentName = result.subStudent != null ? (result.subStudent.Name + " " + (result.subStudent.LastName ?? "")).Trim() : "Unknown",
+                return new QrCodeValidationResponseVM
+                {
+                    Status = "Valid",
+                    Message = "Access Granted",
+                    StudentName = student != null ? (student.Name + " " + (student.LastName ?? "")).Trim() : "Unknown",
                     VisitorName = !string.IsNullOrEmpty(record.GuardianName) ? record.GuardianName : record.ParentType,
+                    Gender = "", 
+                    CourseName = course?.Name,
+                    BranchName = branch?.Name,
+                    Batch = student?.AdmissionGrade,
+                    ValidationTime = DateTime.Now
                 };
             }
 
-            // Mark as used (Soft Delete paradigm for 'Attended')
-            record.IsDeleted = true;
-            record.UpdatedOn = DateTime.UtcNow;
-            
-            // Ensure the entity is tracked and marked as modified
-            context.Carpidum.Update(record);
-            context.SaveChanges();
+            // 2. Fallback: Check VIP Pass Table
+            var vipPass = context.VipCarpidum.IgnoreQueryFilters()
+                .FirstOrDefault(v => v.QrCode == code); // Direct Guid comparison
 
-            var student = result.subStudent;
-            var course = result.subCourse;
-            var branch = result.subBranch;
-
-            string studentName = student != null ? (student.Name + " " + (student.LastName ?? "")).Trim() : "Unknown";
-            string gender = ""; // User requested to hide gender
-            string visitorName = !string.IsNullOrEmpty(record.GuardianName) ? record.GuardianName : record.ParentType;
-            
-            string? courseName = course?.Name;
-            string? branchName = branch?.Name;
-            string? batch = student?.AdmissionGrade;
-
-            return new QrCodeValidationResponseVM
+            if (vipPass != null)
             {
-                Status = "Valid",
-                Message = "Access Granted",
-                StudentName = studentName,
-                VisitorName = visitorName,
-                Gender = gender,
-                CourseName = courseName,
-                BranchName = branchName,
-                Batch = batch,
-                ValidationTime = DateTime.Now
-            };
+                if (vipPass.IsDeleted)
+                {
+                    return new QrCodeValidationResponseVM
+                    {
+                        Status = "AlreadyUsed",
+                        Message = "VIP Pass Already Used",
+                        VisitorName = vipPass.VipName,
+                        StudentName = "VIP Access"
+                    };
+                }
+
+                vipPass.IsDeleted = true;
+                vipPass.UpdatedOn = DateTime.UtcNow;
+                
+                context.VipCarpidum.Update(vipPass);
+                context.SaveChanges();
+
+                return new QrCodeValidationResponseVM
+                {
+                    Status = "Valid",
+                    Message = "Access Granted (VIP)",
+                    VisitorName = vipPass.VipName,
+                    StudentName = "VIP Access",
+                    CourseName = "VIP",
+                    BranchName = "VIP",
+                    Batch = "VIP",
+                    ValidationTime = DateTime.Now
+                };
+            }
+
+            return new QrCodeValidationResponseVM { Status = "NotFound", Message = "QR Code not found" };
         }
 
         public string AddCarpidiumDetails(QrCodeRequestVM qrCode)
