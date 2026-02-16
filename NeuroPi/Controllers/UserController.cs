@@ -94,6 +94,18 @@ namespace NeuroPi.UserManagment.Controllers
             return new ResponseResult<UserResponseVM>(HttpStatusCode.NotFound, null, "User not found");
         }
 
+        // PUT api/user/{id}/contact?tenantId=...
+        [HttpPut("{id}/contact")]
+        public ResponseResult<UserResponseVM> UpdateUserContact(int id, [FromQuery] int tenantId, [FromBody] UserContactUpdateVM updateContact)
+        {
+            var updatedUser = _userService.UpdateUserContact(id, tenantId, updateContact);
+
+            if (updatedUser != null)
+                return new ResponseResult<UserResponseVM>(HttpStatusCode.OK, updatedUser, "User contact updated successfully");
+
+            return new ResponseResult<UserResponseVM>(HttpStatusCode.NotFound, null, "User not found");
+        }
+
         // DELETE api/user/{id}?tenantId=...
         [HttpDelete("{id}")]
         public ResponseResult<object> DeleteUser(int id, [FromQuery] int tenantId)

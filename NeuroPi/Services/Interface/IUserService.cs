@@ -17,6 +17,7 @@ namespace NeuroPi.UserManagment.Services.Interface
         UserResponseVM AddUser(UserRequestVM request, out string message);
 
         UserResponseVM UpdateUser(int id, int tenantId, UserUpdateRequestVM userUpdate);
+        UserResponseVM UpdateUserContact(int id, int tenantId, UserContactUpdateVM contactUpdate);
 
         UserResponseVM DeleteUser(int id, int tenantId);
 

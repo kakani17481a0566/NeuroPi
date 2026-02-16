@@ -655,6 +655,29 @@ namespace NeuroPi.UserManagment.Services.Implementation
 
 
 
+        public UserResponseVM UpdateUserContact(int id, int tenantId, UserContactUpdateVM contactUpdate)
+        {
+            try
+            {
+                var user = _context.Users.FirstOrDefault(u => u.UserId == id && u.TenantId == tenantId && !u.IsDeleted);
+                if (user == null) return null;
+
+                user.Email = contactUpdate.Email ?? user.Email;
+                user.MobileNumber = contactUpdate.MobileNumber ?? user.MobileNumber;
+                user.UpdatedBy = contactUpdate.UpdatedBy ?? id;
+                user.UpdatedOn = DateTime.UtcNow;
+
+                _context.SaveChanges();
+
+                return UserResponseVM.ToViewModel(user);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] UpdateUserContact failed: {ex.Message}");
+                return null;
+            }
+        }
+
         public UserResponseVM DeleteUser(int id, int tenantId)
         {
             var user = _context.Users.FirstOrDefault(u => u.UserId == id && u.TenantId == tenantId && !u.IsDeleted);
