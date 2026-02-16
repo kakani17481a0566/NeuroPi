@@ -18,7 +18,7 @@ namespace NeuroPi.UserManagment.ViewModel.User
 
         public string? MobileNumber { get; set; }
         public string? AlternateNumber { get; set; }
-        public DateOnly DateOfBirth { get; set; }
+        public DateOnly? DateOfBirth { get; set; }
         public string? Address { get; set; }
 
         public int? UpdatedBy { get; set; }
