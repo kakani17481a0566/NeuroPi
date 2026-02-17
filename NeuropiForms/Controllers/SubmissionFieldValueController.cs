@@ -60,5 +60,15 @@ namespace NeuropiForms.Controllers
             }
             return new ResponseResult<SubmissionFieldValueResponseVM>(HttpStatusCode.BadRequest, result, "Not Found any data");
         }
+        [HttpPut]
+        public ResponseResult<SubmissionFieldValueResponseVM> UpdateSubmissionFieldValue(int id ,SubmissionFieldValueUpdateVM updateVM)
+        {
+            var result=submissionFieldValueService.UpdateSubmissionFieldValue(id, updateVM);
+            if(result != null)
+            {
+                return new ResponseResult<SubmissionFieldValueResponseVM>(HttpStatusCode.Accepted, result, "Updated SuccessFully Submission Field Value");
+            }
+            return new ResponseResult<SubmissionFieldValueResponseVM>(HttpStatusCode.BadRequest, result, "Not Updated Submission Field value");
+        }
     }
 }

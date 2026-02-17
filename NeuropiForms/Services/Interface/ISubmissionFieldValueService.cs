@@ -11,5 +11,7 @@ namespace NeuropiForms.Services.Interface
         SubmissionFieldValueResponseVM AddSubmissionFieldValue(SubmissionFieldValueRequestVM requestVM);
 
         SubmissionFieldValueResponseVM DeleteSubmissionValue(int id);
+
+        SubmissionFieldValueResponseVM UpdateSubmissionFieldValue(int id,SubmissionFieldValueUpdateVM updateVM);
     }
 }

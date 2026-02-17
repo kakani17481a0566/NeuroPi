@@ -61,5 +61,26 @@ namespace NeuropiForms.Services.Implementation
             }
             return null;
         }
+
+        public SubmissionFieldValueResponseVM UpdateSubmissionFieldValue(int id, SubmissionFieldValueUpdateVM updateVM)
+        {
+            var result=_context.SubmissionFieldValues.Where(s=>!s.IsDeleted).FirstOrDefault(s=>s.Id==id);
+            if (result != null)
+            {
+                result.SubmissionId = updateVM.SubmissionId;
+                result.FieldId = updateVM.FieldId;
+                result.AppId = updateVM.AppId;
+                result.Value = updateVM.Value;
+                result.ValueDate = updateVM.ValueDate;
+                result.Remarks = updateVM.Remarks;
+                result.UpdatedOn=DateTime.UtcNow;
+                result.UpdatedBy = updateVM.TenantId;
+
+                _context.SaveChanges();
+                return SubmissionFieldValueResponseVM.ToViewModel(result) ;
+            }
+            return null;
+
+        }
     }
 }
