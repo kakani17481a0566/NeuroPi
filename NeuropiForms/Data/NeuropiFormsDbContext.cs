@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using NeuropiForms.Models;
 
 namespace NeuropiForms.Data
 {
@@ -8,22 +9,22 @@ namespace NeuropiForms.Data
         {
         }
 
-        public DbSet<Models.MComplianceMaster> ComplianceMasters { get; set; }
-        public DbSet<Models.MComplianceStatus> ComplianceStatuses { get; set; }
-        public DbSet<Models.MGroupModel> Groups { get; set; }
-        public DbSet<Models.MListModel> Lists { get; set; }
-        public DbSet<Models.MSection> Sections { get; set; }
-        public DbSet<Models.MSectionGroup> SectionGroups { get; set; }
-        public DbSet<Models.MField> Fields { get; set; }
-        public DbSet<Models.MSectionField> SectionFields { get; set; }
-        public DbSet<Models.MForm> Forms { get; set; }
-        public DbSet<Models.MFormSectionMapping> FormSectionMappings { get; set; }
-        public DbSet<Models.MFormVersion> FormVersions { get; set; }
-        public DbSet<Models.MSoapService> SoapServices { get; set; }
-        public DbSet<Models.MDatabaseResource> DatabaseResources { get; set; }
-        public DbSet<Models.MFormSepTable> FormSepTables { get; set; }
-        public DbSet<Models.MFormSubmission> FormSubmissions { get; set; }
-        public DbSet<Models.MSubmissionFieldValue> SubmissionFieldValues { get; set; }
-        public DbSet<Models.MSubmissionSectionValue> SubmissionSectionValues { get; set; }
+        public DbSet<MComplianceMaster> ComplianceMasters { get; set; }
+        public DbSet<MComplianceStatus> ComplianceStatuses { get; set; }
+        public DbSet<MGroupModel> Groups { get; set; }
+        public DbSet<MListModel> Lists { get; set; }
+        public DbSet<MSection> Sections { get; set; }
+        public DbSet<MSectionGroup> SectionGroups { get; set; }
+        public DbSet<MField> Fields { get; set; }
+        public DbSet<MSectionField> SectionFields { get; set; }
+        public DbSet<MForm> Forms { get; set; }
+        public DbSet<MFormSectionMapping> FormSectionMappings { get; set; }
+        public DbSet<MFormVersion> FormVersions { get; set; }
+        public DbSet<MSoapService> SoapServices { get; set; }
+        public DbSet<MDatabaseResource> DatabaseResources { get; set; }
+        public DbSet<MFormSepTable> FormSepTables { get; set; }
+        public DbSet<MFormSubmission> FormSubmissions { get; set; }
+        public DbSet<MSubmissionFieldValue> SubmissionFieldValues { get; set; }
+        public DbSet<MSubmissionSectionValue> SubmissionSectionValues { get; set; }
     }
 }

@@ -28,7 +28,7 @@ namespace NeuropiForms.Models
         public bool? IsRequired { get; set; }
 
         [Column("custom_label")]
-        public string CustomLabel { get; set; }
+        public string? CustomLabel { get; set; }
 
         [Column("version_id")]
         public double? VersionId { get; set; }

@@ -23,6 +23,10 @@ builder.Services.AddScoped<ISubmissionSectionValueService, SubmissionSectionValu
 
 
 builder.Services.AddControllers();
+builder.Services.AddScoped<ISectionService, SectionServiceImpl>();
+builder.Services.AddScoped<IFieldService, FieldServiceImpl>();
+builder.Services.AddScoped<ISectionFieldService, SectionFieldServiceImpl>();
+builder.Services.AddScoped<ISectionGroupService, SectionGroupServiceImpl>();
 
 
 var app = builder.Build();
