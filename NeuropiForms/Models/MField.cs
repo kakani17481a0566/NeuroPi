@@ -10,13 +10,13 @@ namespace NeuropiForms.Models
         public int Id { get; set; }
 
         [Column("name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [Column("question")]
-        public string Question { get; set; }
+        public string? Question { get; set; }
 
         [Column("control_id")]
-        public string ControlId { get; set; }
+        public string? ControlId { get; set; }
 
         [Column("control_type_id")]
         public int? ControlTypeId { get; set; }
@@ -25,19 +25,19 @@ namespace NeuropiForms.Models
         public int? OptionsTypeId { get; set; }
 
         [Column("option_name")]
-        public string OptionName { get; set; }
+        public string? OptionName { get; set; }
 
         [Column("option_json", TypeName = "jsonb")]
-        public string OptionJson { get; set; }
+        public string? OptionJson { get; set; }
 
         [Column("validation_rules")]
-        public string ValidationRules { get; set; }
+        public string? ValidationRules { get; set; }
 
         [Column("placeholder")]
-        public string Placeholder { get; set; }
+        public string? Placeholder { get; set; }
 
         [Column("help_text")]
-        public string HelpText { get; set; }
+        public string? HelpText { get; set; }
 
         [Column("is_active")]
         public bool? IsActive { get; set; } = true;
@@ -52,7 +52,7 @@ namespace NeuropiForms.Models
         public int? Min { get; set; }
 
         [Column("defaultvalue")]
-        public string DefaultValue { get; set; }
+        public string? DefaultValue { get; set; }
 
         [Column("datatype_id")]
         public int? DatatypeId { get; set; }
@@ -61,7 +61,7 @@ namespace NeuropiForms.Models
         public bool? IsCalculated { get; set; }
 
         [Column("formula")]
-        public string Formula { get; set; }
+        public string? Formula { get; set; }
 
         [Column("app_id")]
         public int? AppId { get; set; }

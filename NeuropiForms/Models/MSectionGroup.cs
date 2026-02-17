@@ -27,5 +27,9 @@ namespace NeuropiForms.Models
         [Column("tenant_id")]
         public int? TenantId { get; set; }
 
+        public int? UpdatedBy { get; set; }
+
+
+
     }
 }
