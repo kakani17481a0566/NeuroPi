@@ -18,6 +18,8 @@ builder.Services.AddDbContext<NeuropiForms.Data.NeuropiFormsDbContext>(options =
 builder.Services.AddScoped<NeuropiForms.Services.Interface.IFormService, NeuropiForms.Services.Impl.FormServiceImpl>();
 builder.Services.AddScoped<IFormSubmissionService, FormSubmissionServiceImpl>();
 builder.Services.AddScoped<ISubmissionFieldValueService, SubmissionFieldValueServiceImpl>();
+builder.Services.AddScoped<ISubmissionSectionValueService, SubmissionSectionValueServiceImpl>();
+
 
 
 builder.Services.AddControllers();

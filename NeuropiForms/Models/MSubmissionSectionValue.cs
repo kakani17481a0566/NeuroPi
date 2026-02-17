@@ -10,25 +10,25 @@ namespace NeuropiForms.Models
         public int Id { get; set; }
 
         [Column("submission_id")]
-        public int? SubmissionId { get; set; }
+        public int SubmissionId { get; set; }
 
         [ForeignKey("SubmissionId")]
         public virtual MFormSubmission MFormSubmission { get; set; }
 
         [Column("section_id")]
-        public int? SectionId { get; set; }
+        public int SectionId { get; set; }
 
         [ForeignKey("SectionId")]
         public virtual MSection MSection { get; set; }
 
         [Column("value")]
-        public double? Value { get; set; }
+        public double Value { get; set; }
 
         [Column("app_id")]
-        public int? AppId { get; set; }
+        public int AppId { get; set; }
 
         [Column("tenant_id")]
-        public int? TenantId { get; set; }
+        public int TenantId { get; set; }
 
     }
 }
