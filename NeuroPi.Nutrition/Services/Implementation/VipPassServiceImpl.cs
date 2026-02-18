@@ -179,7 +179,7 @@ namespace NeuroPi.Nutrition.Services.Implementation
                             
                             <h2 style='font-family:""Playfair Display"", ""Times New Roman"", serif; color:#00204a; margin-top:0; font-size:24px; text-align:center;'>Honored Guest</h2>
                             
-                            <p style='text-align:center; font-size:16px; margin-bottom:30px;'>Dear <strong>{{name}}</strong>,</p>
+                            <p style='text-align:center; font-size:16px; margin-bottom:30px;'>Dear <strong>{name}</strong>,</p>
                             
                             <p style='text-align:center; margin-bottom:30px; color:#555;'>
                                 We are pleased to extend this exclusive invitation to you as a distinguished guest. Join us for an evening of excellence and innovation at the annual celebration hosted by <strong>My School Italy</strong> and <strong>Neuropi Ai</strong>.
@@ -214,7 +214,7 @@ namespace NeuroPi.Nutrition.Services.Implementation
                     <tr>
                         <td style='background-color:#f4f4f4; padding:25px; text-align:center; border-top:1px solid #eaeaea;'>
                             <p style='font-size:11px; color:#888; margin:0; line-height:1.5;'>
-                                © {{DateTime.Now.Year}} My School Italy & Neuropi Ai.<br>
+                                © {DateTime.Now.Year} My School Italy & Neuropi Ai.<br>
                                 Excellence in Education & Innovation.
                             </p>
                         </td>

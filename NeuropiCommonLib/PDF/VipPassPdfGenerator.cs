@@ -1,17 +1,20 @@
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
-using System;
 using System.Collections.Generic;
-using System.IO;
 
 namespace NeuropiCommonLib.PDF
 {
     public class VipPassPdfGenerator
     {
+        // Define Brand Colors
+        private static readonly string BrandNavy = "#00204a";
+        private static readonly string BrandGold = "#d4af37";
+        private static readonly string BrandLightGrey = "#f0f2f5";
+        private static readonly string TextDark = "#444444";
+
         public static byte[] GenerateVipPassesPdf(string vipName, List<(int PassId, byte[] QrCodeBytes)> passes)
         {
-            // Set QuestPDF license
             QuestPDF.Settings.License = LicenseType.Community;
 
             var document = Document.Create(container =>
@@ -20,82 +23,127 @@ namespace NeuropiCommonLib.PDF
                 {
                     container.Page(page =>
                     {
+                        // 1. Page Background (Light Grey to make the white card pop)
                         page.Size(PageSizes.A4);
-                        page.Margin(40);
-                        
-                        page.Header().Row(row =>
-                        {
-                            row.RelativeItem().Column(col =>
-                            {
-                                col.Item().Text("VIP ACCESS PASSES").FontSize(24).Bold().FontColor(Colors.Red.Darken4);
-                                col.Item().Text("Carpe Diem Celebration 2026").FontSize(14).SemiBold().FontColor(Colors.Grey.Darken2);
-                            });
-                            
-                            row.ConstantItem(80).AlignCenter().Text("VIP").FontSize(32).Bold().FontColor(Colors.Red.Lighten4);
-                        });
+                        page.Margin(20);
+                        page.PageColor(BrandLightGrey);
+                        page.DefaultTextStyle(x => x.FontFamily(Fonts.Arial).Color(TextDark));
 
-                        page.Content().PaddingVertical(20).Column(col =>
+                        page.Content().AlignCenter().Column(col =>
                         {
-                            col.Spacing(30);
-                            
-                            col.Item().BorderBottom(1).BorderColor(Colors.Grey.Lighten2).PaddingBottom(10).Column(venueCol =>
+                            // Centering the "Card" vertically roughly
+                            col.Spacing(20);
+
+                            // 2. The Main Card Container
+                            col.Item().Background(Colors.White).BorderTop(5).BorderColor(BrandGold).Column(card =>
                             {
-                                venueCol.Spacing(5);
-                                venueCol.Item().Row(row => 
+                                // --- HEADER SECTION (Deep Navy) ---
+                                card.Item().Background(BrandNavy).PaddingVertical(20).PaddingHorizontal(20).Column(header =>
                                 {
-                                    row.RelativeItem().Text(text =>
+                                    header.Spacing(5);
+
+                                    // Small Gold Top Label
+                                    header.Item().AlignCenter().Text(t => t.Span("MY SCHOOL ITALY & NEUROPI AI")
+                                          .FontColor(BrandGold).FontSize(10).SemiBold().LetterSpacing(0.1f));
+
+                                    // Main Title (Serif Font for Premium look)
+                                    header.Item().AlignCenter().Text(t => t.Span("VIP INVITATION")
+                                          .FontFamily(Fonts.TimesNewRoman) // Uses System Times New Roman
+                                          .FontColor(Colors.White).FontSize(28));
+
+                                    // Subtitle
+                                    header.Item().AlignCenter().Text(t => t.Span("Carpe Diem Celebration 2026")
+                                          .FontColor(Colors.Grey.Lighten2).FontSize(14).LetterSpacing(0.05f));
+                                });
+
+                                // --- BODY SECTION ---
+                                card.Item().Padding(20).Column(body =>
+                                {
+                                    body.Spacing(15);
+
+                                    // Greeting
+                                    body.Item().AlignCenter().Text(t => t.Span("Honored Guest")
+                                        .FontFamily(Fonts.TimesNewRoman).FontSize(22).FontColor(BrandNavy));
+
+                                    body.Item().AlignCenter().Text(t =>
                                     {
-                                        text.Span("Honored Guest: ").SemiBold().FontSize(14);
-                                        text.Span(vipName).FontSize(14);
+                                        t.Span("Dear ");
+                                        t.Span(vipName).Bold();
+                                        t.Span(",");
                                     });
-                                    
-                                    row.RelativeItem().AlignRight().Text(text =>
+
+                                    body.Item().AlignCenter().Text(t => t.Span("We are pleased to extend this exclusive invitation to you. Join us for an evening of excellence and innovation.")
+                                        .FontSize(11).LineHeight(1.5f).FontColor(Colors.Grey.Darken2));
+
+                                    // --- DETAILS BOX (Grey box with Gold border) ---
+                                    body.Item().Background(Colors.Grey.Lighten4)
+                                        .BorderLeft(4).BorderColor(BrandGold)
+                                        .Padding(15)
+                                        .Row(row =>
+                                        {
+                                            // Left Col: Date
+                                            row.RelativeItem().Column(d =>
+                                            {
+                                                d.Item().Text(t => t.Span("DATE").FontSize(9).SemiBold().FontColor(Colors.Grey.Darken1));
+                                                d.Item().Text(t => t.Span("28 February 2026").FontSize(14).Bold().FontColor(BrandNavy));
+                                            });
+
+                                            // Right Col: Venue
+                                            row.RelativeItem().Column(v =>
+                                            {
+                                                v.Item().Text(t => t.Span("VENUE").FontSize(9).SemiBold().FontColor(Colors.Grey.Darken1));
+                                                v.Item().Text(t => t.Span("Ashray Conventions").FontSize(14).Bold().FontColor(BrandNavy));
+                                                v.Item().Text(t => t.Span("Near Hitech City Metro, Hyderabad").FontSize(10));
+                                            });
+                                        });
+
+                                    // Map Link Button style
+                                    body.Item().AlignCenter().PaddingTop(10).Element(ComposeMapLink);
+
+                                    // --- QR CODE SECTION ---
+                                    body.Item().PaddingTop(10).Column(qr =>
                                     {
-                                        text.Span("Pass ID: ").SemiBold();
-                                        text.Span(pass.PassId.ToString());
+                                        qr.Spacing(5);
+                                        qr.Item().AlignCenter().Width(100).Height(100).Image(pass.QrCodeBytes);
+
+                                        qr.Item().AlignCenter().Text(text =>
+                                        {
+                                            text.Span("PASS ID: ").FontSize(10).SemiBold();
+                                            text.Span(pass.PassId.ToString()).FontSize(10);
+                                        });
+
+                                        qr.Item().AlignCenter().Text(t => t.Span("Please present this at the VIP Entrance.")
+                                           .FontSize(10).Italic().FontColor(Colors.Grey.Medium));
                                     });
                                 });
 
-                                venueCol.Item().Row(row =>
-                                {
-                                    row.RelativeItem().Text(text =>
-                                    {
-                                        text.Span("Venue: ").SemiBold();
-                                        text.Span("Ashray Conventions, Near Hitech city Metro, Hyderabad");
-                                    });
-                                });
-
-                                venueCol.Item().Row(row =>
-                                {
-                                    row.RelativeItem().Text(text =>
-                                    {
-                                        text.Span("Location: ").SemiBold().FontColor(Colors.Red.Darken4);
-                                        text.Span("https://maps.app.goo.gl/twAGzoyvyfzfCdCj7").FontColor(Colors.Blue.Medium);
-                                    });
-                                });
+                                // --- FOOTER SECTION ---
+                                card.Item().Background(Colors.Grey.Lighten4)
+                                    .BorderTop(1).BorderColor(Colors.Grey.Lighten3)
+                                    .Padding(10)
+                                    .AlignCenter()
+                                    .Text(t => t.Span($"© 2026 My School Italy & Neuropi Ai").FontSize(10).FontColor(Colors.Grey.Darken1));
                             });
-
-                            col.Item().AlignCenter().Column(passCol =>
-                            {
-                                passCol.Spacing(20);
-                                passCol.Item().AlignCenter().Text($"VIP Entry Pass").Bold().FontSize(20).FontColor(Colors.Red.Darken3);
-                                
-                                passCol.Item().AlignCenter().Width(300).Height(300).Image(pass.QrCodeBytes);
-                                
-                                passCol.Item().AlignCenter().Text("Valid for One Admission Only").FontSize(12).SemiBold();
-                                passCol.Item().AlignCenter().PaddingTop(10).Text("Please present this QR code at the VIP Entrance for verification.").FontSize(10).Italic().FontColor(Colors.Grey.Medium);
-                            });
-                        });
-
-                        page.Footer().AlignCenter().Text(text =>
-                        {
-                            text.Span("© 2026 My School Italy & Neuropi Ai").FontSize(9).FontColor(Colors.Grey.Medium);
                         });
                     });
                 }
             });
 
             return document.GeneratePdf();
+        }
+
+        // Helper for the button style
+        static void ComposeMapLink(IContainer container)
+        {
+            container
+                .Background(BrandNavy)
+                .PaddingVertical(10)
+                .PaddingHorizontal(25)
+                .Hyperlink("https://maps.app.goo.gl/twAGzoyvyfzfCdCj7")
+                .Text(t => t.Span("VIEW LOCATION MAP")
+                    .FontColor(BrandGold)
+                    .FontSize(10)
+                    .Bold());
         }
     }
 }
