@@ -128,6 +128,14 @@ namespace NeuroPi.Nutrition.Services.Implementation
                 await smtpClient.SendMailAsync(mailMessage);
                 Console.WriteLine("SendPassesViaEmail: Email sent successfully.");
 
+                // Update EmailSent flag
+                foreach (var pass in passes)
+                {
+                    pass.EmailSent = true;
+                    pass.UpdatedOn = DateTime.UtcNow;
+                }
+                context.SaveChanges();
+
                 return true;
             }
             catch (Exception ex)

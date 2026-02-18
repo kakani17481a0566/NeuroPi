@@ -26,5 +26,8 @@ namespace NeuroPi.Nutrition.Model
 
         [Column("pass_count")]
         public int PassCount { get; set; }
+
+        [Column("email_sent")]
+        public bool EmailSent { get; set; } = false;
     }
 }

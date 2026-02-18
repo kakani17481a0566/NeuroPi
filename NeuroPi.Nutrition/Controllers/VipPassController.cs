@@ -30,7 +30,11 @@ namespace NeuroPi.Nutrition.Controllers
                 if (request.SendEmail)
                 {
                     // Trigger email sending asynchronously
-                    await vipPassService.SendPassesViaEmail(request.VipEmail);
+                    bool sent = await vipPassService.SendPassesViaEmail(request.VipEmail);
+                    if (sent)
+                    {
+                        passes.ForEach(p => p.EmailSent = true);
+                    }
                 }
 
                 return Ok(passes);
