@@ -56,7 +56,7 @@ namespace NeuroPi.Nutrition.Services.Implementation
         public async Task<bool> SendPassesViaEmail(string vipEmail)
         {
             var passes = context.VipCarpidum
-                .Where(v => v.VipEmail == vipEmail && !v.IsDeleted)
+                .Where(v => v.VipEmail == vipEmail && !v.IsDeleted && !v.EmailSent)
                 .ToList();
 
             if (!passes.Any()) 
@@ -65,7 +65,7 @@ namespace NeuroPi.Nutrition.Services.Implementation
                 return false;
             }
 
-            Console.WriteLine($"SendPassesViaEmail: Found {passes.Count} passes for {vipEmail}. Preparing email...");
+            Console.WriteLine($"SendPassesViaEmail: Found {passes.Count} passes for {vipEmail}. Preparing email batches...");
 
             try
             {
@@ -79,62 +79,76 @@ namespace NeuroPi.Nutrition.Services.Implementation
                     EnableSsl = true,
                 };
 
-                using var mailMessage = new MailMessage
+                // Split passes into chunks of 10
+                var passBatches = passes.Chunk(10).ToList();
+                int totalBatches = passBatches.Count;
+                int currentBatch = 1;
+
+                foreach (var batch in passBatches)
                 {
-                    From = new MailAddress("kakanimohithkrishnasai@gmail.com"),
-                    Subject = "VIP Carpe Diem Invitation from My School Italy and Neuropi Ai",
-                    IsBodyHtml = true
-                };
+                    Console.WriteLine($"SendPassesViaEmail: Processing batch {currentBatch} of {totalBatches}...");
 
-                mailMessage.To.Add(vipEmail);
+                    using var mailMessage = new MailMessage
+                    {
+                        From = new MailAddress("kakanimohithkrishnasai@gmail.com"),
+                        Subject = totalBatches > 1 
+                            ? $"VIP Carpe Diem Invitation from My School Italy and Neuropi Ai (Part {currentBatch}/{totalBatches})"
+                            : "VIP Carpe Diem Invitation from My School Italy and Neuropi Ai",
+                        IsBodyHtml = true
+                    };
 
-                string vipName = passes.First().VipName;
-                string body = GetVipPassEmailBody(vipName, passes);
+                    mailMessage.To.Add(vipEmail);
 
-                mailMessage.Body = body;
-                // Add AlternateView for HTML body
-                var htmlView = AlternateView.CreateAlternateViewFromString(body, null, MediaTypeNames.Text.Html);
-                mailMessage.AlternateViews.Add(htmlView);
+                    string vipName = batch.First().VipName;
+                    string body = GetVipPassEmailBody(vipName, batch.ToList());
 
-                foreach (var pass in passes)
-                {
-                    Console.WriteLine($"SendPassesViaEmail: Generating PDF for pass {pass.Id}...");
-                    string qrCodeStr = pass.QrCode.ToString();
-                    using var qrGenerator = new QRCodeGenerator();
-                    using var qrCodeData = qrGenerator.CreateQrCode(qrCodeStr, QRCodeGenerator.ECCLevel.Q);
-                    using var qrCode = new QRCode(qrCodeData);
-                    using Bitmap qrCodeAsBitmap = qrCode.GetGraphic(5);
-                    
-                    using var memoryStream = new MemoryStream();
-                    qrCodeAsBitmap.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
-                    byte[] qrBytes = memoryStream.ToArray();
+                    mailMessage.Body = body;
+                    // Add AlternateView for HTML body
+                    var htmlView = AlternateView.CreateAlternateViewFromString(body, null, MediaTypeNames.Text.Html);
+                    mailMessage.AlternateViews.Add(htmlView);
 
-                    // Generate PDF for this single pass
-                    var singlePassList = new List<(int PassId, byte[] QrCodeBytes)> { (pass.Id, qrBytes) };
-                    byte[] pdfBytes = VipPassPdfGenerator.GenerateVipPassesPdf(vipName, singlePassList);
+                    foreach (var pass in batch)
+                    {
+                        Console.WriteLine($"SendPassesViaEmail: Generating PDF for pass {pass.Id}...");
+                        string qrCodeStr = pass.QrCode.ToString();
+                        using var qrGenerator = new QRCodeGenerator();
+                        using var qrCodeData = qrGenerator.CreateQrCode(qrCodeStr, QRCodeGenerator.ECCLevel.Q);
+                        using var qrCode = new QRCode(qrCodeData);
+                        using Bitmap qrCodeAsBitmap = qrCode.GetGraphic(5);
+                        
+                        using var memoryStream = new MemoryStream();
+                        qrCodeAsBitmap.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
+                        byte[] qrBytes = memoryStream.ToArray();
 
-                    // Create stream for attachment - will be disposed by MailMessage
-                    var pdfStream = new MemoryStream(pdfBytes); 
-                    
-                    // Attach with specific name: {VipName}_{PassId}.pdf
-                    // Sanitize filename to remove invalid chars
-                    string cleanVipName = string.Join("_", vipName.Split(Path.GetInvalidFileNameChars()));
-                    cleanVipName = cleanVipName.Replace(" ", "_");
-                    
-                    mailMessage.Attachments.Add(new Attachment(pdfStream, $"{cleanVipName}_{pass.Id}.pdf", MediaTypeNames.Application.Pdf));
+                        // Generate PDF for this single pass
+                        var singlePassList = new List<(int PassId, byte[] QrCodeBytes)> { (pass.Id, qrBytes) };
+                        byte[] pdfBytes = VipPassPdfGenerator.GenerateVipPassesPdf(vipName, singlePassList);
+
+                        // Create stream for attachment - will be disposed by MailMessage
+                        var pdfStream = new MemoryStream(pdfBytes); 
+                        
+                        // Attach with specific name: {VipName}_{PassId}.pdf
+                        // Sanitize filename to remove invalid chars
+                        string cleanVipName = string.Join("_", vipName.Split(Path.GetInvalidFileNameChars()));
+                        cleanVipName = cleanVipName.Replace(" ", "_");
+                        
+                        mailMessage.Attachments.Add(new Attachment(pdfStream, $"{cleanVipName}_{pass.Id}.pdf", MediaTypeNames.Application.Pdf));
+                    }
+
+                    Console.WriteLine($"SendPassesViaEmail: Sending batch {currentBatch} email via SMTP...");
+                    await smtpClient.SendMailAsync(mailMessage);
+                    Console.WriteLine($"SendPassesViaEmail: Batch {currentBatch} sent successfully.");
+
+                    // Update EmailSent flag for this batch
+                    foreach (var pass in batch)
+                    {
+                        pass.EmailSent = true;
+                        pass.UpdatedOn = DateTime.UtcNow;
+                    }
+                    context.SaveChanges();
+
+                    currentBatch++;
                 }
-
-                Console.WriteLine("SendPassesViaEmail: Sending email via SMTP...");
-                await smtpClient.SendMailAsync(mailMessage);
-                Console.WriteLine("SendPassesViaEmail: Email sent successfully.");
-
-                // Update EmailSent flag
-                foreach (var pass in passes)
-                {
-                    pass.EmailSent = true;
-                    pass.UpdatedOn = DateTime.UtcNow;
-                }
-                context.SaveChanges();
 
                 return true;
             }

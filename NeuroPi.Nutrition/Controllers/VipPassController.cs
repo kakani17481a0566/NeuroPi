@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using NeuroPi.Nutrition.Model;
 using NeuroPi.Nutrition.Services.Interface;
 using NeuroPi.Nutrition.ViewModel.VipPass;
@@ -14,14 +15,16 @@ namespace NeuroPi.Nutrition.Controllers
     public class VipPassController : ControllerBase
     {
         private readonly IVipPassService vipPassService;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
 
-        public VipPassController(IVipPassService _vipPassService)
+        public VipPassController(IVipPassService _vipPassService, IServiceScopeFactory serviceScopeFactory)
         {
             vipPassService = _vipPassService;
+            _serviceScopeFactory = serviceScopeFactory;
         }
 
         [HttpPost("generate")]
-        public async Task<ActionResult<List<MVipCarpidum>>> GenerateBulkPasses([FromBody] VipBulkPassRequestVM request)
+        public ActionResult<List<MVipCarpidum>> GenerateBulkPasses([FromBody] VipBulkPassRequestVM request)
         {
             try
             {
@@ -29,12 +32,23 @@ namespace NeuroPi.Nutrition.Controllers
                 
                 if (request.SendEmail)
                 {
-                    // Trigger email sending asynchronously
-                    bool sent = await vipPassService.SendPassesViaEmail(request.VipEmail);
-                    if (sent)
+                    // Trigger email sending asynchronously in background
+                    _ = Task.Run(async () =>
                     {
-                        passes.ForEach(p => p.EmailSent = true);
-                    }
+                        try
+                        {
+                            using (var scope = _serviceScopeFactory.CreateScope())
+                            {
+                                var scopedService = scope.ServiceProvider.GetRequiredService<IVipPassService>();
+                                await scopedService.SendPassesViaEmail(request.VipEmail);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            // Log the exception (consider using ILogger)
+                            Console.WriteLine($"Background Email Error: {ex}");
+                        }
+                    });
                 }
 
                 return Ok(passes);
@@ -46,12 +60,29 @@ namespace NeuroPi.Nutrition.Controllers
         }
 
         [HttpPost("send-email")]
-        public async Task<ActionResult<bool>> SendPassesViaEmail([FromBody] string vipEmail)
+        public ActionResult<bool> SendPassesViaEmail([FromBody] string vipEmail)
         {
             try
             {
-                var result = await vipPassService.SendPassesViaEmail(vipEmail);
-                return Ok(result);
+                // Trigger email sending asynchronously in background
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        using (var scope = _serviceScopeFactory.CreateScope())
+                        {
+                            var scopedService = scope.ServiceProvider.GetRequiredService<IVipPassService>();
+                            await scopedService.SendPassesViaEmail(vipEmail);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // Log the exception
+                        Console.WriteLine($"Background Email Error: {ex}");
+                    }
+                });
+
+                return Ok(true);
             }
             catch (Exception ex)
             {
