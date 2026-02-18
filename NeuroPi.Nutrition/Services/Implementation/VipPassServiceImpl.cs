@@ -153,51 +153,81 @@ namespace NeuroPi.Nutrition.Services.Implementation
 <html>
 <head>
     <meta charset='UTF-8'>
-    <title>VIP Invitation</title>
+    <title>VIP Invitation - Carpe Diem 2026</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap');
+    </style>
 </head>
-<body style='margin:0; padding:0; background-color:#f8f9fb; font-family:Arial, sans-serif;'>
-    <table width='100%' cellpadding='0' cellspacing='0' style='background-color:#f8f9fb; padding:20px;'>
+<body style='margin:0; padding:0; background-color:#f0f2f5; font-family:""Lato"", Arial, sans-serif; -webkit-font-smoothing: antialiased;'>
+    
+    <table width='100%' cellpadding='0' cellspacing='0' style='background-color:#f0f2f5; padding:40px 10px;'>
         <tr>
             <td align='center'>
-                <table width='600' cellpadding='0' cellspacing='0' style='background-color:#ffffff; border-radius:15px; overflow:hidden; border:1px solid #ddd; box-shadow:0 10px 25px rgba(0,0,0,0.1);'>
+                
+                <table width='600' cellpadding='0' cellspacing='0' style='background-color:#ffffff; max-width:600px; border-radius:4px; overflow:hidden; box-shadow:0 15px 35px rgba(0,32,74,0.15); border-top: 5px solid #d4af37;'>
+                    
                     <tr>
-                        <td style='background:linear-gradient(135deg,#8b0000,#c21807); padding:30px; text-align:center; color:#ffffff;'>
-                            <h1 style='margin:0; font-size:24px; letter-spacing:2px;'>VIP INVITATION</h1>
-                            <p style='margin:10px 0 0; font-size:14px; opacity:0.9;'>Carpe Diem Celebration 2026</p>
+                        <td style='background-color:#00204a; padding:40px 30px; text-align:center; background-image: linear-gradient(180deg, #00204a 0%, #00152e 100%);'>
+                            <p style='color:#d4af37; font-size:11px; text-transform:uppercase; letter-spacing:3px; margin:0 0 10px 0; font-weight:700;'>My School Italy & Neuropi AI</p>
+                            <h1 style='margin:0; font-family:""Playfair Display"", ""Times New Roman"", serif; font-size:32px; letter-spacing:1px; color:#ffffff; font-weight:400;'>VIP INVITATION</h1>
+                            <p style='margin:10px 0 0; font-size:14px; color:#aab8c2; letter-spacing:1px;'>Carpe Diem Celebration 2026</p>
                         </td>
                     </tr>
-                    <tr>
-                        <td style='padding:40px; color:#333; line-height:1.6;'>
-                            <h2 style='color:#8b0000; margin-top:0;'>Honored Guest Invitation</h2>
-                            <p>Dear <strong>{name}</strong>,</p>
-                            <p>We are delighted to extend a special invitation to you as an <strong>Honored VIP Guest</strong> at the Carpe Diem Day Celebration by <strong>My School Italy & Neuropi Ai</strong>.</p>
-                            <p>Please find your personalized VIP access passes attached to this email as a PDF document. You can print the document or present it on your mobile device at the VIP entrance for seamless entry.</p>
 
-                            <div style='margin-top:30px; padding:20px; background:#fff5f5; border-radius:10px; text-align:center;'>
-                                <p style='margin:0; font-weight:bold; color:#8b0000;'>Event Details</p>
-                                <p style='margin:5px 0 0;'>Date: 28th February 2026</p>
-                                <p style='margin:5px 0 0;'>Venue: <strong>Ashray Conventions</strong></p>
-                                <p style='margin:2px 0 0; font-size:12px; color:#555;'>Near Hitech city Metro, Hyderabad</p>
-                                <p style='margin:8px 0 0;'><a href='https://maps.app.goo.gl/twAGzoyvyfzfCdCj7' style='color:#8b0000; text-decoration:none; font-weight:bold; font-size:13px;'>📍 Open in Google Maps</a></p>
+                    <tr>
+                        <td style='padding:50px 40px; color:#444444; line-height:1.8;'>
+                            
+                            <h2 style='font-family:""Playfair Display"", ""Times New Roman"", serif; color:#00204a; margin-top:0; font-size:24px; text-align:center;'>Honored Guest</h2>
+                            
+                            <p style='text-align:center; font-size:16px; margin-bottom:30px;'>Dear <strong>{{name}}</strong>,</p>
+                            
+                            <p style='text-align:center; margin-bottom:30px; color:#555;'>
+                                We are pleased to extend this exclusive invitation to you as a distinguished guest. Join us for an evening of excellence and innovation at the annual celebration hosted by <strong>My School Italy</strong> and <strong>Neuropi Ai</strong>.
+                            </p>
+
+                            <div style='background-color:#f8f9fa; border:1px solid #e1e4e8; border-left:4px solid #d4af37; padding:25px; margin:20px 0;'>
+                                <table width='100%' cellpadding='0' cellspacing='0'>
+                                    <tr>
+                                        <td width='50%' valign='top' style='padding-right:15px; border-right:1px solid #e1e4e8;'>
+                                            <p style='margin:0; font-size:10px; text-transform:uppercase; color:#888; letter-spacing:1px;'>Date</p>
+                                            <p style='margin:5px 0 0; font-weight:bold; color:#00204a; font-size:16px;'>28 February 2026</p>
+                                        </td>
+                                        <td width='50%' valign='top' style='padding-left:15px;'>
+                                            <p style='margin:0; font-size:10px; text-transform:uppercase; color:#888; letter-spacing:1px;'>Venue</p>
+                                            <p style='margin:5px 0 0; font-weight:bold; color:#00204a; font-size:16px;'>Ashray Conventions</p>
+                                            <p style='margin:2px 0 0; font-size:12px; color:#666;'>Near Hitech City Metro, Hyderabad</p>
+                                        </td>
+                                    </tr>
+                                </table>
                             </div>
 
-                            <p style='margin-top:30px;'>We look forward to welcoming you to this magical evening!</p>
+                            <p style='font-size:14px; color:#666; text-align:center; margin-top:30px;'>
+                                <em>Your personalized VIP access pass is attached as a PDF. Please present this at the priority entrance.</em>
+                            </p>
+
+                            <div style='text-align:center; margin-top:35px;'>
+                                <a href='https://maps.app.goo.gl/twAGzoyvyfzfCdCj7' style='background-color:#00204a; color:#d4af37; text-decoration:none; padding:12px 30px; font-weight:bold; font-size:13px; letter-spacing:1px; border-radius:2px; display:inline-block;'>VIEW LOCATION MAP</a>
+                            </div>
                         </td>
                     </tr>
+
                     <tr>
-                        <td style='background:#fafafa; padding:30px; text-align:center; border-top:1px solid #eee;'>
-                            <p style='font-size:12px; color:#999; margin:0;'>
-                                © {DateTime.Now.Year} My School Italy & Neuropi Ai<br>
-                                This is an automated VIP invitation.
+                        <td style='background-color:#f4f4f4; padding:25px; text-align:center; border-top:1px solid #eaeaea;'>
+                            <p style='font-size:11px; color:#888; margin:0; line-height:1.5;'>
+                                © {{DateTime.Now.Year}} My School Italy & Neuropi Ai.<br>
+                                Excellence in Education & Innovation.
                             </p>
                         </td>
                     </tr>
                 </table>
+                
+                <table height='40' width='100%'><tr><td></td></tr></table>
             </td>
         </tr>
     </table>
 </body>
 </html>";
+;
         }
 
         public List<MVipCarpidum> GetVipPasses()
