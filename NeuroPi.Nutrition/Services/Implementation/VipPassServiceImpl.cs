@@ -59,7 +59,7 @@ namespace NeuroPi.Nutrition.Services.Implementation
                 .Where(v => v.VipEmail == vipEmail && !v.IsDeleted && !v.EmailSent)
                 .ToList();
 
-            if (!passes.Any()) 
+            if (!passes.Any())
             {
                 Console.WriteLine($"SendPassesViaEmail: No passes found for email {vipEmail}");
                 return false;
@@ -73,8 +73,8 @@ namespace NeuroPi.Nutrition.Services.Implementation
                 {
                     Port = 587,
                     Credentials = new NetworkCredential(
-                        "kakanimohithkrishnasai@gmail.com",
-                        "vcewdxucyhcjhskp"
+                        "info@neuropi.ai",
+                        "wblollhzrtfyzmlm"
                     ),
                     EnableSsl = true,
                 };
@@ -90,8 +90,8 @@ namespace NeuroPi.Nutrition.Services.Implementation
 
                     using var mailMessage = new MailMessage
                     {
-                        From = new MailAddress("kakanimohithkrishnasai@gmail.com"),
-                        Subject = totalBatches > 1 
+                        From = new MailAddress("info@neuropi.ai"),
+                        Subject = totalBatches > 1
                             ? $"VIP Carpe Diem Invitation from My School Italy and Neuropi Ai (Part {currentBatch}/{totalBatches})"
                             : "VIP Carpe Diem Invitation from My School Italy and Neuropi Ai",
                         IsBodyHtml = true
@@ -115,7 +115,7 @@ namespace NeuroPi.Nutrition.Services.Implementation
                         using var qrCodeData = qrGenerator.CreateQrCode(qrCodeStr, QRCodeGenerator.ECCLevel.Q);
                         using var qrCode = new QRCode(qrCodeData);
                         using Bitmap qrCodeAsBitmap = qrCode.GetGraphic(5);
-                        
+
                         using var memoryStream = new MemoryStream();
                         qrCodeAsBitmap.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
                         byte[] qrBytes = memoryStream.ToArray();
@@ -125,13 +125,13 @@ namespace NeuroPi.Nutrition.Services.Implementation
                         byte[] pdfBytes = VipPassPdfGenerator.GenerateVipPassesPdf(vipName, singlePassList);
 
                         // Create stream for attachment - will be disposed by MailMessage
-                        var pdfStream = new MemoryStream(pdfBytes); 
-                        
+                        var pdfStream = new MemoryStream(pdfBytes);
+
                         // Attach with specific name: {VipName}_{PassId}.pdf
                         // Sanitize filename to remove invalid chars
                         string cleanVipName = string.Join("_", vipName.Split(Path.GetInvalidFileNameChars()));
                         cleanVipName = cleanVipName.Replace(" ", "_");
-                        
+
                         mailMessage.Attachments.Add(new Attachment(pdfStream, $"{cleanVipName}_{pass.Id}.pdf", MediaTypeNames.Application.Pdf));
                     }
 
@@ -173,13 +173,13 @@ namespace NeuroPi.Nutrition.Services.Implementation
     </style>
 </head>
 <body style='margin:0; padding:0; background-color:#f0f2f5; font-family:""Lato"", Arial, sans-serif; -webkit-font-smoothing: antialiased;'>
-    
+
     <table width='100%' cellpadding='0' cellspacing='0' style='background-color:#f0f2f5; padding:40px 10px;'>
         <tr>
             <td align='center'>
-                
+
                 <table width='600' cellpadding='0' cellspacing='0' style='background-color:#ffffff; max-width:600px; border-radius:4px; overflow:hidden; box-shadow:0 15px 35px rgba(0,32,74,0.15); border-top: 5px solid #d4af37;'>
-                    
+
                     <tr>
                         <td style='background-color:#00204a; padding:40px 30px; text-align:center; background-image: linear-gradient(180deg, #00204a 0%, #00152e 100%);'>
                             <p style='color:#d4af37; font-size:11px; text-transform:uppercase; letter-spacing:3px; margin:0 0 10px 0; font-weight:700;'>My School Italy & Neuropi AI</p>
@@ -190,9 +190,9 @@ namespace NeuroPi.Nutrition.Services.Implementation
 
                     <tr>
                         <td style='padding:50px 40px; color:#444444; line-height:1.8;'>
-                            
+
                             <h2 style='font-family:""Playfair Display"", ""Times New Roman"", serif; color:#00204a; margin-top:0; font-size:24px; text-align:center;'>Honored Guest</h2>
-                            
+
                             <p style='text-align:center; margin-bottom:30px; color:#555; text-transform: uppercase;'>
                                 WE CORDIALLY INVITE YOU TO BE OUR SPECIAL GUEST FOR CarpeDiem 2026. OUR CHILDREN WILL BE PERFORMING AMAZING AND ASTONISHING DANCE, DRAMA, GYMNASTICS, AND SHOWCASING THEIR TABLE TENNIS SKILLS. IT PROMISES TO BE A JOYFUL CELEBRATION OF THE TALENT AND HARD WORK OF OUR STUDENTS AND STAFF!
                             </p>
@@ -238,7 +238,7 @@ namespace NeuroPi.Nutrition.Services.Implementation
                         </td>
                     </tr>
                 </table>
-                
+
                 <table height='40' width='100%'><tr><td></td></tr></table>
             </td>
         </tr>

@@ -21,7 +21,7 @@ namespace NeuroPi.Nutrition.Services.Implementation
         }
 
         public string GenerateQrCode(string gmail, string name, string studentName, string gender, string qrcode)
-        {           
+        {
             var inputData = qrcode;
             using var qrGenerator = new QRCodeGenerator();
             using var qrCodeData = qrGenerator.CreateQrCode(inputData, QRCodeGenerator.ECCLevel.Q);
@@ -134,7 +134,7 @@ namespace NeuroPi.Nutrition.Services.Implementation
     </tr>
 
     <!-- Celebration Image Section -->
-  
+
 
     <!-- Footer with Logos -->
     <tr>
@@ -181,15 +181,15 @@ namespace NeuroPi.Nutrition.Services.Implementation
             {
                 Port = 587,
                 Credentials = new NetworkCredential(
-                    "kakanimohithkrishnasai@gmail.com",
-                    "vcewdxucyhcjhskp"
+                    "info@neuropi.ai",
+                    "wblollhzrtfyzmlm"
                 ),
                 EnableSsl = true,
             };
 
             var mailMessage = new MailMessage
             {
-                From = new MailAddress("kakanimohithkrishnasai@gmail.com"),
+                From = new MailAddress("info@neuropi.ai"),
                 Subject = "Carpe Diem Invitation from My School Italy and Neuropi Ai",
                 IsBodyHtml = true
             };
@@ -236,12 +236,12 @@ namespace NeuroPi.Nutrition.Services.Implementation
         public QrCodeValidationResponseVM ValidateQrCode(Guid code)
         {
             string codeStr = code.ToString();
-            
+
             // 1. Try to find in Carpidum (regular student passes) first
             var query = from c in context.Carpidum.IgnoreQueryFilters()
                         join s in context.Students.AsNoTracking() on c.StudentId equals s.Id into students
                         from subStudent in students.DefaultIfEmpty()
-                        
+
                         join co in context.Courses.AsNoTracking() on subStudent.CourseId equals co.Id into courses
                         from subCourse in courses.DefaultIfEmpty()
 
@@ -259,9 +259,9 @@ namespace NeuroPi.Nutrition.Services.Implementation
 
                 if (record.IsDeleted)
                 {
-                    return new QrCodeValidationResponseVM 
-                    { 
-                        Status = "AlreadyUsed", 
+                    return new QrCodeValidationResponseVM
+                    {
+                        Status = "AlreadyUsed",
                         Message = "QR Code Already Used",
                         StudentName = result.subStudent != null ? (result.subStudent.Name + " " + (result.subStudent.LastName ?? "")).Trim() : "Unknown",
                         VisitorName = !string.IsNullOrEmpty(record.GuardianName) ? record.GuardianName : record.ParentType,
@@ -271,7 +271,7 @@ namespace NeuroPi.Nutrition.Services.Implementation
                 // Internal Mark as Used
                 record.IsDeleted = true;
                 record.UpdatedOn = DateTime.UtcNow;
-                
+
                 context.Carpidum.Update(record);
                 context.SaveChanges();
 
@@ -285,7 +285,7 @@ namespace NeuroPi.Nutrition.Services.Implementation
                     Message = "Access Granted",
                     StudentName = student != null ? (student.Name + " " + (student.LastName ?? "")).Trim() : "Unknown",
                     VisitorName = !string.IsNullOrEmpty(record.GuardianName) ? record.GuardianName : record.ParentType,
-                    Gender = "", 
+                    Gender = "",
                     CourseName = course?.Name,
                     BranchName = branch?.Name,
                     Batch = student?.AdmissionGrade,
@@ -312,7 +312,7 @@ namespace NeuroPi.Nutrition.Services.Implementation
 
                 vipPass.IsDeleted = true;
                 vipPass.UpdatedOn = DateTime.UtcNow;
-                
+
                 context.VipCarpidum.Update(vipPass);
                 context.SaveChanges();
 
@@ -335,22 +335,22 @@ namespace NeuroPi.Nutrition.Services.Implementation
         public string AddCarpidiumDetails(QrCodeRequestVM qrCode)
         {
             // Limit removed - allow unlimited passes per student
-            
+
             // ToModel returns MCarpidum (CommonLib)
             var carpidumModel = QrCodeRequestVM.ToModel(qrCode);
-            
+
             // Use request VM properties for email, as carpidumModel doesn't have them
             string qrcodeGenerated = GenerateQrCode(
-                carpidumModel.Email, 
-                carpidumModel.GuardianName, // Mapped from Name 
+                carpidumModel.Email,
+                carpidumModel.GuardianName, // Mapped from Name
                 qrCode.StudentName, // Direct from VM
                 qrCode.Gender,      // Direct from VM
                 carpidumModel.QrCode
             );
-            
+
             context.Carpidum.Add(carpidumModel);
             context.SaveChanges();
-            
+
             return qrcodeGenerated;
         }
 
@@ -359,7 +359,7 @@ namespace NeuroPi.Nutrition.Services.Implementation
             var query = from c in context.Carpidum
                         join s in context.Students on c.StudentId equals s.Id into students
                         from subStudent in students.DefaultIfEmpty()
-                        
+
                         // Join Course
                         join co in context.Courses on subStudent.CourseId equals co.Id into courses
                         from subCourse in courses.DefaultIfEmpty()
@@ -386,7 +386,7 @@ namespace NeuroPi.Nutrition.Services.Implementation
                     carpidum.StudentName = "Unknown";
                     carpidum.Gender = "";
                 }
-                
+
                 carpidum.CourseName = x.subCourse?.Name;
                 carpidum.BranchName = x.subBranch?.Name;
 
