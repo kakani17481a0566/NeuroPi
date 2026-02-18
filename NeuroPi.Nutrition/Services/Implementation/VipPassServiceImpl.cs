@@ -193,23 +193,27 @@ namespace NeuroPi.Nutrition.Services.Implementation
                             
                             <h2 style='font-family:""Playfair Display"", ""Times New Roman"", serif; color:#00204a; margin-top:0; font-size:24px; text-align:center;'>Honored Guest</h2>
                             
-                            <p style='text-align:center; font-size:16px; margin-bottom:30px;'>Dear <strong>{name}</strong>,</p>
-                            
-                            <p style='text-align:center; margin-bottom:30px; color:#555;'>
-                                We are pleased to extend this exclusive invitation to you as a distinguished guest. Join us for an evening of excellence and innovation at the annual celebration hosted by <strong>My School Italy</strong> and <strong>Neuropi Ai</strong>.
+                            <p style='text-align:center; margin-bottom:30px; color:#555; text-transform: uppercase;'>
+                                WE CORDIALLY INVITE YOU TO BE OUR SPECIAL GUEST FOR CarpeDiem 2026. OUR CHILDREN WILL BE PERFORMING AMAZING AND ASTONISHING DANCE, DRAMA, GYMNASTICS, AND SHOWCASING THEIR TABLE TENNIS SKILLS. IT PROMISES TO BE A JOYFUL CELEBRATION OF THE TALENT AND HARD WORK OF OUR STUDENTS AND STAFF!
                             </p>
 
                             <div style='background-color:#f8f9fa; border:1px solid #e1e4e8; border-left:4px solid #d4af37; padding:25px; margin:20px 0;'>
                                 <table width='100%' cellpadding='0' cellspacing='0'>
                                     <tr>
                                         <td width='50%' valign='top' style='padding-right:15px; border-right:1px solid #e1e4e8;'>
-                                            <p style='margin:0; font-size:10px; text-transform:uppercase; color:#888; letter-spacing:1px;'>Date</p>
-                                            <p style='margin:5px 0 0; font-weight:bold; color:#00204a; font-size:16px;'>28 February 2026</p>
+                                            <p style='margin:0; font-size:10px; text-transform:uppercase; color:#888; letter-spacing:1px;'>Date & Time</p>
+                                            <p style='margin:5px 0 0; font-weight:bold; color:#00204a; font-size:16px;'>28TH FEB 2026<br>10:30 AM TO 01:30 PM</p>
                                         </td>
                                         <td width='50%' valign='top' style='padding-left:15px;'>
                                             <p style='margin:0; font-size:10px; text-transform:uppercase; color:#888; letter-spacing:1px;'>Venue</p>
                                             <p style='margin:5px 0 0; font-weight:bold; color:#00204a; font-size:16px;'>Ashray Conventions</p>
                                             <p style='margin:2px 0 0; font-size:12px; color:#666;'>Near Hitech City Metro, Hyderabad</p>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan='2' style='padding-top: 15px; border-top: 1px solid #e1e4e8;'>
+                                            <p style='margin:15px 0 0 0; font-size:10px; text-transform:uppercase; color:#888; letter-spacing:1px;'>Tea & Lunch</p>
+                                            <p style='margin:5px 0 0; font-weight:bold; color:#00204a; font-size:12px;'>TEA - 11:00 AM TO 12:30 PM | LUNCH - 12:45 PM TO 02:45 PM</p>
                                         </td>
                                     </tr>
                                 </table>

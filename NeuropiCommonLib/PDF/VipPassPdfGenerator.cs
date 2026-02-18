@@ -65,14 +65,7 @@ namespace NeuropiCommonLib.PDF
                                     body.Item().AlignCenter().Text(t => t.Span("Honored Guest")
                                         .FontFamily(Fonts.TimesNewRoman).FontSize(22).FontColor(BrandNavy));
 
-                                    body.Item().AlignCenter().Text(t =>
-                                    {
-                                        t.Span("Dear ");
-                                        t.Span(vipName).Bold();
-                                        t.Span(",");
-                                    });
-
-                                    body.Item().AlignCenter().Text(t => t.Span("We are pleased to extend this exclusive invitation to you. Join us for an evening of excellence and innovation.")
+                                    body.Item().AlignCenter().Text(t => t.Span("WE CORDIALLY INVITE YOU TO BE OUR SPECIAL GUEST FOR CarpeDiem 2026. OUR CHILDREN WILL BE PERFORMING AMAZING AND ASTONISHING DANCE, DRAMA, GYMNASTICS, AND SHOWCASING THEIR TABLE TENNIS SKILLS. IT PROMISES TO BE A JOYFUL CELEBRATION OF THE TALENT AND HARD WORK OF OUR STUDENTS AND STAFF!")
                                         .FontSize(11).LineHeight(1.5f).FontColor(Colors.Grey.Darken2));
 
                                     // --- DETAILS BOX (Grey box with Gold border) ---
@@ -84,8 +77,9 @@ namespace NeuropiCommonLib.PDF
                                             // Left Col: Date
                                             row.RelativeItem().Column(d =>
                                             {
-                                                d.Item().Text(t => t.Span("DATE").FontSize(9).SemiBold().FontColor(Colors.Grey.Darken1));
-                                                d.Item().Text(t => t.Span("28 February 2026").FontSize(14).Bold().FontColor(BrandNavy));
+                                                d.Item().Text(t => t.Span("DATE & TIME").FontSize(9).SemiBold().FontColor(Colors.Grey.Darken1));
+                                                d.Item().Text(t => t.Span("28TH FEB 2026").FontSize(14).Bold().FontColor(BrandNavy));
+                                                d.Item().Text(t => t.Span("10:30 AM TO 01:30 PM").FontSize(12).Bold().FontColor(BrandNavy));
                                             });
 
                                             // Right Col: Venue
@@ -95,6 +89,16 @@ namespace NeuropiCommonLib.PDF
                                                 v.Item().Text(t => t.Span("Ashray Conventions").FontSize(14).Bold().FontColor(BrandNavy));
                                                 v.Item().Text(t => t.Span("Near Hitech City Metro, Hyderabad").FontSize(10));
                                             });
+                                        });
+
+                                    // TEA & LUNCH Box
+                                    body.Item().Background(Colors.Grey.Lighten4)
+                                        .BorderLeft(4).BorderColor(BrandGold)
+                                        .Padding(15)
+                                        .Column(c =>
+                                        {
+                                            c.Item().Text(t => t.Span("TEA & LUNCH").FontSize(9).SemiBold().FontColor(Colors.Grey.Darken1));
+                                            c.Item().Text(t => t.Span("TEA - 11:00 AM TO 12:30 PM | LUNCH - 12:45 PM TO 02:45 PM").FontSize(11).Bold().FontColor(BrandNavy));
                                         });
 
                                     // Map Link Button style
