@@ -40,7 +40,7 @@ namespace NeuroPi.Nutrition.Controllers
                             using (var scope = _serviceScopeFactory.CreateScope())
                             {
                                 var scopedService = scope.ServiceProvider.GetRequiredService<IVipPassService>();
-                                await scopedService.SendPassesViaEmail(request.VipEmail);
+                                await scopedService.SendPassesViaEmail(request.VipEmail, request.CcEmails);
                             }
                         }
                         catch (Exception ex)
@@ -60,11 +60,13 @@ namespace NeuroPi.Nutrition.Controllers
         }
 
         [HttpPost("send-email")]
-        public ActionResult<bool> SendPassesViaEmail([FromBody] string vipEmail)
+        public ActionResult<bool> SendPassesViaEmail([FromBody] VipEmailWithCcRequestVM request)
         {
             try
             {
                 // Trigger email sending asynchronously in background
+                string vipEmail = request.VipEmail;
+                string? ccEmails = request.CcEmails;
                 _ = Task.Run(async () =>
                 {
                     try
@@ -72,7 +74,7 @@ namespace NeuroPi.Nutrition.Controllers
                         using (var scope = _serviceScopeFactory.CreateScope())
                         {
                             var scopedService = scope.ServiceProvider.GetRequiredService<IVipPassService>();
-                            await scopedService.SendPassesViaEmail(vipEmail);
+                            await scopedService.SendPassesViaEmail(vipEmail, ccEmails);
                         }
                     }
                     catch (Exception ex)

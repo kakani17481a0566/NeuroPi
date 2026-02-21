@@ -53,7 +53,7 @@ namespace NeuroPi.Nutrition.Services.Implementation
             return passes;
         }
 
-        public async Task<bool> SendPassesViaEmail(string vipEmail)
+        public async Task<bool> SendPassesViaEmail(string vipEmail, string? ccEmails = null)
         {
             var passes = context.VipCarpidum
                 .Where(v => v.VipEmail == vipEmail && !v.IsDeleted && !v.EmailSent)
@@ -98,6 +98,20 @@ namespace NeuroPi.Nutrition.Services.Implementation
                     };
 
                     mailMessage.To.Add(vipEmail);
+
+                    // Add CC recipients if provided (optional, comma-separated)
+                    if (!string.IsNullOrWhiteSpace(ccEmails))
+                    {
+                        var ccList = ccEmails.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                        foreach (var cc in ccList)
+                        {
+                            if (!string.IsNullOrWhiteSpace(cc))
+                            {
+                                mailMessage.CC.Add(cc);
+                                Console.WriteLine($"SendPassesViaEmail: Added CC: {cc}");
+                            }
+                        }
+                    }
 
                     string vipName = batch.First().VipName;
                     string body = GetVipPassEmailBody(vipName, batch.ToList());

@@ -9,7 +9,7 @@ namespace NeuroPi.Nutrition.Services.Interface
     public interface IVipPassService
     {
         List<MVipCarpidum> GenerateBulkPasses(VipBulkPassRequestVM request);
-        Task<bool> SendPassesViaEmail(string vipEmail);
+        Task<bool> SendPassesViaEmail(string vipEmail, string? ccEmails = null);
         List<MVipCarpidum> GetVipPasses();
         List<MVipCarpidum> GetPassesByEmail(string email);
         VipValidationResponseVM ValidateVipPass(Guid code);
