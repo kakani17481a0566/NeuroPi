@@ -13,6 +13,8 @@ using System.Net.Mail;
 using System.Security.Claims;
 using System.Text;
 
+using NeuropiCommonLib.Email;
+
 namespace NeuroPi.UserManagment.Services.Implementation
 {
     public class UserServiceImpl : IUserService
@@ -20,12 +22,14 @@ namespace NeuroPi.UserManagment.Services.Implementation
         private readonly NeuroPiDbContext _context;
         private readonly IConfiguration _configuration;
         private readonly BlobServiceClient _blobServiceClient;
+        private readonly IEmailService _emailService;
 
-        public UserServiceImpl(NeuroPiDbContext context, IConfiguration configuration, BlobServiceClient blobServiceClient)
+        public UserServiceImpl(NeuroPiDbContext context, IConfiguration configuration, BlobServiceClient blobServiceClient, IEmailService emailService)
         {
             _context = context;
             _configuration = configuration;
             _blobServiceClient = blobServiceClient;
+            _emailService = emailService;
         }
 
 
@@ -784,7 +788,6 @@ namespace NeuroPi.UserManagment.Services.Implementation
             }
 
             user.Password = request.NewPassword;
-            user.Password = request.NewPassword;
             user.UpdatedOn = DateTime.UtcNow;
             user.FirstTimeLogin = true; // Force password change on next login
 
@@ -797,6 +800,118 @@ namespace NeuroPi.UserManagment.Services.Implementation
             catch
             {
                 message = "Failed to reset password";
+                return false;
+            }
+        }
+
+        public bool ForgotPassword(ForgotPasswordRequestVM request, out string message)
+        {
+            message = string.Empty;
+
+            var user = _context.Users.FirstOrDefault(u => u.Email.ToLower() == request.Email.ToLower() && !u.IsDeleted);
+            if (user == null)
+            {
+                // We should probably not reveal if an email exists for security, but for now we follow the existing pattern
+                message = "User not found";
+                return false;
+            }
+
+            // Generate 6 digit OTP
+            Random rnd = new Random();
+            string otp = rnd.Next(100000, 999999).ToString();
+
+            // Set OTP and Expiry (e.g., 10 minutes)
+            user.Otp = otp;
+            user.OtpExpiry = DateTime.UtcNow.AddMinutes(10);
+            
+            try
+            {
+                _context.SaveChanges();
+
+                // Send Email via global EmailService from info@neuropi.ai
+                string subject = "Neuropi Password Reset";
+                string body = $"<h1>Password Reset</h1><p>Your OTP for password reset is: <b>{otp}</b></p><p>This OTP will expire in 10 minutes.</p>";
+                
+                // emailService handles credentials from appsettings.json which configures the "From" side automatically
+                _emailService.SendEmailAsync(user.Email, subject, body).GetAwaiter().GetResult();
+
+                message = "OTP sent to your email";
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] ForgotPassword sending email failed: {ex.Message}");
+                message = "Failed to process forgot password request.";
+                return false;
+            }
+        }
+
+        public bool ValidateOtp(ValidateOtpRequestVM request, out string message)
+        {
+            message = string.Empty;
+
+            var user = _context.Users.FirstOrDefault(u => u.Email.ToLower() == request.Email.ToLower() && !u.IsDeleted);
+            if (user == null)
+            {
+                message = "User not found";
+                return false;
+            }
+
+            if (user.Otp != request.Otp)
+            {
+                message = "Invalid OTP";
+                return false;
+            }
+
+            if (user.OtpExpiry < DateTime.UtcNow)
+            {
+                message = "OTP has expired";
+                return false;
+            }
+
+            message = "OTP is valid";
+            return true;
+        }
+
+        public bool ResetPasswordWithOtp(ResetPasswordOtpRequestVM request, out string message)
+        {
+            message = string.Empty;
+
+            var user = _context.Users.FirstOrDefault(u => u.Email.ToLower() == request.Email.ToLower() && !u.IsDeleted);
+            if (user == null)
+            {
+                message = "User not found";
+                return false;
+            }
+
+            if (user.Otp != request.Otp)
+            {
+                message = "Invalid OTP";
+                return false;
+            }
+
+            if (user.OtpExpiry < DateTime.UtcNow)
+            {
+                message = "OTP has expired";
+                return false;
+            }
+
+            // Update Password and Clear OTP
+            user.Password = request.NewPassword;
+            user.Otp = null;
+            user.OtpExpiry = null;
+            user.UpdatedOn = DateTime.UtcNow;
+
+            try
+            {
+                _context.SaveChanges();
+                message = "Password reset successfully";
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] ResetPasswordWithOtp failed: {ex.Message}");
+                message = "Failed to reset password.";
                 return false;
             }
         }

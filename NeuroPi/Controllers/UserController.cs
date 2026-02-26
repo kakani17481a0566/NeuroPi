@@ -272,5 +272,46 @@ namespace NeuroPi.UserManagment.Controllers
 
         }
 
+        [AllowAnonymous]
+        [HttpPost("forgot-password")]
+        public ResponseResult<object> ForgotPassword([FromBody] ForgotPasswordRequestVM request)
+        {
+            var result = _userService.ForgotPassword(request, out string message);
+
+            if (result)
+            {
+                return new ResponseResult<object>(HttpStatusCode.OK, null, message);
+            }
+
+            return new ResponseResult<object>(HttpStatusCode.BadRequest, null, message);
+        }
+
+        [AllowAnonymous]
+        [HttpPost("validate-otp")]
+        public ResponseResult<object> ValidateOtp([FromBody] ValidateOtpRequestVM request)
+        {
+            var result = _userService.ValidateOtp(request, out string message);
+
+            if (result)
+            {
+                return new ResponseResult<object>(HttpStatusCode.OK, null, message);
+            }
+
+            return new ResponseResult<object>(HttpStatusCode.BadRequest, null, message);
+        }
+
+        [AllowAnonymous]
+        [HttpPost("reset-password")]
+        public ResponseResult<object> ResetPasswordWithOtp([FromBody] ResetPasswordOtpRequestVM request)
+        {
+            var result = _userService.ResetPasswordWithOtp(request, out string message);
+
+            if (result)
+            {
+                return new ResponseResult<object>(HttpStatusCode.OK, null, message);
+            }
+
+            return new ResponseResult<object>(HttpStatusCode.BadRequest, null, message);
+        }
     }
 }

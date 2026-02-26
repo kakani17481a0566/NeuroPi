@@ -20,5 +20,13 @@
     "CloudName": "kakani7",
     "ApiKey": "452796136133251",
     "ApiSecret": "ucVACjOxVoClbicrkAlMmipk4nM"
+  },
+  "EmailSettings": {
+    "SmtpHost": "smtp.gmail.com",
+    "SmtpPort": 587,
+    "SmtpUser": "info@neuropi.ai",
+    "SmtpPassword": "pnav etoc rfkm blud",
+    "FromName": "NeuroPi",
+    "FromEmail": "info@neuropi.ai"
   }
 }

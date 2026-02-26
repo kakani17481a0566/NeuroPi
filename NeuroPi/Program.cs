@@ -8,6 +8,7 @@ using Microsoft.OpenApi.Models;
 using NeuroPi.UserManagment.Data;
 using NeuroPi.UserManagment.Services.Implementation;
 using NeuroPi.UserManagment.Services.Interface;
+using NeuropiCommonLib.Email;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -136,6 +137,9 @@ builder.Services.AddScoped<IUserRolesService, UserRolesServiceImpl>();
 builder.Services.AddScoped<IUserService, UserServiceImpl>();
 builder.Services.AddHttpClient<INewsArticle, NewsArticleServiceImpl>();
 builder.Services.AddScoped<IMainMenuService, MainMenuServiceImpl>();
+
+// Register Email Service
+builder.Services.AddTransient<IEmailService, EmailService>();
 
 // -------------------------------------------
 // Build App

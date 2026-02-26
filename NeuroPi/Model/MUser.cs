@@ -61,6 +61,13 @@ namespace NeuroPi.UserManagment.Model
         [Column("first_time_login")]
         public bool FirstTimeLogin { get; set; }
 
+        [Column("otp")]
+        [MaxLength(10)]
+        public string? Otp { get; set; }
+
+        [Column("otp_expiry")]
+        public DateTime? OtpExpiry { get; set; }
+
 
         // ----------------------------
         // Extended profile info

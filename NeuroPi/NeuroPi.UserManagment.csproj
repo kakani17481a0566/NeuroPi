@@ -27,6 +27,9 @@
 				<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 			</None>
 		</ItemGroup>
+		<ItemGroup>
+		  <ProjectReference Include="..\NeuropiCommonLib\NeuropiCommonLib.csproj" />
+		</ItemGroup>
 
 
 
