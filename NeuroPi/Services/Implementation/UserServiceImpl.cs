@@ -807,8 +807,9 @@ namespace NeuroPi.UserManagment.Services.Implementation
         public bool ForgotPassword(ForgotPasswordRequestVM request, out string message)
         {
             message = string.Empty;
+            string identifier = request.Email ?? request.Username ?? string.Empty;
 
-            var user = _context.Users.FirstOrDefault(u => u.Email.ToLower() == request.Email.ToLower() && !u.IsDeleted);
+            var user = _context.Users.FirstOrDefault(u => !string.IsNullOrEmpty(identifier) && (u.Email.ToLower() == identifier.ToLower() || u.Username.ToLower() == identifier.ToLower()) && !u.IsDeleted);
             if (user == null)
             {
                 // We should probably not reveal if an email exists for security, but for now we follow the existing pattern
@@ -849,8 +850,9 @@ namespace NeuroPi.UserManagment.Services.Implementation
         public bool ValidateOtp(ValidateOtpRequestVM request, out string message)
         {
             message = string.Empty;
+            string identifier = request.Email ?? request.Username ?? string.Empty;
 
-            var user = _context.Users.FirstOrDefault(u => u.Email.ToLower() == request.Email.ToLower() && !u.IsDeleted);
+            var user = _context.Users.FirstOrDefault(u => !string.IsNullOrEmpty(identifier) && (u.Email.ToLower() == identifier.ToLower() || u.Username.ToLower() == identifier.ToLower()) && !u.IsDeleted);
             if (user == null)
             {
                 message = "User not found";
@@ -876,8 +878,9 @@ namespace NeuroPi.UserManagment.Services.Implementation
         public bool ResetPasswordWithOtp(ResetPasswordOtpRequestVM request, out string message)
         {
             message = string.Empty;
+            string identifier = request.Email ?? request.Username ?? string.Empty;
 
-            var user = _context.Users.FirstOrDefault(u => u.Email.ToLower() == request.Email.ToLower() && !u.IsDeleted);
+            var user = _context.Users.FirstOrDefault(u => !string.IsNullOrEmpty(identifier) && (u.Email.ToLower() == identifier.ToLower() || u.Username.ToLower() == identifier.ToLower()) && !u.IsDeleted);
             if (user == null)
             {
                 message = "User not found";

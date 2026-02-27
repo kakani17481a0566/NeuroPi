@@ -4,16 +4,18 @@ namespace NeuroPi.UserManagment.ViewModel.User
 {
     public class ForgotPasswordRequestVM
     {
-        [Required]
         [EmailAddress]
-        public string Email { get; set; } = default!;
+        public string? Email { get; set; }
+
+        public string? Username { get; set; }
     }
 
     public class ValidateOtpRequestVM
     {
-        [Required]
         [EmailAddress]
-        public string Email { get; set; } = default!;
+        public string? Email { get; set; }
+
+        public string? Username { get; set; }
 
         [Required]
         [StringLength(10)]
@@ -22,9 +24,10 @@ namespace NeuroPi.UserManagment.ViewModel.User
 
     public class ResetPasswordOtpRequestVM
     {
-        [Required]
         [EmailAddress]
-        public string Email { get; set; } = default!;
+        public string? Email { get; set; }
+
+        public string? Username { get; set; }
 
         [Required]
         [StringLength(10)]
