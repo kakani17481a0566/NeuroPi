@@ -1,4 +1,4 @@
-﻿using Azure.Storage.Blobs;
+using Azure.Storage.Blobs;
 using CloudinaryDotNet;
 using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -23,7 +23,12 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
 // Azure Blob Storage Configuration
-builder.Services.AddSingleton(x => new BlobServiceClient(builder.Configuration.GetConnectionString("AzureBlobStorage")));
+var blobConnectionString = builder.Configuration.GetConnectionString("AzureBlobStorage");
+if (string.IsNullOrEmpty(blobConnectionString))
+{
+    blobConnectionString = "UseDevelopmentStorage=true"; // Fallback to prevent DI crash
+}
+builder.Services.AddSingleton(x => new BlobServiceClient(blobConnectionString));
 
 // User Management Services
 builder.Services.AddScoped<ITenantService, TenantServiceImpl>();
@@ -248,9 +253,11 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+// ALWAYS SHOW ERRORS FOR NOW TO DEBUG AZURE 500 ERROR
+app.UseDeveloperExceptionPage();
+
 app.UseCors("AllowAll");
-
-
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
