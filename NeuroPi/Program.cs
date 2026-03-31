@@ -33,7 +33,12 @@ builder.Services.AddSingleton(cloudinary);
 // -------------------------------------------
 // Azure Blob Storage Configuration
 // -------------------------------------------
-builder.Services.AddSingleton(x => new BlobServiceClient(builder.Configuration.GetConnectionString("AzureBlobStorage")));
+var blobConnectionString = builder.Configuration.GetConnectionString("AzureBlobStorage");
+if (string.IsNullOrEmpty(blobConnectionString))
+{
+    blobConnectionString = "UseDevelopmentStorage=true"; // Fallback to prevent DI crash
+}
+builder.Services.AddSingleton(x => new BlobServiceClient(blobConnectionString));
 
 // -------------------------------------------
 // Add Services to Container
@@ -145,6 +150,9 @@ builder.Services.AddTransient<IEmailService, EmailService>();
 // Build App
 // -------------------------------------------
 var app = builder.Build();
+
+// ALWAYS SHOW ERRORS FOR NOW TO DEBUG AZURE 500 ERROR
+app.UseDeveloperExceptionPage();
 
 // -------------------------------------------
 // Middleware Pipeline

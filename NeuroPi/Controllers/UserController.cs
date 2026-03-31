@@ -1,4 +1,4 @@
-﻿using CloudinaryDotNet;
+using CloudinaryDotNet;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NeuroPi.UserManagment.Response;
@@ -23,12 +23,19 @@ namespace NeuroPi.UserManagment.Controllers
         [HttpGet("login")]
         public ResponseResult<UserLogInSucessVM> Login([FromQuery] string username, [FromQuery] string password)
         {
-            var loginResult = _userService.LogIn(username, password);
+            try
+            {
+                var loginResult = _userService.LogIn(username, password);
 
-            if (loginResult != null)
-                return new ResponseResult<UserLogInSucessVM>(HttpStatusCode.OK, loginResult, "Logged in successfully");
+                if (loginResult != null)
+                    return new ResponseResult<UserLogInSucessVM>(HttpStatusCode.OK, loginResult, "Logged in successfully");
 
-            return new ResponseResult<UserLogInSucessVM>(HttpStatusCode.Unauthorized, null, "Login failed");
+                return new ResponseResult<UserLogInSucessVM>(HttpStatusCode.Unauthorized, null, "Login failed");
+            }
+            catch (Exception ex)
+            {
+                return new ResponseResult<UserLogInSucessVM>(HttpStatusCode.InternalServerError, null, $"Internal Server Error: {ex.Message} | StackTrace: {ex.StackTrace} | InnerException: {ex.InnerException?.Message}");
+            }
         }
 
         // GET api/user/by-tenant?tenantId=...
