@@ -29,16 +29,23 @@ builder.Services.AddScoped<ISectionFieldService, SectionFieldServiceImpl>();
 builder.Services.AddScoped<ISectionGroupService, SectionGroupServiceImpl>();
 
 
+// Explicitly bind to Azure's PORT environment variable (defaults to 8080 on Linux App Service)
+var port = int.Parse(Environment.GetEnvironmentVariable("PORT") ?? "8080");
+builder.WebHost.UseUrls($"http://*:{port}");
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
 
-app.UseHttpsRedirection();
+// Always enable Swagger — required on Azure since ASPNETCORE_ENVIRONMENT=Development is set via app settings
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "NeuroPiForms API v1");
+    c.RoutePrefix = "swagger";
+});
+
+// UseHttpsRedirection disabled — causes redirect loops on Azure App Service Linux free tier
+// app.UseHttpsRedirection();
 
 var summaries = new[]
 {

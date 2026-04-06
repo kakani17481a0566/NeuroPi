@@ -161,7 +161,9 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseCors("AllowAll");
-app.UseHttpsRedirection();
+// UseHttpsRedirection disabled — causes redirect loops on Azure App Service Linux free tier
+// Re-enable when on B1+ with custom domain and SSL
+// app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

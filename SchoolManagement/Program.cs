@@ -16,7 +16,11 @@ using SchoolManagement.ViewModel.Audio;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
-Env.Load();
+// Guard Env.Load() — .env file won't exist on Azure App Service
+if (File.Exists(".env"))
+{
+    Env.Load();
+}
 
 
 builder.Services.AddControllers();
@@ -258,13 +262,18 @@ var app = builder.Build();
 app.UseDeveloperExceptionPage();
 
 app.UseCors("AllowAll");
-if (app.Environment.IsDevelopment())
+
+// Always enable Swagger — safe for internal API, required on Azure (ASPNETCORE_ENVIRONMENT=Development)
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "SchoolManagement API v1");
+    c.RoutePrefix = "swagger";
+});
 app.UseStaticFiles();
-app.UseHttpsRedirection();
+// UseHttpsRedirection disabled — causes redirect loops on Azure App Service Linux free tier
+// Re-enable when on B1+ with custom domain and SSL
+// app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
