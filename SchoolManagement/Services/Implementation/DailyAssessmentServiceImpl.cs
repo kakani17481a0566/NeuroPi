@@ -366,6 +366,7 @@ namespace SchoolManagement.Services.Implementation
                 {
                     AssessmentId = g.Key,
                     Name = g.First().Assessment.Name,
+                    Description = g.First().Assessment.Description,
                     SkillId = g.First().Assessment.AssessmentSkill.Id,
                     SkillName = g.First().Assessment.AssessmentSkill.Name,
                     SubjectId = g.First().Assessment.AssessmentSkill.Subject.Id,
@@ -454,6 +455,7 @@ namespace SchoolManagement.Services.Implementation
                     {
                         AssessmentId = header.AssessmentId,
                         Name = header.Name,
+                        Description = header.Description,
                         SkillId = header.SkillId,
                         SkillName = header.SkillName,
                         StudentScores = students.Select(s =>
@@ -869,6 +871,7 @@ namespace SchoolManagement.Services.Implementation
                     d.StudentId,
                     d.AssessmentId,
                     AssessmentName = d.Assessment.Name,
+                    AssessmentDescription = d.Assessment.Description,
                     SkillId = d.Assessment.AssessmentSkill.Id,
                     SkillName = d.Assessment.AssessmentSkill.Name,
                     SubjectId = d.Assessment.AssessmentSkill.Subject.Id,
@@ -901,20 +904,33 @@ namespace SchoolManagement.Services.Implementation
                     w => w.Id,
                     w => $"{w.Name} ({w.StartDate:dd MMM} - {w.EndDate:dd MMM})");
 
-            // 5. Header details
-            var headerDetails = dailyAssessments
-                .GroupBy(d => d.AssessmentId)
+            // 5. Collapse rows to one header per skill for the student summary.
+            // If the same skill was assessed multiple times (e.g. A3, A4),
+            // keep only the latest assessment as the representative header.
+            var latestAssessmentPerSkill = dailyAssessments
+                .GroupBy(d => new { d.SubjectId, d.SkillId })
+                .Select(g => g
+                    .OrderByDescending(x => x.AssessmentDate)
+                    .ThenByDescending(x => x.TimeTableId)
+                    .ThenByDescending(x => x.AssessmentId)
+                    .First())
+                .ToList();
+
+            // 6. Header details
+            var headerDetails = latestAssessmentPerSkill
                 .Select(g => new AssessmentHeaderVm
                 {
-                    AssessmentId = g.Key,
-                    Name = g.First().AssessmentName,
-                    SkillId = g.First().SkillId,
-                    SkillName = g.First().SkillName,
-                    SubjectId = g.First().SubjectId,
-                    SubjectName = g.First().SubjectName,
-                    SubjectCode = g.First().SubjectCode
+                    AssessmentId = g.AssessmentId,
+                    Name = g.AssessmentName,
+                    Description = g.AssessmentDescription,
+                    SkillId = g.SkillId,
+                    SkillName = g.SkillName,
+                    SubjectId = g.SubjectId,
+                    SubjectName = g.SubjectName,
+                    SubjectCode = g.SubjectCode
                 })
-                .OrderBy(h => h.AssessmentId)
+                .OrderBy(h => h.SubjectId)
+                .ThenBy(h => h.SkillId)
                 .ToList();
 
             var headers = headerDetails.Select(h => h.AssessmentId).ToList();
@@ -923,13 +939,13 @@ namespace SchoolManagement.Services.Implementation
                 .Distinct()
                 .ToList();
 
-            // 6. Latest score per assessment
-            var assessmentGrades = headers.ToDictionary(
-                id => id,
-                id => new Dictionary<int, AssessmentScoreVm>
+            // 7. Latest score per skill (stored under the representative AssessmentId).
+            var assessmentGrades = headerDetails.ToDictionary(
+                header => header.AssessmentId,
+                header => new Dictionary<int, AssessmentScoreVm>
                 {
                     [student.StudentId] = dailyAssessments
-                        .Where(d => d.AssessmentId == id)
+                        .Where(d => d.SkillId == header.SkillId && d.SubjectId == header.SubjectId)
                         .OrderByDescending(d => d.AssessmentDate)
                         .ThenByDescending(d => d.TimeTableId)
                         .Select(d => new AssessmentScoreVm
@@ -943,7 +959,7 @@ namespace SchoolManagement.Services.Implementation
                         .FirstOrDefault() ?? new AssessmentScoreVm()
                 });
 
-            // 7. Overall avg & std dev
+            // 8. Overall avg & std dev
             var scores = dailyAssessments
                 .Where(d => d.MinPercentage.HasValue && d.MaxPercentage.HasValue)
                 .Select(d => (d.MinPercentage.Value + d.MaxPercentage.Value) / 2m)
@@ -964,7 +980,7 @@ namespace SchoolManagement.Services.Implementation
                 student.StandardDeviation = 0;
             }
 
-            // 8. Subject-wise overall
+            // 9. Subject-wise overall
             var subjectWiseAssessments = headerDetails
                 .GroupBy(h => new { h.SubjectId, h.SubjectName, h.SubjectCode })
                 .Select(subjectGroup => new SubjectGroupedAssessmentVm
@@ -976,6 +992,7 @@ namespace SchoolManagement.Services.Implementation
                     {
                         AssessmentId = header.AssessmentId,
                         Name = header.Name,
+                        Description = header.Description,
                         SkillId = header.SkillId,
                         SkillName = header.SkillName,
                         StudentScores = new List<StudentScoreEntryVm>
@@ -994,7 +1011,7 @@ namespace SchoolManagement.Services.Implementation
                     }).ToList()
                 }).ToList();
 
-            // 9. Timetable schedule
+            // 10. Timetable schedule
             var assessmentSchedule = dailyAssessments
                 .GroupBy(d => d.TimeTableId)
                 .Select(g => new AssessmentScheduleVm
@@ -1006,7 +1023,7 @@ namespace SchoolManagement.Services.Implementation
                 .OrderBy(s => s.Date)
                 .ToList();
 
-            // 10. Weekly analysis
+            // 11. Weekly analysis
             var weeklyAnalysis = dailyAssessments
                 .GroupBy(d => new { d.WeekId, d.WeekName, d.WeekStart, d.WeekEnd })
                 .Select(g =>
@@ -1066,7 +1083,7 @@ namespace SchoolManagement.Services.Implementation
                 .OrderBy(w => w.StartDate)
                 .ToList();
 
-            // 11. Term analysis
+            // 12. Term analysis
             var grades = _context.Grades
                 .AsNoTracking()
                 .Where(g => !g.IsDeleted)
@@ -1155,7 +1172,7 @@ namespace SchoolManagement.Services.Implementation
                 t => t.TermId,
                 t => $"{t.TermName} ({t.StartDate:dd MMM} - {t.EndDate:dd MMM})");
 
-            // 12. Pick current week details
+            // 13. Pick current week details
             var selectedWeek = effectiveWeekId.HasValue
                 ? dailyAssessments.FirstOrDefault(d => d.WeekId == effectiveWeekId.Value)
                 : dailyAssessments.FirstOrDefault();
@@ -1164,7 +1181,7 @@ namespace SchoolManagement.Services.Implementation
             DateOnly? weekStartDate = selectedWeek?.WeekStart;
             DateOnly? weekEndDate = selectedWeek?.WeekEnd;
 
-            // 13. Final response
+            // 14. Final response
             return new DailyAssessmentPerformanceSummaryResponse
             {
                 Headers = headerDetails.Select(h => h.Name).ToList(),

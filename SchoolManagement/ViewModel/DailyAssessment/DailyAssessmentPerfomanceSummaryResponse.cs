@@ -52,6 +52,7 @@ public class AssessmentHeaderVm
 {
     public int AssessmentId { get; set; }
     public string Name { get; set; }
+    public string? Description { get; set; }
     public int SkillId { get; set; }
     public string SkillName { get; set; }
     public int SubjectId { get; set; }
@@ -76,6 +77,7 @@ public class SkillAssessmentVm
 {
     public int AssessmentId { get; set; }
     public string Name { get; set; }
+    public string? Description { get; set; }
     public int SkillId { get; set; }
     public string SkillName { get; set; }
     public List<StudentScoreEntryVm> StudentScores { get; set; } = new();
