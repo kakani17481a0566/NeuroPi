@@ -904,33 +904,21 @@ namespace SchoolManagement.Services.Implementation
                     w => w.Id,
                     w => $"{w.Name} ({w.StartDate:dd MMM} - {w.EndDate:dd MMM})");
 
-            // 5. Collapse rows to one header per skill for the student summary.
-            // If the same skill was assessed multiple times (e.g. A3, A4),
-            // keep only the latest assessment as the representative header.
-            var latestAssessmentPerSkill = dailyAssessments
-                .GroupBy(d => new { d.SubjectId, d.SkillId })
-                .Select(g => g
-                    .OrderByDescending(x => x.AssessmentDate)
-                    .ThenByDescending(x => x.TimeTableId)
-                    .ThenByDescending(x => x.AssessmentId)
-                    .First())
-                .ToList();
-
-            // 6. Header details
-            var headerDetails = latestAssessmentPerSkill
+            // 5. Header details - keep one header per assessment.
+            var headerDetails = dailyAssessments
+                .GroupBy(d => d.AssessmentId)
                 .Select(g => new AssessmentHeaderVm
                 {
-                    AssessmentId = g.AssessmentId,
-                    Name = g.AssessmentName,
-                    Description = g.AssessmentDescription,
-                    SkillId = g.SkillId,
-                    SkillName = g.SkillName,
-                    SubjectId = g.SubjectId,
-                    SubjectName = g.SubjectName,
-                    SubjectCode = g.SubjectCode
+                    AssessmentId = g.Key,
+                    Name = g.First().AssessmentName,
+                    Description = g.First().AssessmentDescription,
+                    SkillId = g.First().SkillId,
+                    SkillName = g.First().SkillName,
+                    SubjectId = g.First().SubjectId,
+                    SubjectName = g.First().SubjectName,
+                    SubjectCode = g.First().SubjectCode
                 })
-                .OrderBy(h => h.SubjectId)
-                .ThenBy(h => h.SkillId)
+                .OrderBy(h => h.AssessmentId)
                 .ToList();
 
             var headers = headerDetails.Select(h => h.AssessmentId).ToList();
@@ -939,13 +927,13 @@ namespace SchoolManagement.Services.Implementation
                 .Distinct()
                 .ToList();
 
-            // 7. Latest score per skill (stored under the representative AssessmentId).
-            var assessmentGrades = headerDetails.ToDictionary(
-                header => header.AssessmentId,
-                header => new Dictionary<int, AssessmentScoreVm>
+            // 7. Latest score per assessment.
+            var assessmentGrades = headers.ToDictionary(
+                id => id,
+                id => new Dictionary<int, AssessmentScoreVm>
                 {
                     [student.StudentId] = dailyAssessments
-                        .Where(d => d.SkillId == header.SkillId && d.SubjectId == header.SubjectId)
+                        .Where(d => d.AssessmentId == id)
                         .OrderByDescending(d => d.AssessmentDate)
                         .ThenByDescending(d => d.TimeTableId)
                         .Select(d => new AssessmentScoreVm
