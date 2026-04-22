@@ -1,4 +1,4 @@
-﻿using SchoolManagement.Model;
+using SchoolManagement.Model;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SchoolManagement.ViewModel.Call
@@ -13,6 +13,7 @@ namespace SchoolManagement.ViewModel.Call
         public string Stage { get; set; }
         public string AudioLink { get; set; }
         public string Remarks { get; set; }
+        public TimeSpan? CallDuration { get; set; }
         public int TenantId { get; set; }
     }
 }

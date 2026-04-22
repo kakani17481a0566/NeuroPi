@@ -7,6 +7,7 @@ namespace SchoolManagement.ViewModel.Call
         public string Remarks { get; set; }
         public int TenantId { get; set; }
         public int CreatedBy { get; set; }
+        public TimeSpan? CallDuration { get; set; }
         public IFormFile AudioFile { get; set; }
     }
 }

@@ -42,6 +42,7 @@ namespace SchoolManagement.Services.Implementation
                     Stage = c.Stage?.Name,
                     AudioLink = c.AudioLink,
                     Remarks = c.Remarks,
+                    CallDuration = c.CallDuration,
                     TenantId = c.TenantId,
 
                 }).ToList();
@@ -63,6 +64,7 @@ namespace SchoolManagement.Services.Implementation
                     Stage = c.Stage?.Name,
                     AudioLink = c.AudioLink,
                     Remarks = c.Remarks,
+                    CallDuration = c.CallDuration,
                     TenantId = c.TenantId,
 
                 }).ToList();
@@ -80,6 +82,7 @@ namespace SchoolManagement.Services.Implementation
                 StageId = request.StageId,
                 AudioLink = audioLink,
                 Remarks = request.Remarks,
+                CallDuration = request.CallDuration,
                 TenantId = request.TenantId,
                 CreatedBy = request.CreatedBy,
                 CreatedOn = DateTime.UtcNow
@@ -103,6 +106,7 @@ namespace SchoolManagement.Services.Implementation
                 Stage = savedCall.Stage?.Name,
                 AudioLink = savedCall.AudioLink,
                 Remarks = savedCall.Remarks,
+                CallDuration = savedCall.CallDuration,
                 TenantId = savedCall.TenantId
             };
         }

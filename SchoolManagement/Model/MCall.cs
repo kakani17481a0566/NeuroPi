@@ -31,6 +31,9 @@ namespace SchoolManagement.Model
         [Column("remarks")]
         public string Remarks { get; set; }
 
+        [Column("call_duration")]
+        public TimeSpan? CallDuration { get; set; }
+
         [Column("tenant_id")]
         public int TenantId { get; set; }
 
