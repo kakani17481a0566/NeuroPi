@@ -27,5 +27,16 @@ namespace SchoolManagement.Controllers
             }
             return new ResponseResult<List<CollegeDetailResponseVM>>(System.Net.HttpStatusCode.OK, result, "College Details fetched successfully");
         }
+
+        [HttpGet("tenant/{tenantId}/comprehensive")]
+        public ResponseResult<List<ComprehensiveCollegeVM>> GetAllComprehensiveByTenantId(int tenantId)
+        {
+            var result = _collegeDetailService.GetAllComprehensiveByTenantId(tenantId);
+            if (result == null || result.Count == 0)
+            {
+                return new ResponseResult<List<ComprehensiveCollegeVM>>(System.Net.HttpStatusCode.NotFound, result, "Comprehensive College Details Not Found");
+            }
+            return new ResponseResult<List<ComprehensiveCollegeVM>>(System.Net.HttpStatusCode.OK, result, "Comprehensive College Details fetched successfully");
+        }
     }
 }

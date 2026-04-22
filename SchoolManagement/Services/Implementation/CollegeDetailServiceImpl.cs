@@ -38,5 +38,42 @@ namespace SchoolManagement.Services.Implementation
 
             return result;
         }
+        public List<ComprehensiveCollegeVM> GetAllComprehensiveByTenantId(int tenantId)
+        {
+            var result = _context.CollegeDetails
+                .Where(c => c.TenantId == tenantId)
+                .Select(c => new ComprehensiveCollegeVM
+                {
+                    Id = c.Id,
+                    CollegeName = c.CollegeName,
+                    AddressLine1 = c.AddressLine1,
+                    AddressLine2 = c.AddressLine2,
+                    City = c.City,
+                    State = c.State,
+                    Pincode = c.Pincode,
+                    ContactNumber = c.ContactNumber,
+                    Email = c.Email,
+                    Status = c.Status,
+                    TenantId = c.TenantId,
+                    Courses = _context.CollegeCourses
+                        .Where(cc => cc.CollegeId == c.Id && cc.TenantId == tenantId)
+                        .Select(cc => new SchoolManagement.ViewModel.Courses.CoursesResponseVM
+                        {
+                            Id = cc.Course.Id,
+                            CourseName = cc.Course.CourseName,
+                            CourseCode = cc.Course.CourseCode,
+                            CourseTypeId = cc.Course.CourseTypeId,
+                            CourseTypeName = cc.Course.CourseType != null ? cc.Course.CourseType.Name : null,
+                            Duration = cc.Course.Duration,
+                            ApxFee = cc.Course.ApxFee,
+                            Status = cc.Course.Status,
+                            TenantId = cc.Course.TenantId
+                        })
+                        .ToList()
+                })
+                .ToList();
+
+            return result;
+        }
     }
 }

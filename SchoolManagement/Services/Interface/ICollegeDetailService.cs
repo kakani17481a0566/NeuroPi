@@ -6,5 +6,6 @@ namespace SchoolManagement.Services.Interface
     public interface ICollegeDetailService
     {
         List<CollegeDetailResponseVM> GetAllByTenantId(int tenantId);
+        List<ComprehensiveCollegeVM> GetAllComprehensiveByTenantId(int tenantId);
     }
 }
