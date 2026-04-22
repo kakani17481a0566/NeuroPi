@@ -1,31 +1,28 @@
-using Google.Apis.Auth.OAuth2;
-using Google.Apis.Drive.v3;
-using Google.Apis.Drive.v3.Data;
-using Google.Apis.Services;
-using Google.Apis.Upload;
-using Microsoft.Extensions.Configuration;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using Azure.Storage.Sas;
 using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Data;
 using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.Call;
-using DriveFile = Google.Apis.Drive.v3.Data.File;
 
 namespace SchoolManagement.Services.Implementation
 {
     public class CallServiceImpl : ICallService
     {
-        private static readonly string[] DriveScopes = [DriveService.Scope.Drive];
-
         private readonly SchoolManagementDb context;
-        private readonly string googleCredentialPath;
-        private readonly string googleDriveFolderId;
+        private readonly BlobServiceClient blobServiceClient;
+        private readonly IConfiguration configuration;
 
-        public CallServiceImpl(SchoolManagementDb _context, IConfiguration configuration)
+        public CallServiceImpl(
+            SchoolManagementDb _context,
+            BlobServiceClient _blobServiceClient,
+            IConfiguration _configuration)
         {
             context = _context;
-            googleCredentialPath = configuration["GoogleDrive:CredentialsPath"];
-            googleDriveFolderId = configuration["GoogleDrive:FolderId"];
+            blobServiceClient = _blobServiceClient;
+            configuration = _configuration;
         }
 
         public List<CallResponseVM> GetAllEmployeeLogs(int empId, int tenantId)
@@ -42,11 +39,10 @@ namespace SchoolManagement.Services.Implementation
                     Stage = c.Stage?.Name,
                     AudioLink = c.AudioLink,
                     Remarks = c.Remarks,
-                    CallDuration = c.CallDuration,
                     TenantId = c.TenantId,
-
                 }).ToList();
             }
+
             return null;
         }
 
@@ -64,17 +60,16 @@ namespace SchoolManagement.Services.Implementation
                     Stage = c.Stage?.Name,
                     AudioLink = c.AudioLink,
                     Remarks = c.Remarks,
-                    CallDuration = c.CallDuration,
                     TenantId = c.TenantId,
-
                 }).ToList();
             }
+
             return null;
         }
 
         public async Task<CallResponseVM> AddCallAsync(CallCreateVM request)
         {
-            var audioLink = await UploadAudioToGoogleDriveAsync(request.AudioFile);
+            var audioLink = await UploadAudioToAzureBlobAsync(request.AudioFile);
 
             var call = new MCall
             {
@@ -82,7 +77,6 @@ namespace SchoolManagement.Services.Implementation
                 StageId = request.StageId,
                 AudioLink = audioLink,
                 Remarks = request.Remarks,
-                CallDuration = request.CallDuration,
                 TenantId = request.TenantId,
                 CreatedBy = request.CreatedBy,
                 CreatedOn = DateTime.UtcNow
@@ -106,103 +100,62 @@ namespace SchoolManagement.Services.Implementation
                 Stage = savedCall.Stage?.Name,
                 AudioLink = savedCall.AudioLink,
                 Remarks = savedCall.Remarks,
-                CallDuration = savedCall.CallDuration,
                 TenantId = savedCall.TenantId
             };
         }
 
-        private async Task<string> UploadAudioToGoogleDriveAsync(IFormFile audioFile)
+        private async Task<string> UploadAudioToAzureBlobAsync(IFormFile audioFile)
         {
-            if (string.IsNullOrWhiteSpace(googleCredentialPath))
+            if (audioFile == null || audioFile.Length == 0)
             {
-                throw new InvalidOperationException("Google Drive credential path is missing in configuration.");
+                throw new InvalidOperationException("Audio file is required.");
             }
 
-            if (!System.IO.File.Exists(googleCredentialPath))
+            var containerName = configuration["AzureBlobStorage:CallAudioContainerName"];
+            if (string.IsNullOrWhiteSpace(containerName))
             {
-                throw new FileNotFoundException("Google Drive credential file was not found.", googleCredentialPath);
+                throw new InvalidOperationException("Azure blob container name is missing in configuration. Set AzureBlobStorage:CallAudioContainerName.");
             }
 
-            if (string.IsNullOrWhiteSpace(googleDriveFolderId))
-            {
-                throw new InvalidOperationException("Google Drive folder id is missing in configuration. Set GoogleDrive:FolderId to a shared drive folder that is accessible by the service account.");
-            }
+            var containerClient = blobServiceClient.GetBlobContainerClient(containerName);
+            await containerClient.CreateIfNotExistsAsync(PublicAccessType.None);
 
-            GoogleCredential credential;
-            await using (var stream = new FileStream(googleCredentialPath, FileMode.Open, FileAccess.Read))
-            {
-                credential = GoogleCredential.FromStream(stream).CreateScoped(DriveScopes);
-            }
+            var extension = Path.GetExtension(audioFile.FileName);
+            var blobName = $"call-audio/{DateTime.UtcNow:yyyy/MM/dd}/{Guid.NewGuid()}{extension}";
+            var blobClient = containerClient.GetBlobClient(blobName);
 
-            var driveService = new DriveService(new BaseClientService.Initializer
+            var contentType = string.IsNullOrWhiteSpace(audioFile.ContentType) ? "audio/mpeg" : audioFile.ContentType;
+            var headers = new BlobHttpHeaders
             {
-                HttpClientInitializer = credential,
-                ApplicationName = "SchoolManagement"
-            });
-
-            var fileExtension = Path.GetExtension(audioFile.FileName);
-            var driveFile = new DriveFile
-            {
-                Name = $"call-audio-{DateTime.UtcNow:yyyyMMddHHmmssfff}{fileExtension}",
-                Parents = [googleDriveFolderId]
+                ContentType = contentType,
+                ContentDisposition = "inline" // Encourages playback rather than attachment/download
             };
 
-            await using var uploadStream = audioFile.OpenReadStream();
-            var uploadRequest = driveService.Files.Create(
-                driveFile,
-                uploadStream,
-                string.IsNullOrWhiteSpace(audioFile.ContentType) ? "application/octet-stream" : audioFile.ContentType);
-
-            uploadRequest.Fields = "id";
-            uploadRequest.SupportsAllDrives = true;
-            var uploadProgress = await uploadRequest.UploadAsync();
-            if (uploadProgress.Status == UploadStatus.Failed)
+            await using (var stream = audioFile.OpenReadStream())
             {
-                throw new InvalidOperationException($"Google Drive upload failed: {uploadProgress.Exception?.Message}", uploadProgress.Exception);
+                await blobClient.UploadAsync(stream, new BlobUploadOptions
+                {
+                    HttpHeaders = headers
+                });
             }
 
-            if (uploadProgress.Status != UploadStatus.Completed)
+            if (!blobClient.CanGenerateSasUri)
             {
-                throw new InvalidOperationException($"Google Drive upload did not complete. Status: {uploadProgress.Status}");
+                return blobClient.Uri.ToString();
             }
 
-            var uploadedFileId = uploadRequest.ResponseBody?.Id;
-            if (string.IsNullOrWhiteSpace(uploadedFileId))
+            var sasBuilder = new BlobSasBuilder
             {
-                uploadedFileId = await FindUploadedFileIdByNameAsync(driveService, driveFile.Name);
-            }
-
-            if (string.IsNullOrWhiteSpace(uploadedFileId))
-            {
-                throw new InvalidOperationException("Google Drive upload completed, but the uploaded file id could not be resolved.");
-            }
-
-            var permission = new Permission
-            {
-                Type = "anyone",
-                Role = "reader"
+                BlobContainerName = containerName,
+                BlobName = blobName,
+                Resource = "b",
+                ExpiresOn = DateTimeOffset.UtcNow.AddHours(2), // Reduced expiration for better security
+                ContentType = contentType,
+                ContentDisposition = "inline"
             };
+            sasBuilder.SetPermissions(BlobSasPermissions.Read); // Strict Read-only permission
 
-            var permissionRequest = driveService.Permissions.Create(permission, uploadedFileId);
-            permissionRequest.SupportsAllDrives = true;
-            await permissionRequest.ExecuteAsync();
-
-            return $"https://drive.google.com/uc?export=download&id={uploadedFileId}";
-        }
-
-        private async Task<string?> FindUploadedFileIdByNameAsync(DriveService driveService, string fileName)
-        {
-            var escapedFileName = fileName.Replace("'", "\\'");
-            var listRequest = driveService.Files.List();
-            listRequest.Q = $"name = '{escapedFileName}' and '{googleDriveFolderId}' in parents and trashed = false";
-            listRequest.OrderBy = "createdTime desc";
-            listRequest.PageSize = 1;
-            listRequest.Fields = "files(id,name)";
-            listRequest.IncludeItemsFromAllDrives = true;
-            listRequest.SupportsAllDrives = true;
-
-            var files = await listRequest.ExecuteAsync();
-            return files.Files?.FirstOrDefault()?.Id;
+            return blobClient.GenerateSasUri(sasBuilder).ToString();
         }
     }
 }
