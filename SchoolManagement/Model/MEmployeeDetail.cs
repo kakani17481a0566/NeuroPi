@@ -19,8 +19,11 @@ namespace SchoolManagement.Model
         [Column("name")]
         public string Name { get; set; }
 
-        [Column("status")]
-        public string Status { get; set; }
+        [Column("status_id")]
+        public int? StatusId { get; set; }
+
+        [ForeignKey(nameof(StatusId))]
+        public virtual MMaster Status { get; set; }
 
         [Column("date_of_joining")]
         public DateTime? DateOfJoining { get; set; }
@@ -55,8 +58,11 @@ namespace SchoolManagement.Model
         [Column("academic_year")]
         public string AcademicYear { get; set; }
 
-        [Column("current_status")]
-        public string CurrentStatus { get; set; }
+        [Column("current_status_id")]
+        public int? CurrentStatusId { get; set; }
+
+        [ForeignKey(nameof(CurrentStatusId))]
+        public virtual MMaster CurrentStatus { get; set; }
 
         [Column("tenant_id")]
         public int? TenantId { get; set; }
