@@ -167,6 +167,9 @@ builder.Services.AddScoped<IQuestionService, QuestionServiceImpl>();
 builder.Services.AddScoped<IEmployeeDetailService,EmployeeDetailsServiceImpl>();
 builder.Services.AddScoped<IQuestionAnswerService, QuestionAnswerImpl>();
 builder.Services.AddScoped<ICallService, CallServiceImpl>();
+builder.Services.AddScoped<ICollegeDetailService, CollegeDetailServiceImpl>();
+builder.Services.AddScoped<ICoursesService, CoursesServiceImpl>();
+builder.Services.AddScoped<ICollegeCourseService, CollegeCourseServiceImpl>();
 
 
 

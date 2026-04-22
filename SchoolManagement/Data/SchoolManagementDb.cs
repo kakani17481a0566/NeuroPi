@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NeuroPi.UserManagment.Model;
 using SchoolManagement.Model;
@@ -177,8 +177,11 @@ namespace SchoolManagement.Data
         public DbSet<MQuestion> Questions { get; set; }
 
         public DbSet<MEmployeeDetail> EmployeeDetails { get; set; }
+        public DbSet<MCollegeDetail> CollegeDetails { get; set; }
         public DbSet<MQuestionAnswer> QuestionAnswer { get; set; }
         public DbSet<MCall> Call { get; set; }
+        public DbSet<MCourses> SchoolCourses { get; set; }
+        public DbSet<MCollegeCourse> CollegeCourses { get; set; }
 
 
 
