@@ -172,7 +172,11 @@ namespace SchoolManagement.Data
         public DbSet<MItemBatch> ItemBatches { get; set; }
         public DbSet<MStockTransactionLog> StockTransactionLogs { get; set; }
         public DbSet<MInventoryTransfer> InventoryTransfers { get; set; }
+
+        //crm
         public DbSet<MQuestion> Questions { get; set; }
+
+        public DbSet<MEmployeeDetail> EmployeeDetails { get; set; }
 
 
 
