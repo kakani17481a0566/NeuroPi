@@ -166,6 +166,8 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IQuestionService, QuestionServiceImpl>();
 builder.Services.AddScoped<IEmployeeDetailService,EmployeeDetailsServiceImpl>();
 builder.Services.AddScoped<IQuestionAnswerService, QuestionAnswerImpl>();
+builder.Services.AddScoped<ICallService, CallServiceImpl>();
+
 
 
 

@@ -178,6 +178,8 @@ namespace SchoolManagement.Data
 
         public DbSet<MEmployeeDetail> EmployeeDetails { get; set; }
         public DbSet<MQuestionAnswer> QuestionAnswer { get; set; }
+        public DbSet<MCall> Call { get; set; }
+
 
 
 

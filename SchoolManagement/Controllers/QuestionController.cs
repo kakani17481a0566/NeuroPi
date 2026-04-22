@@ -19,7 +19,7 @@ namespace SchoolManagement.Controllers
             questionService=_questionService;            
         }
 
-        [HttpGet("/questions/{tenantId}")]
+        [HttpGet("questions/{tenantId}")]
         public ResponseResult<List<QuestionsVM>> GetQuestions(int tenantId)
         {
             var response=questionService.getAllQuestions(tenantId);

@@ -1,0 +1,18 @@
+﻿using SchoolManagement.Model;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace SchoolManagement.ViewModel.Call
+{
+    public class CallResponseVM
+    {
+
+        public int Id { get; set; }
+        public int ContactId { get; set; }
+        public string Contact { get; set; }
+        public int? StageId { get; set; }
+        public string Stage { get; set; }
+        public string AudioLink { get; set; }
+        public string Remarks { get; set; }
+        public int TenantId { get; set; }
+    }
+}
