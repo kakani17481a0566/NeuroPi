@@ -163,6 +163,8 @@ builder.Services.AddScoped<ITableFilesService, TableFilesServiceImpl>();
 //enquirey-from 
 builder.Services.AddScoped<IEnquiryFormService, EnquiryFormServiceImpl>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IQuestionService, QuestionServiceImpl>();
+
 
 
 

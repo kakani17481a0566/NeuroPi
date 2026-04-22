@@ -7,7 +7,7 @@ using NeuroPi.CommonLib.Model;
 namespace SchoolManagement.Model
 {
     [Table("courses")]
-    public class MCourses : MBaseModel
+    public class MCourses : NeuroPi.UserManagment.Model.MBaseModel
     {
         [Key]
         [Column("id")]
@@ -39,6 +39,6 @@ namespace SchoolManagement.Model
         public int TenantId { get; set; }
 
         [ForeignKey(nameof(TenantId))]
-        public virtual MTenant Tenant { get; set; }
+        public virtual NeuroPi.UserManagment.Model.MTenant Tenant { get; set; }
     }
 }
