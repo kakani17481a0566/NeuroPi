@@ -36,5 +36,18 @@ namespace SchoolManagement.Controllers
             }
             return new ResponseResult<List<CallResponseVM>>(System.Net.HttpStatusCode.OK, result, "call logs fetched succcessfully");
         }
+
+        [HttpPost]
+        [Consumes("multipart/form-data")]
+        public async Task<ResponseResult<CallResponseVM>> AddCall([FromForm] CallCreateVM request)
+        {
+            if (request.AudioFile == null || request.AudioFile.Length == 0)
+            {
+                return new ResponseResult<CallResponseVM>(System.Net.HttpStatusCode.BadRequest, null, "Audio file is required");
+            }
+
+            var result = await callService.AddCallAsync(request);
+            return new ResponseResult<CallResponseVM>(System.Net.HttpStatusCode.OK, result, "call log created succcessfully");
+        }
     }
 }

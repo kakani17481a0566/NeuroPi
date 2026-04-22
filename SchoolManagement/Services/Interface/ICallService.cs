@@ -8,5 +8,7 @@ namespace SchoolManagement.Services.Interface
 
         List<CallResponseVM> GetAllLogs(int tenantId);
 
+        Task<CallResponseVM> AddCallAsync(CallCreateVM request);
+
     }
 }
