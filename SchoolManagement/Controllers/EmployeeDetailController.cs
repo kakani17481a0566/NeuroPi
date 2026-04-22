@@ -17,7 +17,7 @@ namespace SchoolManagement.Controllers
             employeeDetailService= _employeeDetailService;
         }
 
-        [HttpGet("/employeeDetails/{tenantId}")]
+        [HttpGet("employeeDetails/{tenantId}")]
         public ResponseResult<List<EmployeeDetailsVM>> GetEmployees(int tenantId)
         {
             var result=employeeDetailService.GetAllEmployees(tenantId);
