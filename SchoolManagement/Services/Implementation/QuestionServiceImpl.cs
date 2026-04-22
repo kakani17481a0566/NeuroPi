@@ -28,6 +28,7 @@ namespace SchoolManagement.Services.Implementation
                     .OrderBy(q => q.QOrderId)
                     .Select(q => new Questions
                     {
+                        QuestionId=q.Id,
                          orderId = (int)q.QOrderId,
                          Question = q.Qus
                     })

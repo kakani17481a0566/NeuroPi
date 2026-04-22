@@ -177,6 +177,8 @@ namespace SchoolManagement.Data
         public DbSet<MQuestion> Questions { get; set; }
 
         public DbSet<MEmployeeDetail> EmployeeDetails { get; set; }
+        public DbSet<MQuestionAnswer> QuestionAnswer { get; set; }
+
 
 
 

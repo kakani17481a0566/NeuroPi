@@ -8,6 +8,7 @@
     }
     public class Questions
     {
+        public int QuestionId { get; set; }
         public int orderId {  get; set; }
         public string Question { get; set; }
 
