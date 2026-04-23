@@ -47,7 +47,9 @@ namespace SchoolManagement.Services.Implementation
                               TenantName = c.Tenant != null ? c.Tenant.Name : null,
                               CreatedByName = user != null ? user.FirstName + " " + user.LastName : null,
                               CallStatusName=c.CallStatusName.Name,
-                              DirectionTypeName=c.DirectionTypeName.Name
+                              DirectionTypeName=c.DirectionTypeName.Name,
+                              CallStatusId=c.CallStatusId.Value,
+                              DirectionTypeId=c.DirectionTypeId.Value,
                           }).ToList();
             if (result != null && result.Count() > 0)
             {

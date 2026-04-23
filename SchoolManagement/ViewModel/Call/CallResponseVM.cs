@@ -24,6 +24,8 @@ namespace SchoolManagement.ViewModel.Call
 
         public string? DirectionTypeName { get; set; }
         public string? CallStatusName { get; set; }
+        public int CallStatusId { get; set; }
+        public int DirectionTypeId { get; set; }
 
     }
 }
