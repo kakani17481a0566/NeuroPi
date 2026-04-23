@@ -59,6 +59,7 @@ namespace SchoolManagement.Services.Implementation
                               DirectionTypeName = c.DirectionTypeName != null ? c.DirectionTypeName.Name : null,
                               CallStatusId = c.CallStatusId ?? 0,
                               DirectionTypeId = c.DirectionTypeId ?? 0,
+                              CreatedOn = c.CreatedOn,
                           }).ToList();
 
             if (result == null || result.Count == 0) return null;
@@ -100,6 +101,7 @@ namespace SchoolManagement.Services.Implementation
                               DirectionTypeName = c.DirectionTypeName != null ? c.DirectionTypeName.Name : null,
                               CallStatusId = c.CallStatusId ?? 0,
                               DirectionTypeId = c.DirectionTypeId ?? 0,
+                              CreatedOn = c.CreatedOn,
                           }).ToList();
 
             if (result == null || result.Count == 0) return null;
@@ -124,7 +126,8 @@ namespace SchoolManagement.Services.Implementation
                 Remarks = request.Remarks,
                 TenantId = request.TenantId,
                 CreatedBy = request.CreatedBy,
-                CreatedOn = DateTime.UtcNow
+                CreatedOn = DateTime.UtcNow,
+                CallDuration = request.CallDuration
             };
 
             context.Call.Add(call);
@@ -153,7 +156,8 @@ namespace SchoolManagement.Services.Implementation
                 Remarks = savedCall.Remarks,
                 TenantId = savedCall.TenantId,
                 TenantName = savedCall.Tenant?.Name,
-                CreatedByName = user != null ? user.FirstName + " " + user.LastName : null
+                CreatedByName = user != null ? user.FirstName + " " + user.LastName : null,
+                CreatedOn = savedCall.CreatedOn
             };
         }
 
@@ -298,6 +302,7 @@ namespace SchoolManagement.Services.Implementation
                     DirectionTypeName = call.DirectionTypeName != null ? call.DirectionTypeName.Name : null,
                     CallStatusId = call.CallStatusId ?? 0,
                     DirectionTypeId = call.DirectionTypeId ?? 0,
+                    CreatedOn = call.CreatedOn,
                 });
             }
 
