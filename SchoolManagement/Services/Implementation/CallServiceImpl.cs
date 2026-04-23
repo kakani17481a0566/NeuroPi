@@ -308,7 +308,7 @@ namespace SchoolManagement.Services.Implementation
         }
 
         /// <summary>
-        /// Generates a fresh 2-hour SAS URL for playback.
+        /// Generates a fresh 1-year SAS URL for playback.
         ///
         /// KEY DESIGN DECISION: We always use the injected BlobServiceClient (configured
         /// for neuropiblob4244 — confirmed to be where files actually live) and only
@@ -368,7 +368,7 @@ namespace SchoolManagement.Services.Implementation
                     BlobName = blobName,
                     Resource = "b",
                     StartsOn = DateTimeOffset.UtcNow.AddMinutes(-5),  // ±5 min buffer for clock skew
-                    ExpiresOn = DateTimeOffset.UtcNow.AddHours(2),
+                    ExpiresOn = DateTimeOffset.UtcNow.AddYears(1),
                 };
                 sasBuilder.SetPermissions(BlobSasPermissions.Read);
 
