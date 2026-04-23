@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NeuroPi.CommonLib.Model;
 using SchoolManagement.Services.Interface;
@@ -35,6 +35,17 @@ namespace SchoolManagement.Controllers
                 return new ResponseResult<List<CallResponseVM>>(System.Net.HttpStatusCode.NotFound, result, "Call logs Not Found");
             }
             return new ResponseResult<List<CallResponseVM>>(System.Net.HttpStatusCode.OK, result, "call logs fetched succcessfully");
+        }
+
+        [HttpGet("dashboard/{tenantId}")]
+        public async Task<ResponseResult<CallDashboardOverviewVM>> GetDashboardOverview(int tenantId)
+        {
+            var result = await callService.GetDashboardOverviewAsync(tenantId);
+            if (result == null)
+            {
+                return new ResponseResult<CallDashboardOverviewVM>(System.Net.HttpStatusCode.NotFound, result, "Dashboard data Not Found");
+            }
+            return new ResponseResult<CallDashboardOverviewVM>(System.Net.HttpStatusCode.OK, result, "Dashboard data fetched succcessfully");
         }
 
         [HttpPost]

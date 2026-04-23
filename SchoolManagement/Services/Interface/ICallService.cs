@@ -1,4 +1,4 @@
-﻿using SchoolManagement.ViewModel.Call;
+using SchoolManagement.ViewModel.Call;
 
 namespace SchoolManagement.Services.Interface
 {
@@ -10,5 +10,6 @@ namespace SchoolManagement.Services.Interface
 
         Task<CallResponseVM> AddCallAsync(CallCreateVM request);
 
+        Task<CallDashboardOverviewVM> GetDashboardOverviewAsync(int tenantId);
     }
 }
