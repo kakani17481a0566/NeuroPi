@@ -20,6 +20,7 @@ namespace SchoolManagement.Services.Implementation
                 MQuestionAnswer answerAnswer = new MQuestionAnswer();
                 answerAnswer.TenantId = questions.tenantId;
                 answerAnswer.CreatedBy = questions.createdBy;
+                answerAnswer.EmpId = questions.empId;
                 answerAnswer.QuestionsId = answer.QuestionId;
                 answerAnswer.Answer = answer.Answer;
                 answerAnswer.CreatedOn = DateTime.UtcNow;

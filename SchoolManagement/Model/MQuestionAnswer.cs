@@ -27,5 +27,11 @@ namespace SchoolManagement.Model
 
         [ForeignKey(nameof(TenantId))]
         public virtual NeuroPi.UserManagment.Model.MTenant Tenant { get; set; }
+
+        [Column("emp_id")]
+        public int? EmpId { get; set; }
+
+        [ForeignKey(nameof(EmpId))]
+        public virtual SchoolManagement.Model.MEmployee Employee { get; set; }
     }
 }

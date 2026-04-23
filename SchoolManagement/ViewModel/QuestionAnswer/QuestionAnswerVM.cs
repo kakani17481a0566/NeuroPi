@@ -6,6 +6,7 @@ namespace SchoolManagement.ViewModel.QuestionAnswer
     {
         public int tenantId { get; set; }
         public int createdBy { get; set; }
+        public int empId { get; set; }
         public List<AnswerVM> AnswerVM { get; set; }
     }
     public class AnswerVM
