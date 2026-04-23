@@ -15,5 +15,10 @@ namespace SchoolManagement.ViewModel.Call
         public string Remarks { get; set; }
         public TimeSpan? CallDuration { get; set; }
         public int TenantId { get; set; }
+
+        public string TenantName { get; set; }
+        public string BenificiaryName { get; set; }
+
+        public string BeneficiaryRelationshipName { get; set; }
     }
 }
