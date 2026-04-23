@@ -27,23 +27,29 @@ namespace SchoolManagement.Services.Implementation
 
         public List<CallResponseVM> GetAllEmployeeLogs(int empId, int tenantId)
         {
-            var result = context.Call.Where(e => e.ContactId == empId && e.TenantId == tenantId).Include(e => e.Stage).Include(c => c.Contact).ToList();
+            var result = (from c in context.Call.Include(e => e.Stage).Include(c => c.Contact).Include(c => c.Tenant)
+                          join u in context.Users on c.CreatedBy equals u.UserId into uGroup
+                          from user in uGroup.DefaultIfEmpty()
+                          where c.ContactId == empId && c.TenantId == tenantId
+                          select new CallResponseVM()
+                          {
+                              Id = c.Id,
+                              ContactId = c.ContactId,
+                              Contact = c.Contact != null ? c.Contact.Name : null,
+                              BenificiaryName = c.Contact != null ? c.Contact.Beneficiary : null,
+                              BeneficiaryRelationshipName = c.Contact != null ? c.Contact.BeneficiaryRelationshipName : null,
+                              CallDuration = c.CallDuration,
+                              StageId = c.StageId,
+                              Stage = c.Stage != null ? c.Stage.Name : null,
+                              AudioLink = c.AudioLink,
+                              Remarks = c.Remarks,
+                              TenantId = c.TenantId,
+                              TenantName = c.Tenant != null ? c.Tenant.Name : null,
+                              CreatedByName = user != null ? user.FirstName + " " + user.LastName : null
+                          }).ToList();
             if (result != null && result.Count() > 0)
             {
-                return result.Select(c => new CallResponseVM()
-                {
-                    Id = c.Id,
-                    ContactId = c.ContactId,
-                    Contact = c.Contact?.Name,
-                    BenificiaryName=c.Contact.Beneficiary,
-                    BeneficiaryRelationshipName=c.Contact.BeneficiaryRelationshipName,
-                    CallDuration=c.CallDuration,
-                    StageId = c.StageId,
-                    Stage = c.Stage?.Name,
-                    AudioLink = c.AudioLink,
-                    Remarks = c.Remarks,
-                    TenantId = c.TenantId,
-                }).ToList();
+                return result;
             }
 
             return null;
@@ -51,20 +57,26 @@ namespace SchoolManagement.Services.Implementation
 
         public List<CallResponseVM> GetAllLogs(int tenantId)
         {
-            var result = context.Call.Where(e => e.TenantId == tenantId).Include(e => e.Stage).Include(c => c.Contact).ToList();
+            var result = (from c in context.Call.Include(e => e.Stage).Include(c => c.Contact).Include(c => c.Tenant)
+                          join u in context.Users on c.CreatedBy equals u.UserId into uGroup
+                          from user in uGroup.DefaultIfEmpty()
+                          where c.TenantId == tenantId
+                          select new CallResponseVM()
+                          {
+                              Id = c.Id,
+                              ContactId = c.ContactId,
+                              Contact = c.Contact != null ? c.Contact.Name : null,
+                              StageId = c.StageId,
+                              Stage = c.Stage != null ? c.Stage.Name : null,
+                              AudioLink = c.AudioLink,
+                              Remarks = c.Remarks,
+                              TenantId = c.TenantId,
+                              TenantName = c.Tenant != null ? c.Tenant.Name : null,
+                              CreatedByName = user != null ? user.FirstName + " " + user.LastName : null
+                          }).ToList();
             if (result != null && result.Count() > 0)
             {
-                return result.Select(c => new CallResponseVM()
-                {
-                    Id = c.Id,
-                    ContactId = c.ContactId,
-                    Contact = c.Contact?.Name,
-                    StageId = c.StageId,
-                    Stage = c.Stage?.Name,
-                    AudioLink = c.AudioLink,
-                    Remarks = c.Remarks,
-                    TenantId = c.TenantId,
-                }).ToList();
+                return result;
             }
 
             return null;
@@ -92,18 +104,26 @@ namespace SchoolManagement.Services.Implementation
                 .Where(c => c.Id == call.Id)
                 .Include(c => c.Stage)
                 .Include(c => c.Contact)
+                .Include(c => c.Tenant)
                 .FirstAsync();
+
+            var user = await context.Users.FirstOrDefaultAsync(u => u.UserId == savedCall.CreatedBy);
 
             return new CallResponseVM
             {
                 Id = savedCall.Id,
                 ContactId = savedCall.ContactId,
                 Contact = savedCall.Contact?.Name,
+                BenificiaryName = savedCall.Contact?.Beneficiary,
+                BeneficiaryRelationshipName = savedCall.Contact?.BeneficiaryRelationshipName,
+                CallDuration = savedCall.CallDuration,
                 StageId = savedCall.StageId,
                 Stage = savedCall.Stage?.Name,
                 AudioLink = savedCall.AudioLink,
                 Remarks = savedCall.Remarks,
-                TenantId = savedCall.TenantId
+                TenantId = savedCall.TenantId,
+                TenantName = savedCall.Tenant?.Name,
+                CreatedByName = user != null ? user.FirstName + " " + user.LastName : null
             };
         }
 

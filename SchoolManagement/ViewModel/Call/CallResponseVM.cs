@@ -20,5 +20,6 @@ namespace SchoolManagement.ViewModel.Call
         public string BenificiaryName { get; set; }
 
         public string BeneficiaryRelationshipName { get; set; }
+        public string CreatedByName { get; set; }
     }
 }
