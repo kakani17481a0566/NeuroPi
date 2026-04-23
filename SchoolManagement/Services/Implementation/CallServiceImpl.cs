@@ -49,7 +49,7 @@ namespace SchoolManagement.Services.Implementation
                               CallDuration = c.CallDuration,
                               StageId = c.StageId,
                               Stage = c.Stage != null ? c.Stage.Name : null,
-                              AudioLink = c.AudioLink, // refreshed below
+                              AudioLink = c.AudioLink, // Direct URL (no SAS regeneration)
                               Remarks = c.Remarks,
                               TenantId = c.TenantId,
                               TenantName = c.Tenant != null ? c.Tenant.Name : null,
@@ -57,14 +57,10 @@ namespace SchoolManagement.Services.Implementation
                               CallStatusName = c.CallStatusName != null ? c.CallStatusName.Name : null,
                               DirectionTypeName = c.DirectionTypeName != null ? c.DirectionTypeName.Name : null,
                               CallStatusId = c.CallStatusId ?? 0,
-                              DirectionTypeId = c.DirectionTypeId ?? 0,
-                          }).ToList();
+DirectionTypeId = c.DirectionTypeId ?? 0,
+                            }).ToList();
 
             if (result == null || result.Count == 0) return null;
-
-            // Regenerate fresh SAS URLs so audio is always playable
-            foreach (var r in result)
-                r.AudioLink = GenerateFreshSasUrl(r.AudioLink);
 
             return result;
         }
@@ -89,7 +85,7 @@ namespace SchoolManagement.Services.Implementation
                               BeneficiaryRelationshipName = c.Contact != null ? c.Contact.BeneficiaryRelationshipName : null,
                               StageId = c.StageId,
                               Stage = c.Stage != null ? c.Stage.Name : null,
-                              AudioLink = c.AudioLink, // refreshed below
+                              AudioLink = c.AudioLink, // Direct URL (no SAS regeneration)
                               Remarks = c.Remarks,
                               TenantId = c.TenantId,
                               TenantName = c.Tenant != null ? c.Tenant.Name : null,
@@ -101,10 +97,6 @@ namespace SchoolManagement.Services.Implementation
                           }).ToList();
 
             if (result == null || result.Count == 0) return null;
-
-            // Regenerate fresh SAS URLs so audio is always playable
-            foreach (var r in result)
-                r.AudioLink = GenerateFreshSasUrl(r.AudioLink);
 
             return result;
         }
@@ -189,23 +181,8 @@ namespace SchoolManagement.Services.Implementation
                 });
             }
 
-            if (!blobClient.CanGenerateSasUri)
-            {
-                return blobClient.Uri.ToString();
-            }
-
-            var sasBuilder = new BlobSasBuilder
-            {
-                BlobContainerName = containerName,
-                BlobName = blobName,
-                Resource = "b",
-                ExpiresOn = DateTimeOffset.UtcNow.AddHours(2), // Reduced expiration for better security
-                ContentType = contentType,
-                ContentDisposition = "inline"
-            };
-            sasBuilder.SetPermissions(BlobSasPermissions.Read); // Strict Read-only permission
-
-            return blobClient.GenerateSasUri(sasBuilder).ToString();
+            // Return direct blob URL (no SAS)
+            return blobClient.Uri.ToString();
         }
 
         public async Task<CallDashboardOverviewVM> GetDashboardOverviewAsync(int tenantId)
@@ -305,8 +282,8 @@ namespace SchoolManagement.Services.Implementation
                     CallDuration = call.CallDuration,
                     StageId = call.StageId,
                     Stage = call.Stage != null ? call.Stage.Name : null,
-                    // Regenerate a fresh 2-hour SAS URL so audio is always playable on the dashboard
-                    AudioLink = GenerateFreshSasUrl(call.AudioLink),
+                    // Direct URL (no SAS regeneration)
+                    AudioLink = call.AudioLink,
                     Remarks = call.Remarks,
                     TenantId = call.TenantId,
                     TenantName = call.Tenant != null ? call.Tenant.Name : null,
