@@ -21,5 +21,9 @@ namespace SchoolManagement.ViewModel.Call
 
         public string BeneficiaryRelationshipName { get; set; }
         public string CreatedByName { get; set; }
+
+        public string? DirectionTypeName { get; set; }
+        public string? CallStatusName { get; set; }
+
     }
 }

@@ -27,7 +27,7 @@ namespace SchoolManagement.Services.Implementation
 
         public List<CallResponseVM> GetAllEmployeeLogs(int empId, int tenantId)
         {
-            var result = (from c in context.Call.Include(e => e.Stage).Include(c => c.Contact).Include(c => c.Tenant)
+            var result = (from c in context.Call.Include(e => e.Stage).Include(c => c.Contact).Include(c => c.Tenant).Include(c=>c.DirectionTypeName).Include(c=>c.CallStatusName)
                           join u in context.Users on c.CreatedBy equals u.UserId into uGroup
                           from user in uGroup.DefaultIfEmpty()
                           where c.ContactId == empId && c.TenantId == tenantId
@@ -45,7 +45,9 @@ namespace SchoolManagement.Services.Implementation
                               Remarks = c.Remarks,
                               TenantId = c.TenantId,
                               TenantName = c.Tenant != null ? c.Tenant.Name : null,
-                              CreatedByName = user != null ? user.FirstName + " " + user.LastName : null
+                              CreatedByName = user != null ? user.FirstName + " " + user.LastName : null,
+                              CallStatusName=c.CallStatusName.Name,
+                              DirectionTypeName=c.DirectionTypeName.Name
                           }).ToList();
             if (result != null && result.Count() > 0)
             {

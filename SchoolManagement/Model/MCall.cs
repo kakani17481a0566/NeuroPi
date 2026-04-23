@@ -25,6 +25,18 @@ namespace SchoolManagement.Model
         [ForeignKey(nameof(StageId))]
         public virtual MMaster Stage { get; set; }
 
+        [Column("direction_type_id")]
+        public int? DirectionTypeId { get; set; }
+
+        [ForeignKey(nameof(DirectionTypeId))]
+        public virtual MMaster DirectionTypeName { get; set; }
+        [Column("call_status_id")]
+        public int? CallStatusId { get; set; }
+
+        [ForeignKey(nameof(CallStatusId))]
+        public virtual MMaster CallStatusName { get; set; }
+
+
         [Column("audio_link")]
         public string AudioLink { get; set; }
 
