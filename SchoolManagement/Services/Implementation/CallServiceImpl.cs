@@ -322,82 +322,82 @@ namespace SchoolManagement.Services.Implementation
         }
 
         /// <summary>
-        /// Takes any stored AudioLink (plain blob URL or an already-expired SAS URL) and returns
-        /// a fresh 2-hour SAS URL so the caller can always stream the audio.
-        /// Returns null if the input is null/empty or if SAS generation is not available.
+        /// Generates a fresh 2-hour SAS URL for playback.
+        ///
+        /// KEY DESIGN DECISION: We always use the injected BlobServiceClient (configured
+        /// for neuropiblob4244 — confirmed to be where files actually live) and only
+        /// extract the container name + blob path from the stored URL.
+        /// We intentionally IGNORE the account hostname in the stored URL because legacy
+        /// DB records may contain an old account name (e.g. neuropistorageacct7) even
+        /// though the physical file was uploaded to neuropiblob4244.
         /// </summary>
         private string GenerateFreshSasUrl(string storedUrl)
         {
             if (string.IsNullOrWhiteSpace(storedUrl))
             {
-                logger.LogDebug("[Audio] GenerateFreshSasUrl: storedUrl is null/empty — returning null.");
+                logger.LogDebug("[Audio] storedUrl is null/empty — skipping SAS generation.");
                 return null;
             }
 
-            logger.LogDebug("[Audio] GenerateFreshSasUrl: Input URL = {Url}", storedUrl);
+            logger.LogDebug("[Audio] GenerateFreshSasUrl input: {Url}", storedUrl);
 
             try
             {
                 var uri = new Uri(storedUrl);
-                // URL format: https://<account>.blob.core.windows.net/<container>/<blobName>[?sas]
-                var segments = uri.AbsolutePath.TrimStart('/').Split('/', 2);
 
-                logger.LogDebug("[Audio] Parsed AbsolutePath='{Path}', segments count={Count}",
-                    uri.AbsolutePath, segments.Length);
+                // Parse ONLY the path — ignore the hostname/account name in the stored URL.
+                // AbsolutePath format: /<container>/<blobName>  (SAS query string is NOT in AbsolutePath)
+                var path = uri.AbsolutePath.TrimStart('/');
+                var slash = path.IndexOf('/');
 
-                if (segments.Length < 2)
+                if (slash < 0)
                 {
-                    logger.LogWarning("[Audio] Cannot parse container/blob from URL '{Url}' — returning as-is.", storedUrl);
-                    return storedUrl;
+                    logger.LogWarning("[Audio] Cannot parse container/blob from path '{Path}' — returning null.", path);
+                    return null;
                 }
 
-                var containerName = segments[0];
-                var blobName = segments[1];
+                var containerName = path[..slash];
+                var blobName = path[(slash + 1)..];
 
-                logger.LogDebug("[Audio] Container='{Container}', BlobName='{Blob}'", containerName, blobName);
+                logger.LogDebug("[Audio] Parsed → container='{Container}', blob='{Blob}'", containerName, blobName);
 
-                var containerClient = blobServiceClient.GetBlobContainerClient(containerName);
-                var blobClient = containerClient.GetBlobClient(blobName);
+                // Use the injected blobServiceClient (neuropiblob4244 — where the file actually lives).
+                var blobClient = blobServiceClient
+                    .GetBlobContainerClient(containerName)
+                    .GetBlobClient(blobName);
 
-                logger.LogDebug("[Audio] CanGenerateSasUri={CanSas}, BlobUri={BlobUri}",
-                    blobClient.CanGenerateSasUri, blobClient.Uri);
+                logger.LogDebug("[Audio] Target BlobUri={BlobUri}, CanGenerateSasUri={CanSas}",
+                    blobClient.Uri, blobClient.CanGenerateSasUri);
 
                 if (!blobClient.CanGenerateSasUri)
                 {
-                    logger.LogWarning("[Audio] CanGenerateSasUri=false — BlobServiceClient is not using StorageSharedKeyCredential. " +
-                        "Check that the connection string in AzureBlobStorage:ConnectionString uses AccountKey (not Managed Identity). " +
-                        "Returning plain blob URI.");
-                    return blobClient.Uri.ToString();
+                    logger.LogWarning("[Audio] CanGenerateSasUri=false — BlobServiceClient must use " +
+                        "StorageSharedKeyCredential (connection string with AccountKey), not Managed Identity.");
+                    return null;
                 }
 
-                // NOTE: Do NOT set ContentType/ContentDisposition as SAS response-override parameters.
-                // They are already stored as blob metadata (set at upload time) and including them
-                // in BlobSasBuilder can throw InvalidOperationException in some credential contexts.
                 var sasBuilder = new BlobSasBuilder
                 {
                     BlobContainerName = containerName,
                     BlobName = blobName,
                     Resource = "b",
-                    // StartsOn slightly in the past to handle clock skew between server and Azure
-                    StartsOn = DateTimeOffset.UtcNow.AddMinutes(-5),
+                    StartsOn = DateTimeOffset.UtcNow.AddMinutes(-5),  // ±5 min buffer for clock skew
                     ExpiresOn = DateTimeOffset.UtcNow.AddHours(2),
                 };
                 sasBuilder.SetPermissions(BlobSasPermissions.Read);
 
                 var freshUrl = blobClient.GenerateSasUri(sasBuilder).ToString();
-                logger.LogDebug("[Audio] Fresh SAS URL generated successfully. ExpiresIn=2h, StartsOn=-5min. URL starts with: {Prefix}",
-                    freshUrl.Length > 120 ? freshUrl[..120] + "..." : freshUrl);
+                logger.LogDebug("[Audio] ✅ SAS generated. ExpiresIn=2h. Starts: {Prefix}",
+                    freshUrl.Length > 100 ? freshUrl[..100] + "..." : freshUrl);
 
                 return freshUrl;
             }
             catch (Exception ex)
             {
-                // IMPORTANT: Do NOT fall back to storedUrl — it has an expired SAS token and will
-                // cause an AuthenticationFailed error. Returning null is safer; the UI will show "No audio".
-                logger.LogError(ex, "[Audio] GenerateFreshSasUrl FAILED for URL '{Url}'. " +
-                    "Returning null so the UI shows 'No audio' rather than an expired URL.", storedUrl);
+                logger.LogError(ex, "[Audio] GenerateFreshSasUrl FAILED for '{Url}'.", storedUrl);
                 return null;
             }
         }
+
     }
 }
