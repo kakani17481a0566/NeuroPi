@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Data;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.EmployeeDetails;
@@ -35,6 +35,7 @@ namespace SchoolManagement.Services.Implementation
                     Unit = r.Unit,
                     Beneficiary = r.Beneficiary,
                     BeneficiaryDob = r.BeneficiaryDob,
+                    BeneficiaryRelationshipName = r.BeneficiaryRelationshipName,
                     Grade = r.Grade,
                     CurrentStatusId = r.CurrentStatusId,
                     CurrentStatus = r.CurrentStatus.Name,

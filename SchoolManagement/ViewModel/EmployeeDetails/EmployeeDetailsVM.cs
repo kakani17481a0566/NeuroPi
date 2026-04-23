@@ -1,4 +1,4 @@
-﻿
+
 
 namespace SchoolManagement.ViewModel.EmployeeDetails
 {
@@ -20,6 +20,8 @@ namespace SchoolManagement.ViewModel.EmployeeDetails
         public string Beneficiary { get; set; }
 
         public DateTime? BeneficiaryDob { get; set; }
+
+        public string BeneficiaryRelationshipName { get; set; }
 
         public string Grade { get; set; }
 

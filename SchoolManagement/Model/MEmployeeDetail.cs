@@ -52,6 +52,9 @@ namespace SchoolManagement.Model
         [Column("beneficiary_dob")]
         public DateTime? BeneficiaryDob { get; set; }
 
+        [Column("beneficiary_relationship_name")]
+        public string BeneficiaryRelationshipName { get; set; }
+
         [Column("grade")]
         public string Grade { get; set; }
 
