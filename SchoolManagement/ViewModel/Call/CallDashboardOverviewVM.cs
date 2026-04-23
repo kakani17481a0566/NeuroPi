@@ -13,6 +13,8 @@ namespace SchoolManagement.ViewModel.Call
         public List<CallVolumeVM> VolumeData { get; set; } = new List<CallVolumeVM>();
         public List<CallOutcomeVM> Outcomes { get; set; } = new List<CallOutcomeVM>();
         public List<CallResponseVM> RecentCalls { get; set; } = new List<CallResponseVM>();
+        public List<DashboardTaskVM> Tasks { get; set; } = new List<DashboardTaskVM>();
+        public List<DashboardLeadVM> HotLeads { get; set; } = new List<DashboardLeadVM>();
     }
 
     public class CallVolumeVM
@@ -28,5 +30,24 @@ namespace SchoolManagement.ViewModel.Call
         public string Label { get; set; }
         public int Value { get; set; }
         public string Color { get; set; }
+    }
+
+    public class DashboardTaskVM
+    {
+        public string Id { get; set; }
+        public string Title { get; set; }
+        public string Due { get; set; }
+        public string Priority { get; set; }
+        public bool Done { get; set; }
+    }
+
+    public class DashboardLeadVM
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public string Company { get; set; }
+        public string Score { get; set; }
+        public string Avatar { get; set; }
+        public string Status { get; set; }
     }
 }

@@ -14,20 +14,28 @@ namespace SchoolManagement.Services.Implementation
         private readonly SchoolManagementDb context;
         private readonly BlobServiceClient blobServiceClient;
         private readonly IConfiguration configuration;
+        private readonly ILogger<CallServiceImpl> logger;
 
         public CallServiceImpl(
             SchoolManagementDb _context,
             BlobServiceClient _blobServiceClient,
-            IConfiguration _configuration)
+            IConfiguration _configuration,
+            ILogger<CallServiceImpl> _logger)
         {
             context = _context;
             blobServiceClient = _blobServiceClient;
             configuration = _configuration;
+            logger = _logger;
         }
 
         public List<CallResponseVM> GetAllEmployeeLogs(int empId, int tenantId)
         {
-            var result = (from c in context.Call.Include(e => e.Stage).Include(c => c.Contact).Include(c => c.Tenant).Include(c=>c.DirectionTypeName).Include(c=>c.CallStatusName)
+            var result = (from c in context.Call
+                                  .Include(e => e.Stage)
+                                  .Include(c => c.Contact)
+                                  .Include(c => c.Tenant)
+                                  .Include(c => c.DirectionTypeName)
+                                  .Include(c => c.CallStatusName)
                           join u in context.Users on c.CreatedBy equals u.UserId into uGroup
                           from user in uGroup.DefaultIfEmpty()
                           where c.ContactId == empId && c.TenantId == tenantId
@@ -41,27 +49,34 @@ namespace SchoolManagement.Services.Implementation
                               CallDuration = c.CallDuration,
                               StageId = c.StageId,
                               Stage = c.Stage != null ? c.Stage.Name : null,
-                              AudioLink = c.AudioLink,
+                              AudioLink = c.AudioLink, // refreshed below
                               Remarks = c.Remarks,
                               TenantId = c.TenantId,
                               TenantName = c.Tenant != null ? c.Tenant.Name : null,
                               CreatedByName = user != null ? user.FirstName + " " + user.LastName : null,
-                              CallStatusName=c.CallStatusName.Name,
-                              DirectionTypeName=c.DirectionTypeName.Name,
-                              CallStatusId=c.CallStatusId.Value,
-                              DirectionTypeId=c.DirectionTypeId.Value,
+                              CallStatusName = c.CallStatusName != null ? c.CallStatusName.Name : null,
+                              DirectionTypeName = c.DirectionTypeName != null ? c.DirectionTypeName.Name : null,
+                              CallStatusId = c.CallStatusId ?? 0,
+                              DirectionTypeId = c.DirectionTypeId ?? 0,
                           }).ToList();
-            if (result != null && result.Count() > 0)
-            {
-                return result;
-            }
 
-            return null;
+            if (result == null || result.Count == 0) return null;
+
+            // Regenerate fresh SAS URLs so audio is always playable
+            foreach (var r in result)
+                r.AudioLink = GenerateFreshSasUrl(r.AudioLink);
+
+            return result;
         }
 
         public List<CallResponseVM> GetAllLogs(int tenantId)
         {
-            var result = (from c in context.Call.Include(e => e.Stage).Include(c => c.Contact).Include(c => c.Tenant)
+            var result = (from c in context.Call
+                                  .Include(e => e.Stage)
+                                  .Include(c => c.Contact)
+                                  .Include(c => c.Tenant)
+                                  .Include(c => c.DirectionTypeName)
+                                  .Include(c => c.CallStatusName)
                           join u in context.Users on c.CreatedBy equals u.UserId into uGroup
                           from user in uGroup.DefaultIfEmpty()
                           where c.TenantId == tenantId
@@ -70,20 +85,28 @@ namespace SchoolManagement.Services.Implementation
                               Id = c.Id,
                               ContactId = c.ContactId,
                               Contact = c.Contact != null ? c.Contact.Name : null,
+                              BenificiaryName = c.Contact != null ? c.Contact.Beneficiary : null,
+                              BeneficiaryRelationshipName = c.Contact != null ? c.Contact.BeneficiaryRelationshipName : null,
                               StageId = c.StageId,
                               Stage = c.Stage != null ? c.Stage.Name : null,
-                              AudioLink = c.AudioLink,
+                              AudioLink = c.AudioLink, // refreshed below
                               Remarks = c.Remarks,
                               TenantId = c.TenantId,
                               TenantName = c.Tenant != null ? c.Tenant.Name : null,
-                              CreatedByName = user != null ? user.FirstName + " " + user.LastName : null
+                              CreatedByName = user != null ? user.FirstName + " " + user.LastName : null,
+                              CallStatusName = c.CallStatusName != null ? c.CallStatusName.Name : null,
+                              DirectionTypeName = c.DirectionTypeName != null ? c.DirectionTypeName.Name : null,
+                              CallStatusId = c.CallStatusId ?? 0,
+                              DirectionTypeId = c.DirectionTypeId ?? 0,
                           }).ToList();
-            if (result != null && result.Count() > 0)
-            {
-                return result;
-            }
 
-            return null;
+            if (result == null || result.Count == 0) return null;
+
+            // Regenerate fresh SAS URLs so audio is always playable
+            foreach (var r in result)
+                r.AudioLink = GenerateFreshSasUrl(r.AudioLink);
+
+            return result;
         }
 
         public async Task<CallResponseVM> AddCallAsync(CallCreateVM request)
@@ -193,6 +216,8 @@ namespace SchoolManagement.Services.Implementation
                 .Include(c => c.Stage)
                 .Include(c => c.Contact)
                 .Include(c => c.Tenant)
+                .Include(c => c.DirectionTypeName)
+                .Include(c => c.CallStatusName)
                 .Where(c => c.TenantId == tenantId);
 
             var allCalls = await allCallsQuery.ToListAsync();
@@ -280,15 +305,99 @@ namespace SchoolManagement.Services.Implementation
                     CallDuration = call.CallDuration,
                     StageId = call.StageId,
                     Stage = call.Stage != null ? call.Stage.Name : null,
-                    AudioLink = call.AudioLink,
+                    // Regenerate a fresh 2-hour SAS URL so audio is always playable on the dashboard
+                    AudioLink = GenerateFreshSasUrl(call.AudioLink),
                     Remarks = call.Remarks,
                     TenantId = call.TenantId,
                     TenantName = call.Tenant != null ? call.Tenant.Name : null,
-                    CreatedByName = user != null ? user.FirstName + " " + user.LastName : null
+                    CreatedByName = user != null ? user.FirstName + " " + user.LastName : null,
+                    CallStatusName = call.CallStatusName != null ? call.CallStatusName.Name : null,
+                    DirectionTypeName = call.DirectionTypeName != null ? call.DirectionTypeName.Name : null,
+                    CallStatusId = call.CallStatusId ?? 0,
+                    DirectionTypeId = call.DirectionTypeId ?? 0,
                 });
             }
 
             return vm;
+        }
+
+        /// <summary>
+        /// Takes any stored AudioLink (plain blob URL or an already-expired SAS URL) and returns
+        /// a fresh 2-hour SAS URL so the caller can always stream the audio.
+        /// Returns null if the input is null/empty or if SAS generation is not available.
+        /// </summary>
+        private string GenerateFreshSasUrl(string storedUrl)
+        {
+            if (string.IsNullOrWhiteSpace(storedUrl))
+            {
+                logger.LogDebug("[Audio] GenerateFreshSasUrl: storedUrl is null/empty — returning null.");
+                return null;
+            }
+
+            logger.LogDebug("[Audio] GenerateFreshSasUrl: Input URL = {Url}", storedUrl);
+
+            try
+            {
+                var uri = new Uri(storedUrl);
+                // URL format: https://<account>.blob.core.windows.net/<container>/<blobName>[?sas]
+                var segments = uri.AbsolutePath.TrimStart('/').Split('/', 2);
+
+                logger.LogDebug("[Audio] Parsed AbsolutePath='{Path}', segments count={Count}",
+                    uri.AbsolutePath, segments.Length);
+
+                if (segments.Length < 2)
+                {
+                    logger.LogWarning("[Audio] Cannot parse container/blob from URL '{Url}' — returning as-is.", storedUrl);
+                    return storedUrl;
+                }
+
+                var containerName = segments[0];
+                var blobName = segments[1];
+
+                logger.LogDebug("[Audio] Container='{Container}', BlobName='{Blob}'", containerName, blobName);
+
+                var containerClient = blobServiceClient.GetBlobContainerClient(containerName);
+                var blobClient = containerClient.GetBlobClient(blobName);
+
+                logger.LogDebug("[Audio] CanGenerateSasUri={CanSas}, BlobUri={BlobUri}",
+                    blobClient.CanGenerateSasUri, blobClient.Uri);
+
+                if (!blobClient.CanGenerateSasUri)
+                {
+                    logger.LogWarning("[Audio] CanGenerateSasUri=false — BlobServiceClient is not using StorageSharedKeyCredential. " +
+                        "Check that the connection string in AzureBlobStorage:ConnectionString uses AccountKey (not Managed Identity). " +
+                        "Returning plain blob URI.");
+                    return blobClient.Uri.ToString();
+                }
+
+                // NOTE: Do NOT set ContentType/ContentDisposition as SAS response-override parameters.
+                // They are already stored as blob metadata (set at upload time) and including them
+                // in BlobSasBuilder can throw InvalidOperationException in some credential contexts.
+                var sasBuilder = new BlobSasBuilder
+                {
+                    BlobContainerName = containerName,
+                    BlobName = blobName,
+                    Resource = "b",
+                    // StartsOn slightly in the past to handle clock skew between server and Azure
+                    StartsOn = DateTimeOffset.UtcNow.AddMinutes(-5),
+                    ExpiresOn = DateTimeOffset.UtcNow.AddHours(2),
+                };
+                sasBuilder.SetPermissions(BlobSasPermissions.Read);
+
+                var freshUrl = blobClient.GenerateSasUri(sasBuilder).ToString();
+                logger.LogDebug("[Audio] Fresh SAS URL generated successfully. ExpiresIn=2h, StartsOn=-5min. URL starts with: {Prefix}",
+                    freshUrl.Length > 120 ? freshUrl[..120] + "..." : freshUrl);
+
+                return freshUrl;
+            }
+            catch (Exception ex)
+            {
+                // IMPORTANT: Do NOT fall back to storedUrl — it has an expired SAS token and will
+                // cause an AuthenticationFailed error. Returning null is safer; the UI will show "No audio".
+                logger.LogError(ex, "[Audio] GenerateFreshSasUrl FAILED for URL '{Url}'. " +
+                    "Returning null so the UI shows 'No audio' rather than an expired URL.", storedUrl);
+                return null;
+            }
         }
     }
 }
