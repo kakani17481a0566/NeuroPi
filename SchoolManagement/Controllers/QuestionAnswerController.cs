@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using NeuroPi.CommonLib.Model;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.QuestionAnswer;
+using System.Collections.Generic;
 using System.Net;
 
 namespace SchoolManagement.Controllers
@@ -24,6 +25,14 @@ namespace SchoolManagement.Controllers
             if (result != null)
                 return new ResponseResult<string>(HttpStatusCode.Created, result, " Answered the questions Successfully");
             return new ResponseResult<string>(HttpStatusCode.NotAcceptable, result, "Not Answered ");
+        }
+        [HttpGet("empid/{empid}")]
+        public ResponseResult<List<QuestionAnswerVM>> GetAnswersByEmpid(string empid)
+        {
+            var result = questionAnswerService.GetAnswersByEmpid(empid);
+            if (result != null)
+                return new ResponseResult<List<QuestionAnswerVM>>(HttpStatusCode.OK, result, "Retrieved Successfully");
+            return new ResponseResult<List<QuestionAnswerVM>>(HttpStatusCode.NotFound, null, "Not Found");
         }
 
     }

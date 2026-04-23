@@ -49,7 +49,7 @@ namespace SchoolManagement.Services.Implementation
                               CallDuration = c.CallDuration,
                               StageId = c.StageId,
                               Stage = c.Stage != null ? c.Stage.Name : null,
-                              AudioLink = c.AudioLink, // Direct URL (no SAS regeneration)
+                              AudioLink = c.AudioLink,
                               Remarks = c.Remarks,
                               TenantId = c.TenantId,
                               TenantName = c.Tenant != null ? c.Tenant.Name : null,
@@ -57,10 +57,15 @@ namespace SchoolManagement.Services.Implementation
                               CallStatusName = c.CallStatusName != null ? c.CallStatusName.Name : null,
                               DirectionTypeName = c.DirectionTypeName != null ? c.DirectionTypeName.Name : null,
                               CallStatusId = c.CallStatusId ?? 0,
-DirectionTypeId = c.DirectionTypeId ?? 0,
-                            }).ToList();
+                              DirectionTypeId = c.DirectionTypeId ?? 0,
+                          }).ToList();
 
             if (result == null || result.Count == 0) return null;
+
+            foreach (var item in result)
+            {
+                item.AudioLink = GenerateFreshSasUrl(item.AudioLink) ?? item.AudioLink;
+            }
 
             return result;
         }
@@ -85,7 +90,7 @@ DirectionTypeId = c.DirectionTypeId ?? 0,
                               BeneficiaryRelationshipName = c.Contact != null ? c.Contact.BeneficiaryRelationshipName : null,
                               StageId = c.StageId,
                               Stage = c.Stage != null ? c.Stage.Name : null,
-                              AudioLink = c.AudioLink, // Direct URL (no SAS regeneration)
+                              AudioLink = c.AudioLink,
                               Remarks = c.Remarks,
                               TenantId = c.TenantId,
                               TenantName = c.Tenant != null ? c.Tenant.Name : null,
@@ -97,6 +102,11 @@ DirectionTypeId = c.DirectionTypeId ?? 0,
                           }).ToList();
 
             if (result == null || result.Count == 0) return null;
+
+            foreach (var item in result)
+            {
+                item.AudioLink = GenerateFreshSasUrl(item.AudioLink) ?? item.AudioLink;
+            }
 
             return result;
         }
@@ -138,7 +148,7 @@ DirectionTypeId = c.DirectionTypeId ?? 0,
                 CallDuration = savedCall.CallDuration,
                 StageId = savedCall.StageId,
                 Stage = savedCall.Stage?.Name,
-                AudioLink = savedCall.AudioLink,
+                AudioLink = GenerateFreshSasUrl(savedCall.AudioLink) ?? savedCall.AudioLink,
                 Remarks = savedCall.Remarks,
                 TenantId = savedCall.TenantId,
                 TenantName = savedCall.Tenant?.Name,
@@ -282,8 +292,7 @@ DirectionTypeId = c.DirectionTypeId ?? 0,
                     CallDuration = call.CallDuration,
                     StageId = call.StageId,
                     Stage = call.Stage != null ? call.Stage.Name : null,
-                    // Direct URL (no SAS regeneration)
-                    AudioLink = call.AudioLink,
+                    AudioLink = GenerateFreshSasUrl(call.AudioLink) ?? call.AudioLink,
                     Remarks = call.Remarks,
                     TenantId = call.TenantId,
                     TenantName = call.Tenant != null ? call.Tenant.Name : null,
