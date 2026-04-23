@@ -34,21 +34,30 @@ namespace SchoolManagement.Services.Implementation
 return "Some error occured";
             
         }
-        public List<QuestionAnswerVM> GetAnswersByEmpid(string empid)
+        public List<QuestionAnswerVM> GetAnswersByEmpid(string empid, int tenantId)
         {
             int empIdInt = Convert.ToInt32(empid);
-            var answers = context.QuestionAnswer.Where(x => x.EmpId == empIdInt).ToList();
+            var answers = context.QuestionAnswer
+                .Where(x => x.EmpId == empIdInt && x.TenantId == tenantId)
+                .Select(answer => new
+                {
+                    Answer = answer,
+                    Question = answer.Question
+                })
+                .ToList();
             List<QuestionAnswerVM> result = new List<QuestionAnswerVM>();
-            foreach(var answer in answers)
+            foreach(var item in answers)
             {
                 QuestionAnswerVM vm = new QuestionAnswerVM();
-                vm.empId = (int)answer.EmpId;
-                vm.tenantId = (int)answer.TenantId;
-                vm.createdBy = (int)answer.CreatedBy;
+                vm.empId = (int)item.Answer.EmpId;
+                vm.tenantId = (int)item.Answer.TenantId;
+                vm.createdBy = (int)item.Answer.CreatedBy;
                 List<AnswerVM> answerList = new List<AnswerVM>();
                 AnswerVM ans = new AnswerVM();
-                ans.QuestionId = (int)answer.QuestionsId;
-                ans.Answer = answer.Answer;
+                ans.QuestionId = (int)item.Answer.QuestionsId;
+                ans.QOrderId = item.Question?.QOrderId;
+                ans.Qus = item.Question?.Qus;
+                ans.Answer = item.Answer.Answer;
                 answerList.Add(ans);
                 vm.AnswerVM = answerList;
                 result.Add(vm);

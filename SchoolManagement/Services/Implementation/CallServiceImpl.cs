@@ -1,3 +1,4 @@
+using Azure.Storage;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Sas;
@@ -180,7 +181,7 @@ namespace SchoolManagement.Services.Implementation
             var headers = new BlobHttpHeaders
             {
                 ContentType = contentType,
-                ContentDisposition = "inline" // Encourages playback rather than attachment/download
+                ContentDisposition = "inline"
             };
 
             await using (var stream = audioFile.OpenReadStream())
@@ -191,14 +192,13 @@ namespace SchoolManagement.Services.Implementation
                 });
             }
 
-            // Return direct blob URL (no SAS)
             return blobClient.Uri.ToString();
         }
 
         public async Task<CallDashboardOverviewVM> GetDashboardOverviewAsync(int tenantId)
         {
             var vm = new CallDashboardOverviewVM();
-            
+
             var allCallsQuery = context.Call
                 .Include(c => c.Stage)
                 .Include(c => c.Contact)
@@ -210,18 +210,18 @@ namespace SchoolManagement.Services.Implementation
             var allCalls = await allCallsQuery.ToListAsync();
 
             vm.TotalCalls = allCalls.Count;
-            
+
             TimeSpan totalDuration = TimeSpan.Zero;
-            foreach(var call in allCalls)
+            foreach (var call in allCalls)
             {
-                if(call.CallDuration.HasValue)
+                if (call.CallDuration.HasValue)
                 {
                     totalDuration += call.CallDuration.Value;
                 }
             }
 
             vm.TotalCallingDuration = $"{(int)totalDuration.TotalHours}h {totalDuration.Minutes}m {totalDuration.Seconds}s";
-            
+
             if (vm.TotalCalls > 0)
             {
                 var avgTicks = totalDuration.Ticks / vm.TotalCalls;
@@ -233,9 +233,8 @@ namespace SchoolManagement.Services.Implementation
                 vm.AvgHandleTime = "0m 0s";
             }
 
-            // Outcomes
             var outcomesMap = new Dictionary<string, int>();
-            foreach(var call in allCalls)
+            foreach (var call in allCalls)
             {
                 string stage = call.Stage != null ? call.Stage.Name : "Unknown";
                 if (!outcomesMap.ContainsKey(stage))
@@ -247,7 +246,7 @@ namespace SchoolManagement.Services.Implementation
 
             var colors = new string[] { "bg-emerald-500", "bg-primary-500", "bg-amber-400", "bg-violet-500", "bg-red-400", "bg-sky-500", "bg-pink-500" };
             int colorIndex = 0;
-            foreach(var kvp in outcomesMap)
+            foreach (var kvp in outcomesMap)
             {
                 vm.Outcomes.Add(new CallOutcomeVM
                 {
@@ -258,27 +257,25 @@ namespace SchoolManagement.Services.Implementation
                 colorIndex++;
             }
 
-            // Volume Data (Last 7 days, mock for now using CreatedOn date part)
             var recentDays = allCalls.Where(c => c.CreatedOn > DateTime.UtcNow.AddDays(-7))
                                     .GroupBy(c => c.CreatedOn.Date)
                                     .OrderBy(g => g.Key);
-            foreach(var group in recentDays)
+            foreach (var group in recentDays)
             {
                 vm.VolumeData.Add(new CallVolumeVM
                 {
-                    Hour = group.Key.ToString("dd MMM"), // Abusing 'Hour' property for Date
+                    Hour = group.Key.ToString("dd MMM"),
                     Inbound = group.Count(),
-                    Outbound = 0, // Mock outbound
-                    Missed = 0    // Mock missed
+                    Outbound = 0,
+                    Missed = 0
                 });
             }
 
-            // Recent Calls
             var recentLogs = allCalls.OrderByDescending(c => c.CreatedOn).Take(10).ToList();
             var userIds = recentLogs.Select(c => c.CreatedBy).Distinct().ToList();
             var users = await context.Users.Where(u => userIds.Contains(u.UserId)).ToDictionaryAsync(u => u.UserId);
 
-            foreach(var call in recentLogs)
+            foreach (var call in recentLogs)
             {
                 var user = users.ContainsKey(call.CreatedBy) ? users[call.CreatedBy] : null;
 
@@ -307,21 +304,11 @@ namespace SchoolManagement.Services.Implementation
             return vm;
         }
 
-        /// <summary>
-        /// Generates a fresh 1-year SAS URL for playback.
-        ///
-        /// KEY DESIGN DECISION: We always use the injected BlobServiceClient (configured
-        /// for neuropiblob4244 — confirmed to be where files actually live) and only
-        /// extract the container name + blob path from the stored URL.
-        /// We intentionally IGNORE the account hostname in the stored URL because legacy
-        /// DB records may contain an old account name (e.g. neuropistorageacct7) even
-        /// though the physical file was uploaded to neuropiblob4244.
-        /// </summary>
         private string GenerateFreshSasUrl(string storedUrl)
         {
             if (string.IsNullOrWhiteSpace(storedUrl))
             {
-                logger.LogDebug("[Audio] storedUrl is null/empty — skipping SAS generation.");
+                logger.LogDebug("[Audio] storedUrl is null/empty, skipping SAS generation.");
                 return null;
             }
 
@@ -330,50 +317,36 @@ namespace SchoolManagement.Services.Implementation
             try
             {
                 var uri = new Uri(storedUrl);
+                var blobUriBuilder = new BlobUriBuilder(uri);
 
-                // Parse ONLY the path — ignore the hostname/account name in the stored URL.
-                // AbsolutePath format: /<container>/<blobName>  (SAS query string is NOT in AbsolutePath)
-                var path = uri.AbsolutePath.TrimStart('/');
-                var slash = path.IndexOf('/');
-
-                if (slash < 0)
+                if (string.IsNullOrWhiteSpace(blobUriBuilder.BlobContainerName) || string.IsNullOrWhiteSpace(blobUriBuilder.BlobName))
                 {
-                    logger.LogWarning("[Audio] Cannot parse container/blob from path '{Path}' — returning null.", path);
+                    logger.LogWarning("[Audio] Cannot parse container/blob from stored URL '{Url}'.", storedUrl);
                     return null;
                 }
 
-                var containerName = path[..slash];
-                var blobName = path[(slash + 1)..];
-
-                logger.LogDebug("[Audio] Parsed → container='{Container}', blob='{Blob}'", containerName, blobName);
-
-                // Use the injected blobServiceClient (neuropiblob4244 — where the file actually lives).
-                var blobClient = blobServiceClient
-                    .GetBlobContainerClient(containerName)
-                    .GetBlobClient(blobName);
-
-                logger.LogDebug("[Audio] Target BlobUri={BlobUri}, CanGenerateSasUri={CanSas}",
-                    blobClient.Uri, blobClient.CanGenerateSasUri);
-
-                if (!blobClient.CanGenerateSasUri)
+                var credential = CreateSharedKeyCredential(blobUriBuilder.AccountName);
+                if (credential == null)
                 {
-                    logger.LogWarning("[Audio] CanGenerateSasUri=false — BlobServiceClient must use " +
-                        "StorageSharedKeyCredential (connection string with AccountKey), not Managed Identity.");
-                    return null;
+                    logger.LogWarning("[Audio] No matching storage credentials found for account '{AccountName}'. Returning stored URL.", blobUriBuilder.AccountName);
+                    return storedUrl;
                 }
+
+                var blobClient = new BlobClient(uri, credential);
 
                 var sasBuilder = new BlobSasBuilder
                 {
-                    BlobContainerName = containerName,
-                    BlobName = blobName,
+                    BlobContainerName = blobUriBuilder.BlobContainerName,
+                    BlobName = blobUriBuilder.BlobName,
                     Resource = "b",
-                    StartsOn = DateTimeOffset.UtcNow.AddMinutes(-5),  // ±5 min buffer for clock skew
+                    StartsOn = DateTimeOffset.UtcNow.AddMinutes(-5),
                     ExpiresOn = DateTimeOffset.UtcNow.AddYears(1),
                 };
                 sasBuilder.SetPermissions(BlobSasPermissions.Read);
 
                 var freshUrl = blobClient.GenerateSasUri(sasBuilder).ToString();
-                logger.LogDebug("[Audio] ✅ SAS generated. ExpiresIn=2h. Starts: {Prefix}",
+                logger.LogDebug("[Audio] SAS generated for host '{Host}'. Prefix: {Prefix}",
+                    uri.Host,
                     freshUrl.Length > 100 ? freshUrl[..100] + "..." : freshUrl);
 
                 return freshUrl;
@@ -385,5 +358,53 @@ namespace SchoolManagement.Services.Implementation
             }
         }
 
+        private StorageSharedKeyCredential CreateSharedKeyCredential(string accountName)
+        {
+            if (string.IsNullOrWhiteSpace(accountName))
+            {
+                return null;
+            }
+
+            var primaryConnectionString = configuration["AzureBlobStorage:ConnectionString"];
+            var fallbackConnectionString = configuration.GetConnectionString("AzureBlobStorage");
+
+            foreach (var connectionString in new[] { primaryConnectionString, fallbackConnectionString })
+            {
+                var credential = TryCreateSharedKeyCredential(connectionString, accountName);
+                if (credential != null)
+                {
+                    return credential;
+                }
+            }
+
+            return null;
+        }
+
+        private StorageSharedKeyCredential TryCreateSharedKeyCredential(string connectionString, string expectedAccountName)
+        {
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                return null;
+            }
+
+            var segments = connectionString
+                .Split(';', StringSplitOptions.RemoveEmptyEntries)
+                .Select(segment => segment.Split('=', 2))
+                .Where(parts => parts.Length == 2)
+                .ToDictionary(parts => parts[0].Trim(), parts => parts[1].Trim(), StringComparer.OrdinalIgnoreCase);
+
+            if (!segments.TryGetValue("AccountName", out var configuredAccountName) ||
+                !segments.TryGetValue("AccountKey", out var accountKey))
+            {
+                return null;
+            }
+
+            if (!string.Equals(configuredAccountName, expectedAccountName, StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
+            }
+
+            return new StorageSharedKeyCredential(configuredAccountName, accountKey);
+        }
     }
 }

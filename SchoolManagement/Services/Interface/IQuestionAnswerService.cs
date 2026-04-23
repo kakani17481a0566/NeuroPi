@@ -7,6 +7,6 @@ namespace SchoolManagement.Services.Interface
     public interface IQuestionAnswerService
     {
         string AddAnswers(QuestionAnswerVM questions);
-        List<QuestionAnswerVM> GetAnswersByEmpid(string empid);
+        List<QuestionAnswerVM> GetAnswersByEmpid(string empid, int tenantId);
     }
 }

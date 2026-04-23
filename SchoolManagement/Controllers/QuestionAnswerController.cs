@@ -26,10 +26,10 @@ namespace SchoolManagement.Controllers
                 return new ResponseResult<string>(HttpStatusCode.Created, result, " Answered the questions Successfully");
             return new ResponseResult<string>(HttpStatusCode.NotAcceptable, result, "Not Answered ");
         }
-        [HttpGet("empid/{empid}")]
-        public ResponseResult<List<QuestionAnswerVM>> GetAnswersByEmpid(string empid)
+        [HttpGet("empid/{empid}/tenant/{tenantId}")]
+        public ResponseResult<List<QuestionAnswerVM>> GetAnswersByEmpid(string empid, int tenantId)
         {
-            var result = questionAnswerService.GetAnswersByEmpid(empid);
+            var result = questionAnswerService.GetAnswersByEmpid(empid, tenantId);
             if (result != null)
                 return new ResponseResult<List<QuestionAnswerVM>>(HttpStatusCode.OK, result, "Retrieved Successfully");
             return new ResponseResult<List<QuestionAnswerVM>>(HttpStatusCode.NotFound, null, "Not Found");

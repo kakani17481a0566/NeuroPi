@@ -12,6 +12,8 @@ namespace SchoolManagement.ViewModel.QuestionAnswer
     public class AnswerVM
     {
         public int QuestionId { get; set; }
+        public int? QOrderId { get; set; }
+        public string Qus { get; set; }
 
         public string Answer { get; set; }
     }
