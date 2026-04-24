@@ -170,7 +170,7 @@ builder.Services.AddScoped<ICallService, CallServiceImpl>();
 builder.Services.AddScoped<ICollegeDetailService, CollegeDetailServiceImpl>();
 builder.Services.AddScoped<ICoursesService, CoursesServiceImpl>();
 builder.Services.AddScoped<ICollegeCourseService, CollegeCourseServiceImpl>();
-
+builder.Services.AddScoped<ICandidateCollegeService, CandidateCollegeServiceImpl>();
 
 
 
