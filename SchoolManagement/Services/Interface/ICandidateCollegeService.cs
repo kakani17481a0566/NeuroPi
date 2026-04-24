@@ -6,5 +6,7 @@ namespace SchoolManagement.Services.Interface
     public interface ICandidateCollegeService
     {
         List<CandidateCollegeResponseVM> GetByEmpIdAndTenantId(int empId, int tenantId);
+
+        List<CollegeDetailsVM> GetCollegeDetails(int empId, int tenantId);
     }
 }

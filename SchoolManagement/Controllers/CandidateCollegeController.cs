@@ -27,5 +27,15 @@ namespace SchoolManagement.Controllers
             }
             return new ResponseResult<List<CandidateCollegeResponseVM>>(System.Net.HttpStatusCode.OK, result, "Candidate College fetched successfully");
         }
+        [HttpGet("college/{empId}/tenant/{tenantId}")]
+        public ResponseResult<List<CollegeDetailsVM>> GetCoursesAndColleges(int empId, int tenantId)
+        {
+            var result = _candidateCollegeService.GetCollegeDetails(empId, tenantId);
+            if (result == null || result.Count == 0)
+            {
+                return new ResponseResult<List<CollegeDetailsVM>>(System.Net.HttpStatusCode.NotFound, result, "Candidate College Not Found");
+            }
+            return new ResponseResult<List<CollegeDetailsVM>>(System.Net.HttpStatusCode.OK, result, "Candidate College fetched successfully");
+        }
     }
 }

@@ -40,5 +40,26 @@ namespace SchoolManagement.Services.Implementation
 
             return result;
         }
+
+        public List<CollegeDetailsVM> GetCollegeDetails(int empId, int tenantId)
+        {
+            var collegeDetails = _context.CandidateColleges
+                .Where(c => c.EmpId == empId && c.TenantId == tenantId)
+                .Select(c => new CollegeDetailsVM
+                {
+                     CollegeId = c.CollegeId,
+                     CollegeName = c.College.CollegeName,
+                     coursesList = _context.CollegeCourses
+                            .Where(cc => cc.CollegeId == c.CollegeId)
+                            .Select(cc => new Course
+                            {
+                                CourseId = cc.CourseId,
+                                CourseName = cc.Course.CourseName
+                            })
+                                .ToList()
+                }).ToList();
+            return collegeDetails;
+            
+        }
     }
 }
