@@ -178,6 +178,7 @@ namespace SchoolManagement.Data
 
         public DbSet<MEmployeeDetail> EmployeeDetails { get; set; }
         public DbSet<MCollegeDetail> CollegeDetails { get; set; }
+        public DbSet<MCandidateCollege> CandidateColleges { get; set; }
         public DbSet<MQuestionAnswer> QuestionAnswer { get; set; }
         public DbSet<MCall> Call { get; set; }
         public DbSet<MCourses> SchoolCourses { get; set; }
