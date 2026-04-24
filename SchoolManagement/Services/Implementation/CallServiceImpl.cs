@@ -127,7 +127,9 @@ namespace SchoolManagement.Services.Implementation
                 TenantId = request.TenantId,
                 CreatedBy = request.CreatedBy,
                 CreatedOn = DateTime.UtcNow,
-                CallDuration = request.CallDuration
+                CallDuration = request.CallDuration,
+                CallStatusId = request.CallStatusId,
+                DirectionTypeId = request.DirectionTypeId
             };
 
             context.Call.Add(call);
