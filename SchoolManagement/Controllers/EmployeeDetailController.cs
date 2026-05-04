@@ -25,5 +25,32 @@ namespace SchoolManagement.Controllers
                 return new ResponseResult<List<EmployeeDetailsVM>>(HttpStatusCode.OK, result,"Employee Details fetched Successfully");
             return new ResponseResult<List<EmployeeDetailsVM>>(HttpStatusCode.NotFound, result,"Employee Details Not Found");
         }
+
+        [HttpPost]
+        public ResponseResult<EmployeeDetailsVM> CreateEmployeeDetail([FromBody] EmployeeDetailRequestVM request)
+        {
+            var result = employeeDetailService.CreateEmployeeDetail(request);
+            if (result != null)
+                return new ResponseResult<EmployeeDetailsVM>(HttpStatusCode.OK, result, "Employee Detail created successfully");
+            return new ResponseResult<EmployeeDetailsVM>(HttpStatusCode.BadRequest, result, "Failed to create Employee Detail. Contact not found or invalid tenant.");
+        }
+
+        [HttpPut("{id}/{tenantId}")]
+        public ResponseResult<EmployeeDetailsVM> UpdateEmployeeDetail(int id, int tenantId, [FromBody] EmployeeDetailUpdateVM request)
+        {
+            var result = employeeDetailService.UpdateEmployeeDetail(id, tenantId, request);
+            if (result != null)
+                return new ResponseResult<EmployeeDetailsVM>(HttpStatusCode.OK, result, "Employee Detail updated successfully");
+            return new ResponseResult<EmployeeDetailsVM>(HttpStatusCode.NotFound, result, "Employee Detail not found or contact validation failed.");
+        }
+
+        [HttpDelete("{id}/{tenantId}")]
+        public ResponseResult<EmployeeDetailsVM> DeleteEmployeeDetail(int id, int tenantId)
+        {
+            var result = employeeDetailService.DeleteEmployeeDetail(id, tenantId);
+            if (result != null)
+                return new ResponseResult<EmployeeDetailsVM>(HttpStatusCode.OK, result, "Employee Detail deleted successfully");
+            return new ResponseResult<EmployeeDetailsVM>(HttpStatusCode.NotFound, result, "Employee Detail not found.");
+        }
     }
 }

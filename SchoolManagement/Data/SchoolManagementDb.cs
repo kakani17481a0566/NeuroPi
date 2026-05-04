@@ -177,6 +177,7 @@ namespace SchoolManagement.Data
         public DbSet<MQuestion> Questions { get; set; }
 
         public DbSet<MEmployeeDetail> EmployeeDetails { get; set; }
+        public DbSet<NeuroPi.UserManagment.Model.MAuditLog> AuditLogs { get; set; }
         public DbSet<MCollegeDetail> CollegeDetails { get; set; }
         public DbSet<MCandidateCollege> CandidateColleges { get; set; }
         public DbSet<MQuestionAnswer> QuestionAnswer { get; set; }

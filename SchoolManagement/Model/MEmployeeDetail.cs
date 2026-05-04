@@ -72,5 +72,11 @@ namespace SchoolManagement.Model
 
         [ForeignKey(nameof(TenantId))]
         public virtual NeuroPi.UserManagment.Model.MTenant Tenant { get; set; }
+
+        [Column("permanent_address_id")]
+        public int? PermanentAddressId { get; set; }
+
+        [ForeignKey(nameof(PermanentAddressId))]
+        public virtual MContact PermanentAddress { get; set; }
     }
 }
