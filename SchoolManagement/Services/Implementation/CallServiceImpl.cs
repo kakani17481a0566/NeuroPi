@@ -59,8 +59,7 @@ namespace SchoolManagement.Services.Implementation
                               CallStatusId = c.CallStatusId ?? 0,
                               DirectionTypeId = c.DirectionTypeId ?? 0,
                               CreatedOn = c.CreatedOn,
-                              PermanentAddressId = c.Contact != null ? c.Contact.PermanentAddressId : null,
-                              PermanentAddress = c.Contact != null ? c.Contact.PermanentAddress : null
+                              PermanentAddress = PermanentAddressVM.FromModel(c.Contact != null ? c.Contact.PermanentAddress : null)
                           }).ToList();
 
             if (result == null || result.Count == 0) return null;
@@ -102,8 +101,7 @@ namespace SchoolManagement.Services.Implementation
                               CallStatusId = c.CallStatusId ?? 0,
                               DirectionTypeId = c.DirectionTypeId ?? 0,
                               CreatedOn = c.CreatedOn,
-                              PermanentAddressId = c.Contact != null ? c.Contact.PermanentAddressId : null,
-                              PermanentAddress = c.Contact != null ? c.Contact.PermanentAddress : null
+                              PermanentAddress = PermanentAddressVM.FromModel(c.Contact != null ? c.Contact.PermanentAddress : null)
                           }).ToList();
 
             if (result == null || result.Count == 0) return null;
@@ -161,8 +159,7 @@ namespace SchoolManagement.Services.Implementation
                 TenantName = savedCall.Tenant?.Name,
                 CreatedByName = user != null ? user.FirstName + " " + user.LastName : null,
                 CreatedOn = savedCall.CreatedOn,
-                PermanentAddressId = savedCall.Contact?.PermanentAddressId,
-                PermanentAddress = savedCall.Contact?.PermanentAddress
+                PermanentAddress = PermanentAddressVM.FromModel(savedCall.Contact?.PermanentAddress)
             };
         }
 
@@ -307,8 +304,7 @@ namespace SchoolManagement.Services.Implementation
                     CallStatusId = call.CallStatusId ?? 0,
                     DirectionTypeId = call.DirectionTypeId ?? 0,
                     CreatedOn = call.CreatedOn,
-                    PermanentAddressId = call.Contact?.PermanentAddressId,
-                    PermanentAddress = call.Contact?.PermanentAddress
+                    PermanentAddress = PermanentAddressVM.FromModel(call.Contact?.PermanentAddress)
                 });
             }
 
