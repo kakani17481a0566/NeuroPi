@@ -34,6 +34,7 @@ namespace SchoolManagement.Services.Implementation
             var result = (from c in context.Call
                                   .Include(e => e.Stage)
                                   .Include(c => c.Contact)
+                                  .ThenInclude(e => e.PermanentAddress)
                                   .Include(c => c.Tenant)
                                   .Include(c => c.DirectionTypeName)
                                   .Include(c => c.CallStatusName)
@@ -45,8 +46,6 @@ namespace SchoolManagement.Services.Implementation
                               Id = c.Id,
                               ContactId = c.ContactId,
                               Contact = c.Contact != null ? c.Contact.Name : null,
-                              BenificiaryName = c.Contact != null ? c.Contact.Beneficiary : null,
-                              BeneficiaryRelationshipName = c.Contact != null ? c.Contact.BeneficiaryRelationshipName : null,
                               CallDuration = c.CallDuration,
                               StageId = c.StageId,
                               Stage = c.Stage != null ? c.Stage.Name : null,
@@ -60,6 +59,8 @@ namespace SchoolManagement.Services.Implementation
                               CallStatusId = c.CallStatusId ?? 0,
                               DirectionTypeId = c.DirectionTypeId ?? 0,
                               CreatedOn = c.CreatedOn,
+                              PermanentAddressId = c.Contact != null ? c.Contact.PermanentAddressId : null,
+                              PermanentAddress = c.Contact != null ? c.Contact.PermanentAddress : null
                           }).ToList();
 
             if (result == null || result.Count == 0) return null;
@@ -77,6 +78,7 @@ namespace SchoolManagement.Services.Implementation
             var result = (from c in context.Call
                                   .Include(e => e.Stage)
                                   .Include(c => c.Contact)
+                                  .ThenInclude(e => e.PermanentAddress)
                                   .Include(c => c.Tenant)
                                   .Include(c => c.DirectionTypeName)
                                   .Include(c => c.CallStatusName)
@@ -88,8 +90,6 @@ namespace SchoolManagement.Services.Implementation
                               Id = c.Id,
                               ContactId = c.ContactId,
                               Contact = c.Contact != null ? c.Contact.Name : null,
-                              BenificiaryName = c.Contact != null ? c.Contact.Beneficiary : null,
-                              BeneficiaryRelationshipName = c.Contact != null ? c.Contact.BeneficiaryRelationshipName : null,
                               StageId = c.StageId,
                               Stage = c.Stage != null ? c.Stage.Name : null,
                               AudioLink = c.AudioLink,
@@ -102,6 +102,8 @@ namespace SchoolManagement.Services.Implementation
                               CallStatusId = c.CallStatusId ?? 0,
                               DirectionTypeId = c.DirectionTypeId ?? 0,
                               CreatedOn = c.CreatedOn,
+                              PermanentAddressId = c.Contact != null ? c.Contact.PermanentAddressId : null,
+                              PermanentAddress = c.Contact != null ? c.Contact.PermanentAddress : null
                           }).ToList();
 
             if (result == null || result.Count == 0) return null;
@@ -139,6 +141,7 @@ namespace SchoolManagement.Services.Implementation
                 .Where(c => c.Id == call.Id)
                 .Include(c => c.Stage)
                 .Include(c => c.Contact)
+                .ThenInclude(e => e.PermanentAddress)
                 .Include(c => c.Tenant)
                 .FirstAsync();
 
@@ -149,8 +152,6 @@ namespace SchoolManagement.Services.Implementation
                 Id = savedCall.Id,
                 ContactId = savedCall.ContactId,
                 Contact = savedCall.Contact?.Name,
-                BenificiaryName = savedCall.Contact?.Beneficiary,
-                BeneficiaryRelationshipName = savedCall.Contact?.BeneficiaryRelationshipName,
                 CallDuration = savedCall.CallDuration,
                 StageId = savedCall.StageId,
                 Stage = savedCall.Stage?.Name,
@@ -159,7 +160,9 @@ namespace SchoolManagement.Services.Implementation
                 TenantId = savedCall.TenantId,
                 TenantName = savedCall.Tenant?.Name,
                 CreatedByName = user != null ? user.FirstName + " " + user.LastName : null,
-                CreatedOn = savedCall.CreatedOn
+                CreatedOn = savedCall.CreatedOn,
+                PermanentAddressId = savedCall.Contact?.PermanentAddressId,
+                PermanentAddress = savedCall.Contact?.PermanentAddress
             };
         }
 
@@ -205,9 +208,10 @@ namespace SchoolManagement.Services.Implementation
         {
             var vm = new CallDashboardOverviewVM();
 
-            var allCallsQuery = context.Call
+             var allCallsQuery = context.Call
                 .Include(c => c.Stage)
                 .Include(c => c.Contact)
+                .ThenInclude(e => e.PermanentAddress)
                 .Include(c => c.Tenant)
                 .Include(c => c.DirectionTypeName)
                 .Include(c => c.CallStatusName)
@@ -290,8 +294,6 @@ namespace SchoolManagement.Services.Implementation
                     Id = call.Id,
                     ContactId = call.ContactId,
                     Contact = call.Contact != null ? call.Contact.Name : null,
-                    BenificiaryName = call.Contact != null ? call.Contact.Beneficiary : null,
-                    BeneficiaryRelationshipName = call.Contact != null ? call.Contact.BeneficiaryRelationshipName : null,
                     CallDuration = call.CallDuration,
                     StageId = call.StageId,
                     Stage = call.Stage != null ? call.Stage.Name : null,
@@ -305,6 +307,8 @@ namespace SchoolManagement.Services.Implementation
                     CallStatusId = call.CallStatusId ?? 0,
                     DirectionTypeId = call.DirectionTypeId ?? 0,
                     CreatedOn = call.CreatedOn,
+                    PermanentAddressId = call.Contact?.PermanentAddressId,
+                    PermanentAddress = call.Contact?.PermanentAddress
                 });
             }
 

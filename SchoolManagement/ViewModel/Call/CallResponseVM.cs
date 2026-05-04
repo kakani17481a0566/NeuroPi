@@ -28,5 +28,8 @@ namespace SchoolManagement.ViewModel.Call
         public int DirectionTypeId { get; set; }
         public DateTime CreatedOn { get; set; }
 
+        public int? PermanentAddressId { get; set; }
+        public MContact PermanentAddress { get; set; }
+
     }
 }

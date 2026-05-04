@@ -53,3 +53,4 @@ namespace SchoolManagement.Model
         public virtual NeuroPi.UserManagment.Model.MTenant Tenant { get; set; }
     }
 }
+
