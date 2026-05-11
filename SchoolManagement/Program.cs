@@ -122,6 +122,7 @@ builder.Services.AddScoped<IGeneticRegistrationService, GeneticRegistrationServi
 builder.Services.AddScoped<IPageSessionService, PageSessionService>();
 
 builder.Services.AddScoped<IInventoryTransferService, InventoryTransferServiceImpl>();
+builder.Services.AddScoped<IQuestionCategoryService, QuestionCategoryServiceImpl>();
 
 // Global Inventory Management Services
 builder.Services.AddScoped<IStocktakeService, StocktakeServiceImpl>();
