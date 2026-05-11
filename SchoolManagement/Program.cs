@@ -126,6 +126,7 @@ builder.Services.AddScoped<IInventoryTransferService, InventoryTransferServiceIm
 builder.Services.AddScoped<IQuestionCategoryService, QuestionCategoryServiceImpl>();
 builder.Services.AddScoped<IQuestionPaperService, QuestionPaperServiceImpl>();
 builder.Services.AddScoped<IQuestionCategorySubcategoryService, QuestionCategorySubcategoryServiceImpl>();
+builder.Services.AddScoped<IQuestionOptionService, QuestionOptionServiceImpl>();
 
 builder.Services.AddScoped<IQuestionPaperQuestionsService, QuestionPaperQuestionsService>();
 
