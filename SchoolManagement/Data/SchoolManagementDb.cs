@@ -175,6 +175,7 @@ namespace SchoolManagement.Data
 
         //crm
         public DbSet<MQuestion> Questions { get; set; }
+        public DbSet<MQuestionSymmetric> QuestionsSymmetric { get; set; }
 
         // Question Bank / Assessment
         public DbSet<MQuestionPaper> QuestionPapers { get; set; }
