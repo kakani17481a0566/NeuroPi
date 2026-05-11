@@ -24,7 +24,11 @@ namespace SchoolManagement.Model
         public virtual MQuestionPaper Paper { get; set; }
 
         [Column("candidate_id")]
+        [ForeignKey(nameof(Candidate))]
         public int CandidateId { get; set; }
+
+        [ForeignKey(nameof(CandidateId))]
+        public virtual MEmployeeDetail Candidate { get; set; }
 
         [Column("question_id")]
         public int QuestionId { get; set; }
