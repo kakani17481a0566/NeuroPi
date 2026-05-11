@@ -47,6 +47,16 @@ namespace SchoolManagement.Controllers
             return new ResponseResult<QuestionResponsesGetVM>(HttpStatusCode.OK, result, "Question response created successfully.");
         }
 
+        [HttpPost("batch")]
+        public ResponseResult<List<QuestionResponsesGetVM>> CreateBatch([FromBody] QuestionResponsesBatchRequestVM request)
+        {
+            if (request == null || request.Responses == null || request.Responses.Count == 0)
+                return new ResponseResult<List<QuestionResponsesGetVM>>(HttpStatusCode.BadRequest, null, "Request or response list is empty.");
+
+            var results = _service.CreateBatch(request);
+            return new ResponseResult<List<QuestionResponsesGetVM>>(HttpStatusCode.OK, results, "Question responses processed successfully.");
+        }
+
         [HttpPut("{id:int}/{tenantId:int}")]
         public ResponseResult<QuestionResponsesGetVM> Update(int id, int tenantId, [FromBody] QuestionResponsesUpdateVM request)
         {
