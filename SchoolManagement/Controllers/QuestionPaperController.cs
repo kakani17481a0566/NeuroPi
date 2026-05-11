@@ -24,10 +24,10 @@ namespace SchoolManagement.Controllers
             var result = _QuestionPaperService.GetQuestionPapers();
             if (result == null)
             {
-                return new ResponseResult<List<QuestionPaperResponseVM>>(HttpStatusCode.NotFound, null, "Question Category records Not Found");
+                return new ResponseResult<List<QuestionPaperResponseVM>>(HttpStatusCode.NotFound, null, "Question Paper records Not Found");
 
             }
-            return new ResponseResult<List<QuestionPaperResponseVM>>(HttpStatusCode.OK, result, "Question Category records retrieved successfully");
+            return new ResponseResult<List<QuestionPaperResponseVM>>(HttpStatusCode.OK, result, "Question Paper records retrieved successfully");
         }
 
         [HttpGet("id/{id}")]
@@ -36,9 +36,9 @@ namespace SchoolManagement.Controllers
             var result = _QuestionPaperService.GetQuestionPaperById(id);
             if (result == null)
             {
-                return new ResponseResult<QuestionPaperResponseVM>(HttpStatusCode.NotFound, null, "Question Category not found");
+                return new ResponseResult<QuestionPaperResponseVM>(HttpStatusCode.NotFound, null, "Question Paper not found");
             }
-            return new ResponseResult<QuestionPaperResponseVM>(HttpStatusCode.OK, result, "Question Category retrieved successfully");
+            return new ResponseResult<QuestionPaperResponseVM>(HttpStatusCode.OK, result, "Question Paper retrieved successfully");
         }
 
         [HttpGet("tenantId/{tenantId}")]
@@ -47,9 +47,9 @@ namespace SchoolManagement.Controllers
             var result = _QuestionPaperService.GetQuestionPaperByTenantId(tenantId);
             if (result == null)
             {
-                return new ResponseResult<List<QuestionPaperResponseVM>>(HttpStatusCode.NotFound, null, "Question Category records not found for the specified tenant");
+                return new ResponseResult<List<QuestionPaperResponseVM>>(HttpStatusCode.NotFound, null, "Question Paper records not found for the specified tenant");
             }
-            return new ResponseResult<List<QuestionPaperResponseVM>>(HttpStatusCode.OK, result, "Question Category records retrieved successfully for the specified tenant");
+            return new ResponseResult<List<QuestionPaperResponseVM>>(HttpStatusCode.OK, result, "Question Paper records retrieved successfully for the specified tenant");
         }
         [HttpGet("id/tenantId/{id}/{tenantId}")]
         public ResponseResult<QuestionPaperResponseVM> GetQuestionPaperByIdAndTenantId(int id, int tenantId)
@@ -57,9 +57,9 @@ namespace SchoolManagement.Controllers
             var result = _QuestionPaperService.GetQuestionPaperByIdAndTenantId(id, tenantId);
             if (result == null)
             {
-                return new ResponseResult<QuestionPaperResponseVM>(HttpStatusCode.NotFound, null, "Question Category not found for the specified id and tenant");
+                return new ResponseResult<QuestionPaperResponseVM>(HttpStatusCode.NotFound, null, "Question Paper not found for the specified id and tenant");
             }
-            return new ResponseResult<QuestionPaperResponseVM>(HttpStatusCode.OK, result, "Question Category retrieved successfully for the specified id and tenant");
+            return new ResponseResult<QuestionPaperResponseVM>(HttpStatusCode.OK, result, "Question Paper retrieved successfully for the specified id and tenant");
         }
         [HttpPost]
         public ResponseResult<QuestionPaperResponseVM> CreateQuestionPaper(QuestionPaperRequestVM request)
@@ -67,9 +67,9 @@ namespace SchoolManagement.Controllers
             var result = _QuestionPaperService.CreateQuestionPaper(request);
             if (result == null)
             {
-                return new ResponseResult<QuestionPaperResponseVM>(HttpStatusCode.BadRequest, null, "Failed to create Question Category");
+                return new ResponseResult<QuestionPaperResponseVM>(HttpStatusCode.BadRequest, null, "Failed to create Question Paper");
             }
-            return new ResponseResult<QuestionPaperResponseVM>(HttpStatusCode.OK, result, "Question Category created successfully");
+            return new ResponseResult<QuestionPaperResponseVM>(HttpStatusCode.OK, result, "Question Paper created successfully");
         }
 
         [HttpPut("id/{id}/tenantId/{tenantId}")]
@@ -78,9 +78,9 @@ namespace SchoolManagement.Controllers
             var result = _QuestionPaperService.UpdateQuestionPaper(id, tenantId, request);
             if (result == null)
             {
-                return new ResponseResult<QuestionPaperResponseVM>(HttpStatusCode.BadRequest, null, "Failed to update Question Category");
+                return new ResponseResult<QuestionPaperResponseVM>(HttpStatusCode.BadRequest, null, "Failed to update Question Paper");
             }
-            return new ResponseResult<QuestionPaperResponseVM>(HttpStatusCode.OK, result, "Question Category updated successfully");
+            return new ResponseResult<QuestionPaperResponseVM>(HttpStatusCode.OK, result, "Question Paper updated successfully");
         }
 
         [HttpDelete("id/{id}/tenantId/{tenantId}")]
@@ -89,9 +89,9 @@ namespace SchoolManagement.Controllers
             var result = _QuestionPaperService.DeleteQuestionPaper(id, tenantId);
             if (!result)
             {
-                return new ResponseResult<bool>(HttpStatusCode.BadRequest, false, "Failed to delete Question Category");
+                return new ResponseResult<bool>(HttpStatusCode.BadRequest, false, "Failed to delete Question Paper");
             }
-            return new ResponseResult<bool>(HttpStatusCode.OK, true, "Question Category deleted successfully");
+            return new ResponseResult<bool>(HttpStatusCode.OK, true, "Question Paper deleted successfully");
         }
     }
 }

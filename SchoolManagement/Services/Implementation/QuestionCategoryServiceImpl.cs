@@ -73,7 +73,7 @@ namespace SchoolManagement.Services.Implementation
 
         public QuestionCategoryResponseVM UpdateQuestionCategory(int id, int tenantId, QuestionCategoryUpdateVM request)
         {
-            var questionCategory = _dbContext.QuestionCategories.FirstOrDefault(q => q.Id == id && q.TenantId == tenantId && q.     IsActive);
+            var questionCategory = _dbContext.QuestionCategories.FirstOrDefault(q => q.Id == id && q.TenantId == tenantId && q.IsActive);
             if (questionCategory == null)
             {
                 return null;
