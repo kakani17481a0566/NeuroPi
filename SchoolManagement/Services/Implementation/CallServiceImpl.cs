@@ -116,7 +116,7 @@ namespace SchoolManagement.Services.Implementation
 
         public async Task<CallResponseVM> AddCallAsync(CallCreateVM request)
         {
-            var audioLink = await UploadAudioToAzureBlobAsync(request.AudioFile);
+            var audioLink = request.AudioFile != null ? await UploadAudioToAzureBlobAsync(request.AudioFile) : null;
 
             var call = new MCall
             {

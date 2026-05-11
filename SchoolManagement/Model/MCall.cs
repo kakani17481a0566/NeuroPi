@@ -38,10 +38,10 @@ namespace SchoolManagement.Model
 
 
         [Column("audio_link")]
-        public string AudioLink { get; set; }
+        public string? AudioLink { get; set; }
 
         [Column("remarks")]
-        public string Remarks { get; set; }
+        public string? Remarks { get; set; }
 
         [Column("call_duration")]
         public TimeSpan? CallDuration { get; set; }

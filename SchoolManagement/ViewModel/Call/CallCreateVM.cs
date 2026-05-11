@@ -4,11 +4,11 @@ namespace SchoolManagement.ViewModel.Call
     {
         public int ContactId { get; set; }
         public int? StageId { get; set; }
-        public string Remarks { get; set; }
+        public string? Remarks { get; set; }
         public int TenantId { get; set; }
         public int CreatedBy { get; set; }
         public TimeSpan? CallDuration { get; set; }
-        public IFormFile AudioFile { get; set; }
+        public IFormFile? AudioFile { get; set; }
         public int? CallStatusId { get; set; }
         public int? DirectionTypeId { get; set; }
     }
