@@ -13,8 +13,8 @@ namespace SchoolManagement.ViewModel.QuestionAnswer
     {
         public int QuestionId { get; set; }
         public int? QOrderId { get; set; }
-        public string Qus { get; set; }
+        public string? Qus { get; set; }
 
-        public string Answer { get; set; }
+        public string? Answer { get; set; }
     }
 }
