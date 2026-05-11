@@ -35,9 +35,5 @@ namespace SchoolManagement.Model
         [Column("is_correct")]
         public bool IsCorrect { get; set; }
 
-        [Column("is_delete")]
-        public bool IsDelete { get; set; }
-
-        public virtual ICollection<MQuestionResponse> Responses { get; set; } = new List<MQuestionResponse>();
     }
 }

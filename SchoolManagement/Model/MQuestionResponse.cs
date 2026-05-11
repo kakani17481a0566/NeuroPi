@@ -32,12 +32,6 @@ namespace SchoolManagement.Model
         [ForeignKey(nameof(QuestionId))]
         public virtual MQuestionSymmetric Question { get; set; }
 
-        [Column("option_id")]
-        public int? OptionId { get; set; }
-
-        [ForeignKey(nameof(OptionId))]
-        public virtual MQuestionOption? Option { get; set; }
-
         [Column("response_text")]
         public string? ResponseText { get; set; }
     }

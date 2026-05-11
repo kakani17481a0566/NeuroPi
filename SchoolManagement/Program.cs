@@ -11,6 +11,7 @@ using NeuroPi.UserManagment.Services.Interface;
 using NeuropiCommonLib.Email;
 using SchoolManagement.Data;
 using SchoolManagement.Services.Implementation;
+using SchoolManagement.Services;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.Audio;
 using System.Text;
@@ -126,6 +127,7 @@ builder.Services.AddScoped<IQuestionCategoryService, QuestionCategoryServiceImpl
 builder.Services.AddScoped<IQuestionPaperService, QuestionPaperServiceImpl>();
 builder.Services.AddScoped<IQuestionCategorySubcategoryService, QuestionCategorySubcategoryServiceImpl>();
 
+builder.Services.AddScoped<IQuestionPaperQuestionsService, QuestionPaperQuestionsService>();
 
 // Global Inventory Management Services
 builder.Services.AddScoped<IStocktakeService, StocktakeServiceImpl>();
@@ -168,6 +170,7 @@ builder.Services.AddScoped<ITableFilesService, TableFilesServiceImpl>();
 builder.Services.AddScoped<IEnquiryFormService, EnquiryFormServiceImpl>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IQuestionService, QuestionServiceImpl>();
+builder.Services.AddScoped<IQuestionResponsesService, QuestionResponsesService>();
 builder.Services.AddScoped<IEmployeeDetailService,EmployeeDetailsServiceImpl>();
 builder.Services.AddScoped<IQuestionAnswerService, QuestionAnswerImpl>();
 builder.Services.AddScoped<ICallService, CallServiceImpl>();
