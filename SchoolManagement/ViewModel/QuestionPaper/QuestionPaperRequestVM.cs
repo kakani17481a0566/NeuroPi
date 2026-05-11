@@ -1,14 +1,12 @@
 ﻿using SchoolManagement.Model;
 
-namespace SchoolManagement.ViewModel.QuestionCategory
+namespace SchoolManagement.ViewModel.QuestionPaper
 {
-    public class QuestionCategoryRequestVM
+    public class QuestionPaperRequestVM
     {
-        public string CategoryName { get; set; }
+        public string PaperName { get; set; }
 
         public string? Description { get; set; }
-
-        public string Code { get; set; }
 
         public bool IsActive { get; set; } = true;
 
@@ -18,13 +16,12 @@ namespace SchoolManagement.ViewModel.QuestionCategory
 
         public DateTime CreatedOn { get; set; }
 
-        public static MQuestionCategory ToModel(QuestionCategoryRequestVM request)
+        public static MQuestionPaper ToModel(QuestionPaperRequestVM request)
         {
-            return new MQuestionCategory
+            return new MQuestionPaper                  
             {
-                CategoryName = request.CategoryName,
+                PaperName = request.PaperName,
                 Description = request.Description,
-                Code = request.Code,
                 IsActive = request.IsActive,
                 TenantId = request.TenantId,
                 CreatedBy = request.CreatedBy,

@@ -123,6 +123,7 @@ builder.Services.AddScoped<IPageSessionService, PageSessionService>();
 
 builder.Services.AddScoped<IInventoryTransferService, InventoryTransferServiceImpl>();
 builder.Services.AddScoped<IQuestionCategoryService, QuestionCategoryServiceImpl>();
+builder.Services.AddScoped<IQuestionPaperService, QuestionPaperServiceImpl>();
 
 // Global Inventory Management Services
 builder.Services.AddScoped<IStocktakeService, StocktakeServiceImpl>();
