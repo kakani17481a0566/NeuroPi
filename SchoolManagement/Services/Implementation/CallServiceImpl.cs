@@ -58,9 +58,11 @@ namespace SchoolManagement.Services.Implementation
                               DirectionTypeName = c.DirectionTypeName != null ? c.DirectionTypeName.Name : null,
                               CallStatusId = c.CallStatusId ?? 0,
                               DirectionTypeId = c.DirectionTypeId ?? 0,
-                              CreatedOn = c.CreatedOn,
-                              PermanentAddress = PermanentAddressVM.FromModel(c.Contact != null ? c.Contact.PermanentAddress : null)
-                          }).ToList();
+                               CreatedOn = c.CreatedOn,
+                               BenificiaryName = c.Contact != null ? c.Contact.Beneficiary : null,
+                               BeneficiaryRelationshipName = c.Contact != null ? c.Contact.BeneficiaryRelationshipName : null,
+                               PermanentAddress = PermanentAddressVM.FromModel(c.Contact != null ? c.Contact.PermanentAddress : null)
+                           }).ToList();
 
             if (result == null || result.Count == 0) return null;
 
@@ -100,9 +102,11 @@ namespace SchoolManagement.Services.Implementation
                               DirectionTypeName = c.DirectionTypeName != null ? c.DirectionTypeName.Name : null,
                               CallStatusId = c.CallStatusId ?? 0,
                               DirectionTypeId = c.DirectionTypeId ?? 0,
-                              CreatedOn = c.CreatedOn,
-                              PermanentAddress = PermanentAddressVM.FromModel(c.Contact != null ? c.Contact.PermanentAddress : null)
-                          }).ToList();
+                               CreatedOn = c.CreatedOn,
+                               BenificiaryName = c.Contact != null ? c.Contact.Beneficiary : null,
+                               BeneficiaryRelationshipName = c.Contact != null ? c.Contact.BeneficiaryRelationshipName : null,
+                               PermanentAddress = PermanentAddressVM.FromModel(c.Contact != null ? c.Contact.PermanentAddress : null)
+                           }).ToList();
 
             if (result == null || result.Count == 0) return null;
 
@@ -159,6 +163,8 @@ namespace SchoolManagement.Services.Implementation
                 TenantName = savedCall.Tenant?.Name,
                 CreatedByName = user != null ? user.FirstName + " " + user.LastName : null,
                 CreatedOn = savedCall.CreatedOn,
+                BenificiaryName = savedCall.Contact?.Beneficiary,
+                BeneficiaryRelationshipName = savedCall.Contact?.BeneficiaryRelationshipName,
                 PermanentAddress = PermanentAddressVM.FromModel(savedCall.Contact?.PermanentAddress)
             };
         }
@@ -304,6 +310,8 @@ namespace SchoolManagement.Services.Implementation
                     CallStatusId = call.CallStatusId ?? 0,
                     DirectionTypeId = call.DirectionTypeId ?? 0,
                     CreatedOn = call.CreatedOn,
+                    BenificiaryName = call.Contact?.Beneficiary,
+                    BeneficiaryRelationshipName = call.Contact?.BeneficiaryRelationshipName,
                     PermanentAddress = PermanentAddressVM.FromModel(call.Contact?.PermanentAddress)
                 });
             }
