@@ -26,9 +26,13 @@ namespace SchoolManagement.Model
         [Column("subcategory_name")]
         public string SubcategoryName { get; set; }
 
+        [Column("code")]
+        public string? Code { get; set; }
+
+        [Column("description")]
+        public string? Description { get; set; }
+
         [Column("is_active")]
         public bool IsActive { get; set; } = true;
-
-        public virtual ICollection<MQuestionBank> Questions { get; set; } = new List<MQuestionBank>();
     }
 }

@@ -27,7 +27,7 @@ namespace SchoolManagement.Model
         public int QuestionId { get; set; }
 
         [ForeignKey(nameof(QuestionId))]
-        public virtual MQuestionBank QuestionBank { get; set; }
+        public virtual MQuestion Question { get; set; }
 
         [Column("sq")]
         public int Sq { get; set; }

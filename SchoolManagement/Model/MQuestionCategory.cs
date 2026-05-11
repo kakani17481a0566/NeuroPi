@@ -11,19 +11,24 @@ namespace SchoolManagement.Model
         [Column("id")]
         public int Id { get; set; }
 
+        [Column("category_name")]
+        public string CategoryName { get; set; }
+
+        [Column("description")]
+        public string? Description { get; set; }
+
+        [Column("code")]
+        public string Code { get; set; }
+
+        [Column("is_active")]
+        public bool IsActive { get; set; } = true;
+
         [Column("tenant_id")]
         public int TenantId { get; set; }
 
         [ForeignKey(nameof(TenantId))]
         public virtual MTenant Tenant { get; set; }
 
-        [Column("category_name")]
-        public string CategoryName { get; set; }
-
-        [Column("is_active")]
-        public bool IsActive { get; set; } = true;
-
         public virtual ICollection<MQuestionCategorySubcategory> Subcategories { get; set; } = new List<MQuestionCategorySubcategory>();
-        public virtual ICollection<MQuestionBank> Questions { get; set; } = new List<MQuestionBank>();
     }
 }

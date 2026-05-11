@@ -180,7 +180,6 @@ namespace SchoolManagement.Data
         public DbSet<MQuestionPaper> QuestionPapers { get; set; }
         public DbSet<MQuestionCategory> QuestionCategories { get; set; }
         public DbSet<MQuestionCategorySubcategory> QuestionCategorySubcategories { get; set; }
-        public DbSet<MQuestionBank> QuestionBank { get; set; }
         public DbSet<MQuestionOption> QuestionOptions { get; set; }
         public DbSet<MQuestionPaperQuestion> QuestionPaperQuestions { get; set; }
         public DbSet<MQuestionResponse> QuestionResponses { get; set; }
