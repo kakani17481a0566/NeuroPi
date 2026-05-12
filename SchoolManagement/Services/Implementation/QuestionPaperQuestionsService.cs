@@ -4,7 +4,7 @@ using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.QuestionPaperQuestions;
 
-namespace SchoolManagement.Services
+namespace SchoolManagement.Services.Implementation
 {
     public class QuestionPaperQuestionsService : IQuestionPaperQuestionsService
     {
@@ -106,6 +106,7 @@ namespace SchoolManagement.Services
                 .Where(m => m.MasterTypeId == 68 && !m.IsDeleted)
                 .OrderBy(m => m.Id)
                 .Select(m => m.Name)
+                .Distinct()
                 .ToListAsync();
 
             var categories = await _context.QuestionCategories
