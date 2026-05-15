@@ -38,11 +38,11 @@ return "Some error occured";
         {
             int empIdInt = Convert.ToInt32(empid);
             var answers = context.QuestionAnswer
-                .Where(x => x.EmpId == empIdInt && x.TenantId == tenantId)
+                .Where(x => x.EmpId == empIdInt && x.TenantId == tenantId && !x.IsDeleted)
                 .ToList();
 
             var questions = context.Questions
-                .Where(q => q.TenantId == tenantId)
+                .Where(q => q.TenantId == tenantId && !q.IsDeleted && q.QCtg != null && !q.QCtg.IsDeleted)
                 .OrderBy(q => q.QOrderId)
                 .Select(q => new { q, QCtgName = q.QCtg.Name })
                 .ToList();
