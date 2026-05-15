@@ -19,8 +19,11 @@ namespace SchoolManagement.Model
         [Required]
         public string EmployeeCode { get; set; } = string.Empty;
 
-        [Column("q_ctg_id")]
-        public int? QCtgId { get; set; }
+        [Column("questionid")]
+        public int? QuestionId { get; set; }
+
+        [Column("questionctgid")]
+        public int? QuestionCtgId { get; set; }
 
         [Column("q_order_id")]
         public int? QOrderId { get; set; }
