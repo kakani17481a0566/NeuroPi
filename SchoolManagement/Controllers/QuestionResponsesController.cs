@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using SchoolManagement.Model;
 using SchoolManagement.Response;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.QuestionResponses;
@@ -15,6 +16,16 @@ namespace SchoolManagement.Controllers
         public QuestionResponsesController(IQuestionResponsesService service)
         {
             _service = service;
+        }
+
+        [HttpGet("employee/{employeeId:int}/tenant/{tenantId:int}")]
+        public ResponseResult<List<MVwEmployeeQuestionAnswers>> GetEmployeeQuestionAnswers(int employeeId, int tenantId)
+        {
+            var result = _service.GetEmployeeQuestionAnswers(employeeId, tenantId);
+            if (result == null || result.Count == 0)
+                return new ResponseResult<List<MVwEmployeeQuestionAnswers>>(HttpStatusCode.NotFound, null, "No question answers found for this employee.");
+
+            return new ResponseResult<List<MVwEmployeeQuestionAnswers>>(HttpStatusCode.OK, result, "Employee question answers fetched successfully.");
         }
 
         [HttpGet("tenant/{tenantId:int}")]

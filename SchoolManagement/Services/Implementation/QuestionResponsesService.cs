@@ -14,6 +14,13 @@ namespace SchoolManagement.Services.Implementation
             _context = context;
         }
 
+        public List<MVwEmployeeQuestionAnswers> GetEmployeeQuestionAnswers(int employeeId, int tenantId)
+        {
+            return _context.VwEmployeeQuestionAnswers
+                .Where(x => x.EmployeeId == employeeId && x.TenantId == tenantId)
+                .ToList();
+        }
+
         public List<QuestionResponsesListVM> GetAllByTenantId(int tenantId)
         {
             var data = _context.QuestionResponses

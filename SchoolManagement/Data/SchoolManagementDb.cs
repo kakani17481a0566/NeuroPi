@@ -193,6 +193,7 @@ namespace SchoolManagement.Data
         public DbSet<MCall> Call { get; set; }
         public DbSet<MCourses> SchoolCourses { get; set; }
         public DbSet<MCollegeCourse> CollegeCourses { get; set; }
+        public DbSet<MVwEmployeeQuestionAnswers> VwEmployeeQuestionAnswers { get; set; }
 
 
 
@@ -238,6 +239,10 @@ namespace SchoolManagement.Data
             modelBuilder.Entity<MVTermTable>()
                 .HasNoKey()
                 .ToView("v_term_table");
+
+            modelBuilder.Entity<MVwEmployeeQuestionAnswers>()
+                .HasNoKey()
+                .ToView("vw_employee_question_answers");
 
 
             modelBuilder.Entity<MItemsGroup>()
