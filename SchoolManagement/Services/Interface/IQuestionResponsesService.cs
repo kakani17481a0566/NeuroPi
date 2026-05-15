@@ -6,6 +6,7 @@ namespace SchoolManagement.Services.Interface
     {
         List<QuestionResponsesListVM> GetAllByTenantId(int tenantId);
         QuestionResponsesGetVM GetByIdAndTenantId(int id, int tenantId);
+        List<QuestionResponsesListVM> GetByCandidate(int candidateId, int tenantId);
         QuestionResponsesGetVM Create(QuestionResponsesCreateVM request);
         List<QuestionResponsesGetVM> CreateBatch(QuestionResponsesBatchRequestVM request);
         QuestionResponsesGetVM Update(int id, int tenantId, QuestionResponsesUpdateVM request);

@@ -3,7 +3,7 @@ using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.QuestionResponses;
 
-namespace SchoolManagement.Services
+namespace SchoolManagement.Services.Implementation
 {
     public class QuestionResponsesService : IQuestionResponsesService
     {
@@ -29,6 +29,15 @@ namespace SchoolManagement.Services
                 .FirstOrDefault(r => r.Id == id && r.TenantId == tenantId && !r.IsDeleted);
 
             return QuestionResponsesGetVM.ToViewModel(response);
+        }
+
+        public List<QuestionResponsesListVM> GetByCandidate(int candidateId, int tenantId)
+        {
+            var data = _context.QuestionResponses
+                .Where(r => r.CandidateId == candidateId && r.TenantId == tenantId && !r.IsDeleted)
+                .ToList();
+
+            return QuestionResponsesListVM.ToViewModelList(data);
         }
 
         public QuestionResponsesGetVM Create(QuestionResponsesCreateVM request)

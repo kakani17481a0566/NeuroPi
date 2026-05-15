@@ -27,6 +27,16 @@ namespace SchoolManagement.Controllers
             return new ResponseResult<List<QuestionResponsesListVM>>(HttpStatusCode.OK, result, "Question responses fetched successfully.");
         }
 
+        [HttpGet("candidate/{candidateId:int}/tenant/{tenantId:int}")]
+        public ResponseResult<List<QuestionResponsesListVM>> GetByCandidate(int candidateId, int tenantId)
+        {
+            var result = _service.GetByCandidate(candidateId, tenantId);
+            if (result == null || result.Count == 0)
+                return new ResponseResult<List<QuestionResponsesListVM>>(HttpStatusCode.NotFound, null, "No responses found for this candidate.");
+
+            return new ResponseResult<List<QuestionResponsesListVM>>(HttpStatusCode.OK, result, "Candidate responses fetched successfully.");
+        }
+
         [HttpGet("{id:int}/{tenantId:int}")]
         public ResponseResult<QuestionResponsesGetVM> GetById(int id, int tenantId)
         {

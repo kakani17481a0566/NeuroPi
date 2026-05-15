@@ -11,7 +11,6 @@ using NeuroPi.UserManagment.Services.Interface;
 using NeuropiCommonLib.Email;
 using SchoolManagement.Data;
 using SchoolManagement.Services.Implementation;
-using SchoolManagement.Services;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.Audio;
 using System.Text;

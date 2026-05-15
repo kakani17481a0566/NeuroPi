@@ -39,27 +39,35 @@ return "Some error occured";
             int empIdInt = Convert.ToInt32(empid);
             var answers = context.QuestionAnswer
                 .Where(x => x.EmpId == empIdInt && x.TenantId == tenantId)
-                .Select(answer => new
-                {
-                    Answer = answer,
-                    Question = answer.Question
-                })
                 .ToList();
-            List<QuestionAnswerVM> result = new List<QuestionAnswerVM>();
-            foreach(var item in answers)
+
+            var questions = context.Questions
+                .Where(q => q.TenantId == tenantId)
+                .OrderBy(q => q.QOrderId)
+                .Select(q => new { q, QCtgName = q.QCtg.Name })
+                .ToList();
+
+            var result = new List<QuestionAnswerVM>();
+            foreach (var item in questions)
             {
-                QuestionAnswerVM vm = new QuestionAnswerVM();
-                vm.empId = (int)item.Answer.EmpId;
-                vm.tenantId = (int)item.Answer.TenantId;
-                vm.createdBy = (int)item.Answer.CreatedBy;
-                List<AnswerVM> answerList = new List<AnswerVM>();
-                AnswerVM ans = new AnswerVM();
-                ans.QuestionId = (int)item.Answer.QuestionsId;
-                ans.QOrderId = item.Question?.QOrderId;
-                ans.Qus = item.Question?.Qus;
-                ans.Answer = item.Answer.Answer;
-                answerList.Add(ans);
-                vm.AnswerVM = answerList;
+                var question = item.q;
+                var answer = answers.FirstOrDefault(a => a.QuestionsId == question.Id);
+                var vm = new QuestionAnswerVM();
+                vm.empId = empIdInt;
+                vm.tenantId = tenantId;
+                vm.createdBy = answer?.CreatedBy ?? 0;
+                vm.AnswerVM = new List<AnswerVM>
+                {
+                    new AnswerVM
+                    {
+                        QuestionId = question.Id,
+                        QOrderId = question.QOrderId,
+                        Qus = question.Qus,
+                        QCtgName = item.QCtgName,
+                        Answer = answer?.Answer,
+                        IsAnswered = answer != null
+                    }
+                };
                 result.Add(vm);
             }
             return result;
