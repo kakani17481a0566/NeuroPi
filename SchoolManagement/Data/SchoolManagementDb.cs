@@ -194,6 +194,7 @@ namespace SchoolManagement.Data
         public DbSet<MCourses> SchoolCourses { get; set; }
         public DbSet<MCollegeCourse> CollegeCourses { get; set; }
         public DbSet<MVwEmployeeQuestionAnswers> VwEmployeeQuestionAnswers { get; set; }
+        public DbSet<MVwEmployeeProgress> VwEmployeeProgress { get; set; }
 
         // Study Plan
         public DbSet<MStudyPlan> StudyPlans { get; set; }
@@ -248,6 +249,10 @@ namespace SchoolManagement.Data
             modelBuilder.Entity<MVwEmployeeQuestionAnswers>()
                 .HasNoKey()
                 .ToView("vw_employee_question_answers");
+
+            modelBuilder.Entity<MVwEmployeeProgress>()
+                .HasNoKey()
+                .ToView("vw_employee_progress");
 
 
             modelBuilder.Entity<MItemsGroup>()

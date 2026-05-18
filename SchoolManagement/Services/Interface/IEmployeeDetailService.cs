@@ -1,4 +1,5 @@
 ﻿using SchoolManagement.ViewModel.EmployeeDetails;
+using SchoolManagement.ViewModel.EmployeeProgress;
 
 namespace SchoolManagement.Services.Interface
 {
@@ -8,5 +9,6 @@ namespace SchoolManagement.Services.Interface
         EmployeeDetailsVM CreateEmployeeDetail(EmployeeDetailRequestVM request);
         EmployeeDetailsVM UpdateEmployeeDetail(int id, int tenantId, EmployeeDetailUpdateVM request);
         EmployeeDetailsVM DeleteEmployeeDetail(int id, int tenantId);
+        EmployeeProgressVm? GetEmployeeProgress(int id, int tenantId);
     }
 }

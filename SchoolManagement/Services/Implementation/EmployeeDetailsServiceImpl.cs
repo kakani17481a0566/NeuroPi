@@ -1,8 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using NeuroPi.UserManagment.Model;
 using SchoolManagement.Data;
+using SchoolManagement.Model;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.EmployeeDetails;
+using SchoolManagement.ViewModel.EmployeeProgress;
 
 namespace SchoolManagement.Services.Implementation
 {
@@ -193,6 +195,16 @@ namespace SchoolManagement.Services.Implementation
                 PermanentAddressId = updatedDetail.PermanentAddressId,
                 PermanentAddress = updatedDetail.PermanentAddress
             };
+        }
+
+        public EmployeeProgressVm? GetEmployeeProgress(int id, int tenantId)
+        {
+            var row = context.Set<MVwEmployeeProgress>()
+                .FirstOrDefault(x => x.Id == id && x.TenantId == tenantId);
+
+            if (row == null) return null;
+
+            return EmployeeProgressVm.FromModel(row);
         }
 
         public EmployeeDetailsVM DeleteEmployeeDetail(int id, int tenantId)

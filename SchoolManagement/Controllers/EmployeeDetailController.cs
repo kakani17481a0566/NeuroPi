@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using NeuroPi.CommonLib.Model;
 using SchoolManagement.Services.Interface;
 using SchoolManagement.ViewModel.EmployeeDetails;
+using SchoolManagement.ViewModel.EmployeeProgress;
 using System.Net;
 
 namespace SchoolManagement.Controllers
@@ -51,6 +52,15 @@ namespace SchoolManagement.Controllers
             if (result != null)
                 return new ResponseResult<EmployeeDetailsVM>(HttpStatusCode.OK, result, "Employee Detail deleted successfully");
             return new ResponseResult<EmployeeDetailsVM>(HttpStatusCode.NotFound, result, "Employee Detail not found.");
+        }
+
+        [HttpGet("employee-progress/{id}/tenant/{tenantId}")]
+        public ResponseResult<EmployeeProgressVm> GetEmployeeProgress(int id, int tenantId)
+        {
+            var result = employeeDetailService.GetEmployeeProgress(id, tenantId);
+            if (result == null)
+                return new ResponseResult<EmployeeProgressVm>(HttpStatusCode.NotFound, null, "Employee progress not found");
+            return new ResponseResult<EmployeeProgressVm>(HttpStatusCode.OK, result, "Employee progress fetched successfully");
         }
     }
 }
