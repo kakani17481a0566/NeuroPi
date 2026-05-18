@@ -179,6 +179,13 @@ builder.Services.AddScoped<ICoursesService, CoursesServiceImpl>();
 builder.Services.AddScoped<ICollegeCourseService, CollegeCourseServiceImpl>();
 builder.Services.AddScoped<ICandidateCollegeService, CandidateCollegeServiceImpl>();
 
+// Study Plan Services
+builder.Services.AddScoped<IStudyPlanService, StudyPlanServiceImpl>();
+builder.Services.AddScoped<IStudyPlanStepsService, StudyPlanStepsServiceImpl>();
+builder.Services.AddScoped<IStudyCoursesService, StudyCoursesServiceImpl>();
+builder.Services.AddScoped<IStudyCoursesMapService, StudyCoursesMapServiceImpl>();
+builder.Services.AddScoped<IEmployeeStudyPlanService, EmployeeStudyPlanServiceImpl>();
+
 
 
 

@@ -195,7 +195,12 @@ namespace SchoolManagement.Data
         public DbSet<MCollegeCourse> CollegeCourses { get; set; }
         public DbSet<MVwEmployeeQuestionAnswers> VwEmployeeQuestionAnswers { get; set; }
 
-
+        // Study Plan
+        public DbSet<MStudyPlan> StudyPlans { get; set; }
+        public DbSet<MStudyPlanSteps> StudyPlanSteps { get; set; }
+        public DbSet<MStudyCourses> StudyCourses { get; set; }
+        public DbSet<MStudyCoursesMap> StudyCoursesMaps { get; set; }
+        public DbSet<MEmployeeStudyPlan> EmployeeStudyPlans { get; set; }
 
 
 
