@@ -127,6 +127,7 @@ namespace SchoolManagement.Services.Implementation
                 {
                     var subQuestions = questions
                         .Where(q => q.CategoryId == category.Id && q.SubcategoryId == sub.Id)
+                        .Take(3)
                         .Select(q =>
                         {
                             var isLikert = likertTypeIds.Contains(q.QuestionTypeId);
