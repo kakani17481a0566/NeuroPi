@@ -1,0 +1,94 @@
+# =============================================================================
+# Old App Services — Azure App Service CI/CD Pipeline
+# Target Subscription: Old App (57dd642a-03dd-4fd6-8b3a-9198f75e0ba3)
+# Target Resource Group: Old-App
+# Services:
+#   - old-np-user-api       (NeuroPi.UserManagment)
+#   - old-np-school-api     (SchoolManagement)
+#   - old-np-nutrition-api  (NeuroPi.Nutrition)
+#   - old-np-forms-api      (NeuropiForms)
+# Runtime: .NET 8 | Linux App Service Plan (B1) | Central India
+# =============================================================================
+
+name: Deploy Old App Services to Azure
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'NeuroPi/**'
+      - 'SchoolManagement/**'
+      - 'NeuroPi.Nutrition/**'
+      - 'NeuropiForms/**'
+      - 'NeuropiCommonLib/**'
+      - 'CommonLib/**'
+      - '.github/workflows/deploy_old_app_services.yml'
+  workflow_dispatch:
+
+env:
+  AZURE_RESOURCE_GROUP: Old-App
+  AZURE_SUBSCRIPTION_ID: "57dd642a-03dd-4fd6-8b3a-9198f75e0ba3"
+  DOTNET_VERSION: '8.0.x'
+
+jobs:
+  # ===========================================================================
+  # BUILD & DEPLOY MATRIX (Runs all 4 services)
+  # ===========================================================================
+  build-and-deploy:
+    name: Build & Deploy — ${{ matrix.service.name }}
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          - name: old-np-user-api
+            project: NeuroPi/NeuroPi.UserManagment.csproj
+            artifact: old-np-user-api-artifact
+
+          - name: old-np-school-api
+            project: SchoolManagement/SchoolManagement.csproj
+            artifact: old-np-school-api-artifact
+
+          - name: old-np-nutrition-api
+            project: NeuroPi.Nutrition/NeuroPi.Nutrition.csproj
+            artifact: old-np-nutrition-api-artifact
+
+          - name: old-np-forms-api
+            project: NeuropiForms/NeuropiForms.csproj
+            artifact: old-np-forms-api-artifact
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: dotnet restore ${{ matrix.service.project }}
+
+      - name: Build project
+        run: dotnet build ${{ matrix.service.project }} --configuration Release --no-restore
+
+      - name: Publish project
+        run: dotnet publish ${{ matrix.service.project }} --configuration Release --no-build --output ./publish/${{ matrix.service.name }}
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ matrix.service.name }}
+          package: ./publish/${{ matrix.service.name }}
+
